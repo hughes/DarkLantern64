@@ -1,0 +1,440 @@
+{
+  "date": "2026-09-05",
+  "status": "passed",
+  "automated": {
+    "python_tests": 70,
+    "gameplay_regression_groups": 23,
+    "scale_cases": 30,
+    "host_mission": "passed",
+    "profiler": "passed",
+    "render_visibility": "passed"
+  },
+  "editor": {
+    "source": "C:\\Users\\hughe\\dev\\DarkLantern64\\content\\enemy_patrols.json",
+    "checks": [
+      "Duplicated enemy owns translated, independent patrol waypoints",
+      "Three independently mapped models cook from authored content",
+      "Code-defined Scout defaults and per-instance sentry behavior survive save",
+      "Unsafe deletion, duplicate IDs and unknown types reject without corrupting content",
+      "New enemy viewport transform round-trips into the saved level"
+    ],
+    "capture": {
+      "path": "C:\\Users\\hughe\\dev\\DarkLantern64\\.dev/editor\\scenes\\enemy_patrols\\captures\\e68dfefa43b04a8386dd6f2cd062feee.png",
+      "type": "LightEngine viewport"
+    },
+    "source_sha256": "c2736e29bd778e1f880c606079f33f8599462bdcc8b313c9587aa93976feaeab",
+    "source_file_sha256": "7b046e91cc7af5a6a34889390c1dad418a6b8389b5a911093b62fd05a2a9ed37",
+    "counts": {
+      "colliders": 14,
+      "enemies": 3,
+      "entities": 30,
+      "instanced_triangles": 792,
+      "instanced_vertices": 522,
+      "lights": 2,
+      "meshes": 4,
+      "models": 22,
+      "patrol_points": 7
+    },
+    "passed": true
+  },
+  "runtime": {
+    "name": "enemy-patrols",
+    "passed": true,
+    "log": ".dev\\ares\\runs\\e10f5cc7eef14923b77e3f9967b6fde9\\enemy-patrols.log",
+    "tested_rom": ".dev\\ares\\runs\\e10f5cc7eef14923b77e3f9967b6fde9\\DarkLantern64-enemy_patrols.z64",
+    "rom_sha256": "b0f3f9c314f67e2a7fe017b58900a06ad027daefe1ce912c0f94550d6238c4fa",
+    "rom_bytes": 294912,
+    "settings": ".dev\\ares\\runs\\e10f5cc7eef14923b77e3f9967b6fde9\\settings.bml",
+    "settings_source_sha256": "4b013206c69c12be9e0fdbd91b389e6c40b87816bb40835c6daadb713b18ce80",
+    "profile_report": null,
+    "elapsed_seconds": 9.828,
+    "peak_sampled_heap_bytes": 614056,
+    "max_reported_cpu_ms": 20.58,
+    "boot": "DL64 boot_ok memory=8388608 scene=\"Enemy Patrol Workshop\" meshes=4 models=22 colliders=14 version=2 world=3d renderer=xyz-mesh-rdpq depth=hardware",
+    "terminal_event": "DL64 profile_end window=6",
+    "enemy_samples": {
+      "store-guard": [
+        {
+          "index": 0,
+          "position": [
+            3.01,
+            0.0,
+            -4.0
+          ],
+          "state": "PATROL",
+          "patrol_index": 1,
+          "sees": 0,
+          "hears": 0,
+          "awareness": 0.0
+        },
+        {
+          "index": 0,
+          "position": [
+            3.81,
+            0.0,
+            -3.77
+          ],
+          "state": "PATROL",
+          "patrol_index": 1,
+          "sees": 0,
+          "hears": 0,
+          "awareness": 0.0
+        },
+        {
+          "index": 0,
+          "position": [
+            4.63,
+            0.0,
+            -3.53
+          ],
+          "state": "PATROL",
+          "patrol_index": 1,
+          "sees": 0,
+          "hears": 0,
+          "awareness": 0.0
+        },
+        {
+          "index": 0,
+          "position": [
+            5.45,
+            0.0,
+            -3.3
+          ],
+          "state": "PATROL",
+          "patrol_index": 1,
+          "sees": 0,
+          "hears": 0,
+          "awareness": 0.0
+        },
+        {
+          "index": 0,
+          "position": [
+            6.27,
+            0.0,
+            -3.07
+          ],
+          "state": "PATROL",
+          "patrol_index": 1,
+          "sees": 0,
+          "hears": 0,
+          "awareness": 0.0
+        },
+        {
+          "index": 0,
+          "position": [
+            6.41,
+            0.0,
+            -2.3
+          ],
+          "state": "PATROL",
+          "patrol_index": 2,
+          "sees": 0,
+          "hears": 0,
+          "awareness": 0.0
+        },
+        {
+          "index": 0,
+          "position": [
+            6.43,
+            0.0,
+            -1.45
+          ],
+          "state": "PATROL",
+          "patrol_index": 2,
+          "sees": 0,
+          "hears": 0,
+          "awareness": 0.0
+        }
+      ],
+      "workroom-scout": [
+        {
+          "index": 1,
+          "position": [
+            -7.0,
+            0.0,
+            -3.52
+          ],
+          "state": "PATROL",
+          "patrol_index": 0,
+          "sees": 0,
+          "hears": 0,
+          "awareness": 0.0
+        },
+        {
+          "index": 1,
+          "position": [
+            -6.42,
+            0.0,
+            -4.29
+          ],
+          "state": "PATROL",
+          "patrol_index": 1,
+          "sees": 0,
+          "hears": 0,
+          "awareness": 0.0
+        },
+        {
+          "index": 1,
+          "position": [
+            -5.52,
+            0.0,
+            -4.93
+          ],
+          "state": "PATROL",
+          "patrol_index": 1,
+          "sees": 0,
+          "hears": 0,
+          "awareness": 0.0
+        },
+        {
+          "index": 1,
+          "position": [
+            -4.62,
+            0.0,
+            -5.56
+          ],
+          "state": "PATROL",
+          "patrol_index": 1,
+          "sees": 0,
+          "hears": 0,
+          "awareness": 0.0
+        },
+        {
+          "index": 1,
+          "position": [
+            -3.97,
+            0.0,
+            -5.49
+          ],
+          "state": "PATROL",
+          "patrol_index": 2,
+          "sees": 0,
+          "hears": 0,
+          "awareness": 0.0
+        },
+        {
+          "index": 1,
+          "position": [
+            -3.68,
+            0.0,
+            -4.43
+          ],
+          "state": "PATROL",
+          "patrol_index": 2,
+          "sees": 0,
+          "hears": 0,
+          "awareness": 0.0
+        },
+        {
+          "index": 1,
+          "position": [
+            -3.38,
+            0.0,
+            -3.37
+          ],
+          "state": "PATROL",
+          "patrol_index": 2,
+          "sees": 0,
+          "hears": 0,
+          "awareness": 0.0
+        }
+      ],
+      "store-sentry": [
+        {
+          "index": 2,
+          "position": [
+            7.5,
+            0.0,
+            5.0
+          ],
+          "state": "PATROL",
+          "patrol_index": 0,
+          "sees": 0,
+          "hears": 0,
+          "awareness": 0.0
+        },
+        {
+          "index": 2,
+          "position": [
+            7.5,
+            0.0,
+            5.0
+          ],
+          "state": "PATROL",
+          "patrol_index": 0,
+          "sees": 0,
+          "hears": 0,
+          "awareness": 0.0
+        },
+        {
+          "index": 2,
+          "position": [
+            7.5,
+            0.0,
+            5.0
+          ],
+          "state": "PATROL",
+          "patrol_index": 0,
+          "sees": 0,
+          "hears": 0,
+          "awareness": 0.0
+        },
+        {
+          "index": 2,
+          "position": [
+            7.5,
+            0.0,
+            5.0
+          ],
+          "state": "PATROL",
+          "patrol_index": 0,
+          "sees": 0,
+          "hears": 0,
+          "awareness": 0.0
+        },
+        {
+          "index": 2,
+          "position": [
+            7.5,
+            0.0,
+            5.0
+          ],
+          "state": "PATROL",
+          "patrol_index": 0,
+          "sees": 0,
+          "hears": 0,
+          "awareness": 0.0
+        },
+        {
+          "index": 2,
+          "position": [
+            7.5,
+            0.0,
+            5.0
+          ],
+          "state": "PATROL",
+          "patrol_index": 0,
+          "sees": 0,
+          "hears": 0,
+          "awareness": 0.0
+        },
+        {
+          "index": 2,
+          "position": [
+            7.5,
+            0.0,
+            5.0
+          ],
+          "state": "PATROL",
+          "patrol_index": 0,
+          "sees": 0,
+          "hears": 0,
+          "awareness": 0.0
+        }
+      ]
+    },
+    "source_file_sha256": "7b046e91cc7af5a6a34889390c1dad418a6b8389b5a911093b62fd05a2a9ed37",
+    "checks": [
+      "Both patrol enemies move and advance their own route index",
+      "Undisturbed sentry holds its post",
+      "Three distinct stable enemy indices",
+      "Ordinary ROM runs without capture freezing or gameplay input"
+    ],
+    "limitations": "Short example-level behavior check; no crowded chase, navigation or hardware performance certification"
+  },
+  "captures": {
+    "name": "capture-enemy_patrols",
+    "passed": true,
+    "log": ".dev\\ares\\runs\\5f773568aa7e4a38bf21f2c7c04ae478\\capture-enemy_patrols.log",
+    "tested_rom": ".dev\\ares\\runs\\5f773568aa7e4a38bf21f2c7c04ae478\\DarkLantern64-enemy_patrols-capture.z64",
+    "rom_sha256": "0563b88872393dc99ac1621979c496754a5937f3d91099834e6412bff91dc089",
+    "rom_bytes": 294912,
+    "settings": ".dev\\ares\\runs\\5f773568aa7e4a38bf21f2c7c04ae478\\settings.bml",
+    "settings_source_sha256": "4b013206c69c12be9e0fdbd91b389e6c40b87816bb40835c6daadb713b18ce80",
+    "profile_report": null,
+    "elapsed_seconds": 8.156,
+    "peak_sampled_heap_bytes": 614056,
+    "max_reported_cpu_ms": 30.56,
+    "boot": "DL64 boot_ok memory=8388608 scene=\"Enemy Patrol Workshop\" meshes=4 models=22 colliders=14 version=2 world=3d renderer=xyz-mesh-rdpq depth=hardware",
+    "terminal_event": "DL64 capture_complete views=2",
+    "captures": [
+      {
+        "view": {
+          "id": "workroom-scout",
+          "pitch": -4,
+          "position": [
+            -6,
+            0,
+            2.7
+          ],
+          "yaw": 180
+        },
+        "image": "C:\\Users\\hughe\\dev\\DarkLantern64\\.dev\\ares\\runs\\5f773568aa7e4a38bf21f2c7c04ae478\\workroom-scout.png",
+        "sha256": "7e306c0fb3de7fe25d42d27952d31787f7043e9a0995d2fea342017aec4492ca"
+      },
+      {
+        "view": {
+          "id": "store-watch",
+          "pitch": -2,
+          "position": [
+            4.5,
+            0,
+            -6.5
+          ],
+          "yaw": 12
+        },
+        "image": "C:\\Users\\hughe\\dev\\DarkLantern64\\.dev\\ares\\runs\\5f773568aa7e4a38bf21f2c7c04ae478\\store-watch.png",
+        "sha256": "c8bfc6c26f6932dbcfab34ffd908911c05831197d51749043e6102790123681d"
+      }
+    ],
+    "measurement": "Raw RDP framebuffer before VI filtering; capture timings are diagnostic only"
+  },
+  "original_mission": {
+    "platform": "Ares emulator",
+    "status": "complete",
+    "passed": true,
+    "started_at_utc": "2026-09-06T00:40:22Z",
+    "results": [
+      {
+        "name": "smoke-4mb",
+        "passed": true,
+        "log": ".dev\\ares\\runs\\381197353d814c7ca3a424d6d1465e71\\smoke-4mb.log",
+        "tested_rom": ".dev\\ares\\runs\\381197353d814c7ca3a424d6d1465e71\\DarkLantern64.z64",
+        "rom_sha256": "16557f57e87fe2868f3904981f134c202a4852552223936a9e65d3ff53f67da7",
+        "rom_bytes": 294912,
+        "settings": ".dev\\ares\\runs\\381197353d814c7ca3a424d6d1465e71\\settings.bml",
+        "settings_source_sha256": "4b013206c69c12be9e0fdbd91b389e6c40b87816bb40835c6daadb713b18ce80",
+        "profile_report": null,
+        "elapsed_seconds": 4.281,
+        "peak_sampled_heap_bytes": null,
+        "max_reported_cpu_ms": null,
+        "boot": null,
+        "terminal_event": "DL64 boot_failed reason=expansion_pak memory=4194304 required=8388608"
+      },
+      {
+        "name": "smoke-8mb",
+        "passed": true,
+        "log": ".dev\\ares\\runs\\595e7ae286d945279377113481a736cd\\smoke-8mb.log",
+        "tested_rom": ".dev\\ares\\runs\\595e7ae286d945279377113481a736cd\\DarkLantern64-autoplay.z64",
+        "rom_sha256": "35bdc11dcbaaad6bae96bd2f4eaafe69fd094bb5d6f250dbfc0ab722eac2efbc",
+        "rom_bytes": 294912,
+        "settings": ".dev\\ares\\runs\\595e7ae286d945279377113481a736cd\\settings.bml",
+        "settings_source_sha256": "4b013206c69c12be9e0fdbd91b389e6c40b87816bb40835c6daadb713b18ce80",
+        "profile_report": ".dev\\ares\\runs\\595e7ae286d945279377113481a736cd\\profile.json",
+        "elapsed_seconds": 35.39,
+        "peak_sampled_heap_bytes": 614048,
+        "max_reported_cpu_ms": 31.65,
+        "boot": "DL64 boot_ok memory=8388608 scene=\"DarkLantern64 - The Lantern Store\" meshes=4 models=20 colliders=14 version=2 world=3d renderer=xyz-mesh-rdpq depth=hardware",
+        "terminal_event": "DL64 profile_replay_done complete=1 caught=0"
+      }
+    ],
+    "debug_overlay": false,
+    "hardware_validation": "Original N64 and M64 pending",
+    "source_sha256": "e189b62e6efe3af58b5ec74ff91aa33aea3584fd22e9f1dcaa6031f3afe65fd2"
+  },
+  "limits": [
+    "Ares only; original N64 and M64 pending",
+    "16 enemies is an authoring cap, not a frame-rate guarantee",
+    "Direct waypoint navigation without detours or crowd avoidance"
+  ]
+}

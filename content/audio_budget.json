@@ -1,0 +1,111 @@
+{
+  "schema_version": 1,
+  "status": "planning_only",
+  "description": "ILLUSTRATIVE AUDIO PLANNING ONLY. These invented asset durations and encounter contexts are not cooked waveforms, current level state, measured allocations, or an accepted audio budget.",
+  "output": {
+    "sample_rate_hz": 32000,
+    "buffer_frames": 1280,
+    "buffer_count": 3,
+    "padding_bytes": 8,
+    "note": "Proposed 16-bit stereo output: nominal 40 ms blocks. Rate and frames are independent planning inputs; actual AI divider and queued latency require measurement. Eight padding bytes mirror the checked driver request, before 16-byte allocation rounding."
+  },
+  "budget": {
+    "ram_bytes": 262144,
+    "status": "illustrative",
+    "note": "Editable 256 KiB thought experiment only; the user has not accepted this envelope and it does not imply remaining whole-machine memory is free."
+  },
+  "buffer_pool": {
+    "decoded_bytes": 98304,
+    "decoder_workspace_bytes": 8192,
+    "channel_capacity": 16,
+    "retention": "persistent",
+    "note": "Manual persistent provisioning, including idle/warmed allocations. Not a claim that libdragon allocates this exact pool. Compare the largest scenario requirements, then verify per-slot high-water sizes and allocator behavior on target."
+  },
+  "allowances": {
+    "runtime_bytes": 16384,
+    "allocator_bytes": 4096,
+    "unmeasured_bytes": 32768,
+    "reserve_bytes": 16384,
+    "unmeasured_items": [
+      "Exact linked audio code, stacks, static mixer state, file handles and pointer tables",
+      "Actual codec working state, lookahead, retained sample overlap and slot allocation high-water marks",
+      "Custom room effect implementation and final delay/scratch requirements",
+      "Allocator metadata, fragmentation and target-rate-dependent buffer changes",
+      "Audio share of RSPQ buffers already shared with graphics must be reconciled in the whole-machine ledger"
+    ],
+    "note": "All allowances are manual placeholders, not measured sizes. Shared graphics/RSPQ storage must be assigned once in the whole-machine budget. Unknown allowance and reserve remain separate from enumerated allocations."
+  },
+  "assets": [
+    {
+      "id": "step-stone", "label": "Example stone footstep bank", "codec": "vadpcm",
+      "sample_rate_hz": 22050, "sample_frames": 33075, "channels": 1, "bits_per_sample": 16,
+      "encoded_payload_bytes": null, "container_bytes": 224, "residency": "encoded",
+      "resident_padding_bytes": 0, "shared_state_bytes": 256, "decoder_workspace_bytes": 256,
+      "decode_block_frames": 32,
+      "note": "Invented 1.5-second bank; no recordings exist. Container/shared/decoder sizes are manual conservative placeholders, not a measured WAV64 layout."
+    },
+    {
+      "id": "step-wood", "label": "Example wooden footstep bank", "codec": "vadpcm",
+      "sample_rate_hz": 22050, "sample_frames": 33075, "channels": 1, "bits_per_sample": 16,
+      "encoded_payload_bytes": null, "container_bytes": 224, "residency": "encoded",
+      "resident_padding_bytes": 0, "shared_state_bytes": 256, "decoder_workspace_bytes": 256,
+      "decode_block_frames": 32,
+      "note": "Invented alternate material bank retained during the example doorway transition."
+    },
+    {
+      "id": "guard-voice", "label": "Example dry guard utterance", "codec": "vadpcm",
+      "sample_rate_hz": 32000, "sample_frames": 128000, "channels": 1, "bits_per_sample": 16,
+      "encoded_payload_bytes": null, "container_bytes": 224, "residency": "stream",
+      "resident_padding_bytes": 0, "shared_state_bytes": 256, "decoder_workspace_bytes": 512,
+      "decode_block_frames": 32,
+      "note": "Invented four-second line. Distinct simultaneous speakers share encoded catalogue data but need independent playback windows/state."
+    },
+    {
+      "id": "guard-muffled", "label": "Example muffled guard variant", "codec": "vadpcm",
+      "sample_rate_hz": 32000, "sample_frames": 128000, "channels": 1, "bits_per_sample": 16,
+      "encoded_payload_bytes": null, "container_bytes": 224, "residency": "stream",
+      "resident_padding_bytes": 0, "shared_state_bytes": 256, "decoder_workspace_bytes": 512,
+      "decode_block_frames": 32,
+      "note": "Hypothetical synchronized variant for crossfade accounting only; synchronization/seeking still needs implementation."
+    },
+    {
+      "id": "ambience", "label": "Example stereo ambient bed", "codec": "vadpcm",
+      "sample_rate_hz": 32000, "sample_frames": 960000, "channels": 2, "bits_per_sample": 16,
+      "encoded_payload_bytes": null, "container_bytes": 352, "residency": "stream",
+      "resident_padding_bytes": 0, "shared_state_bytes": 384, "decoder_workspace_bytes": 512,
+      "decode_block_frames": 32,
+      "note": "Invented 30-second stereo loop; two mixer slots, one interleaved per-playback window."
+    },
+    {
+      "id": "interaction", "label": "Example resident interaction cue", "codec": "pcm",
+      "sample_rate_hz": 32000, "sample_frames": 8000, "channels": 1, "bits_per_sample": 16,
+      "encoded_payload_bytes": null, "container_bytes": 24, "residency": "decoded",
+      "resident_padding_bytes": 64, "shared_state_bytes": 128, "decoder_workspace_bytes": 0,
+      "decode_block_frames": 1,
+      "note": "Invented quarter-second PCM cue. Resident source data does not remove the SDK's per-playback mixer buffer."
+    }
+  ],
+  "voices": [
+    {"id": "player-step", "label": "Player stone steps", "asset": "step-stone", "window_ms": 125, "max_playback_rate_hz": 32000, "buffer_bits": 16, "padding_bytes": 64, "note": "Explicit planning window and playback cap; allocation is not inferred from the 22050 Hz source alone."},
+    {"id": "guard-step", "label": "Guard stone steps", "asset": "step-stone", "window_ms": 125, "max_playback_rate_hz": 32000, "buffer_bits": 16, "padding_bytes": 64, "note": "Independent playback of the same asset; count another decoded window."},
+    {"id": "wood-step", "label": "Player wood steps", "asset": "step-wood", "window_ms": 125, "max_playback_rate_hz": 32000, "buffer_bits": 16, "padding_bytes": 64, "note": "Material transition can overlap a previous stone step."},
+    {"id": "guard-dry", "label": "Nearby dry guard line", "asset": "guard-voice", "window_ms": 125, "max_playback_rate_hz": 32000, "buffer_bits": 16, "padding_bytes": 64, "note": "Same voice ID across contexts means continuous playback, deduplicated in transitions."},
+    {"id": "guard-wet", "label": "Muffled variant during crossfade", "asset": "guard-muffled", "window_ms": 125, "max_playback_rate_hz": 32000, "buffer_bits": 16, "padding_bytes": 64, "note": "Additional variant voice; not one free filter parameter."},
+    {"id": "guard-second", "label": "Second guard using same dry bank", "asset": "guard-voice", "window_ms": 125, "max_playback_rate_hz": 32000, "buffer_bits": 16, "padding_bytes": 64, "note": "Distinct simultaneous playback; no window deduplication by asset."},
+    {"id": "ambient-bed", "label": "Continuous stereo ambience", "asset": "ambience", "window_ms": 125, "max_playback_rate_hz": 32000, "buffer_bits": 16, "padding_bytes": 64, "note": "Two channels with one interleaved decoded window."},
+    {"id": "door-click", "label": "Door interaction cue", "asset": "interaction", "window_ms": 125, "max_playback_rate_hz": 32000, "buffer_bits": 16, "padding_bytes": 64, "note": "Resident PCM still has a mixer playback window."}
+  ],
+  "effects": [
+    {"id": "hall-tail", "label": "Proposed hall response", "sample_rate_hz": 32000, "delay_ms": 300, "channels": 1, "sample_bytes": 2, "state_bytes": 256, "scratch_bytes": 2048, "note": "One hypothetical shared mono delay line; reverb implementation and its exact state are unknown."},
+    {"id": "courtyard-tail", "label": "Proposed courtyard response", "sample_rate_hz": 32000, "delay_ms": 100, "channels": 1, "sample_bytes": 2, "state_bytes": 256, "scratch_bytes": 2048, "note": "Separate allocation so both room tails remain charged during transition."}
+  ],
+  "contexts": [
+    {"id": "quiet-corridor", "label": "Planning: quiet corridor", "voices": ["player-step", "guard-dry", "ambient-bed"], "resident_assets": ["step-stone"], "effects": ["hall-tail"], "note": "Hypothetical encounter; not current runtime level state. Persistent decoded and decoder pools remain allocated even with few voices."},
+    {"id": "door-crossfade", "label": "Planning: doorway crossfade", "voices": ["wood-step", "guard-dry", "guard-wet", "ambient-bed", "door-click"], "resident_assets": ["step-wood", "interaction"], "effects": ["hall-tail"], "note": "Hypothetical dry/muffled overlap while entering a different surface area."},
+    {"id": "pursuit", "label": "Planning: pursuit", "voices": ["player-step", "guard-step", "guard-dry", "guard-second", "ambient-bed"], "resident_assets": ["step-stone"], "effects": ["courtyard-tail"], "note": "Hypothetical multiple-emitter stress case with shared source banks."}
+  ],
+  "transitions": [
+    {"id": "quiet-to-door", "label": "Planning: corridor to doorway overlap", "contexts": ["quiet-corridor", "door-crossfade"], "extra_bytes": 4096, "note": "Union keeps both banks and deduplicates continuous voice/effect IDs. Extra is manual transition/prefetch allowance."},
+    {"id": "door-to-pursuit", "label": "Planning: doorway to pursuit overlap", "contexts": ["door-crossfade", "pursuit"], "extra_bytes": 8192, "note": "Both room tails and both material banks overlap. Shared persistent pools, reserves and runtime allowances count once."}
+  ]
+}

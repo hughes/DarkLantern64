@@ -1,0 +1,217 @@
+{
+  "date": "2026-09-05",
+  "validation": {
+    "python_tests": 85,
+    "gameplay_groups": 26,
+    "launcher": "passed",
+    "profiler": "passed",
+    "scale_benchmark": "passed",
+    "render_visibility": "passed"
+  },
+  "bundle_build": {
+    "signature": "b67888b5fe6d9f59f7fd7f5b8c41de49251e573e560b1bbb562ea8ac6ee794cd",
+    "rom": "build\\DarkLantern64-bundle-level_bundle-menu.z64",
+    "rom_sha256": "164881fba03915c8e79d0ba82db94658981130c735a60c16162abb99ca6af0bb",
+    "rom_bytes": 327680,
+    "static_image_bytes": 572592
+  },
+  "bundle_sources": [
+    {
+      "id": "lantern-store",
+      "source": "C:\\Users\\hughe\\dev\\DarkLantern64\\content\\first_room.json",
+      "source_sha256": "e189b62e6efe3af58b5ec74ff91aa33aea3584fd22e9f1dcaa6031f3afe65fd2"
+    },
+    {
+      "id": "moonlit-yard",
+      "source": "C:\\Users\\hughe\\dev\\DarkLantern64\\content\\moonlit_courtyard.json",
+      "source_sha256": "14225ccc6bde55c078a89b9d0989eb80e965e4c89949a41d070e39a09a73c212"
+    },
+    {
+      "id": "enemy-workshop",
+      "source": "C:\\Users\\hughe\\dev\\DarkLantern64\\content\\enemy_patrols.json",
+      "source_sha256": "ceefc0bd032e042d98611bc587938e894631b17a9f3081a5478901f4af7cdcda"
+    }
+  ],
+  "resident_geometry_bytes": 24156,
+  "menu_and_switching": {
+    "passed": true,
+    "platform": "Ares",
+    "runs": [
+      {
+        "name": "bundle-idle",
+        "passed": true,
+        "log": ".dev\\ares\\runs\\345e1b2f10a2421896409b07cab3f606\\bundle-idle.log",
+        "tested_rom": ".dev\\ares\\runs\\345e1b2f10a2421896409b07cab3f606\\DarkLantern64-bundle-level_bundle-menu.z64",
+        "rom_sha256": "164881fba03915c8e79d0ba82db94658981130c735a60c16162abb99ca6af0bb",
+        "rom_bytes": 327680,
+        "settings": ".dev\\ares\\runs\\345e1b2f10a2421896409b07cab3f606\\settings.bml",
+        "settings_source_sha256": "4b013206c69c12be9e0fdbd91b389e6c40b87816bb40835c6daadb713b18ce80",
+        "profile_report": null,
+        "elapsed_seconds": 5.562,
+        "peak_sampled_heap_bytes": null,
+        "max_reported_cpu_ms": null,
+        "boot": null,
+        "terminal_event": "DL64 profile_end window=1"
+      },
+      {
+        "name": "bundle-4mb",
+        "passed": true,
+        "log": ".dev\\ares\\runs\\6e71bc9986fd49a89907f3cf130a6cfe\\bundle-4mb.log",
+        "tested_rom": ".dev\\ares\\runs\\6e71bc9986fd49a89907f3cf130a6cfe\\DarkLantern64-bundle-level_bundle-menu.z64",
+        "rom_sha256": "164881fba03915c8e79d0ba82db94658981130c735a60c16162abb99ca6af0bb",
+        "rom_bytes": 327680,
+        "settings": ".dev\\ares\\runs\\6e71bc9986fd49a89907f3cf130a6cfe\\settings.bml",
+        "settings_source_sha256": "4b013206c69c12be9e0fdbd91b389e6c40b87816bb40835c6daadb713b18ce80",
+        "profile_report": null,
+        "elapsed_seconds": 4.015,
+        "peak_sampled_heap_bytes": null,
+        "max_reported_cpu_ms": null,
+        "boot": null,
+        "terminal_event": "DL64 boot_failed reason=expansion_pak memory=4194304 required=8388608"
+      },
+      {
+        "name": "bundle-switching",
+        "passed": true,
+        "log": ".dev\\ares\\runs\\1721ffa7308b43fa9f8594c005262ee5\\bundle-switching.log",
+        "tested_rom": ".dev\\ares\\runs\\1721ffa7308b43fa9f8594c005262ee5\\DarkLantern64-bundle-level_bundle-menu-menu-test.z64",
+        "rom_sha256": "23a8ed8cf59510cb193d4ecdc9a63aa0ac22dd4f94843f9af35cc0b9de546a5c",
+        "rom_bytes": 327680,
+        "settings": ".dev\\ares\\runs\\1721ffa7308b43fa9f8594c005262ee5\\settings.bml",
+        "settings_source_sha256": "4b013206c69c12be9e0fdbd91b389e6c40b87816bb40835c6daadb713b18ce80",
+        "profile_report": null,
+        "elapsed_seconds": 17.078,
+        "peak_sampled_heap_bytes": 668760,
+        "max_reported_cpu_ms": 0.0,
+        "boot": "DL64 boot_ok memory=8388608 scene=\"DarkLantern64 - The Lantern Store\" meshes=4 models=20 colliders=14 version=2 world=3d renderer=xyz-mesh-rdpq depth=hardware",
+        "terminal_event": "DL64 menu_test_complete transitions=30 variants=5 cycles=3"
+      },
+      {
+        "name": "bundle-direct",
+        "passed": true,
+        "log": ".dev\\ares\\runs\\0b0f4cc5231947fa9a9a9821419f0f26\\bundle-direct.log",
+        "tested_rom": ".dev\\ares\\runs\\0b0f4cc5231947fa9a9a9821419f0f26\\DarkLantern64-bundle-level_bundle-start-enemy-workshop-preset-store-door-open.z64",
+        "rom_sha256": "429195378bd8625d5528270fcd38748782164bfd194f9fac6ff2fffba0c92d44",
+        "rom_bytes": 327680,
+        "settings": ".dev\\ares\\runs\\0b0f4cc5231947fa9a9a9821419f0f26\\settings.bml",
+        "settings_source_sha256": "4b013206c69c12be9e0fdbd91b389e6c40b87816bb40835c6daadb713b18ce80",
+        "profile_report": null,
+        "elapsed_seconds": 4.781,
+        "peak_sampled_heap_bytes": 614120,
+        "max_reported_cpu_ms": 0.0,
+        "boot": "DL64 boot_ok memory=8388608 scene=\"Enemy Patrol Workshop\" meshes=4 models=22 colliders=14 version=2 world=3d renderer=xyz-mesh-rdpq depth=hardware",
+        "terminal_event": "DL64 frame n=0 t=0.02 ms=16.67 cpu_ms=0.00 heap=614120/7749840 triangles=0 player=2.50,0.00,0.00 yaw=1.571 pitch=0.000 grounded=1 guard=3.01,0.00,-4.00 light=0.184 alert=0.000 state=PATROL door=1 complete=0 caught=0"
+      },
+      {
+        "name": "single-direct-preset",
+        "passed": true,
+        "log": ".dev\\ares\\runs\\188c7df91bf54d76a6afbbd0946a346f\\single-direct-preset.log",
+        "tested_rom": ".dev\\ares\\runs\\188c7df91bf54d76a6afbbd0946a346f\\DarkLantern64-enemy_patrols-preset-scout-observation.z64",
+        "rom_sha256": "94c26b6c400fe442c1bb5eb609b101d6e85eb835a3181196b6b308f68efd62a4",
+        "rom_bytes": 311296,
+        "settings": ".dev\\ares\\runs\\188c7df91bf54d76a6afbbd0946a346f\\settings.bml",
+        "settings_source_sha256": "4b013206c69c12be9e0fdbd91b389e6c40b87816bb40835c6daadb713b18ce80",
+        "profile_report": null,
+        "elapsed_seconds": 3.781,
+        "peak_sampled_heap_bytes": 614048,
+        "max_reported_cpu_ms": 0.0,
+        "boot": "DL64 boot_ok memory=8388608 scene=\"Enemy Patrol Workshop\" meshes=4 models=22 colliders=14 version=2 world=3d renderer=xyz-mesh-rdpq depth=hardware",
+        "terminal_event": "DL64 frame n=0 t=0.02 ms=16.67 cpu_ms=0.00 heap=614048/7776768 triangles=0 player=-6.00,0.00,2.70 yaw=3.142 pitch=-0.070 grounded=1 guard=3.01,0.00,-4.00 light=0.080 alert=0.000 state=PATROL door=0 complete=0 caught=0"
+      }
+    ],
+    "checks": [
+      "Ordinary menu renders without starting a level; 4 MiB boot gate works",
+      "Every bundled default/test start launches and restarts three times",
+      "Position, view, stance, door and clean mission state match authored starts",
+      "Repeated textured/untextured switches reach a stable per-start heap",
+      "Menu resume preserves paused simulation time",
+      "Both bundle and standalone ROMs bypass the menu into a named start"
+    ],
+    "heap_samples": {
+      "lantern-store/default": [
+        614120,
+        614120,
+        614120,
+        614120,
+        614120,
+        614120
+      ],
+      "moonlit-yard/default": [
+        668760,
+        668760,
+        668760,
+        668760,
+        668760,
+        668760
+      ],
+      "enemy-workshop/default": [
+        614120,
+        614120,
+        614120,
+        614120,
+        614120,
+        614120
+      ],
+      "enemy-workshop/store-door-open": [
+        614120,
+        614120,
+        614120,
+        614120,
+        614120,
+        614120
+      ],
+      "enemy-workshop/scout-observation": [
+        614120,
+        614120,
+        614120,
+        614120,
+        614120,
+        614120
+      ]
+    },
+    "menu_image": "C:\\Users\\hughe\\dev\\DarkLantern64\\.dev\\ares\\runs\\1721ffa7308b43fa9f8594c005262ee5\\level-select.png"
+  },
+  "original_mission": {
+    "platform": "Ares emulator",
+    "status": "complete",
+    "passed": true,
+    "started_at_utc": "2026-09-06T01:02:14Z",
+    "results": [
+      {
+        "name": "smoke-4mb",
+        "passed": true,
+        "log": ".dev\\ares\\runs\\4935e5d77fda460996f271dc6b09d0b6\\smoke-4mb.log",
+        "tested_rom": ".dev\\ares\\runs\\4935e5d77fda460996f271dc6b09d0b6\\DarkLantern64.z64",
+        "rom_sha256": "463f33d4af6034646219dd478cdaa6550f962181646105694b1467f00caaf2a1",
+        "rom_bytes": 311296,
+        "settings": ".dev\\ares\\runs\\4935e5d77fda460996f271dc6b09d0b6\\settings.bml",
+        "settings_source_sha256": "4b013206c69c12be9e0fdbd91b389e6c40b87816bb40835c6daadb713b18ce80",
+        "profile_report": null,
+        "elapsed_seconds": 4.032,
+        "peak_sampled_heap_bytes": null,
+        "max_reported_cpu_ms": null,
+        "boot": null,
+        "terminal_event": "DL64 boot_failed reason=expansion_pak memory=4194304 required=8388608"
+      },
+      {
+        "name": "smoke-8mb",
+        "passed": true,
+        "log": ".dev\\ares\\runs\\976ba0d6550247e7a485ff0eed8d12e2\\smoke-8mb.log",
+        "tested_rom": ".dev\\ares\\runs\\976ba0d6550247e7a485ff0eed8d12e2\\DarkLantern64-autoplay.z64",
+        "rom_sha256": "6fac82f2041bdd9c5e37fe88d5b5af5d110dbb69fc4f51d547bfa14c8d291796",
+        "rom_bytes": 311296,
+        "settings": ".dev\\ares\\runs\\976ba0d6550247e7a485ff0eed8d12e2\\settings.bml",
+        "settings_source_sha256": "4b013206c69c12be9e0fdbd91b389e6c40b87816bb40835c6daadb713b18ce80",
+        "profile_report": ".dev\\ares\\runs\\976ba0d6550247e7a485ff0eed8d12e2\\profile.json",
+        "elapsed_seconds": 34.343,
+        "peak_sampled_heap_bytes": 614040,
+        "max_reported_cpu_ms": 30.86,
+        "boot": "DL64 boot_ok memory=8388608 scene=\"DarkLantern64 - The Lantern Store\" meshes=4 models=20 colliders=14 version=2 world=3d renderer=xyz-mesh-rdpq depth=hardware",
+        "terminal_event": "DL64 profile_replay_done complete=1 caught=0"
+      }
+    ],
+    "debug_overlay": false,
+    "hardware_validation": "Original N64 and M64 pending",
+    "source_sha256": "e189b62e6efe3af58b5ec74ff91aa33aea3584fd22e9f1dcaa6031f3afe65fd2"
+  },
+  "hardware_validation": "Original N64 and M64 pending"
+}

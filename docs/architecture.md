@@ -1,6 +1,8 @@
 # Architecture
 
-Status: proposed implementation direction, 2026-09-05. Only the [8 MiB memory requirement](decisions/0001-memory-baseline.md) is a recorded accepted technical decision. This document defines boundaries for the first implementation; it does not describe a running DarkLantern64 engine.
+Status: architecture and prototype direction, 2026-09-05. The [8 MiB memory requirement](decisions/0001-memory-baseline.md) and [full 3D world](decisions/0002-full-3d-world.md) are accepted. Current implementations are distinguished from longer-term authoring goals below.
+
+The [hardware guide](n64-hardware-guide.md) documents the platform facts and proposed rendering budgets. The [audio design](audio-design.md) treats playback, acoustics, and AI hearing as one information system. The full 3D compiler, editor, and ROM now build; the editor transform round trip and an Ares input-only mission replay have passed. The [audio memory planner](audio-memory-planning.md) supplies scenario estimates, while runtime allocation instrumentation remains future work.
 
 ## Responsibilities
 
@@ -26,7 +28,7 @@ flowchart LR
     I --> B
 ```
 
-This is a desired workflow diagram. Automated feedback into the editor is future work.
+The prototype implements save, validation, cooking, ROM building, and build diagnostics in the editor. Runtime logs and measurements are currently inspected through project files; automatic emulator telemetry ingestion into the editor remains future work.
 
 ## Existing foundations
 
@@ -38,7 +40,19 @@ Read-only source inspection on 2026-09-05 found:
 | LightEngine, same snapshot | `src/scene/Scene.h` stores entity-indexed component arrays and imports editor/rendering/Vulkan types. `src/serialization/SceneWriter.h` does not persist entity IDs. | Introduce a portable content boundary and stable authoring identity. |
 | libdragon fork `7a82f8e50e82ad4601d530801630d8bd0d2fcd00` | Windows support and Bazel hello-world ROM rules; see `WINDOWS.md`, `BAZEL.md`, and `bazel/rom.bzl`. | Reuse the toolchain work, then add game and asset targets. The prototype imports a locally installed SDK. |
 
-These are inspection snapshots, not dependency pins or fresh build verification. An N64 backend, gameplay relationship editor, and DarkLantern64 content compiler have not been established by this inspection.
+These are the original inspection snapshots. [dependencies.json](../dependencies.json) now pins the LightEngine layout feature revision. The ROM still uses a separately installed libdragon SDK; its actual compiler identity, headers, libraries, and packaging tools participate in the build fingerprint. Automated SDK provisioning remains work to do.
+
+## Saved 3D implementation and integration boundary
+
+`content/first_room.json` is the canonical versioned source scene. It references reusable OBJ models and records stable IDs, XYZ positions, Euler rotations, scales, colors, collision proxies, and gameplay links. The compiler emits indexed XYZ meshes and instances for the runtime, plus glTF and scene JSON for LightEngine from the same model geometry. Runtime model rotations use radians; authoring rotations use degrees. Transforms apply scale, then X/Y/Z rotation, then translation. World units are meters with +Y up.
+
+The N64 renderer transforms and clips mesh triangles on the CPU and submits them to libdragon's RDP triangle API with a hardware depth buffer. Guards and interactions are model instances. Static faces cache front/back illumination; dynamic guards share two body-light probes across their faces, and the rotating relic uses emissive shading. This deliberately approximates limb-scale lighting while avoiding hundreds of repeated visibility queries per frame. This backend establishes the geometry contract without requiring an SDK migration; its measured cost will inform an RSP/Tiny3D backend decision.
+
+`src/game.c` is portable C17. It handles player movement, gravity, steps/jumping, arbitrary-yaw box collision, XYZ sight/light queries, guard state, hearing, a linked door/control, and objective completion. Player and guard positions represent their feet; perception uses eye positions. Upright box collision is a first implementation limit, not a restriction on visual model transforms or the future world representation. Patrols use explicit world-space waypoints; general navigation is future work.
+
+The compiler currently generates a C header that the N64 compiler/linker packs into the ROM. It is not a host-native binary dump or a stable streaming package. New runtime package formats must follow the requirements below.
+
+The editor/content round trip is verified with an actual XYZ/rotation edit, generated-header change, save, and restoration. Both ROM variants compile and package. Ares has exercised the 4 MiB startup error and an 8 MiB input-only route through the gate, up the stairs, and to objective completion. This is functional emulator evidence; original-hardware performance and visual acceptance remain separate checks.
 
 ## Authoring model
 
@@ -50,7 +64,7 @@ Use the [Dark Object System research](research/thief-object-system.md) to guide 
 - **Relationships:** typed source/destination IDs with optional data, suitable for a control-to-door connection or patrol route. Detect missing endpoints and invalid relationship types. Legitimate graph cycles, such as looping patrols, remain possible.
 - **Surface semantics:** explicit gameplay materials for footstep sounds and interactions. Visual texture changes should not silently change gameplay material assignments.
 
-Begin with only the property and relationship types needed for the first encounter. Editable text content with explicit schema versions should support review and migration. The exact schema and file layout are implementation decisions still to make.
+The initial schema implements only the first encounter's entity kinds and links. Prototype inheritance, traits, provenance inspectors, general relationship editing, and Blender reimport ownership remain planned work. Changes to the source format require explicit schema versions and validation.
 
 ## Compiled data and runtime state
 
@@ -74,11 +88,13 @@ Keep Vulkan/editor dependencies outside the N64 target. The runtime should use b
 
 | Decision | Evidence needed |
 | --- | --- |
-| Renderer and libdragon revision | A representative room rendered and profiled on the target path. [Tiny3D](https://github.com/HailToDodongo/tiny3d) is a candidate and currently requires libdragon preview; it is not selected. |
+| Long-term geometry backend and libdragon revision | Measure the CPU-transform/RDP-triangle prototype on representative content. [Tiny3D](https://github.com/HailToDodongo/tiny3d) remains a candidate; its SDK requirements need checking before migration. |
 | Display mode and frame target | Test 320x240 at a proposed 30 fps as an initial experiment; record results before adopting a budget. PAL timing remains to be specified. |
-| Runtime language subset and shared code | Compile a small module with the chosen N64 toolchain; document supported dependencies. |
-| Collision, navigation, and acoustic representation | The first encounter's movement, patrol, sight, and hearing requirements. |
+| Runtime language subset | Portable C17 is implemented for gameplay and shared with host tests. Broader runtime dependencies remain constrained by target compilation and budgets. |
+| Detailed collision, navigation, and acoustics | Extend upright box proxies and authored patrols when sloped walkable geometry, detours, or richer sound propagation require it. |
 | Build distribution | Extend the existing Bazel prototype while making SDK identity and asset dependencies reproducible. |
 | ROM capacity, streaming, and saving | Measured content size, cartridge constraints, and game design needs. |
 
 Implementation order and acceptance checks are in [First playable](first-playable.md).
+
+The [mission scale guide](scaling-guide.md) records the first guard/light workload measurements and hidden-room rendering comparison. Model bounds culling is implemented; spatial query candidates, separate guard perception scheduling, general actor/item arrays and 3D cell/portal visibility are the next scaling foundations.

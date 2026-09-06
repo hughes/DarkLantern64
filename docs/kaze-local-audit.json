@@ -1,0 +1,57 @@
+{
+  "date": "2026-09-05",
+  "measurement": "Read-only linked ELF symbol and call-site inspection; no cache-miss or speed measurement",
+  "elf_sha256": "a9fba3a568d84a33a777fee981d3dc51d75bc370052690e860abccdae916ca6e",
+  "rom_sha256": "b5b22edbd77f6af0bad1caa788b1afb6a851b7c0ba82d37fedad258a4b230deb",
+  "source_sha256": "cd7f578c9876cdf9d546438a52fd05e082885a1668a70ea232c7fb9dcaffe88d",
+  "compiler": "mips64-elf-gcc.exe (GCC) 16.2.0",
+  "symbols": {
+    "dl_line_of_sight": {
+      "bytes": 1132,
+      "symbol_type": "T"
+    },
+    "incident_light": {
+      "bytes": 1576,
+      "symbol_type": "t"
+    },
+    "light_model": {
+      "bytes": 2768,
+      "symbol_type": "t"
+    },
+    "dl_game_update": {
+      "bytes": 5096,
+      "symbol_type": "T"
+    },
+    "models": {
+      "bytes": 6144,
+      "symbol_type": "b"
+    },
+    "dl_render_frame": {
+      "bytes": 9084,
+      "symbol_type": "T"
+    },
+    "camera_vertices": {
+      "bytes": 49152,
+      "symbol_type": "b"
+    },
+    "world_vertices": {
+      "bytes": 49152,
+      "symbol_type": "b"
+    },
+    "faces": {
+      "bytes": 131072,
+      "symbol_type": "b"
+    }
+  },
+  "line_of_sight_direct_calls": [
+    "80014a24:\t0c00038c \tjal\t80000e30 <fmaxf>",
+    "80014a34:\t0c0003aa \tjal\t80000ea8 <fminf>",
+    "80014ac8:\t0c0002d4 \tjal\t80000b50 <cosf>",
+    "80014ad4:\t0c000352 \tjal\t80000d48 <sinf>"
+  ],
+  "limitations": [
+    "Symbol size includes cold paths and compiler inlining, and is not hot instruction working-set size.",
+    "Array symbols report reserved capacity, not per-frame data traffic.",
+    "Runtime behavior and benchmark ROMs were unchanged."
+  ]
+}

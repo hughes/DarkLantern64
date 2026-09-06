@@ -1,0 +1,480 @@
+{
+  "recorded_at_utc": "2026-09-06T01:39:12.597401+00:00",
+  "source": {
+    "blend": "art/loot.blend",
+    "sha256": "18a89e3eb20a2b2c0549dadbde30e3bc92aca8dc2db6bc8b1c43d8d7ff210381",
+    "generator": "tools/blender/create_loot.py",
+    "generator_sha256": "0a92dd6b1487d7049c5c535365734f5344400ddf100778c37a953c0f9c00b7fb",
+    "provenance": "Original meshes and procedural atlas created inside Blender for DarkLantern64; no downloaded art inputs."
+  },
+  "scope": "Five static props, reusable exporter, editor import and placement. No pickup or loot-value gameplay.",
+  "meshes": [
+    {
+      "id": "mesh-loot-coins",
+      "uri": "assets/loot/loot-coins.obj",
+      "sha256": "7473c43fc7d121a67f68abb829467386bb4b3f971cbbd8b2e2443fe1bd4133bb",
+      "vertices_with_uv_seams": 240,
+      "triangles": 132,
+      "geometry_bytes": 5592
+    },
+    {
+      "id": "mesh-loot-goblet",
+      "uri": "assets/loot/loot-goblet.obj",
+      "sha256": "2e20cea43e56c24dc2f59caee49f8d294bf8ef7127944e20c49a860e83047f96",
+      "vertices_with_uv_seams": 304,
+      "triangles": 156,
+      "geometry_bytes": 7016
+    },
+    {
+      "id": "mesh-loot-jewel",
+      "uri": "assets/loot/loot-jewel.obj",
+      "sha256": "6f292237ab1bd32ace5246e973bade97a806561098a478776b5711516155ab81",
+      "vertices_with_uv_seams": 112,
+      "triangles": 60,
+      "geometry_bytes": 2600
+    },
+    {
+      "id": "mesh-loot-purse",
+      "uri": "assets/loot/loot-purse.obj",
+      "sha256": "01739945996e2a82fd869814fc075536a8dac61715cea43232049c43a999d675",
+      "vertices_with_uv_seams": 296,
+      "triangles": 160,
+      "geometry_bytes": 6880
+    },
+    {
+      "id": "mesh-loot-scepter",
+      "uri": "assets/loot/loot-scepter.obj",
+      "sha256": "7d98395c3ba13f1a6a423164e4a9db881743676cb3a79dd233960ba4e0a54795",
+      "vertices_with_uv_seams": 360,
+      "triangles": 180,
+      "geometry_bytes": 8280
+    }
+  ],
+  "geometry_bytes_per_set": 30368,
+  "atlas": {
+    "uri": "content/assets/loot/mat-loot-atlas.png",
+    "sha256": "9271248322575a098beff2416548eaa251e5ef46aec27792f5652795fd133c0a",
+    "width": 32,
+    "height": 32,
+    "runtime_format": "RGBA16",
+    "decoded_pixel_bytes": 2048,
+    "sprite_bytes": 2184
+  },
+  "memory_note": "Geometry and texture bytes exclude instance state, renderer buffers, lighting caches and allocation overhead. Bundle geometry is per level; atlas sprites are deduplicated.",
+  "blender_checks": {
+    "passed": true,
+    "blender_version": "5.3.0 Alpha",
+    "content_root": "C:\\Users\\hughe\\dev\\DarkLantern64\\build\\blender-export-smoke\\fixture-3968825a54b644c892f649bc819a355f",
+    "pack": "C:\\Users\\hughe\\dev\\DarkLantern64\\build\\blender-export-smoke\\fixture-3968825a54b644c892f649bc819a355f\\assets\\test\\pack.json",
+    "triangles": 6,
+    "runtime_vertices": 14,
+    "reflected_volume_m3": 0.12500000522336563,
+    "packed_image_loaded_before_export": false,
+    "checks": [
+      "add-on registration",
+      "evaluated modifiers",
+      "rotation and reflected scale",
+      "local origin and metre conversion",
+      "outward triangle winding",
+      "UV seams and V conversion",
+      "current texture pixels",
+      "source image state preserved",
+      "emission and backface flags",
+      "unchanged export cache",
+      "changed mesh re-export",
+      "failed export preserves files",
+      "packed image export after reopening blend"
+    ]
+  },
+  "cli_reexport": {
+    "exit_code": 0,
+    "source_preserved": true,
+    "changed_files": [],
+    "before": {
+      "art/loot.blend": "18a89e3eb20a2b2c0549dadbde30e3bc92aca8dc2db6bc8b1c43d8d7ff210381",
+      "content/assets/loot/loot-coins.obj": "7473c43fc7d121a67f68abb829467386bb4b3f971cbbd8b2e2443fe1bd4133bb",
+      "content/assets/loot/loot-goblet.obj": "2e20cea43e56c24dc2f59caee49f8d294bf8ef7127944e20c49a860e83047f96",
+      "content/assets/loot/loot-jewel.obj": "6f292237ab1bd32ace5246e973bade97a806561098a478776b5711516155ab81",
+      "content/assets/loot/loot-purse.obj": "01739945996e2a82fd869814fc075536a8dac61715cea43232049c43a999d675",
+      "content/assets/loot/loot-scepter.obj": "7d98395c3ba13f1a6a423164e4a9db881743676cb3a79dd233960ba4e0a54795",
+      "content/assets/loot/mat-loot-atlas.png": "9271248322575a098beff2416548eaa251e5ef46aec27792f5652795fd133c0a",
+      "content/assets/loot/pack.json": "3997262333dced5512fe96a1d55f8d51fc3aeafe1f00eb24e451af5b901e0707"
+    },
+    "after": {
+      "art/loot.blend": "18a89e3eb20a2b2c0549dadbde30e3bc92aca8dc2db6bc8b1c43d8d7ff210381",
+      "content/assets/loot/loot-coins.obj": "7473c43fc7d121a67f68abb829467386bb4b3f971cbbd8b2e2443fe1bd4133bb",
+      "content/assets/loot/loot-goblet.obj": "2e20cea43e56c24dc2f59caee49f8d294bf8ef7127944e20c49a860e83047f96",
+      "content/assets/loot/loot-jewel.obj": "6f292237ab1bd32ace5246e973bade97a806561098a478776b5711516155ab81",
+      "content/assets/loot/loot-purse.obj": "01739945996e2a82fd869814fc075536a8dac61715cea43232049c43a999d675",
+      "content/assets/loot/loot-scepter.obj": "7d98395c3ba13f1a6a423164e4a9db881743676cb3a79dd233960ba4e0a54795",
+      "content/assets/loot/mat-loot-atlas.png": "9271248322575a098beff2416548eaa251e5ef46aec27792f5652795fd133c0a",
+      "content/assets/loot/pack.json": "3997262333dced5512fe96a1d55f8d51fc3aeafe1f00eb24e451af5b901e0707"
+    }
+  },
+  "regeneration": {
+    "exit_code": 0,
+    "source_preserved": true,
+    "changed_files": [],
+    "before": {
+      "art/loot.blend": "18a89e3eb20a2b2c0549dadbde30e3bc92aca8dc2db6bc8b1c43d8d7ff210381",
+      "content/assets/loot/loot-coins.obj": "7473c43fc7d121a67f68abb829467386bb4b3f971cbbd8b2e2443fe1bd4133bb",
+      "content/assets/loot/loot-goblet.obj": "2e20cea43e56c24dc2f59caee49f8d294bf8ef7127944e20c49a860e83047f96",
+      "content/assets/loot/loot-jewel.obj": "6f292237ab1bd32ace5246e973bade97a806561098a478776b5711516155ab81",
+      "content/assets/loot/loot-purse.obj": "01739945996e2a82fd869814fc075536a8dac61715cea43232049c43a999d675",
+      "content/assets/loot/loot-scepter.obj": "7d98395c3ba13f1a6a423164e4a9db881743676cb3a79dd233960ba4e0a54795",
+      "content/assets/loot/mat-loot-atlas.png": "9271248322575a098beff2416548eaa251e5ef46aec27792f5652795fd133c0a",
+      "content/assets/loot/pack.json": "3997262333dced5512fe96a1d55f8d51fc3aeafe1f00eb24e451af5b901e0707"
+    },
+    "after": {
+      "art/loot.blend": "18a89e3eb20a2b2c0549dadbde30e3bc92aca8dc2db6bc8b1c43d8d7ff210381",
+      "content/assets/loot/loot-coins.obj": "7473c43fc7d121a67f68abb829467386bb4b3f971cbbd8b2e2443fe1bd4133bb",
+      "content/assets/loot/loot-goblet.obj": "2e20cea43e56c24dc2f59caee49f8d294bf8ef7127944e20c49a860e83047f96",
+      "content/assets/loot/loot-jewel.obj": "6f292237ab1bd32ace5246e973bade97a806561098a478776b5711516155ab81",
+      "content/assets/loot/loot-purse.obj": "01739945996e2a82fd869814fc075536a8dac61715cea43232049c43a999d675",
+      "content/assets/loot/loot-scepter.obj": "7d98395c3ba13f1a6a423164e4a9db881743676cb3a79dd233960ba4e0a54795",
+      "content/assets/loot/mat-loot-atlas.png": "9271248322575a098beff2416548eaa251e5ef46aec27792f5652795fd133c0a",
+      "content/assets/loot/pack.json": "3997262333dced5512fe96a1d55f8d51fc3aeafe1f00eb24e451af5b901e0707"
+    },
+    "generated_source_bytes": 115027,
+    "generated_source_sha256": "ea7ca7aa3feef6dd34f00a267686f28ece456f93e14b09dc88b17b97a680fa50"
+  },
+  "editor": {
+    "passed": true,
+    "checks": [
+      "Asset pack imports all reusable definitions and prefabs",
+      "Identical reimport is idempotent",
+      "Conflicting definitions and traversal fail without changing document or catalog",
+      "Prefab instantiates a decorative model with its default scale",
+      "Invalid, duplicate and unknown placements reject",
+      "Save cooks the new prop; viewport gizmo edits round-trip to canonical JSON",
+      "Delete removes the prop while protecting colliding level geometry",
+      "Reload and reimport restore the catalog without dirtying saved definitions"
+    ],
+    "capture": {
+      "path": "C:\\Users\\hughe\\dev\\DarkLantern64\\.dev/editor\\scenes\\asset_test_cc31b7922d344d989b23c5527b54df3c\\captures\\19794db7fd9a43fe8de929ceb45216cb.png",
+      "type": "LightEngine viewport"
+    },
+    "evidence": ".dev/editor/scenes/asset_test_cc31b7922d344d989b23c5527b54df3c/asset-verification.json"
+  },
+  "host_checks": {
+    "command": "python tools/build.py --test",
+    "passed": true,
+    "python_tests": 110,
+    "suites": [
+      "gameplay",
+      "profiler",
+      "scale benchmark",
+      "render visibility",
+      "launcher"
+    ],
+    "log": "build/loot-host-tests.log"
+  },
+  "bundle": {
+    "rom": "build/DarkLantern64-bundle-level_bundle-menu.z64",
+    "rom_sha256": "9f46d9a0e4a1fd955ca1daf2cf110b2071a1c5a8cb9cf571e6a5c823746547d6",
+    "rom_bytes": 360448,
+    "static_image_bytes": 665664,
+    "resident_geometry_bytes": 115260,
+    "levels": [
+      {
+        "id": "lantern-store",
+        "source_sha256": "a19a383c2f8508fdd6b071c9bc007c00aefdadbbb04c6b4d3a2fb3fe58f9b7cd",
+        "counts": {
+          "entities": 30,
+          "meshes": 9,
+          "models": 25,
+          "colliders": 14,
+          "instanced_vertices": 1722,
+          "instanced_triangles": 1312,
+          "lights": 2,
+          "enemies": 1,
+          "test_starts": 1,
+          "patrol_points": 4
+        }
+      },
+      {
+        "id": "moonlit-yard",
+        "source_sha256": "1145d0c8bdaa1779ae57d4e885326e9b69c98ea20057db28b282c809e4dde080",
+        "counts": {
+          "entities": 54,
+          "meshes": 14,
+          "models": 49,
+          "colliders": 27,
+          "instanced_vertices": 3234,
+          "instanced_triangles": 1788,
+          "lights": 4,
+          "enemies": 1,
+          "test_starts": 1,
+          "patrol_points": 3
+        }
+      },
+      {
+        "id": "enemy-workshop",
+        "source_sha256": "b248068035e3bc43f91549e94287e79058bc55dcf13194f34bade5357008f484",
+        "counts": {
+          "entities": 35,
+          "meshes": 9,
+          "models": 27,
+          "colliders": 14,
+          "instanced_vertices": 1834,
+          "instanced_triangles": 1480,
+          "lights": 2,
+          "enemies": 3,
+          "test_starts": 3,
+          "patrol_points": 7
+        }
+      }
+    ],
+    "checks": [
+      "Ordinary menu renders without starting a level; 4 MiB boot gate works",
+      "Every bundled default/test start launches and restarts three times",
+      "Position, view, stance, door and clean mission state match authored starts",
+      "Repeated textured/untextured switches reach a stable per-start heap",
+      "Menu resume preserves paused simulation time",
+      "Both bundle and standalone ROMs bypass the menu into a named start"
+    ],
+    "heap_samples": {
+      "lantern-store/default": [
+        616320,
+        616320,
+        616320,
+        616320,
+        616320,
+        616320
+      ],
+      "lantern-store/loot-crate": [
+        616320,
+        616320,
+        616320,
+        616320,
+        616320,
+        616320
+      ],
+      "moonlit-yard/default": [
+        708592,
+        708592,
+        708592,
+        708592,
+        708592,
+        708592
+      ],
+      "moonlit-yard/loot-counter": [
+        708592,
+        708592,
+        708592,
+        708592,
+        708592,
+        708592
+      ],
+      "enemy-workshop/default": [
+        616320,
+        616320,
+        616320,
+        616320,
+        616320,
+        616320
+      ],
+      "enemy-workshop/store-door-open": [
+        616320,
+        616320,
+        616320,
+        616320,
+        616320,
+        616320
+      ],
+      "enemy-workshop/scout-observation": [
+        616320,
+        616320,
+        616320,
+        616320,
+        616320,
+        616320
+      ],
+      "enemy-workshop/loot-crate": [
+        616320,
+        616320,
+        616320,
+        616320,
+        616320,
+        616320
+      ]
+    },
+    "launches_and_restarts": 48,
+    "resumes": 24,
+    "passed": true
+  },
+  "direct_start": {
+    "rom": "build/DarkLantern64-moonlit_courtyard-preset-loot-counter.z64",
+    "rom_sha256": "f190bfc6ef572ddd3e57b8093c470f89552e2e923c86800e2e0ba3c56972b32b",
+    "preset": "loot-counter"
+  },
+  "mission": {
+    "platform": "Ares emulator",
+    "status": "complete",
+    "passed": true,
+    "started_at_utc": "2026-09-06T01:35:13Z",
+    "results": [
+      {
+        "name": "smoke-4mb",
+        "passed": true,
+        "log": ".dev\\ares\\runs\\da0fca1be7064967b1282eed1b53894d\\smoke-4mb.log",
+        "tested_rom": ".dev\\ares\\runs\\da0fca1be7064967b1282eed1b53894d\\DarkLantern64.z64",
+        "rom_sha256": "ba846f0ef427ae45653891f1541fd45cc0c0b545fe419ca7f76adeb0494ad1a3",
+        "rom_bytes": 311296,
+        "settings": ".dev\\ares\\runs\\da0fca1be7064967b1282eed1b53894d\\settings.bml",
+        "settings_source_sha256": "935f01da7d03f4d3dda584219d21e9301aa4296d05a1e4421445223b45a47b2a",
+        "profile_report": null,
+        "elapsed_seconds": 4.281,
+        "peak_sampled_heap_bytes": null,
+        "max_reported_cpu_ms": null,
+        "boot": null,
+        "terminal_event": "DL64 boot_failed reason=expansion_pak memory=4194304 required=8388608"
+      },
+      {
+        "name": "smoke-8mb",
+        "passed": true,
+        "log": ".dev\\ares\\runs\\ff4c88c6941648e0b6ad7e0a8827b5b6\\smoke-8mb.log",
+        "tested_rom": ".dev\\ares\\runs\\ff4c88c6941648e0b6ad7e0a8827b5b6\\DarkLantern64-autoplay.z64",
+        "rom_sha256": "84387e9068ae0b5cee5d1508b7728c3769952a26f8cf262ce2f38d3b51426b87",
+        "rom_bytes": 327680,
+        "settings": ".dev\\ares\\runs\\ff4c88c6941648e0b6ad7e0a8827b5b6\\settings.bml",
+        "settings_source_sha256": "935f01da7d03f4d3dda584219d21e9301aa4296d05a1e4421445223b45a47b2a",
+        "profile_report": ".dev\\ares\\runs\\ff4c88c6941648e0b6ad7e0a8827b5b6\\profile.json",
+        "elapsed_seconds": 42.172,
+        "peak_sampled_heap_bytes": 616304,
+        "max_reported_cpu_ms": 57.16,
+        "boot": "DL64 boot_ok memory=8388608 scene=\"DarkLantern64 - The Lantern Store\" meshes=9 models=25 colliders=14 version=2 world=3d renderer=xyz-mesh-rdpq depth=hardware",
+        "terminal_event": "DL64 profile_replay_done complete=1 caught=0"
+      }
+    ],
+    "debug_overlay": false,
+    "hardware_validation": "Original N64 and M64 pending",
+    "source_sha256": "a19a383c2f8508fdd6b071c9bc007c00aefdadbbb04c6b4d3a2fb3fe58f9b7cd"
+  },
+  "captures": {
+    "courtyard": {
+      "name": "capture-moonlit_courtyard",
+      "passed": true,
+      "log": ".dev\\ares\\runs\\5fdaa965ec954516b1eabc19c3498e31\\capture-moonlit_courtyard.log",
+      "tested_rom": ".dev\\ares\\runs\\5fdaa965ec954516b1eabc19c3498e31\\DarkLantern64-moonlit_courtyard-capture.z64",
+      "rom_sha256": "c747a771437a243c8d04b5552732baedacb80817f35b3a1607bc8e2d26a73ed5",
+      "rom_bytes": 327680,
+      "settings": ".dev\\ares\\runs\\5fdaa965ec954516b1eabc19c3498e31\\settings.bml",
+      "settings_source_sha256": "4b013206c69c12be9e0fdbd91b389e6c40b87816bb40835c6daadb713b18ce80",
+      "profile_report": null,
+      "elapsed_seconds": 19.968,
+      "peak_sampled_heap_bytes": 708592,
+      "max_reported_cpu_ms": 266.48,
+      "boot": "DL64 boot_ok memory=8388608 scene=\"DarkLantern64 - The Moonlit Delivery Yard\" meshes=14 models=49 colliders=27 version=2 world=3d renderer=xyz-mesh-rdpq depth=hardware",
+      "terminal_event": "DL64 capture_complete views=5",
+      "captures": [
+        {
+          "view": {
+            "id": "shelter-to-courtyard",
+            "position": [
+              -2.8,
+              0,
+              4.9
+            ],
+            "yaw": 153,
+            "pitch": 5
+          },
+          "image": "C:\\Users\\hughe\\dev\\DarkLantern64\\.dev\\ares\\runs\\5fdaa965ec954516b1eabc19c3498e31\\shelter-to-courtyard.png",
+          "sha256": "266560a11e4e56c913d15fba4c1344a8852e09d491d6d551aad109e4e7c17534"
+        },
+        {
+          "view": {
+            "id": "warm-lamp-cool-roofs",
+            "position": [
+              1.0,
+              0,
+              -1.1
+            ],
+            "yaw": 298,
+            "pitch": 9
+          },
+          "image": "C:\\Users\\hughe\\dev\\DarkLantern64\\.dev\\ares\\runs\\5fdaa965ec954516b1eabc19c3498e31\\warm-lamp-cool-roofs.png",
+          "sha256": "560ff9f68a6080b796ec42ebf699051095845cef14be34315a0429871a2e2dde"
+        },
+        {
+          "view": {
+            "id": "doorway-landmark",
+            "position": [
+              -1.2,
+              0,
+              -1.8
+            ],
+            "yaw": 155,
+            "pitch": 2
+          },
+          "image": "C:\\Users\\hughe\\dev\\DarkLantern64\\.dev\\ares\\runs\\5fdaa965ec954516b1eabc19c3498e31\\doorway-landmark.png",
+          "sha256": "ee733da123c88b0b617f0bb8602dcabebcef415f001568a59a2f08dfdcb05f07"
+        },
+        {
+          "view": {
+            "id": "doorway-open",
+            "position": [
+              -1.2,
+              0,
+              -1.8
+            ],
+            "yaw": 155,
+            "pitch": 2,
+            "door_open": true
+          },
+          "image": "C:\\Users\\hughe\\dev\\DarkLantern64\\.dev\\ares\\runs\\5fdaa965ec954516b1eabc19c3498e31\\doorway-open.png",
+          "sha256": "901184e6355af6c53e2f86489bdaef214614b60c2916948600859a572ffd39c1"
+        },
+        {
+          "view": {
+            "id": "blender-loot-counter",
+            "position": [
+              -3.45,
+              0,
+              5.18
+            ],
+            "yaw": 180,
+            "pitch": -8
+          },
+          "image": "C:\\Users\\hughe\\dev\\DarkLantern64\\.dev\\ares\\runs\\5fdaa965ec954516b1eabc19c3498e31\\blender-loot-counter.png",
+          "sha256": "cd832aa9f1fccfde005fbd56b92a3c825b9dda467407156384115fce2bed7326"
+        }
+      ],
+      "measurement": "Raw RDP framebuffer before VI filtering; capture timings are diagnostic only"
+    },
+    "store": {
+      "name": "capture-first_room",
+      "passed": true,
+      "log": ".dev\\ares\\runs\\d809defde55b4e51a2804a71fd032337\\capture-first_room.log",
+      "tested_rom": ".dev\\ares\\runs\\d809defde55b4e51a2804a71fd032337\\DarkLantern64-capture.z64",
+      "rom_sha256": "aff2fdac3a4d22882fa4d9c35bd75a0e2e2feff8c6fd7f7caa1998a19a687c5f",
+      "rom_bytes": 327680,
+      "settings": ".dev\\ares\\runs\\d809defde55b4e51a2804a71fd032337\\settings.bml",
+      "settings_source_sha256": "4b013206c69c12be9e0fdbd91b389e6c40b87816bb40835c6daadb713b18ce80",
+      "profile_report": null,
+      "elapsed_seconds": 6.079,
+      "peak_sampled_heap_bytes": 616296,
+      "max_reported_cpu_ms": 218.43,
+      "boot": "DL64 boot_ok memory=8388608 scene=\"DarkLantern64 - The Lantern Store\" meshes=9 models=25 colliders=14 version=2 world=3d renderer=xyz-mesh-rdpq depth=hardware",
+      "terminal_event": "DL64 capture_complete views=1",
+      "captures": [
+        {
+          "view": {
+            "id": "blender-loot-crate",
+            "position": [
+              -5,
+              0,
+              3.0
+            ],
+            "yaw": 180,
+            "pitch": 0
+          },
+          "image": "C:\\Users\\hughe\\dev\\DarkLantern64\\.dev\\ares\\runs\\d809defde55b4e51a2804a71fd032337\\blender-loot-crate.png",
+          "sha256": "23ed6205f6cd16f0f2fca23937080b0de37c00813c8261a941e4112d55fb8b81"
+        }
+      ],
+      "measurement": "Raw RDP framebuffer before VI filtering; capture timings are diagnostic only"
+    }
+  },
+  "hardware_validation": "Ares only; original N64 and M64 pending. Capture synchronization makes capture timings unsuitable as performance measurements."
+}

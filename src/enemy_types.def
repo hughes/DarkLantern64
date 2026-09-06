@@ -1,0 +1,5 @@
+// Code-owned enemy archetypes. Keep one DL_ENEMY_TYPE row per type.
+// Symbol, stable content ID, editor label, speed (m/s), sight (m), hearing (m).
+// The content compiler validates this same catalog and exports it to the editor.
+DL_ENEMY_TYPE(WATCHMAN, "watchman", "Watchman", 0.8f, 6.5f, 7.0f)
+DL_ENEMY_TYPE(SCOUT, "scout", "Scout", 1.1f, 8.0f, 8.0f)

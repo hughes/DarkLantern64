@@ -1,0 +1,12 @@
+/build/
+/external/
+/.dev/
+/bazel-*
+/editor/bazel-*
+# LightEngine's extension cache currently embeds host-specific SDK/Bazel paths.
+/editor/MODULE.bazel.lock
+/editor/imgui.ini
+__pycache__/
+*.pyc
+*.blend[0-9]
+/imgui.ini

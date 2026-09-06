@@ -6,19 +6,66 @@ Our development approach is to extend **LightEngine** into a productive content 
 
 **Memory baseline: 8 MiB of RDRAM.** Original N64 hardware requires an Expansion Pak. M64 includes Expansion Pak functionality; see the [accepted memory decision](docs/decisions/0001-memory-baseline.md) for sources and validation requirements.
 
+**Full 3D:** reusable model assets, arbitrary XYZ transforms, varying heights, and freely placed geometry. See the [accepted world decision](docs/decisions/0002-full-3d-world.md).
+
+**Creating levels?** Start with the [creator quickstart](docs/creator-guide.md): open the editor, place and tune content, then build and play using the included VS Code tasks.
+
+**Creating models?** The [Blender asset guide](docs/blender-assets.md) covers the editable loot set, exporter, material budget, prefab placement, and a direct launch at the courtyard's loot counter.
+
+## Build and play
+
+**Full 3D prototype:** the model compiler, desktop editor, and both ROM variants build. The editor's XYZ/rotation save round trip and Ares startup/mission replay have passed. Original N64 and M64 validation remains pending; this is still placeholder content and a prototype rendering/audio backend.
+
+The current development host is Windows. Install Python 3.11+ with Pillow (`python -m pip install Pillow`), the Windows libdragon SDK from our fork (default `C:\n64-toolchain`, or set `N64_INST`), and Ares. Open Ares once so it creates its settings file. MSYS2/MinGW GCC is needed for host simulation tests.
+
+```powershell
+.\build.ps1 -Test          # content validation and portable gameplay tests
+.\build.ps1 -Run           # cook, build build/DarkLantern64.z64, launch Ares
+.\build.ps1 -Autoplay      # build the input replay variant
+python tools/smoke_ares.py # exercise 4 MiB startup and 8 MiB mission replay
+python tools/build.py --level content/moonlit_courtyard.json --run # textured night study
+```
+
+N64 controller: the **stick looks left/right/up/down** (push up to look up); **C-Up/Down move forward/backward**, and **C-Left/Right strafe**. Z crouches, L jumps, A interacts, B makes noise, R restarts, and Start toggles debug. The D-pad also provides digital look controls.
+
+Keyboard controls in the project-local Ares settings: W/S move, A/D strafe, arrow keys turn and look, Z crouch, Space jump, E interact, N make noise, R restart, Tab debug. Ares settings are copied to `.dev/ares`; the installed settings file is left untouched. Set `ARES_EXE` if Ares is installed somewhere other than `%LOCALAPPDATA%\ares`.
+
+For the LightEngine editor, also install Bazelisk, the Visual Studio C++ build tools, and Vulkan SDK (`VULKAN_SDK`). The first build downloads desktop dependencies and compiles the engine.
+
+```powershell
+python tools/setup_editor.py # fetch the pinned LightEngine revision if missing
+.\build.ps1 -Editor -Run
+python tools/editorctl.py inspect
+```
+
+The engine revision is recorded in [dependencies.json](dependencies.json). Project layouts and the saved-tab startup fix have both merged into LightEngine through [PR #14](https://github.com/hughes/LightEngine/pull/14) and [PR #15](https://github.com/hughes/LightEngine/pull/15). The project retains its tested, published revision; setup checks an existing checkout without resetting it. See the [editor guide](editor/README.md) and [workflow](docs/workflow.md) for editing and automation.
+
 ## Start here
 
 | Document | Purpose |
 | --- | --- |
+| [Creator quickstart](docs/creator-guide.md) | A short hands-on guide for artists and level/game designers. |
+| [Level select and test starts](docs/level-select.md) | Bundle levels into one ROM, switch during testing, or launch directly into a named starting state. |
+| [Enemy authoring](docs/enemy-authoring.md) | Place multiple enemies, choose code-defined types, and author independent patrols or sentry posts. |
 | [Vision](docs/vision.md) | Game pillars, collaboration, and scope. |
 | [Architecture](docs/architecture.md) | Editor/runtime boundary, content model, and existing foundations. |
+| [N64 hardware guide](docs/n64-hardware-guide.md) | Processors, memory/bandwidth, graphics features, lighting, and seamless spaces. |
+| [Modern N64 graphics](docs/modern-n64-graphics.md) | Native HDR/bloom, material tricks, shadows and game evidence versus emulator enhancements. |
+| [Audio design](docs/audio-design.md) | Output fidelity, acoustics, material cues, positional sound, and AI hearing. |
+| [Audio memory planning](docs/audio-memory-planning.md) | Scenario estimates, retained buffers, transition peaks, and budget assumptions. |
+| [Game profiling](docs/profiling.md) | Record Ares subsystem timings and compare frame-budget costs. |
+| [Mission scale](docs/scaling-guide.md) | Measured guard, room, loot and light costs; culling and larger-mission architecture. |
+| [Kaze performance research](docs/kaze-performance-notes.md) | Public SM64 optimization techniques mapped to our source and compiled-code audit. |
+| [Texture pipeline](docs/texture-pipeline.md) | Cook StreetLight textures from editor materials into the N64 ROM. |
+| [Night contrast study](docs/night-contrast.md) | Moonlight, warm lamps and dark cover in a continuous outdoor yard. |
 | [Workflow](docs/workflow.md) | Authoring, compilation, iteration, and debugging. |
 | [First playable](docs/first-playable.md) | A small encounter that proves the entire pipeline, with completion criteria. |
 | [Memory decision](docs/decisions/0001-memory-baseline.md) | Accepted 8 MiB requirement and its consequences. |
+| [World decision](docs/decisions/0002-full-3d-world.md) | Accepted full 3D model and level requirements. |
 | [Thief research](docs/research/thief-object-system.md) | Historical ideas and their proposed application. |
 
 ## Project status
 
-Initial documentation, dated 2026-09-05. This repository does not yet contain game code, a content compiler, build targets, or a playable ROM. Implementation and platform validation remain pending.
+Prototype implementation in progress, dated 2026-09-05. The repository now contains a portable gameplay module, N64 runtime, content compiler, LightEngine editor application, and build/debug tools. Placeholder mesh assets are authored in `content/`; generated outputs are kept in ignored `build/` and `.dev/` directories.
 
-The documents identify accepted decisions, proposed designs, and inspected existing capabilities separately. Proposed milestones are not completed work. Build instructions will be added with the project skeleton once they can be exercised.
+The 3D renderer uses CPU transforms and RDP hardware triangles/depth, with flat-color or textured models. The courtyard adds colored vertex lighting, occlusion, emissive surfaces and fog; its source texture pixels are cooked into the ROM. Collision uses upright rotated boxes; sloped mesh collision, animated assets, richer navigation, and SDK provisioning remain future work. Original N64 and M64 validation is **pending**. See [First playable](docs/first-playable.md) for acceptance details.

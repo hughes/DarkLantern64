@@ -1,0 +1,95 @@
+{
+  "version": 1,
+  "assets": [
+    {
+      "id": "mesh-loot-coins",
+      "uri": "assets/loot/loot-coins.obj"
+    },
+    {
+      "id": "mesh-loot-goblet",
+      "uri": "assets/loot/loot-goblet.obj"
+    },
+    {
+      "id": "mesh-loot-jewel",
+      "uri": "assets/loot/loot-jewel.obj"
+    },
+    {
+      "id": "mesh-loot-purse",
+      "uri": "assets/loot/loot-purse.obj"
+    },
+    {
+      "id": "mesh-loot-scepter",
+      "uri": "assets/loot/loot-scepter.obj"
+    }
+  ],
+  "materials": [
+    {
+      "id": "mat-loot-atlas",
+      "color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "double_sided": false,
+      "texture": {
+        "uri": "assets/loot/mat-loot-atlas.png",
+        "width": 32,
+        "height": 32,
+        "format": "RGBA16"
+      }
+    }
+  ],
+  "prefabs": [
+    {
+      "id": "loot-coins",
+      "model": "mesh-loot-coins",
+      "material": "mat-loot-atlas",
+      "scale": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "id": "loot-goblet",
+      "model": "mesh-loot-goblet",
+      "material": "mat-loot-atlas",
+      "scale": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "id": "loot-jewel",
+      "model": "mesh-loot-jewel",
+      "material": "mat-loot-atlas",
+      "scale": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "id": "loot-purse",
+      "model": "mesh-loot-purse",
+      "material": "mat-loot-atlas",
+      "scale": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "id": "loot-scepter",
+      "model": "mesh-loot-scepter",
+      "material": "mat-loot-atlas",
+      "scale": [
+        1,
+        1,
+        1
+      ]
+    }
+  ]
+}

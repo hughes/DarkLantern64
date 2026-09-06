@@ -1,0 +1,1973 @@
+{
+  "version": 2,
+  "title": "DarkLantern64 - The Moonlit Delivery Yard",
+  "environment": {
+    "ambient": [
+      0.012,
+      0.019,
+      0.037
+    ],
+    "moon_direction": [
+      -0.76,
+      0.52,
+      0.39
+    ],
+    "moon_color": [
+      0.35,
+      0.52,
+      0.9
+    ],
+    "moon_intensity": 0.8,
+    "fog_color": [
+      0.022,
+      0.036,
+      0.07
+    ],
+    "fog_near": 18,
+    "fog_far": 48,
+    "sky_top": [
+      0.012,
+      0.022,
+      0.065
+    ],
+    "sky_bottom": [
+      0.055,
+      0.095,
+      0.17
+    ],
+    "exposure": 1.35
+  },
+  "views": [
+    {
+      "id": "shelter-to-courtyard",
+      "position": [
+        -2.8,
+        0,
+        4.9
+      ],
+      "yaw": 153,
+      "pitch": 5
+    },
+    {
+      "id": "warm-lamp-cool-roofs",
+      "position": [
+        1.0,
+        0,
+        -1.1
+      ],
+      "yaw": 298,
+      "pitch": 9
+    },
+    {
+      "id": "doorway-landmark",
+      "position": [
+        -1.2,
+        0,
+        -1.8
+      ],
+      "yaw": 155,
+      "pitch": 2
+    },
+    {
+      "id": "doorway-open",
+      "position": [
+        -1.2,
+        0,
+        -1.8
+      ],
+      "yaw": 155,
+      "pitch": 2,
+      "door_open": true
+    },
+    {
+      "id": "blender-loot-counter",
+      "position": [
+        -3.45,
+        0,
+        5.18
+      ],
+      "yaw": 180,
+      "pitch": -8
+    },
+    {
+      "id": "loot-pulse-phase-a",
+      "position": [
+        -3.45,
+        0,
+        5.18
+      ],
+      "yaw": 180,
+      "pitch": -8,
+      "animation_time": 0.9
+    },
+    {
+      "id": "loot-pulse-phase-b",
+      "position": [
+        -3.45,
+        0,
+        5.18
+      ],
+      "yaw": 180,
+      "pitch": -8,
+      "animation_time": 2.7
+    }
+  ],
+  "assets": [
+    {
+      "id": "night-block",
+      "uri": "models/night_block.obj"
+    },
+    {
+      "id": "night-paving",
+      "uri": "models/night_paving.obj"
+    },
+    {
+      "id": "night-facade",
+      "uri": "models/night_facade.obj"
+    },
+    {
+      "id": "night-roof",
+      "uri": "models/night_roof.obj"
+    },
+    {
+      "id": "night-arch",
+      "uri": "models/night_arch.obj"
+    },
+    {
+      "id": "night-lamppost",
+      "uri": "models/night_lamppost.obj"
+    },
+    {
+      "id": "night-barrel",
+      "uri": "models/night_barrel.obj"
+    },
+    {
+      "id": "mesh-guard",
+      "uri": "models/guard.obj"
+    },
+    {
+      "id": "mesh-objective",
+      "uri": "models/lantern.obj"
+    },
+    {
+      "id": "mesh-loot-coins",
+      "uri": "assets/loot/loot-coins.obj"
+    },
+    {
+      "id": "mesh-loot-goblet",
+      "uri": "assets/loot/loot-goblet.obj"
+    },
+    {
+      "id": "mesh-loot-jewel",
+      "uri": "assets/loot/loot-jewel.obj"
+    },
+    {
+      "id": "mesh-loot-purse",
+      "uri": "assets/loot/loot-purse.obj"
+    },
+    {
+      "id": "mesh-loot-scepter",
+      "uri": "assets/loot/loot-scepter.obj"
+    }
+  ],
+  "materials": [
+    {
+      "id": "mat-pavingstone",
+      "color": [
+        1,
+        1,
+        1,
+        1
+      ],
+      "texture": {
+        "uri": "textures/streetlight-pavingstone.jpg",
+        "width": 32,
+        "height": 32,
+        "format": "RGBA16"
+      },
+      "double_sided": false
+    },
+    {
+      "id": "mat-brick",
+      "color": [
+        1,
+        1,
+        1,
+        1
+      ],
+      "texture": {
+        "uri": "textures/streetlight-brick.jpg",
+        "width": 64,
+        "height": 32,
+        "format": "RGBA16"
+      },
+      "double_sided": false
+    },
+    {
+      "id": "mat-stone",
+      "color": [
+        0.5,
+        0.57,
+        0.65,
+        1
+      ],
+      "double_sided": false
+    },
+    {
+      "id": "mat-roof",
+      "color": [
+        0.16,
+        0.21,
+        0.28,
+        1
+      ],
+      "double_sided": false
+    },
+    {
+      "id": "mat-wood",
+      "color": [
+        0.36,
+        0.2,
+        0.095,
+        1
+      ],
+      "double_sided": false
+    },
+    {
+      "id": "mat-iron",
+      "color": [
+        0.12,
+        0.15,
+        0.2,
+        1
+      ],
+      "double_sided": false
+    },
+    {
+      "id": "mat-lamp-glass",
+      "color": [
+        1,
+        0.78,
+        0.36,
+        1
+      ],
+      "emissive": [
+        1,
+        0.75,
+        0.28
+      ],
+      "double_sided": false
+    },
+    {
+      "id": "mat-warm-window",
+      "color": [
+        1,
+        0.58,
+        0.18,
+        1
+      ],
+      "emissive": [
+        0.95,
+        0.45,
+        0.095
+      ],
+      "double_sided": false
+    },
+    {
+      "id": "mat-guard",
+      "color": [
+        0.47,
+        0.27,
+        0.18,
+        1
+      ],
+      "double_sided": false
+    },
+    {
+      "id": "mat-control",
+      "color": [
+        0.17,
+        0.64,
+        0.37,
+        1
+      ],
+      "emissive": [
+        0.045,
+        0.11,
+        0.055
+      ],
+      "double_sided": false
+    },
+    {
+      "id": "mat-objective",
+      "color": [
+        0.92,
+        0.7,
+        0.29,
+        1
+      ],
+      "emissive": [
+        0.22,
+        0.12,
+        0.02
+      ],
+      "double_sided": false
+    },
+    {
+      "id": "mat-loot-atlas",
+      "color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "double_sided": false,
+      "texture": {
+        "uri": "assets/loot/mat-loot-atlas.png",
+        "width": 32,
+        "height": 32,
+        "format": "RGBA16"
+      }
+    }
+  ],
+  "entities": [
+    {
+      "id": "courtyard-paving",
+      "kind": "static",
+      "transform": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "model": "night-paving",
+      "material": "mat-pavingstone",
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          -0.125,
+          0
+        ],
+        "half_size": [
+          5.5,
+          0.125,
+          7.5
+        ]
+      }
+    },
+    {
+      "id": "west-warehouse",
+      "kind": "static",
+      "transform": {
+        "position": [
+          -5.55,
+          1.7,
+          0
+        ],
+        "rotation": [
+          0,
+          90,
+          0
+        ],
+        "scale": [
+          15,
+          3.4,
+          0.3
+        ]
+      },
+      "model": "night-facade",
+      "material": "mat-brick",
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          0.5,
+          0.5,
+          0.5
+        ]
+      }
+    },
+    {
+      "id": "east-warehouse",
+      "kind": "static",
+      "transform": {
+        "position": [
+          5.55,
+          2.25,
+          0
+        ],
+        "rotation": [
+          0,
+          -90,
+          0
+        ],
+        "scale": [
+          15,
+          4.5,
+          0.3
+        ]
+      },
+      "model": "night-facade",
+      "material": "mat-brick",
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          0.5,
+          0.5,
+          0.5
+        ]
+      }
+    },
+    {
+      "id": "north-back-wall",
+      "kind": "static",
+      "transform": {
+        "position": [
+          0,
+          2.1,
+          -7.55
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          11,
+          4.2,
+          0.3
+        ]
+      },
+      "model": "night-facade",
+      "material": "mat-brick",
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          0.5,
+          0.5,
+          0.5
+        ]
+      }
+    },
+    {
+      "id": "south-back-wall",
+      "kind": "static",
+      "transform": {
+        "position": [
+          0,
+          1.6,
+          7.55
+        ],
+        "rotation": [
+          0,
+          180,
+          0
+        ],
+        "scale": [
+          11,
+          3.2,
+          0.3
+        ]
+      },
+      "model": "night-facade",
+      "material": "mat-brick",
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          0.5,
+          0.5,
+          0.5
+        ]
+      }
+    },
+    {
+      "id": "west-pitched-roof",
+      "kind": "static",
+      "transform": {
+        "position": [
+          -6.1,
+          3.4,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          2.8,
+          1.0,
+          15.8
+        ]
+      },
+      "model": "night-roof",
+      "material": "mat-roof",
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0.02,
+          0
+        ],
+        "half_size": [
+          0.5,
+          0.025,
+          0.5
+        ]
+      }
+    },
+    {
+      "id": "east-pitched-roof",
+      "kind": "static",
+      "transform": {
+        "position": [
+          6.1,
+          4.5,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          2.8,
+          1.25,
+          15.8
+        ]
+      },
+      "model": "night-roof",
+      "material": "mat-roof",
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0.02,
+          0
+        ],
+        "half_size": [
+          0.5,
+          0.025,
+          0.5
+        ]
+      }
+    },
+    {
+      "id": "north-pitched-roof",
+      "kind": "static",
+      "transform": {
+        "position": [
+          0,
+          4.2,
+          -7.5
+        ],
+        "rotation": [
+          0,
+          90,
+          0
+        ],
+        "scale": [
+          3.0,
+          1.2,
+          11.6
+        ]
+      },
+      "model": "night-roof",
+      "material": "mat-roof",
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0.02,
+          0
+        ],
+        "half_size": [
+          0.5,
+          0.025,
+          0.5
+        ]
+      }
+    },
+    {
+      "id": "west-eave",
+      "kind": "static",
+      "transform": {
+        "position": [
+          -4.74,
+          3.42,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          0.12,
+          0.12,
+          15.2
+        ]
+      },
+      "model": "night-block",
+      "material": "mat-stone"
+    },
+    {
+      "id": "east-eave",
+      "kind": "static",
+      "transform": {
+        "position": [
+          4.74,
+          4.52,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          0.12,
+          0.12,
+          15.2
+        ]
+      },
+      "model": "night-block",
+      "material": "mat-stone"
+    },
+    {
+      "id": "south-shelter-roof",
+      "kind": "static",
+      "transform": {
+        "position": [
+          -2.5,
+          2.85,
+          5.3
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          6.1,
+          0.22,
+          4.6
+        ]
+      },
+      "model": "night-block",
+      "material": "mat-roof",
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          0.5,
+          0.5,
+          0.5
+        ]
+      }
+    },
+    {
+      "id": "west-shelter-post",
+      "kind": "static",
+      "transform": {
+        "position": [
+          -5.05,
+          1.35,
+          3.14
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          0.2,
+          2.7,
+          0.2
+        ]
+      },
+      "model": "night-block",
+      "material": "mat-wood",
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          0.5,
+          0.5,
+          0.5
+        ]
+      }
+    },
+    {
+      "id": "east-shelter-post",
+      "kind": "static",
+      "transform": {
+        "position": [
+          0.05,
+          1.35,
+          3.14
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          0.2,
+          2.7,
+          0.2
+        ]
+      },
+      "model": "night-block",
+      "material": "mat-wood",
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          0.5,
+          0.5,
+          0.5
+        ]
+      }
+    },
+    {
+      "id": "shelter-front-beam",
+      "kind": "static",
+      "transform": {
+        "position": [
+          -2.5,
+          2.67,
+          3.14
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          5.5,
+          0.2,
+          0.25
+        ]
+      },
+      "model": "night-block",
+      "material": "mat-wood"
+    },
+    {
+      "id": "delivery-left-wall",
+      "kind": "static",
+      "transform": {
+        "position": [
+          -2.9,
+          1.4,
+          -5.8
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          5.2,
+          2.8,
+          0.32
+        ]
+      },
+      "model": "night-facade",
+      "material": "mat-brick",
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          0.5,
+          0.5,
+          0.5
+        ]
+      }
+    },
+    {
+      "id": "delivery-right-wall",
+      "kind": "static",
+      "transform": {
+        "position": [
+          3.7,
+          1.4,
+          -5.8
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          3.6,
+          2.8,
+          0.32
+        ]
+      },
+      "model": "night-facade",
+      "material": "mat-brick",
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          0.5,
+          0.5,
+          0.5
+        ]
+      }
+    },
+    {
+      "id": "delivery-lintel",
+      "kind": "static",
+      "transform": {
+        "position": [
+          0.8,
+          3.28,
+          -5.8
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          2.2,
+          0.26,
+          0.48
+        ]
+      },
+      "model": "night-block",
+      "material": "mat-stone",
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          0.5,
+          0.5,
+          0.5
+        ]
+      }
+    },
+    {
+      "id": "delivery-arch",
+      "kind": "static",
+      "transform": {
+        "position": [
+          0.8,
+          2.12,
+          -5.61
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          0.98,
+          0.8,
+          0.42
+        ]
+      },
+      "model": "night-arch",
+      "material": "mat-stone"
+    },
+    {
+      "id": "delivery-left-jamb",
+      "kind": "static",
+      "transform": {
+        "position": [
+          -0.26,
+          1.06,
+          -5.62
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          0.24,
+          2.12,
+          0.45
+        ]
+      },
+      "model": "night-block",
+      "material": "mat-stone",
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          0.5,
+          0.5,
+          0.5
+        ]
+      }
+    },
+    {
+      "id": "delivery-right-jamb",
+      "kind": "static",
+      "transform": {
+        "position": [
+          1.86,
+          1.06,
+          -5.62
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          0.24,
+          2.12,
+          0.45
+        ]
+      },
+      "model": "night-block",
+      "material": "mat-stone",
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          0.5,
+          0.5,
+          0.5
+        ]
+      }
+    },
+    {
+      "id": "delivery-alcove-ceiling",
+      "kind": "static",
+      "model": "night-block",
+      "material": "mat-roof",
+      "transform": {
+        "position": [
+          0,
+          3.48,
+          -6.65
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          11,
+          0.16,
+          1.9
+        ]
+      },
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          0.5,
+          0.5,
+          0.5
+        ]
+      }
+    },
+    {
+      "id": "delivery-door",
+      "kind": "door",
+      "transform": {
+        "position": [
+          0.8,
+          1.16,
+          -5.8
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1.84,
+          2.32,
+          0.14
+        ]
+      },
+      "model": "night-block",
+      "material": "mat-wood",
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          0.5,
+          0.5,
+          0.5
+        ]
+      }
+    },
+    {
+      "id": "delivery-control",
+      "kind": "control",
+      "transform": {
+        "position": [
+          2.12,
+          0.97,
+          -5.56
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          0.2,
+          0.26,
+          0.14
+        ]
+      },
+      "model": "night-block",
+      "material": "mat-control",
+      "target": "delivery-door"
+    },
+    {
+      "id": "objective-plinth",
+      "kind": "static",
+      "transform": {
+        "position": [
+          0.8,
+          0.25,
+          -6.85
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          0.8,
+          0.5,
+          0.55
+        ]
+      },
+      "model": "night-block",
+      "material": "mat-stone",
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          0.5,
+          0.5,
+          0.5
+        ]
+      }
+    },
+    {
+      "id": "silver-lantern",
+      "kind": "objective",
+      "transform": {
+        "position": [
+          0.8,
+          0.91,
+          -6.85
+        ],
+        "rotation": [
+          0,
+          20,
+          0
+        ],
+        "scale": [
+          0.65,
+          0.65,
+          0.65
+        ]
+      },
+      "model": "mesh-objective",
+      "material": "mat-objective"
+    },
+    {
+      "id": "near-lamp-post",
+      "kind": "static",
+      "transform": {
+        "position": [
+          -3.45,
+          0,
+          1.25
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "model": "night-lamppost",
+      "material": "mat-iron",
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          1.2,
+          0
+        ],
+        "half_size": [
+          0.18,
+          1.2,
+          0.18
+        ]
+      }
+    },
+    {
+      "id": "near-lamp",
+      "kind": "light",
+      "transform": {
+        "position": [
+          -3.45,
+          2.73,
+          1.25
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          0.32,
+          0.4,
+          0.32
+        ]
+      },
+      "model": "night-block",
+      "material": "mat-lamp-glass",
+      "radius": 5.0,
+      "intensity": 2.2,
+      "color": [
+        1,
+        0.48,
+        0.12
+      ]
+    },
+    {
+      "id": "far-lamp-post",
+      "kind": "static",
+      "transform": {
+        "position": [
+          3.45,
+          0,
+          -2.85
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "model": "night-lamppost",
+      "material": "mat-iron",
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          1.2,
+          0
+        ],
+        "half_size": [
+          0.18,
+          1.2,
+          0.18
+        ]
+      }
+    },
+    {
+      "id": "far-lamp",
+      "kind": "light",
+      "transform": {
+        "position": [
+          3.45,
+          2.73,
+          -2.85
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          0.32,
+          0.4,
+          0.32
+        ]
+      },
+      "model": "night-block",
+      "material": "mat-lamp-glass",
+      "radius": 5.0,
+      "intensity": 2.2,
+      "color": [
+        1,
+        0.48,
+        0.12
+      ]
+    },
+    {
+      "id": "delivery-pocket-light",
+      "kind": "light",
+      "transform": {
+        "position": [
+          0.8,
+          2.68,
+          -6.55
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          0.22,
+          0.2,
+          0.22
+        ]
+      },
+      "model": "night-block",
+      "material": "mat-lamp-glass",
+      "radius": 3.5,
+      "intensity": 0.95,
+      "color": [
+        1,
+        0.61,
+        0.26
+      ]
+    },
+    {
+      "id": "west-lit-window",
+      "kind": "static",
+      "transform": {
+        "position": [
+          -5.37,
+          2.12,
+          -2.6
+        ],
+        "rotation": [
+          0,
+          90,
+          0
+        ],
+        "scale": [
+          0.9,
+          0.8,
+          0.035
+        ]
+      },
+      "model": "night-block",
+      "material": "mat-warm-window"
+    },
+    {
+      "id": "west-window-mullion",
+      "kind": "static",
+      "transform": {
+        "position": [
+          -5.34,
+          2.12,
+          -2.6
+        ],
+        "rotation": [
+          0,
+          90,
+          0
+        ],
+        "scale": [
+          0.94,
+          0.07,
+          0.07
+        ]
+      },
+      "model": "night-block",
+      "material": "mat-wood"
+    },
+    {
+      "id": "east-lit-window",
+      "kind": "static",
+      "transform": {
+        "position": [
+          5.37,
+          2.55,
+          1.1
+        ],
+        "rotation": [
+          0,
+          90,
+          0
+        ],
+        "scale": [
+          0.9,
+          0.8,
+          0.035
+        ]
+      },
+      "model": "night-block",
+      "material": "mat-warm-window"
+    },
+    {
+      "id": "east-window-mullion",
+      "kind": "static",
+      "transform": {
+        "position": [
+          5.34,
+          2.55,
+          1.1
+        ],
+        "rotation": [
+          0,
+          90,
+          0
+        ],
+        "scale": [
+          0.94,
+          0.07,
+          0.07
+        ]
+      },
+      "model": "night-block",
+      "material": "mat-wood"
+    },
+    {
+      "id": "angled-cargo",
+      "kind": "static",
+      "transform": {
+        "position": [
+          -0.65,
+          0.58,
+          0.65
+        ],
+        "rotation": [
+          0,
+          24,
+          0
+        ],
+        "scale": [
+          1.3,
+          1.16,
+          1.1
+        ]
+      },
+      "model": "night-block",
+      "material": "mat-wood",
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          0.5,
+          0.5,
+          0.5
+        ]
+      }
+    },
+    {
+      "id": "stacked-cargo",
+      "kind": "static",
+      "transform": {
+        "position": [
+          -0.82,
+          1.39,
+          0.65
+        ],
+        "rotation": [
+          0,
+          -9,
+          0
+        ],
+        "scale": [
+          0.67,
+          0.46,
+          0.73
+        ]
+      },
+      "model": "night-block",
+      "material": "mat-wood",
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          0.5,
+          0.5,
+          0.5
+        ]
+      }
+    },
+    {
+      "id": "cargo-strap",
+      "kind": "static",
+      "transform": {
+        "position": [
+          -0.65,
+          0.59,
+          0.65
+        ],
+        "rotation": [
+          0,
+          24,
+          0
+        ],
+        "scale": [
+          0.14,
+          1.19,
+          1.13
+        ]
+      },
+      "model": "night-block",
+      "material": "mat-iron"
+    },
+    {
+      "id": "far-cargo",
+      "kind": "static",
+      "transform": {
+        "position": [
+          -3.88,
+          0.43,
+          -3.48
+        ],
+        "rotation": [
+          0,
+          -17,
+          0
+        ],
+        "scale": [
+          1.3,
+          0.86,
+          0.95
+        ]
+      },
+      "model": "night-block",
+      "material": "mat-wood",
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          0.5,
+          0.5,
+          0.5
+        ]
+      }
+    },
+    {
+      "id": "supply-drum",
+      "kind": "static",
+      "transform": {
+        "position": [
+          3.72,
+          0,
+          3.4
+        ],
+        "rotation": [
+          0,
+          17,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "model": "night-barrel",
+      "material": "mat-wood",
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0.45,
+          0
+        ],
+        "half_size": [
+          0.38,
+          0.45,
+          0.38
+        ]
+      }
+    },
+    {
+      "id": "spare-drum",
+      "kind": "static",
+      "transform": {
+        "position": [
+          4.6,
+          0,
+          3.85
+        ],
+        "rotation": [
+          0,
+          4,
+          0
+        ],
+        "scale": [
+          0.85,
+          0.85,
+          0.85
+        ]
+      },
+      "model": "night-barrel",
+      "material": "mat-iron",
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0.45,
+          0
+        ],
+        "half_size": [
+          0.38,
+          0.45,
+          0.38
+        ]
+      }
+    },
+    {
+      "id": "player-start",
+      "kind": "spawn",
+      "transform": {
+        "position": [
+          -2.8,
+          0,
+          4.9
+        ],
+        "rotation": [
+          0,
+          153,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "id": "patrol-far",
+      "kind": "waypoint",
+      "transform": {
+        "position": [
+          2.6,
+          0,
+          -1.8
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "id": "patrol-middle",
+      "kind": "waypoint",
+      "transform": {
+        "position": [
+          2.6,
+          0,
+          0.5
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "id": "patrol-west",
+      "kind": "waypoint",
+      "transform": {
+        "position": [
+          0.4,
+          0,
+          -2.0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "id": "courtyard-watchman",
+      "kind": "guard",
+      "transform": {
+        "position": [
+          2.6,
+          0,
+          -1.8
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "model": "mesh-guard",
+      "material": "mat-guard",
+      "patrol": [
+        "patrol-far",
+        "patrol-middle",
+        "patrol-west"
+      ],
+      "speed": 0.48,
+      "sight_range": 3.2,
+      "hearing_range": 5.5
+    },
+    {
+      "id": "loot-counter",
+      "kind": "static",
+      "model": "night-block",
+      "material": "mat-wood",
+      "transform": {
+        "position": [
+          -3.45,
+          0.5,
+          3.7
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          2.1,
+          1,
+          0.72
+        ]
+      },
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          0.5,
+          0.5,
+          0.5
+        ]
+      }
+    },
+    {
+      "id": "yard-loot-coins",
+      "kind": "static",
+      "model": "mesh-loot-coins",
+      "material": "mat-loot-atlas",
+      "transform": {
+        "position": [
+          -4.18,
+          1.002,
+          3.72
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "loot_highlight": true
+    },
+    {
+      "id": "yard-loot-goblet",
+      "kind": "static",
+      "model": "mesh-loot-goblet",
+      "material": "mat-loot-atlas",
+      "transform": {
+        "position": [
+          -3.8,
+          1.002,
+          3.72
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "loot_highlight": true
+    },
+    {
+      "id": "yard-loot-jewel",
+      "kind": "static",
+      "model": "mesh-loot-jewel",
+      "material": "mat-loot-atlas",
+      "transform": {
+        "position": [
+          -3.45,
+          1.002,
+          3.72
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "loot_highlight": true
+    },
+    {
+      "id": "yard-loot-purse",
+      "kind": "static",
+      "model": "mesh-loot-purse",
+      "material": "mat-loot-atlas",
+      "transform": {
+        "position": [
+          -3.1,
+          1.002,
+          3.72
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "loot_highlight": true
+    },
+    {
+      "id": "yard-loot-scepter",
+      "kind": "static",
+      "model": "mesh-loot-scepter",
+      "material": "mat-loot-atlas",
+      "transform": {
+        "position": [
+          -2.72,
+          1.002,
+          3.72
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "loot_highlight": true
+    },
+    {
+      "id": "counter-pendant",
+      "kind": "static",
+      "model": "mesh-objective",
+      "material": "mat-lamp-glass",
+      "transform": {
+        "position": [
+          -3.45,
+          2.25,
+          4.32
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          0.16,
+          0.2,
+          0.16
+        ]
+      }
+    },
+    {
+      "id": "counter-pendant-chain",
+      "kind": "static",
+      "model": "night-block",
+      "material": "mat-iron",
+      "transform": {
+        "position": [
+          -3.45,
+          2.59,
+          4.32
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          0.018,
+          0.44,
+          0.018
+        ]
+      }
+    },
+    {
+      "id": "counter-lamp",
+      "kind": "light",
+      "radius": 3,
+      "intensity": 0.9,
+      "color": [
+        1,
+        0.78,
+        0.46
+      ],
+      "transform": {
+        "position": [
+          -3.45,
+          2.17,
+          4.32
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      }
+    }
+  ],
+  "test_starts": [
+    {
+      "id": "loot-counter",
+      "label": "Blender loot counter",
+      "position": [
+        -3.45,
+        0,
+        5.18
+      ],
+      "yaw": 180,
+      "pitch": -8
+    }
+  ]
+}

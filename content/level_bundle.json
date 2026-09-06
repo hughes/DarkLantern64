@@ -1,0 +1,9 @@
+{
+  "version": 1,
+  "title": "DarkLantern64",
+  "levels": [
+    {"id": "lantern-store", "source": "first_room.json"},
+    {"id": "moonlit-yard", "source": "moonlit_courtyard.json"},
+    {"id": "enemy-workshop", "source": "enemy_patrols.json"}
+  ]
+}

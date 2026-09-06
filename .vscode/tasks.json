@@ -1,0 +1,255 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "DarkLantern64: Build + Play loot counter",
+      "detail": "Build the saved moonlit yard and launch directly at its Blender-made loot display. Save + Cook first.",
+      "type": "process",
+      "command": "python",
+      "args": ["tools/build.py", "--level", "content/moonlit_courtyard.json", "--start-preset", "loot-counter", "--run"],
+      "options": { "cwd": "${workspaceFolder}" },
+      "presentation": { "reveal": "always", "panel": "dedicated", "focus": false },
+      "problemMatcher": []
+    },
+    {
+      "label": "DarkLantern64: Open loot in Blender",
+      "detail": "Open art/loot.blend for interactive editing. Save the .blend before exporting.",
+      "type": "process",
+      "command": "python",
+      "args": ["tools/blender_assets.py", "--open"],
+      "options": { "cwd": "${workspaceFolder}" },
+      "presentation": { "reveal": "always", "panel": "dedicated", "focus": false },
+      "problemMatcher": []
+    },
+    {
+      "label": "DarkLantern64: Export Blender loot assets",
+      "detail": "Export the saved art/loot.blend to content/assets/loot/pack.json without changing any level.",
+      "type": "process",
+      "command": "python",
+      "args": ["tools/blender_assets.py"],
+      "options": { "cwd": "${workspaceFolder}" },
+      "presentation": { "reveal": "always", "panel": "dedicated", "focus": false },
+      "problemMatcher": []
+    },
+    {
+      "label": "DarkLantern64: Package Blender export add-on",
+      "detail": "Create build/darklantern64_export.zip for manual installation in Blender.",
+      "type": "process",
+      "command": "python",
+      "args": ["tools/blender_assets.py", "--package-addon"],
+      "options": { "cwd": "${workspaceFolder}" },
+      "presentation": { "reveal": "always", "panel": "dedicated", "focus": false },
+      "problemMatcher": []
+    },
+    {
+      "label": "DarkLantern64: Recreate loot demo (overwrites loot.blend)",
+      "detail": "Regenerate the five example props and export pack, replacing art/loot.blend. Preserve your edits in another source file first.",
+      "type": "process",
+      "command": "python",
+      "args": ["tools/blender_assets.py", "--make-demo"],
+      "options": { "cwd": "${workspaceFolder}" },
+      "presentation": { "reveal": "always", "panel": "dedicated", "focus": false },
+      "problemMatcher": []
+    },
+    {
+      "label": "DarkLantern64: Build + Play level select",
+      "detail": "Bundle the saved Lantern Store, moonlit yard and enemy workshop into one ROM with a level-select screen.",
+      "type": "process",
+      "command": "python",
+      "args": ["tools/build.py", "--bundle", "content/level_bundle.json", "--run"],
+      "options": { "cwd": "${workspaceFolder}" },
+      "presentation": { "reveal": "always", "panel": "dedicated", "focus": false },
+      "problemMatcher": []
+    },
+    {
+      "label": "DarkLantern64: Build + Play test start",
+      "detail": "Launch directly into a named test start in the enemy workshop. Save + Cook first.",
+      "type": "process",
+      "command": "python",
+      "args": ["tools/build.py", "--level", "content/enemy_patrols.json", "--start-preset", "${input:enemyTestStart}", "--run"],
+      "options": { "cwd": "${workspaceFolder}" },
+      "presentation": { "reveal": "always", "panel": "dedicated", "focus": false },
+      "problemMatcher": []
+    },
+    {
+      "label": "DarkLantern64: Verify level switching",
+      "detail": "Exercise the selector, every bundled test start, restart and resume in isolated Ares runs.",
+      "type": "process",
+      "command": "python",
+      "args": ["tools/smoke_bundle.py"],
+      "options": { "cwd": "${workspaceFolder}" },
+      "presentation": { "reveal": "always", "panel": "dedicated", "focus": false },
+      "problemMatcher": []
+    },
+    {
+      "label": "DarkLantern64: Open enemy workshop",
+      "detail": "Edit three enemies, their types, patrol routes and sentry posts.",
+      "type": "process",
+      "command": "python",
+      "args": ["tools/build.py", "--editor", "--run", "--level", "content/enemy_patrols.json"],
+      "options": { "cwd": "${workspaceFolder}" },
+      "presentation": { "reveal": "always", "panel": "dedicated", "focus": false },
+      "problemMatcher": []
+    },
+    {
+      "label": "DarkLantern64: Save + Cook enemy workshop",
+      "detail": "Save the open enemy workshop and refresh its models and waypoint markers.",
+      "type": "process",
+      "command": "python",
+      "args": ["tools/editorctl.py", "save", "--level", "content/enemy_patrols.json"],
+      "options": { "cwd": "${workspaceFolder}" },
+      "presentation": { "reveal": "always", "panel": "dedicated", "focus": false },
+      "problemMatcher": []
+    },
+    {
+      "label": "DarkLantern64: Build + Play enemy workshop",
+      "detail": "Build the saved three-enemy level and launch it in Ares. Save + Cook first.",
+      "type": "process",
+      "command": "python",
+      "args": ["tools/build.py", "--run", "--level", "content/enemy_patrols.json"],
+      "options": { "cwd": "${workspaceFolder}" },
+      "presentation": { "reveal": "always", "panel": "dedicated", "focus": false },
+      "problemMatcher": []
+    },
+    {
+      "label": "DarkLantern64: Scale study",
+      "detail": "Measure guard/light workloads and compare eight saved-courtyard fixtures with bounds culling on/off in isolated Ares runs.",
+      "type": "process",
+      "command": "python",
+      "args": ["tools/scale_study.py", "--compare-culling"],
+      "options": { "cwd": "${workspaceFolder}" },
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true, "focus": false },
+      "problemMatcher": []
+    },
+    {
+      "label": "DarkLantern64: Guard + light workload study",
+      "detail": "Run the short isolated CPU workload diagnostic; excludes drawing, animation and inter-guard behavior.",
+      "type": "process",
+      "command": "python",
+      "args": ["tools/scale_study.py", "--micro-only"],
+      "options": { "cwd": "${workspaceFolder}" },
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true, "focus": false },
+      "problemMatcher": []
+    },
+    {
+      "label": "DarkLantern64: Save + Cook courtyard (editor must be open)",
+      "detail": "Save the running courtyard workshop and refresh its cooked preview.",
+      "type": "process",
+      "command": "python",
+      "args": ["tools/editorctl.py", "--level", "content/moonlit_courtyard.json", "save"],
+      "options": { "cwd": "${workspaceFolder}" },
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true, "focus": false },
+      "problemMatcher": []
+    },
+    {
+      "label": "DarkLantern64: Validate saved courtyard",
+      "detail": "Check the saved courtyard, models and texture recipes.",
+      "type": "process",
+      "command": "python",
+      "args": ["tools/compile_level.py", "content/moonlit_courtyard.json", "--validate-only"],
+      "options": { "cwd": "${workspaceFolder}" },
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true, "focus": false },
+      "problemMatcher": []
+    },
+    {
+      "label": "DarkLantern64: Open courtyard editor",
+      "detail": "Edit the separate moonlit courtyard, including shared texture materials and night lighting.",
+      "type": "process",
+      "command": "python",
+      "args": ["tools/build.py", "--editor", "--run", "--level", "content/moonlit_courtyard.json"],
+      "options": { "cwd": "${workspaceFolder}" },
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true, "focus": false },
+      "problemMatcher": []
+    },
+    {
+      "label": "DarkLantern64: Build + Play courtyard",
+      "detail": "Build the saved courtyard and launch it in Ares. Save + Cook editor changes first.",
+      "type": "process",
+      "command": "python",
+      "args": ["tools/build.py", "--run", "--level", "content/moonlit_courtyard.json"],
+      "options": { "cwd": "${workspaceFolder}" },
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true, "focus": false },
+      "problemMatcher": []
+    },
+    {
+      "label": "DarkLantern64: Capture courtyard views",
+      "detail": "Build a diagnostic ROM and export actual N64 framebuffers at the authored cameras. Save changes first.",
+      "type": "process",
+      "command": "python",
+      "args": ["tools/capture_ares.py", "--level", "content/moonlit_courtyard.json"],
+      "options": { "cwd": "${workspaceFolder}" },
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true, "focus": false },
+      "problemMatcher": []
+    },
+    {
+      "label": "DarkLantern64: Open editor",
+      "detail": "Build and open the LightEngine editor for this project.",
+      "type": "process",
+      "command": "python",
+      "args": ["tools/build.py", "--editor", "--run"],
+      "options": { "cwd": "${workspaceFolder}" },
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true, "focus": false },
+      "problemMatcher": []
+    },
+    {
+      "label": "DarkLantern64: Validate saved level",
+      "detail": "Check the saved first_room.json and its model assets. Save editor changes first.",
+      "type": "process",
+      "command": "python",
+      "args": ["tools/compile_level.py", "--validate-only"],
+      "options": { "cwd": "${workspaceFolder}" },
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true, "focus": false },
+      "problemMatcher": []
+    },
+    {
+      "label": "DarkLantern64: Save + Cook (editor must be open)",
+      "detail": "Ask the running editor to save level changes and generate the preview and game data.",
+      "type": "process",
+      "command": "python",
+      "args": ["tools/editorctl.py", "save"],
+      "options": { "cwd": "${workspaceFolder}" },
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true, "focus": false },
+      "problemMatcher": []
+    },
+    {
+      "label": "DarkLantern64: Build game",
+      "detail": "Cook saved content and build the N64 ROM. Save editor changes first.",
+      "type": "process",
+      "command": "python",
+      "args": ["tools/build.py"],
+      "options": { "cwd": "${workspaceFolder}" },
+      "group": { "kind": "build", "isDefault": true },
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true, "focus": false },
+      "problemMatcher": []
+    },
+    {
+      "label": "DarkLantern64: Build + Play game",
+      "detail": "Build saved content and open the game in Ares with 8 MiB memory enabled.",
+      "type": "process",
+      "command": "python",
+      "args": ["tools/build.py", "--run"],
+      "options": { "cwd": "${workspaceFolder}" },
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true, "focus": false },
+      "problemMatcher": []
+    },
+    {
+      "label": "DarkLantern64: Report game profile",
+      "detail": "Summarize completed profiling windows from the latest Ares play session.",
+      "type": "process",
+      "command": "python",
+      "args": ["tools/profile_report.py"],
+      "options": { "cwd": "${workspaceFolder}" },
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true, "focus": false },
+      "problemMatcher": []
+    }
+  ],
+  "inputs": [
+    {
+      "id": "enemyTestStart",
+      "type": "pickString",
+      "description": "Choose the enemy workshop's starting state",
+      "options": ["store-door-open", "scout-observation"],
+      "default": "store-door-open"
+    }
+  ]
+}

@@ -1,0 +1,242 @@
+{
+  "date": "2026-09-05",
+  "platform": "Ares, emulated CPU timer; target hardware validation pending",
+  "manual_rom_sha256": "be61d33a9b1ddc01362fb0b2d692feb4e7cb29141b09b63ff4355c8112250b76",
+  "capture_rom_sha256": "55012501be30a52593767c284074a658827857949f24e50bd0068f0c4ed546d8",
+  "canonical_content_sha256": "cd7f578c9876cdf9d546438a52fd05e082885a1668a70ea232c7fb9dcaffe88d",
+  "raw_source_sha256": "24cb5e9c07587a93f4977176acee6b3d23a67fbb539450c964c093e14911de8a",
+  "runtime_sources": {
+    "game.c": "17be9d6aae7f4b84191a4dba79734d4b90b81dac086ae00758e28cc3469d48d5",
+    "game.h": "1aaff33f97624ee3451b7bb3ff54335b6b5580bcec565ef603fab2f43e25f734",
+    "render.c": "6f8649198d324a9f034b16b2ac2ebfebdb456a293ad798deed7102637abc3b04",
+    "render.h": "4f0ae3f733ad222ac5b8d228ae33c19d3047fdcafd18c5c08689504a58661593",
+    "main.c": "08aa5f1f27b176c41407f8aebacf7999a6a672b53cf403dcd02de1e29cd3a79b",
+    "dl_profile.c": "da918b7fc4d9070cda2553f547b435f55fd147c44df0ed3db120a6c5c6c57129",
+    "dl_profile.h": "e2dc70f428d2e7e405d20317bd35f0cd9198e098b9f85b3999084c7d631b4f82"
+  },
+  "rom_bytes": 311296,
+  "static_image_bytes": 544704,
+  "peak_sampled_heap_bytes": 668760,
+  "texture_pixel_bytes": 6144,
+  "texture_sprite_bytes": 6416,
+  "night_cache_bytes": 48192,
+  "capture_measurement": "Raw RDP framebuffer before VI filtering; capture timings are diagnostic only",
+  "captures": [
+    {
+      "view": {
+        "id": "shelter-to-courtyard",
+        "position": [
+          -2.8,
+          0,
+          4.9
+        ],
+        "yaw": 153,
+        "pitch": 5
+      },
+      "image": "docs/images/night-shelter-to-courtyard.png",
+      "sha256": "4633bca67edc6bef2a025e9864aedcea974a9672d77dd141fcf0b77d050a6a21"
+    },
+    {
+      "view": {
+        "id": "warm-lamp-cool-roofs",
+        "position": [
+          1.0,
+          0,
+          -1.1
+        ],
+        "yaw": 298,
+        "pitch": 9
+      },
+      "image": "docs/images/night-warm-lamp-cool-roofs.png",
+      "sha256": "d9ad0b08d651c39274ad60a8bcd5c669e3961d559c3a6e8c37e3c6ce8ef2edee"
+    },
+    {
+      "view": {
+        "id": "doorway-landmark",
+        "position": [
+          -1.2,
+          0,
+          -1.8
+        ],
+        "yaw": 155,
+        "pitch": 2
+      },
+      "image": "docs/images/night-doorway-landmark.png",
+      "sha256": "ee733da123c88b0b617f0bb8602dcabebcef415f001568a59a2f08dfdcb05f07"
+    },
+    {
+      "view": {
+        "id": "doorway-open",
+        "position": [
+          -1.2,
+          0,
+          -1.8
+        ],
+        "yaw": 155,
+        "pitch": 2,
+        "door_open": true
+      },
+      "image": "docs/images/night-doorway-open.png",
+      "sha256": "901184e6355af6c53e2f86489bdaef214614b60c2916948600859a572ffd39c1"
+    }
+  ],
+  "profile": {
+    "schema_version": 1,
+    "measurement": "Emulated CPU-timer elapsed time; not CPU utilization or host CPU time",
+    "source_log": ".dev/ares/runs/3234e2edef9b468faa015d700460a0f2/night-profile.log",
+    "source_log_sha256": "9dc5fe56d836048d11318e51e80ed03cf502cee1b9728511115ddbd63f8f98fe",
+    "source_log_bytes": 7591,
+    "complete_windows": 5,
+    "frames": 101,
+    "ignored_trailing_partial_window": false,
+    "ticks_per_second": 46875000,
+    "target_fps": 30,
+    "frame_budget_ms": 33.333333333333336,
+    "debug_states": [
+      0
+    ],
+    "debug_frames": {
+      "0": 101
+    },
+    "audio_calls": 127,
+    "frame": {
+      "total_ticks": 236461038,
+      "max_ticks": 2408565,
+      "average_ms": 49.94556578217822,
+      "max_ms": 51.38272,
+      "percent_of_30fps_budget": 149.83669734653466,
+      "percent_of_frame_elapsed": 100.0
+    },
+    "slots": {
+      "input": {
+        "total_ticks": 216300,
+        "max_ticks": 3650,
+        "average_ms": 0.04568712871287128,
+        "max_ms": 0.07786666666666667,
+        "percent_of_30fps_budget": 0.13706138613861385,
+        "percent_of_frame_elapsed": 0.09147384356825838
+      },
+      "gameplay": {
+        "total_ticks": 19076245,
+        "max_ticks": 196876,
+        "average_ms": 4.029305874587459,
+        "max_ms": 4.200021333333333,
+        "percent_of_30fps_budget": 12.087917623762378,
+        "percent_of_frame_elapsed": 8.067394595468198
+      },
+      "audio_events": {
+        "total_ticks": 68694,
+        "max_ticks": 12972,
+        "average_ms": 0.01450962376237624,
+        "max_ms": 0.276736,
+        "percent_of_30fps_budget": 0.04352887128712872,
+        "percent_of_frame_elapsed": 0.02905087475764189
+      },
+      "audio_mix": {
+        "total_ticks": 2934804,
+        "max_ticks": 92728,
+        "average_ms": 0.619892594059406,
+        "max_ms": 1.9781973333333334,
+        "percent_of_30fps_budget": 1.859677782178218,
+        "percent_of_frame_elapsed": 1.2411363938950484
+      },
+      "cache": {
+        "total_ticks": 0,
+        "max_ticks": 0,
+        "average_ms": 0.0,
+        "max_ms": 0.0,
+        "percent_of_30fps_budget": 0.0,
+        "percent_of_frame_elapsed": 0.0
+      },
+      "transforms": {
+        "total_ticks": 36889807,
+        "max_ticks": 370601,
+        "average_ms": 7.791906429042903,
+        "max_ms": 7.906154666666667,
+        "percent_of_30fps_budget": 23.37571928712871,
+        "percent_of_frame_elapsed": 15.600797201947493
+      },
+      "lighting": {
+        "total_ticks": 12641646,
+        "max_ticks": 127098,
+        "average_ms": 2.6701826534653463,
+        "max_ms": 2.711424,
+        "percent_of_30fps_budget": 8.010547960396039,
+        "percent_of_frame_elapsed": 5.346185615576973
+      },
+      "triangles": {
+        "total_ticks": 105420619,
+        "max_ticks": 1048192,
+        "average_ms": 22.267061438943895,
+        "max_ms": 22.361429333333334,
+        "percent_of_30fps_budget": 66.8011843168317,
+        "percent_of_frame_elapsed": 44.58265932165958
+      },
+      "hud": {
+        "total_ticks": 7359971,
+        "max_ticks": 79014,
+        "average_ms": 1.5545813333333331,
+        "max_ms": 1.685632,
+        "percent_of_30fps_budget": 4.6637439999999994,
+        "percent_of_frame_elapsed": 3.1125512525238936
+      },
+      "debug_hud": {
+        "total_ticks": 0,
+        "max_ticks": 0,
+        "average_ms": 0.0,
+        "max_ms": 0.0,
+        "percent_of_30fps_budget": 0.0,
+        "percent_of_frame_elapsed": 0.0
+      },
+      "render_setup": {
+        "total_ticks": 1488154,
+        "max_ticks": 16556,
+        "average_ms": 0.3143295577557756,
+        "max_ms": 0.35319466666666666,
+        "percent_of_30fps_budget": 0.9429886732673267,
+        "percent_of_frame_elapsed": 0.6293442727761349
+      },
+      "display_wait": {
+        "total_ticks": 49395526,
+        "max_ticks": 521385,
+        "average_ms": 10.433378429042905,
+        "max_ms": 11.12288,
+        "percent_of_30fps_budget": 31.300135287128718,
+        "percent_of_frame_elapsed": 20.889498928783354
+      },
+      "other": {
+        "total_ticks": 969272,
+        "max_ticks": 107523,
+        "average_ms": 0.2047307194719472,
+        "max_ms": 2.293824,
+        "percent_of_30fps_budget": 0.6141921584158416,
+        "percent_of_frame_elapsed": 0.4099076990434255
+      }
+    },
+    "limitations": [
+      "Ares timing model; original N64 and M64 hardware validation remains pending.",
+      "Slot maxima are worst observed per-frame totals and must not be added together.",
+      "Submission scopes include internal queue stalls; this does not time RDP/GPU execution.",
+      "Audio callback time is attributed exclusively; other interrupts remain in the interrupted scope.",
+      "Profiling and enabled debug display add overhead. Incomplete trailing records are excluded."
+    ]
+  },
+  "regression": {
+    "passed": true,
+    "checks": [
+      {
+        "name": "smoke-4mb",
+        "rom_sha256": "8d7a3249d5a73bc5d094709f63114b89f8bde764f281df09d5694f4bd44f7198",
+        "log": ".dev/ares/runs/26a8ee9dedb64e00873639e67eea69b0/smoke-4mb.log",
+        "passed": true
+      },
+      {
+        "name": "smoke-8mb",
+        "rom_sha256": "94ae4989d59f6904d2d17520889a517174b3f5f7e3b3182984d20b4fb03063f2",
+        "log": ".dev/ares/runs/a5ff5c752d844704afadd398ecfc406e/smoke-8mb.log",
+        "passed": true
+      }
+    ],
+    "graphics_queue_fix": "Explicit rspq_flush before display_get resolves the reproduced RSP asleep/pending-command timeout in this SDK/Ares setup."
+  }
+}

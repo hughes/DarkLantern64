@@ -1,0 +1,1194 @@
+{
+  "assets": [
+    {
+      "id": "mesh-block",
+      "uri": "models/block.obj"
+    },
+    {
+      "id": "mesh-floor",
+      "uri": "models/floor.obj"
+    },
+    {
+      "id": "mesh-guard",
+      "uri": "models/guard.obj"
+    },
+    {
+      "id": "mesh-lantern",
+      "uri": "models/lantern.obj"
+    },
+    {
+      "id": "mesh-loot-coins",
+      "uri": "assets/loot/loot-coins.obj"
+    },
+    {
+      "id": "mesh-loot-goblet",
+      "uri": "assets/loot/loot-goblet.obj"
+    },
+    {
+      "id": "mesh-loot-jewel",
+      "uri": "assets/loot/loot-jewel.obj"
+    },
+    {
+      "id": "mesh-loot-purse",
+      "uri": "assets/loot/loot-purse.obj"
+    },
+    {
+      "id": "mesh-loot-scepter",
+      "uri": "assets/loot/loot-scepter.obj"
+    }
+  ],
+  "entities": [
+    {
+      "collider": {
+        "center": [
+          0,
+          -0.25,
+          0
+        ],
+        "half_size": [
+          9,
+          0.25,
+          8
+        ],
+        "shape": "box"
+      },
+      "id": "floor",
+      "kind": "static",
+      "material": "mat-floor",
+      "model": "mesh-floor",
+      "transform": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "collider": {
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          0.5,
+          0.5,
+          0.5
+        ],
+        "shape": "box"
+      },
+      "id": "north-wall",
+      "kind": "static",
+      "material": "mat-stone",
+      "model": "mesh-block",
+      "transform": {
+        "position": [
+          0,
+          1.5,
+          -8
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          18,
+          3,
+          0.3
+        ]
+      }
+    },
+    {
+      "collider": {
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          0.5,
+          0.5,
+          0.5
+        ],
+        "shape": "box"
+      },
+      "id": "south-wall",
+      "kind": "static",
+      "material": "mat-stone",
+      "model": "mesh-block",
+      "transform": {
+        "position": [
+          0,
+          1.5,
+          8
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          18,
+          3,
+          0.3
+        ]
+      }
+    },
+    {
+      "collider": {
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          0.5,
+          0.5,
+          0.5
+        ],
+        "shape": "box"
+      },
+      "id": "west-wall",
+      "kind": "static",
+      "material": "mat-stone",
+      "model": "mesh-block",
+      "transform": {
+        "position": [
+          -9,
+          1.5,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          0.3,
+          3,
+          16
+        ]
+      }
+    },
+    {
+      "collider": {
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          0.5,
+          0.5,
+          0.5
+        ],
+        "shape": "box"
+      },
+      "id": "east-wall",
+      "kind": "static",
+      "material": "mat-stone",
+      "model": "mesh-block",
+      "transform": {
+        "position": [
+          9,
+          1.5,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          0.3,
+          3,
+          16
+        ]
+      }
+    },
+    {
+      "collider": {
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          0.5,
+          0.5,
+          0.5
+        ],
+        "shape": "box"
+      },
+      "id": "diagonal-divider-north",
+      "kind": "static",
+      "material": "mat-stone",
+      "model": "mesh-block",
+      "transform": {
+        "position": [
+          -1.2552723687472256,
+          1.5,
+          -4.684740257501981
+        ],
+        "rotation": [
+          0,
+          15,
+          0
+        ],
+        "scale": [
+          0.3,
+          3,
+          8.2
+        ]
+      }
+    },
+    {
+      "collider": {
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          0.5,
+          0.5,
+          0.5
+        ],
+        "shape": "box"
+      },
+      "id": "diagonal-divider-south",
+      "kind": "static",
+      "material": "mat-stone",
+      "model": "mesh-block",
+      "transform": {
+        "position": [
+          1.2552723687472256,
+          1.5,
+          4.684740257501981
+        ],
+        "rotation": [
+          0,
+          15,
+          0
+        ],
+        "scale": [
+          0.3,
+          3,
+          8.2
+        ]
+      }
+    },
+    {
+      "collider": {
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          0.5,
+          0.5,
+          0.5
+        ],
+        "shape": "box"
+      },
+      "id": "store-door",
+      "kind": "door",
+      "material": "mat-wood",
+      "model": "mesh-block",
+      "transform": {
+        "position": [
+          0,
+          1.5,
+          0
+        ],
+        "rotation": [
+          0,
+          105,
+          0
+        ],
+        "scale": [
+          1.5,
+          3,
+          0.3
+        ]
+      }
+    },
+    {
+      "collider": {
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          0.5,
+          0.5,
+          0.5
+        ],
+        "shape": "box"
+      },
+      "id": "rotated-crate",
+      "kind": "static",
+      "material": "mat-wood",
+      "model": "mesh-block",
+      "transform": {
+        "position": [
+          -5,
+          0.65,
+          1.4
+        ],
+        "rotation": [
+          0,
+          28,
+          0
+        ],
+        "scale": [
+          1.3,
+          1.3,
+          1.3
+        ]
+      }
+    },
+    {
+      "collider": {
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          0.5,
+          0.5,
+          0.5
+        ],
+        "shape": "box"
+      },
+      "id": "raised-platform",
+      "kind": "static",
+      "material": "mat-stone",
+      "model": "mesh-block",
+      "transform": {
+        "position": [
+          5,
+          0.4,
+          5
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          3,
+          0.8,
+          3
+        ]
+      }
+    },
+    {
+      "collider": {
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          0.5,
+          0.5,
+          0.5
+        ],
+        "shape": "box"
+      },
+      "id": "step-1",
+      "kind": "static",
+      "material": "mat-wood",
+      "model": "mesh-block",
+      "transform": {
+        "position": [
+          5,
+          0.1,
+          2.25
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1.4,
+          0.2,
+          0.4
+        ]
+      }
+    },
+    {
+      "collider": {
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          0.5,
+          0.5,
+          0.5
+        ],
+        "shape": "box"
+      },
+      "id": "step-2",
+      "kind": "static",
+      "material": "mat-wood",
+      "model": "mesh-block",
+      "transform": {
+        "position": [
+          5,
+          0.2,
+          2.65
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1.4,
+          0.4,
+          0.4
+        ]
+      }
+    },
+    {
+      "collider": {
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          0.5,
+          0.5,
+          0.5
+        ],
+        "shape": "box"
+      },
+      "id": "step-3",
+      "kind": "static",
+      "material": "mat-wood",
+      "model": "mesh-block",
+      "transform": {
+        "position": [
+          5,
+          0.30000000000000004,
+          3.05
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1.4,
+          0.6000000000000001,
+          0.4
+        ]
+      }
+    },
+    {
+      "collider": {
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          0.5,
+          0.5,
+          0.5
+        ],
+        "shape": "box"
+      },
+      "id": "step-4",
+      "kind": "static",
+      "material": "mat-wood",
+      "model": "mesh-block",
+      "transform": {
+        "position": [
+          5,
+          0.4,
+          3.45
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1.4,
+          0.8,
+          0.4
+        ]
+      }
+    },
+    {
+      "id": "tilted-rafter",
+      "kind": "static",
+      "material": "mat-wood",
+      "model": "mesh-block",
+      "transform": {
+        "position": [
+          -4,
+          3.3,
+          -2
+        ],
+        "rotation": [
+          12,
+          25,
+          8
+        ],
+        "scale": [
+          6,
+          0.28,
+          0.3
+        ]
+      }
+    },
+    {
+      "id": "player-start",
+      "kind": "spawn",
+      "transform": {
+        "position": [
+          -6,
+          0,
+          5
+        ],
+        "rotation": [
+          0,
+          180,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "hearing_range": 8,
+      "id": "store-guard",
+      "kind": "guard",
+      "material": "mat-guard",
+      "model": "mesh-guard",
+      "patrol": [
+        "patrol-nw",
+        "patrol-ne",
+        "patrol-se",
+        "patrol-sw"
+      ],
+      "sight_range": 7,
+      "speed": 0.85,
+      "transform": {
+        "position": [
+          3,
+          0,
+          -4
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "id": "patrol-nw",
+      "kind": "waypoint",
+      "transform": {
+        "position": [
+          3,
+          0,
+          -4
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "id": "patrol-ne",
+      "kind": "waypoint",
+      "transform": {
+        "position": [
+          6.5,
+          0,
+          -3
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "id": "patrol-se",
+      "kind": "waypoint",
+      "transform": {
+        "position": [
+          6.5,
+          0,
+          1.5
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "id": "patrol-sw",
+      "kind": "waypoint",
+      "transform": {
+        "position": [
+          3,
+          0,
+          1.5
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "id": "door-control",
+      "kind": "control",
+      "material": "mat-control",
+      "model": "mesh-block",
+      "target": "store-door",
+      "transform": {
+        "position": [
+          -1.05,
+          0.9,
+          0.28
+        ],
+        "rotation": [
+          0,
+          15,
+          0
+        ],
+        "scale": [
+          0.22,
+          0.26,
+          0.22
+        ]
+      }
+    },
+    {
+      "id": "silver-lantern",
+      "kind": "objective",
+      "material": "mat-objective",
+      "model": "mesh-lantern",
+      "transform": {
+        "position": [
+          5,
+          1.2,
+          5
+        ],
+        "rotation": [
+          0,
+          20,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "id": "workroom-light",
+      "intensity": 0.9,
+      "kind": "light",
+      "material": "mat-light",
+      "model": "mesh-lantern",
+      "radius": 5.3,
+      "transform": {
+        "position": [
+          -4,
+          2.6,
+          -3
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          0.3,
+          0.3,
+          0.3
+        ]
+      }
+    },
+    {
+      "id": "store-light",
+      "intensity": 0.85,
+      "kind": "light",
+      "material": "mat-light",
+      "model": "mesh-lantern",
+      "radius": 5.2,
+      "transform": {
+        "position": [
+          5,
+          2.6,
+          -2
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          0.3,
+          0.3,
+          0.3
+        ]
+      }
+    },
+    {
+      "behavior": "patrol",
+      "enemy_type": "scout",
+      "id": "workroom-scout",
+      "kind": "guard",
+      "material": "mat-guard",
+      "model": "mesh-guard",
+      "patrol": [
+        "scout-west",
+        "scout-north",
+        "scout-east"
+      ],
+      "transform": {
+        "position": [
+          -7.0,
+          0.0,
+          -3.5
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "id": "scout-west",
+      "kind": "waypoint",
+      "transform": {
+        "position": [
+          -7,
+          0,
+          -4
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "id": "scout-north",
+      "kind": "waypoint",
+      "transform": {
+        "position": [
+          -4,
+          0,
+          -6
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "id": "scout-east",
+      "kind": "waypoint",
+      "transform": {
+        "position": [
+          -3,
+          0,
+          -2
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "behavior": "sentry",
+      "enemy_type": "watchman",
+      "id": "store-sentry",
+      "kind": "guard",
+      "material": "mat-guard",
+      "model": "mesh-guard",
+      "patrol": [],
+      "transform": {
+        "position": [
+          7.5,
+          0,
+          5
+        ],
+        "rotation": [
+          0,
+          180,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "id": "store-loot-coins",
+      "kind": "static",
+      "model": "mesh-loot-coins",
+      "material": "mat-loot-atlas",
+      "transform": {
+        "position": [
+          -5.25,
+          1.302,
+          1.35
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "loot_highlight": true
+    },
+    {
+      "id": "store-loot-goblet",
+      "kind": "static",
+      "model": "mesh-loot-goblet",
+      "material": "mat-loot-atlas",
+      "transform": {
+        "position": [
+          -4.85,
+          1.302,
+          1.45
+        ],
+        "rotation": [
+          0,
+          20,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "loot_highlight": true
+    },
+    {
+      "id": "store-loot-purse",
+      "kind": "static",
+      "model": "mesh-loot-purse",
+      "material": "mat-loot-atlas",
+      "transform": {
+        "position": [
+          -5.07,
+          1.302,
+          1.0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "loot_highlight": true
+    },
+    {
+      "id": "store-loot-jewel",
+      "kind": "static",
+      "model": "mesh-loot-jewel",
+      "material": "mat-loot-atlas",
+      "transform": {
+        "position": [
+          4.4,
+          0.802,
+          5.3
+        ],
+        "rotation": [
+          0,
+          25,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "loot_highlight": true
+    },
+    {
+      "id": "store-loot-scepter",
+      "kind": "static",
+      "model": "mesh-loot-scepter",
+      "material": "mat-loot-atlas",
+      "transform": {
+        "position": [
+          5.95,
+          0.912,
+          5.45
+        ],
+        "rotation": [
+          0,
+          0,
+          90
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "loot_highlight": true
+    }
+  ],
+  "materials": [
+    {
+      "color": [
+        0.36,
+        0.4,
+        0.48,
+        1
+      ],
+      "id": "mat-stone"
+    },
+    {
+      "color": [
+        0.22,
+        0.26,
+        0.3,
+        1
+      ],
+      "id": "mat-floor"
+    },
+    {
+      "color": [
+        0.4,
+        0.24,
+        0.1,
+        1
+      ],
+      "id": "mat-wood"
+    },
+    {
+      "color": [
+        0.65,
+        0.18,
+        0.13,
+        1
+      ],
+      "id": "mat-guard"
+    },
+    {
+      "color": [
+        0.92,
+        0.64,
+        0.14,
+        1
+      ],
+      "id": "mat-objective"
+    },
+    {
+      "color": [
+        0.17,
+        0.7,
+        0.38,
+        1
+      ],
+      "id": "mat-control"
+    },
+    {
+      "color": [
+        1,
+        0.72,
+        0.28,
+        1
+      ],
+      "id": "mat-light"
+    },
+    {
+      "id": "mat-loot-atlas",
+      "color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "double_sided": false,
+      "texture": {
+        "uri": "assets/loot/mat-loot-atlas.png",
+        "width": 32,
+        "height": 32,
+        "format": "RGBA16"
+      }
+    }
+  ],
+  "title": "Enemy Patrol Workshop",
+  "test_starts": [
+    {
+      "id": "store-door-open",
+      "label": "Open store door",
+      "position": [
+        2.5,
+        0,
+        0
+      ],
+      "yaw": 90,
+      "pitch": 0,
+      "door_open": true
+    },
+    {
+      "id": "scout-observation",
+      "label": "Observe the scout",
+      "position": [
+        -6,
+        0,
+        2.7
+      ],
+      "yaw": 180,
+      "pitch": -4,
+      "crouched": true
+    },
+    {
+      "id": "loot-crate",
+      "label": "Blender loot crate",
+      "position": [
+        -5,
+        0,
+        3.0
+      ],
+      "yaw": 180,
+      "pitch": 0
+    }
+  ],
+  "version": 2,
+  "views": [
+    {
+      "id": "workroom-scout",
+      "pitch": -4,
+      "position": [
+        -6,
+        0,
+        2.7
+      ],
+      "yaw": 180
+    },
+    {
+      "id": "store-watch",
+      "pitch": -2,
+      "position": [
+        4.5,
+        0,
+        -6.5
+      ],
+      "yaw": 12
+    },
+    {
+      "id": "blender-loot-crate",
+      "position": [
+        -5,
+        0,
+        3.0
+      ],
+      "yaw": 180,
+      "pitch": 0
+    }
+  ]
+}

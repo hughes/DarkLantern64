@@ -1,0 +1,7 @@
+build --enable_bzlmod
+build --verbose_failures
+build --enable_platform_specific_config
+build:windows --cxxopt=/std:c++latest
+build:linux --cxxopt=-std=c++23
+build:dbg --compilation_mode=dbg
+build --repo_env=VULKAN_SDK

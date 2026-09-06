@@ -1,12 +1,16 @@
 # Vision
 
-Status: initial direction, 2026-09-05. The [memory baseline](decisions/0001-memory-baseline.md) is accepted; specific mechanics and technical choices below remain subject to iteration.
+Status: initial direction, 2026-09-05. The [memory baseline](decisions/0001-memory-baseline.md) and [full 3D world](decisions/0002-full-3d-world.md) are accepted; specific mechanics and technical choices below remain subject to iteration.
 
 ## The game
 
 DarkLantern64 is a first-person stealth game inspired by *Thief: The Dark Project*, designed for N64 hardware with 8 MiB of memory. ModRetro M64 and compatible emulators are also targets.
 
+The environment is fully 3D, built from models with arbitrary placement and varying heights. Levels need not follow a grid. This applies to the placeholder prototype as well as the eventual artwork.
+
 The desired experience is tension through observation and deliberate action: reading a space, listening, judging exposure, and using a small set of understandable tools to reach a goal. Light, sound, materials, and guards should form a coherent world that rewards experimentation.
+
+Audio is a primary gameplay information channel. Clear and muffled voices, footsteps on different materials, movement rhythms, and equipment sounds should reveal useful clues about nearby entities and spaces. Player playback and AI hearing should derive from the same world events and compatible acoustic rules. The proposed implementation is described in [Audio design](audio-design.md).
 
 The N64's memory, rendering, audio, and controller constraints will inform the design from the beginning. Readable silhouettes, carefully composed spaces, and useful sound cues are promising directions to explore with the art. Final visual style, setting, story, and campaign structure remain open.
 

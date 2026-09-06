@@ -1,0 +1,14 @@
+{
+  "lightengine": {
+    "repository": "git@github.com:hughes/LightEngine.git",
+    "commit": "a6be6a0926032ebc5f02ae845ff2548e93fa43a2",
+    "path": "external/LightEngine",
+    "branch": "codex/restore-saved-editor-tabs"
+  },
+  "libdragon": {
+    "repository": "git@github.com:hughes/libdragon.git",
+    "inspected_fork_commit": "7a82f8e50e82ad4601d530801630d8bd0d2fcd00",
+    "sdk": "N64_INST or C:/n64-toolchain",
+    "note": "ROM builds use the installed SDK; build reports fingerprint headers, libraries, compiler identity, and tools. This is not yet an automatically provisioned SDK pin."
+  }
+}

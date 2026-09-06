@@ -1,0 +1,4123 @@
+{
+  "version": 1,
+  "passed": true,
+  "measurement": "Ares emulated CPU timer; hardware validation pending",
+  "render_cases": [
+    {
+      "case": "baseline",
+      "culling": false,
+      "run": {
+        "name": "scale-baseline",
+        "passed": true,
+        "log": ".dev\\ares\\runs\\a32a67a5c74d4c638a901b704b7d95e8\\scale-baseline.log",
+        "tested_rom": ".dev\\ares\\runs\\a32a67a5c74d4c638a901b704b7d95e8\\DarkLantern64-scale_baseline_8014bbf7-unculled.z64",
+        "rom_sha256": "9e9d30658daa422018f5eb0594f0d64568febb55e094509818e9cd5ce5aa15db",
+        "rom_bytes": 311296,
+        "settings": ".dev\\ares\\runs\\a32a67a5c74d4c638a901b704b7d95e8\\settings.bml",
+        "settings_source_sha256": "4b013206c69c12be9e0fdbd91b389e6c40b87816bb40835c6daadb713b18ce80",
+        "profile_report": null,
+        "elapsed_seconds": 7.797,
+        "peak_sampled_heap_bytes": 668760,
+        "max_reported_cpu_ms": 39.75,
+        "boot": "DL64 boot_ok memory=8388608 scene=\"DarkLantern64 scale study - baseline\" meshes=9 models=41 colliders=26 version=2 world=3d renderer=xyz-mesh-rdpq depth=hardware",
+        "terminal_event": "DL64 profile_end window=3"
+      },
+      "profile": {
+        "schema_version": 1,
+        "measurement": "Emulated CPU-timer elapsed time; not CPU utilization or host CPU time",
+        "source_log": ".dev\\ares\\runs\\a32a67a5c74d4c638a901b704b7d95e8\\scale-baseline.log",
+        "source_log_sha256": "6a620db02afde78e934145a78cbf0fef51e41ea5905a937b61a6377bd51eaad7",
+        "source_log_bytes": 5199,
+        "complete_windows": 3,
+        "frames": 61,
+        "ignored_trailing_partial_window": false,
+        "ticks_per_second": 46875000,
+        "target_fps": 30,
+        "frame_budget_ms": 33.333333333333336,
+        "debug_states": [
+          0
+        ],
+        "debug_frames": {
+          "0": 61
+        },
+        "audio_calls": 77,
+        "frame": {
+          "total_ticks": 142678629,
+          "max_ticks": 2405861,
+          "average_ms": 49.89853691803278,
+          "max_ms": 51.32503466666667,
+          "percent_of_30fps_budget": 149.69561075409837,
+          "percent_of_frame_elapsed": 100.0
+        },
+        "slots": {
+          "input": {
+            "total_ticks": 138191,
+            "max_ticks": 3830,
+            "average_ms": 0.04832909289617487,
+            "max_ms": 0.08170666666666666,
+            "percent_of_30fps_budget": 0.14498727868852462,
+            "percent_of_frame_elapsed": 0.09685472937926815
+          },
+          "gameplay": {
+            "total_ticks": 11168652,
+            "max_ticks": 187940,
+            "average_ms": 3.905976655737705,
+            "max_ms": 4.009386666666667,
+            "percent_of_30fps_budget": 11.717929967213115,
+            "percent_of_frame_elapsed": 7.827838042934937
+          },
+          "audio_events": {
+            "total_ticks": 28434,
+            "max_ticks": 12519,
+            "average_ms": 0.009944131147540985,
+            "max_ms": 0.267072,
+            "percent_of_30fps_budget": 0.029832393442622958,
+            "percent_of_frame_elapsed": 0.019928702847291868
+          },
+          "audio_mix": {
+            "total_ticks": 1648119,
+            "max_ticks": 92666,
+            "average_ms": 0.5763913442622951,
+            "max_ms": 1.9768746666666666,
+            "percent_of_30fps_budget": 1.7291740327868854,
+            "percent_of_frame_elapsed": 1.1551267429125633
+          },
+          "cache": {
+            "total_ticks": 0,
+            "max_ticks": 0,
+            "average_ms": 0.0,
+            "max_ms": 0.0,
+            "percent_of_30fps_budget": 0.0,
+            "percent_of_frame_elapsed": 0.0
+          },
+          "transforms": {
+            "total_ticks": 23516595,
+            "max_ticks": 387426,
+            "average_ms": 8.224382950819672,
+            "max_ms": 8.265088,
+            "percent_of_30fps_budget": 24.673148852459015,
+            "percent_of_frame_elapsed": 16.482212623447623
+          },
+          "lighting": {
+            "total_ticks": 8335859,
+            "max_ticks": 139336,
+            "average_ms": 2.9152730928961748,
+            "max_ms": 2.972501333333333,
+            "percent_of_30fps_budget": 8.745819278688526,
+            "percent_of_frame_elapsed": 5.842401947946948
+          },
+          "triangles": {
+            "total_ticks": 63133438,
+            "max_ticks": 1039716,
+            "average_ms": 22.07945372677596,
+            "max_ms": 22.180608,
+            "percent_of_30fps_budget": 66.23836118032787,
+            "percent_of_frame_elapsed": 44.248699642326955
+          },
+          "hud": {
+            "total_ticks": 4823479,
+            "max_ticks": 80764,
+            "average_ms": 1.6868997595628417,
+            "max_ms": 1.7229653333333332,
+            "percent_of_30fps_budget": 5.060699278688525,
+            "percent_of_frame_elapsed": 3.380659762296987
+          },
+          "debug_hud": {
+            "total_ticks": 0,
+            "max_ticks": 0,
+            "average_ms": 0.0,
+            "max_ms": 0.0,
+            "percent_of_30fps_budget": 0.0,
+            "percent_of_frame_elapsed": 0.0
+          },
+          "render_setup": {
+            "total_ticks": 867706,
+            "max_ticks": 15869,
+            "average_ms": 0.30346002185792353,
+            "max_ms": 0.33853866666666665,
+            "percent_of_30fps_budget": 0.9103800655737706,
+            "percent_of_frame_elapsed": 0.6081541475983765
+          },
+          "display_wait": {
+            "total_ticks": 28538178,
+            "max_ticks": 498048,
+            "average_ms": 9.980564983606557,
+            "max_ms": 10.625024,
+            "percent_of_30fps_budget": 29.94169495081967,
+            "percent_of_frame_elapsed": 20.00171868766695
+          },
+          "other": {
+            "total_ticks": 479978,
+            "max_ticks": 112773,
+            "average_ms": 0.16786115846994537,
+            "max_ms": 2.405824,
+            "percent_of_30fps_budget": 0.5035834754098361,
+            "percent_of_frame_elapsed": 0.33640497064209945
+          }
+        },
+        "limitations": [
+          "Ares timing model; original N64 and M64 hardware validation remains pending.",
+          "Slot maxima are worst observed per-frame totals and must not be added together.",
+          "Submission scopes include internal queue stalls; this does not time RDP/GPU execution.",
+          "Audio callback time is attributed exclusively; other interrupts remain in the interrupted scope.",
+          "Profiling and enabled debug display add overhead. Incomplete trailing records are excluded."
+        ]
+      },
+      "work_samples": [
+        {
+          "models": 41,
+          "visible": 41,
+          "camera_vertices": 1826
+        },
+        {
+          "models": 41,
+          "visible": 41,
+          "camera_vertices": 1826
+        },
+        {
+          "models": 41,
+          "visible": 41,
+          "camera_vertices": 1826
+        }
+      ],
+      "models": 41,
+      "colliders": 26,
+      "lights": 3,
+      "static_image_bytes": 550080,
+      "source_sha256": "99406d751d693cdec5174e205bcc93ebd87842a65cb78b62a51783ae413c0caa"
+    },
+    {
+      "case": "baseline",
+      "culling": true,
+      "run": {
+        "name": "scale-baseline",
+        "passed": true,
+        "log": ".dev\\ares\\runs\\8dedb8fca58041a98f4b51e4fb22c44a\\scale-baseline.log",
+        "tested_rom": ".dev\\ares\\runs\\8dedb8fca58041a98f4b51e4fb22c44a\\DarkLantern64-scale_baseline_8014bbf7.z64",
+        "rom_sha256": "9623a145ed40badbfc647fa292e6f04259827e4bebf2e4070e26134f6f51acd9",
+        "rom_bytes": 311296,
+        "settings": ".dev\\ares\\runs\\8dedb8fca58041a98f4b51e4fb22c44a\\settings.bml",
+        "settings_source_sha256": "4b013206c69c12be9e0fdbd91b389e6c40b87816bb40835c6daadb713b18ce80",
+        "profile_report": null,
+        "elapsed_seconds": 7.812,
+        "peak_sampled_heap_bytes": 668760,
+        "max_reported_cpu_ms": 40.74,
+        "boot": "DL64 boot_ok memory=8388608 scene=\"DarkLantern64 scale study - baseline\" meshes=9 models=41 colliders=26 version=2 world=3d renderer=xyz-mesh-rdpq depth=hardware",
+        "terminal_event": "DL64 profile_end window=3"
+      },
+      "profile": {
+        "schema_version": 1,
+        "measurement": "Emulated CPU-timer elapsed time; not CPU utilization or host CPU time",
+        "source_log": ".dev\\ares\\runs\\8dedb8fca58041a98f4b51e4fb22c44a\\scale-baseline.log",
+        "source_log_sha256": "3f89375785c9073eb05510d0b45c8c55f272d7f500c10e0f6b3ae8dcaa747cd6",
+        "source_log_bytes": 5190,
+        "complete_windows": 3,
+        "frames": 61,
+        "ignored_trailing_partial_window": false,
+        "ticks_per_second": 46875000,
+        "target_fps": 30,
+        "frame_budget_ms": 33.333333333333336,
+        "debug_states": [
+          0
+        ],
+        "debug_frames": {
+          "0": 61
+        },
+        "audio_calls": 77,
+        "frame": {
+          "total_ticks": 142598783,
+          "max_ticks": 2406309,
+          "average_ms": 49.87061263387978,
+          "max_ms": 51.334592,
+          "percent_of_30fps_budget": 149.61183790163935,
+          "percent_of_frame_elapsed": 100.0
+        },
+        "slots": {
+          "input": {
+            "total_ticks": 113408,
+            "max_ticks": 3033,
+            "average_ms": 0.03966181420765027,
+            "max_ms": 0.064704,
+            "percent_of_30fps_budget": 0.11898544262295081,
+            "percent_of_frame_elapsed": 0.07952943048609327
+          },
+          "gameplay": {
+            "total_ticks": 11169962,
+            "max_ticks": 187584,
+            "average_ms": 3.9064347978142075,
+            "max_ms": 4.001792,
+            "percent_of_30fps_budget": 11.719304393442624,
+            "percent_of_frame_elapsed": 7.83313978212563
+          },
+          "audio_events": {
+            "total_ticks": 27953,
+            "max_ticks": 12440,
+            "average_ms": 0.009775912568306011,
+            "max_ms": 0.26538666666666666,
+            "percent_of_30fps_budget": 0.029327737704918033,
+            "percent_of_frame_elapsed": 0.019602551586993557
+          },
+          "audio_mix": {
+            "total_ticks": 1647944,
+            "max_ticks": 92645,
+            "average_ms": 0.5763301420765027,
+            "max_ms": 1.9764266666666668,
+            "percent_of_30fps_budget": 1.7289904262295082,
+            "percent_of_frame_elapsed": 1.1556508164589314
+          },
+          "cache": {
+            "total_ticks": 0,
+            "max_ticks": 0,
+            "average_ms": 0.0,
+            "max_ms": 0.0,
+            "percent_of_30fps_budget": 0.0,
+            "percent_of_frame_elapsed": 0.0
+          },
+          "transforms": {
+            "total_ticks": 23121357,
+            "max_ticks": 385074,
+            "average_ms": 8.086157639344261,
+            "max_ms": 8.214912,
+            "percent_of_30fps_budget": 24.258472918032783,
+            "percent_of_frame_elapsed": 16.214273722097616
+          },
+          "lighting": {
+            "total_ticks": 7914235,
+            "max_ticks": 132078,
+            "average_ms": 2.7678198907103826,
+            "max_ms": 2.817664,
+            "percent_of_30fps_budget": 8.303459672131147,
+            "percent_of_frame_elapsed": 5.550001783675811
+          },
+          "triangles": {
+            "total_ticks": 66678991,
+            "max_ticks": 1099232,
+            "average_ms": 23.319428546448087,
+            "max_ms": 23.450282666666666,
+            "percent_of_30fps_budget": 69.95828563934427,
+            "percent_of_frame_elapsed": 46.75985979487637
+          },
+          "hud": {
+            "total_ticks": 4873092,
+            "max_ticks": 81254,
+            "average_ms": 1.7042507540983605,
+            "max_ms": 1.7334186666666667,
+            "percent_of_30fps_budget": 5.112752262295081,
+            "percent_of_frame_elapsed": 3.4173447328789615
+          },
+          "debug_hud": {
+            "total_ticks": 0,
+            "max_ticks": 0,
+            "average_ms": 0.0,
+            "max_ms": 0.0,
+            "percent_of_30fps_budget": 0.0,
+            "percent_of_frame_elapsed": 0.0
+          },
+          "render_setup": {
+            "total_ticks": 888524,
+            "max_ticks": 15595,
+            "average_ms": 0.3107406338797814,
+            "max_ms": 0.33269333333333334,
+            "percent_of_30fps_budget": 0.9322219016393442,
+            "percent_of_frame_elapsed": 0.623093676753188
+          },
+          "display_wait": {
+            "total_ticks": 25690336,
+            "max_ticks": 453457,
+            "average_ms": 8.984598382513662,
+            "max_ms": 9.673749333333333,
+            "percent_of_30fps_budget": 26.953795147540983,
+            "percent_of_frame_elapsed": 18.015817147611983
+          },
+          "other": {
+            "total_ticks": 472981,
+            "max_ticks": 108480,
+            "average_ms": 0.16541412021857924,
+            "max_ms": 2.31424,
+            "percent_of_30fps_budget": 0.4962423606557377,
+            "percent_of_frame_elapsed": 0.3316865614484241
+          }
+        },
+        "limitations": [
+          "Ares timing model; original N64 and M64 hardware validation remains pending.",
+          "Slot maxima are worst observed per-frame totals and must not be added together.",
+          "Submission scopes include internal queue stalls; this does not time RDP/GPU execution.",
+          "Audio callback time is attributed exclusively; other interrupts remain in the interrupted scope.",
+          "Profiling and enabled debug display add overhead. Incomplete trailing records are excluded."
+        ]
+      },
+      "work_samples": [
+        {
+          "models": 41,
+          "visible": 39,
+          "camera_vertices": 1760
+        },
+        {
+          "models": 41,
+          "visible": 39,
+          "camera_vertices": 1760
+        },
+        {
+          "models": 41,
+          "visible": 39,
+          "camera_vertices": 1760
+        }
+      ],
+      "models": 41,
+      "colliders": 26,
+      "lights": 3,
+      "static_image_bytes": 550552,
+      "source_sha256": "99406d751d693cdec5174e205bcc93ebd87842a65cb78b62a51783ae413c0caa"
+    },
+    {
+      "case": "hidden4",
+      "culling": false,
+      "run": {
+        "name": "scale-hidden4",
+        "passed": true,
+        "log": ".dev\\ares\\runs\\6f2f44e167a548e3874f3a118def5e17\\scale-hidden4.log",
+        "tested_rom": ".dev\\ares\\runs\\6f2f44e167a548e3874f3a118def5e17\\DarkLantern64-scale_hidden4_8014bbf7-unculled.z64",
+        "rom_sha256": "b688b3937c2b6cf3aa532319942312dc1c283e9c614673668abae87ea034b404",
+        "rom_bytes": 311296,
+        "settings": ".dev\\ares\\runs\\6f2f44e167a548e3874f3a118def5e17\\settings.bml",
+        "settings_source_sha256": "4b013206c69c12be9e0fdbd91b389e6c40b87816bb40835c6daadb713b18ce80",
+        "profile_report": null,
+        "elapsed_seconds": 9.063,
+        "peak_sampled_heap_bytes": 682584,
+        "max_reported_cpu_ms": 46.13,
+        "boot": "DL64 boot_ok memory=8388608 scene=\"DarkLantern64 scale study - hidden4\" meshes=9 models=65 colliders=50 version=2 world=3d renderer=xyz-mesh-rdpq depth=hardware",
+        "terminal_event": "DL64 profile_end window=3"
+      },
+      "profile": {
+        "schema_version": 1,
+        "measurement": "Emulated CPU-timer elapsed time; not CPU utilization or host CPU time",
+        "source_log": ".dev\\ares\\runs\\6f2f44e167a548e3874f3a118def5e17\\scale-hidden4.log",
+        "source_log_sha256": "8a79e8f38d24a0ad39a36b40ef71d1a3bca58068e041c2a9c6f75eedcf3485d0",
+        "source_log_bytes": 5201,
+        "complete_windows": 3,
+        "frames": 61,
+        "ignored_trailing_partial_window": false,
+        "ticks_per_second": 46875000,
+        "target_fps": 30,
+        "frame_budget_ms": 33.333333333333336,
+        "debug_states": [
+          0
+        ],
+        "debug_frames": {
+          "0": 61
+        },
+        "audio_calls": 76,
+        "frame": {
+          "total_ticks": 143187956,
+          "max_ticks": 2479067,
+          "average_ms": 50.07666220765027,
+          "max_ms": 52.88676266666667,
+          "percent_of_30fps_budget": 150.2299866229508,
+          "percent_of_frame_elapsed": 100.0
+        },
+        "slots": {
+          "input": {
+            "total_ticks": 124935,
+            "max_ticks": 4199,
+            "average_ms": 0.043693114754098365,
+            "max_ms": 0.08957866666666667,
+            "percent_of_30fps_budget": 0.13107934426229512,
+            "percent_of_frame_elapsed": 0.08725245019909356
+          },
+          "gameplay": {
+            "total_ticks": 17472443,
+            "max_ticks": 291656,
+            "average_ms": 6.110581158469945,
+            "max_ms": 6.221994666666666,
+            "percent_of_30fps_budget": 18.331743475409837,
+            "percent_of_frame_elapsed": 12.202452977260183
+          },
+          "audio_events": {
+            "total_ticks": 36143,
+            "max_ticks": 20114,
+            "average_ms": 0.012640174863387978,
+            "max_ms": 0.4290986666666667,
+            "percent_of_30fps_budget": 0.037920524590163936,
+            "percent_of_frame_elapsed": 0.02524164811738775
+          },
+          "audio_mix": {
+            "total_ticks": 1632645,
+            "max_ticks": 145850,
+            "average_ms": 0.5709796721311475,
+            "max_ms": 3.111466666666667,
+            "percent_of_30fps_budget": 1.7129390163934424,
+            "percent_of_frame_elapsed": 1.1402111222259503
+          },
+          "cache": {
+            "total_ticks": 0,
+            "max_ticks": 0,
+            "average_ms": 0.0,
+            "max_ms": 0.0,
+            "percent_of_30fps_budget": 0.0,
+            "percent_of_frame_elapsed": 0.0
+          },
+          "transforms": {
+            "total_ticks": 30587594,
+            "max_ticks": 503394,
+            "average_ms": 10.697300633879781,
+            "max_ms": 10.739072,
+            "percent_of_30fps_budget": 32.09190190163934,
+            "percent_of_frame_elapsed": 21.361848338696866
+          },
+          "lighting": {
+            "total_ticks": 9931878,
+            "max_ticks": 166203,
+            "average_ms": 3.4734436721311477,
+            "max_ms": 3.545664,
+            "percent_of_30fps_budget": 10.420331016393444,
+            "percent_of_frame_elapsed": 6.936252375863233
+          },
+          "triangles": {
+            "total_ticks": 67185221,
+            "max_ticks": 1108078,
+            "average_ms": 23.496470732240436,
+            "max_ms": 23.638997333333332,
+            "percent_of_30fps_budget": 70.4894121967213,
+            "percent_of_frame_elapsed": 46.921000115400766
+          },
+          "hud": {
+            "total_ticks": 4093348,
+            "max_ticks": 69629,
+            "average_ms": 1.4315533989071039,
+            "max_ms": 1.4854186666666667,
+            "percent_of_30fps_budget": 4.294660196721312,
+            "percent_of_frame_elapsed": 2.858723676452229
+          },
+          "debug_hud": {
+            "total_ticks": 0,
+            "max_ticks": 0,
+            "average_ms": 0.0,
+            "max_ms": 0.0,
+            "percent_of_30fps_budget": 0.0,
+            "percent_of_frame_elapsed": 0.0
+          },
+          "render_setup": {
+            "total_ticks": 892696,
+            "max_ticks": 15430,
+            "average_ms": 0.31219969398907105,
+            "max_ms": 0.3291733333333333,
+            "percent_of_30fps_budget": 0.9365990819672131,
+            "percent_of_frame_elapsed": 0.6234434968818188
+          },
+          "display_wait": {
+            "total_ticks": 10742921,
+            "max_ticks": 325033,
+            "average_ms": 3.75708712568306,
+            "max_ms": 6.934037333333333,
+            "percent_of_30fps_budget": 11.27126137704918,
+            "percent_of_frame_elapsed": 7.502670825191471
+          },
+          "other": {
+            "total_ticks": 488132,
+            "max_ticks": 108369,
+            "average_ms": 0.1707128306010929,
+            "max_ms": 2.311872,
+            "percent_of_30fps_budget": 0.5121384918032788,
+            "percent_of_frame_elapsed": 0.3409029737110012
+          }
+        },
+        "limitations": [
+          "Ares timing model; original N64 and M64 hardware validation remains pending.",
+          "Slot maxima are worst observed per-frame totals and must not be added together.",
+          "Submission scopes include internal queue stalls; this does not time RDP/GPU execution.",
+          "Audio callback time is attributed exclusively; other interrupts remain in the interrupted scope.",
+          "Profiling and enabled debug display add overhead. Incomplete trailing records are excluded."
+        ]
+      },
+      "work_samples": [
+        {
+          "models": 65,
+          "visible": 65,
+          "camera_vertices": 2402
+        },
+        {
+          "models": 65,
+          "visible": 65,
+          "camera_vertices": 2402
+        },
+        {
+          "models": 65,
+          "visible": 65,
+          "camera_vertices": 2402
+        }
+      ],
+      "models": 65,
+      "colliders": 50,
+      "lights": 3,
+      "static_image_bytes": 552672,
+      "source_sha256": "e684a21c7eeef0a7bc310e46d2b4dae97689d7f16df9fc276834d536e6e272dd"
+    },
+    {
+      "case": "hidden4",
+      "culling": true,
+      "run": {
+        "name": "scale-hidden4",
+        "passed": true,
+        "log": ".dev\\ares\\runs\\75fb23e4e4684c53aaaaa8031bbd8e50\\scale-hidden4.log",
+        "tested_rom": ".dev\\ares\\runs\\75fb23e4e4684c53aaaaa8031bbd8e50\\DarkLantern64-scale_hidden4_8014bbf7.z64",
+        "rom_sha256": "2a4b9003b2f1aa4094398f38aac4348932660322644197535d68894d08bc7a88",
+        "rom_bytes": 311296,
+        "settings": ".dev\\ares\\runs\\75fb23e4e4684c53aaaaa8031bbd8e50\\settings.bml",
+        "settings_source_sha256": "4b013206c69c12be9e0fdbd91b389e6c40b87816bb40835c6daadb713b18ce80",
+        "profile_report": null,
+        "elapsed_seconds": 8.812,
+        "peak_sampled_heap_bytes": 682584,
+        "max_reported_cpu_ms": 44.31,
+        "boot": "DL64 boot_ok memory=8388608 scene=\"DarkLantern64 scale study - hidden4\" meshes=9 models=65 colliders=50 version=2 world=3d renderer=xyz-mesh-rdpq depth=hardware",
+        "terminal_event": "DL64 profile_end window=3"
+      },
+      "profile": {
+        "schema_version": 1,
+        "measurement": "Emulated CPU-timer elapsed time; not CPU utilization or host CPU time",
+        "source_log": ".dev\\ares\\runs\\75fb23e4e4684c53aaaaa8031bbd8e50\\scale-hidden4.log",
+        "source_log_sha256": "9d0e01bd29d15950d556e8f29afc644cf2263914e294207d22d9201091b31abd",
+        "source_log_bytes": 5189,
+        "complete_windows": 3,
+        "frames": 61,
+        "ignored_trailing_partial_window": false,
+        "ticks_per_second": 46875000,
+        "target_fps": 30,
+        "frame_budget_ms": 33.333333333333336,
+        "debug_states": [
+          0
+        ],
+        "debug_frames": {
+          "0": 61
+        },
+        "audio_calls": 76,
+        "frame": {
+          "total_ticks": 143103520,
+          "max_ticks": 2481674,
+          "average_ms": 50.047132677595634,
+          "max_ms": 52.94237866666667,
+          "percent_of_30fps_budget": 150.1413980327869,
+          "percent_of_frame_elapsed": 100.0
+        },
+        "slots": {
+          "input": {
+            "total_ticks": 142735,
+            "max_ticks": 3472,
+            "average_ms": 0.04991825136612022,
+            "max_ms": 0.07406933333333333,
+            "percent_of_30fps_budget": 0.14975475409836064,
+            "percent_of_frame_elapsed": 0.0997424801290702
+          },
+          "gameplay": {
+            "total_ticks": 17344543,
+            "max_ticks": 290786,
+            "average_ms": 6.065851103825136,
+            "max_ms": 6.203434666666666,
+            "percent_of_30fps_budget": 18.19755331147541,
+            "percent_of_frame_elapsed": 12.120276985499729
+          },
+          "audio_events": {
+            "total_ticks": 35653,
+            "max_ticks": 20079,
+            "average_ms": 0.012468808743169399,
+            "max_ms": 0.428352,
+            "percent_of_30fps_budget": 0.0374064262295082,
+            "percent_of_frame_elapsed": 0.02491413209123018
+          },
+          "audio_mix": {
+            "total_ticks": 1633344,
+            "max_ticks": 146004,
+            "average_ms": 0.571224131147541,
+            "max_ms": 3.114752,
+            "percent_of_30fps_budget": 1.7136723934426228,
+            "percent_of_frame_elapsed": 1.1413723436013314
+          },
+          "cache": {
+            "total_ticks": 0,
+            "max_ticks": 0,
+            "average_ms": 0.0,
+            "max_ms": 0.0,
+            "percent_of_30fps_budget": 0.0,
+            "percent_of_frame_elapsed": 0.0
+          },
+          "transforms": {
+            "total_ticks": 23394803,
+            "max_ticks": 386061,
+            "average_ms": 8.181789027322404,
+            "max_ms": 8.235968,
+            "percent_of_30fps_budget": 24.54536708196721,
+            "percent_of_frame_elapsed": 16.34816739658116
+          },
+          "lighting": {
+            "total_ticks": 10067059,
+            "max_ticks": 169194,
+            "average_ms": 3.520720087431694,
+            "max_ms": 3.609472,
+            "percent_of_30fps_budget": 10.562160262295084,
+            "percent_of_frame_elapsed": 7.0348087873729455
+          },
+          "triangles": {
+            "total_ticks": 68606225,
+            "max_ticks": 1130191,
+            "average_ms": 23.99343387978142,
+            "max_ms": 24.110741333333333,
+            "percent_of_30fps_budget": 71.98030163934426,
+            "percent_of_frame_elapsed": 47.941675368991625
+          },
+          "hud": {
+            "total_ticks": 4548809,
+            "max_ticks": 76889,
+            "average_ms": 1.5908403060109289,
+            "max_ms": 1.6402986666666666,
+            "percent_of_30fps_budget": 4.772520918032787,
+            "percent_of_frame_elapsed": 3.1786842140570686
+          },
+          "debug_hud": {
+            "total_ticks": 0,
+            "max_ticks": 0,
+            "average_ms": 0.0,
+            "max_ms": 0.0,
+            "percent_of_30fps_budget": 0.0,
+            "percent_of_frame_elapsed": 0.0
+          },
+          "render_setup": {
+            "total_ticks": 935154,
+            "max_ticks": 17083,
+            "average_ms": 0.32704839344262293,
+            "max_ms": 0.36443733333333334,
+            "percent_of_30fps_budget": 0.9811451803278688,
+            "percent_of_frame_elapsed": 0.6534807809060182
+          },
+          "display_wait": {
+            "total_ticks": 15901769,
+            "max_ticks": 457265,
+            "average_ms": 5.561274404371584,
+            "max_ms": 9.754986666666667,
+            "percent_of_30fps_budget": 16.683823213114753,
+            "percent_of_frame_elapsed": 11.112073972743648
+          },
+          "other": {
+            "total_ticks": 493426,
+            "max_ticks": 110257,
+            "average_ms": 0.17256428415300545,
+            "max_ms": 2.352149333333333,
+            "percent_of_30fps_budget": 0.5176928524590163,
+            "percent_of_frame_elapsed": 0.3448035380261785
+          }
+        },
+        "limitations": [
+          "Ares timing model; original N64 and M64 hardware validation remains pending.",
+          "Slot maxima are worst observed per-frame totals and must not be added together.",
+          "Submission scopes include internal queue stalls; this does not time RDP/GPU execution.",
+          "Audio callback time is attributed exclusively; other interrupts remain in the interrupted scope.",
+          "Profiling and enabled debug display add overhead. Incomplete trailing records are excluded."
+        ]
+      },
+      "work_samples": [
+        {
+          "models": 65,
+          "visible": 39,
+          "camera_vertices": 1760
+        },
+        {
+          "models": 65,
+          "visible": 39,
+          "camera_vertices": 1760
+        },
+        {
+          "models": 65,
+          "visible": 39,
+          "camera_vertices": 1760
+        }
+      ],
+      "models": 65,
+      "colliders": 50,
+      "lights": 3,
+      "static_image_bytes": 553144,
+      "source_sha256": "e684a21c7eeef0a7bc310e46d2b4dae97689d7f16df9fc276834d536e6e272dd"
+    },
+    {
+      "case": "hidden12",
+      "culling": false,
+      "run": {
+        "name": "scale-hidden12",
+        "passed": true,
+        "log": ".dev\\ares\\runs\\1e44043b320945df82ef4ff41e7b9d40\\scale-hidden12.log",
+        "tested_rom": ".dev\\ares\\runs\\1e44043b320945df82ef4ff41e7b9d40\\DarkLantern64-scale_hidden12_8014bbf7-unculled.z64",
+        "rom_sha256": "abb788ffd6632ad9e6164907ba9f7e96a046a02b80104936435dda5c701e7d53",
+        "rom_bytes": 311296,
+        "settings": ".dev\\ares\\runs\\1e44043b320945df82ef4ff41e7b9d40\\settings.bml",
+        "settings_source_sha256": "4b013206c69c12be9e0fdbd91b389e6c40b87816bb40835c6daadb713b18ce80",
+        "profile_report": null,
+        "elapsed_seconds": 11.062,
+        "peak_sampled_heap_bytes": 710232,
+        "max_reported_cpu_ms": 58.06,
+        "boot": "DL64 boot_ok memory=8388608 scene=\"DarkLantern64 scale study - hidden12\" meshes=9 models=113 colliders=98 version=2 world=3d renderer=xyz-mesh-rdpq depth=hardware",
+        "terminal_event": "DL64 profile_end window=3"
+      },
+      "profile": {
+        "schema_version": 1,
+        "measurement": "Emulated CPU-timer elapsed time; not CPU utilization or host CPU time",
+        "source_log": ".dev\\ares\\runs\\1e44043b320945df82ef4ff41e7b9d40\\scale-hidden12.log",
+        "source_log_sha256": "ae7b1cad59d5d8e12582c7765e9f315b195fcad0e22b2ac6ab9870baba12e936",
+        "source_log_bytes": 5207,
+        "complete_windows": 3,
+        "frames": 53,
+        "ignored_trailing_partial_window": false,
+        "ticks_per_second": 46875000,
+        "target_fps": 30,
+        "frame_budget_ms": 33.333333333333336,
+        "debug_states": [
+          0
+        ],
+        "debug_frames": {
+          "0": 53
+        },
+        "audio_calls": 78,
+        "frame": {
+          "total_ticks": 145447403,
+          "max_ticks": 2977386,
+          "average_ms": 58.5448666163522,
+          "max_ms": 63.517568,
+          "percent_of_30fps_budget": 175.6345998490566,
+          "percent_of_frame_elapsed": 100.0
+        },
+        "slots": {
+          "input": {
+            "total_ticks": 106181,
+            "max_ticks": 3466,
+            "average_ms": 0.042739522012578614,
+            "max_ms": 0.07394133333333333,
+            "percent_of_30fps_budget": 0.12821856603773585,
+            "percent_of_frame_elapsed": 0.07300302226778158
+          },
+          "gameplay": {
+            "total_ticks": 25193997,
+            "max_ticks": 489357,
+            "average_ms": 10.140979924528303,
+            "max_ms": 10.439616,
+            "percent_of_30fps_budget": 30.422939773584908,
+            "percent_of_frame_elapsed": 17.321723509906878
+          },
+          "audio_events": {
+            "total_ticks": 47567,
+            "max_ticks": 33596,
+            "average_ms": 0.019146465408805033,
+            "max_ms": 0.7167146666666667,
+            "percent_of_30fps_budget": 0.0574393962264151,
+            "percent_of_frame_elapsed": 0.032703918405473355
+          },
+          "audio_mix": {
+            "total_ticks": 1669261,
+            "max_ticks": 145922,
+            "average_ms": 0.6719037987421383,
+            "max_ms": 3.1130026666666666,
+            "percent_of_30fps_budget": 2.0157113962264153,
+            "percent_of_frame_elapsed": 1.1476732932797706
+          },
+          "cache": {
+            "total_ticks": 0,
+            "max_ticks": 0,
+            "average_ms": 0.0,
+            "max_ms": 0.0,
+            "percent_of_30fps_budget": 0.0,
+            "percent_of_frame_elapsed": 0.0
+          },
+          "transforms": {
+            "total_ticks": 38909339,
+            "max_ticks": 736528,
+            "average_ms": 15.661620729559747,
+            "max_ms": 15.712597333333333,
+            "percent_of_30fps_budget": 46.98486218867924,
+            "percent_of_frame_elapsed": 26.751484177410855
+          },
+          "lighting": {
+            "total_ticks": 13097309,
+            "max_ticks": 251089,
+            "average_ms": 5.271872805031447,
+            "max_ms": 5.356565333333333,
+            "percent_of_30fps_budget": 15.81561841509434,
+            "percent_of_frame_elapsed": 9.004842114644013
+          },
+          "triangles": {
+            "total_ticks": 59858378,
+            "max_ticks": 1138150,
+            "average_ms": 24.093938314465408,
+            "max_ms": 24.280533333333334,
+            "percent_of_30fps_budget": 72.28181494339623,
+            "percent_of_frame_elapsed": 41.15465574864888
+          },
+          "hud": {
+            "total_ticks": 4003285,
+            "max_ticks": 80139,
+            "average_ms": 1.6113851572327045,
+            "max_ms": 1.709632,
+            "percent_of_30fps_budget": 4.834155471698113,
+            "percent_of_frame_elapsed": 2.7523935920670923
+          },
+          "debug_hud": {
+            "total_ticks": 0,
+            "max_ticks": 0,
+            "average_ms": 0.0,
+            "max_ms": 0.0,
+            "percent_of_30fps_budget": 0.0,
+            "percent_of_frame_elapsed": 0.0
+          },
+          "render_setup": {
+            "total_ticks": 764032,
+            "max_ticks": 16138,
+            "average_ms": 0.30753489308176096,
+            "max_ms": 0.3442773333333333,
+            "percent_of_30fps_budget": 0.9226046792452829,
+            "percent_of_frame_elapsed": 0.5252977944198839
+          },
+          "display_wait": {
+            "total_ticks": 1363468,
+            "max_ticks": 274340,
+            "average_ms": 0.5488173081761006,
+            "max_ms": 5.852586666666666,
+            "percent_of_30fps_budget": 1.6464519245283018,
+            "percent_of_frame_elapsed": 0.9374302819281002
+          },
+          "other": {
+            "total_ticks": 434586,
+            "max_ticks": 105566,
+            "average_ms": 0.17492769811320755,
+            "max_ms": 2.2520746666666667,
+            "percent_of_30fps_budget": 0.5247830943396227,
+            "percent_of_frame_elapsed": 0.2987925470212761
+          }
+        },
+        "limitations": [
+          "Ares timing model; original N64 and M64 hardware validation remains pending.",
+          "Slot maxima are worst observed per-frame totals and must not be added together.",
+          "Submission scopes include internal queue stalls; this does not time RDP/GPU execution.",
+          "Audio callback time is attributed exclusively; other interrupts remain in the interrupted scope.",
+          "Profiling and enabled debug display add overhead. Incomplete trailing records are excluded."
+        ]
+      },
+      "work_samples": [
+        {
+          "models": 113,
+          "visible": 113,
+          "camera_vertices": 3554
+        },
+        {
+          "models": 113,
+          "visible": 113,
+          "camera_vertices": 3554
+        },
+        {
+          "models": 113,
+          "visible": 113,
+          "camera_vertices": 3554
+        }
+      ],
+      "models": 113,
+      "colliders": 98,
+      "lights": 3,
+      "static_image_bytes": 557856,
+      "source_sha256": "44776ed00ab1225a19eaccc84dff6906277e89301995a832218d1ead9f90918b"
+    },
+    {
+      "case": "hidden12",
+      "culling": true,
+      "run": {
+        "name": "scale-hidden12",
+        "passed": true,
+        "log": ".dev\\ares\\runs\\179bd027c37c47178c6301ec1cccdcf4\\scale-hidden12.log",
+        "tested_rom": ".dev\\ares\\runs\\179bd027c37c47178c6301ec1cccdcf4\\DarkLantern64-scale_hidden12_8014bbf7.z64",
+        "rom_sha256": "388fc554df75a488118917ff73190ebbfa171f9eca0beedadd70434529e1922f",
+        "rom_bytes": 311296,
+        "settings": ".dev\\ares\\runs\\179bd027c37c47178c6301ec1cccdcf4\\settings.bml",
+        "settings_source_sha256": "4b013206c69c12be9e0fdbd91b389e6c40b87816bb40835c6daadb713b18ce80",
+        "profile_report": null,
+        "elapsed_seconds": 10.812,
+        "peak_sampled_heap_bytes": 710232,
+        "max_reported_cpu_ms": 50.31,
+        "boot": "DL64 boot_ok memory=8388608 scene=\"DarkLantern64 scale study - hidden12\" meshes=9 models=113 colliders=98 version=2 world=3d renderer=xyz-mesh-rdpq depth=hardware",
+        "terminal_event": "DL64 profile_end window=3"
+      },
+      "profile": {
+        "schema_version": 1,
+        "measurement": "Emulated CPU-timer elapsed time; not CPU utilization or host CPU time",
+        "source_log": ".dev\\ares\\runs\\179bd027c37c47178c6301ec1cccdcf4\\scale-hidden12.log",
+        "source_log_sha256": "22765d81c7cadec42f4c88ace2ba723b01f48dff3acc2fa66a3687f459b558b1",
+        "source_log_bytes": 5187,
+        "complete_windows": 3,
+        "frames": 61,
+        "ignored_trailing_partial_window": false,
+        "ticks_per_second": 46875000,
+        "target_fps": 30,
+        "frame_budget_ms": 33.333333333333336,
+        "debug_states": [
+          0
+        ],
+        "debug_frames": {
+          "0": 61
+        },
+        "audio_calls": 77,
+        "frame": {
+          "total_ticks": 143386240,
+          "max_ticks": 2457264,
+          "average_ms": 50.146007431693995,
+          "max_ms": 52.421632,
+          "percent_of_30fps_budget": 150.438022295082,
+          "percent_of_frame_elapsed": 100.0
+        },
+        "slots": {
+          "input": {
+            "total_ticks": 129569,
+            "max_ticks": 3494,
+            "average_ms": 0.04531374863387978,
+            "max_ms": 0.07453866666666667,
+            "percent_of_30fps_budget": 0.13594124590163933,
+            "percent_of_frame_elapsed": 0.0903636220602479
+          },
+          "gameplay": {
+            "total_ticks": 32296174,
+            "max_ticks": 539903,
+            "average_ms": 11.29483680874317,
+            "max_ms": 11.517930666666667,
+            "percent_of_30fps_budget": 33.88451042622951,
+            "percent_of_frame_elapsed": 22.523900480269237
+          },
+          "audio_events": {
+            "total_ticks": 50838,
+            "max_ticks": 34173,
+            "average_ms": 0.017779409836065574,
+            "max_ms": 0.729024,
+            "percent_of_30fps_budget": 0.05333822950819672,
+            "percent_of_frame_elapsed": 0.03545528497016171
+          },
+          "audio_mix": {
+            "total_ticks": 1648789,
+            "max_ticks": 73009,
+            "average_ms": 0.5766256612021858,
+            "max_ms": 1.5575253333333334,
+            "percent_of_30fps_budget": 1.7298769836065575,
+            "percent_of_frame_elapsed": 1.1498934625805097
+          },
+          "cache": {
+            "total_ticks": 0,
+            "max_ticks": 0,
+            "average_ms": 0.0,
+            "max_ms": 0.0,
+            "percent_of_30fps_budget": 0.0,
+            "percent_of_frame_elapsed": 0.0
+          },
+          "transforms": {
+            "total_ticks": 23988698,
+            "max_ticks": 397206,
+            "average_ms": 8.389490010928961,
+            "max_ms": 8.473728,
+            "percent_of_30fps_budget": 25.16847003278688,
+            "percent_of_frame_elapsed": 16.73012556853433
+          },
+          "lighting": {
+            "total_ticks": 15112469,
+            "max_ticks": 253536,
+            "average_ms": 5.285235060109289,
+            "max_ms": 5.408768,
+            "percent_of_30fps_budget": 15.855705180327869,
+            "percent_of_frame_elapsed": 10.539692651121893
+          },
+          "triangles": {
+            "total_ticks": 63418735,
+            "max_ticks": 1046274,
+            "average_ms": 22.179229726775954,
+            "max_ms": 22.320512,
+            "percent_of_30fps_budget": 66.53768918032787,
+            "percent_of_frame_elapsed": 44.22930331390236
+          },
+          "hud": {
+            "total_ticks": 5173706,
+            "max_ticks": 87220,
+            "average_ms": 1.809383519125683,
+            "max_ms": 1.8606933333333333,
+            "percent_of_30fps_budget": 5.42815055737705,
+            "percent_of_frame_elapsed": 3.6082304689766604
+          },
+          "debug_hud": {
+            "total_ticks": 0,
+            "max_ticks": 0,
+            "average_ms": 0.0,
+            "max_ms": 0.0,
+            "percent_of_30fps_budget": 0.0,
+            "percent_of_frame_elapsed": 0.0
+          },
+          "render_setup": {
+            "total_ticks": 891283,
+            "max_ticks": 17148,
+            "average_ms": 0.31170553005464485,
+            "max_ms": 0.365824,
+            "percent_of_30fps_budget": 0.9351165901639347,
+            "percent_of_frame_elapsed": 0.6215959076686857
+          },
+          "display_wait": {
+            "total_ticks": 205267,
+            "max_ticks": 36725,
+            "average_ms": 0.07178736612021858,
+            "max_ms": 0.7834666666666666,
+            "percent_of_30fps_budget": 0.21536209836065573,
+            "percent_of_frame_elapsed": 0.14315669341772264
+          },
+          "other": {
+            "total_ticks": 470712,
+            "max_ticks": 109722,
+            "average_ms": 0.1646205901639344,
+            "max_ms": 2.340736,
+            "percent_of_30fps_budget": 0.49386177049180324,
+            "percent_of_frame_elapsed": 0.3282825464981856
+          }
+        },
+        "limitations": [
+          "Ares timing model; original N64 and M64 hardware validation remains pending.",
+          "Slot maxima are worst observed per-frame totals and must not be added together.",
+          "Submission scopes include internal queue stalls; this does not time RDP/GPU execution.",
+          "Audio callback time is attributed exclusively; other interrupts remain in the interrupted scope.",
+          "Profiling and enabled debug display add overhead. Incomplete trailing records are excluded."
+        ]
+      },
+      "work_samples": [
+        {
+          "models": 113,
+          "visible": 39,
+          "camera_vertices": 1760
+        },
+        {
+          "models": 113,
+          "visible": 39,
+          "camera_vertices": 1760
+        },
+        {
+          "models": 113,
+          "visible": 39,
+          "camera_vertices": 1760
+        }
+      ],
+      "models": 113,
+      "colliders": 98,
+      "lights": 3,
+      "static_image_bytes": 558328,
+      "source_sha256": "44776ed00ab1225a19eaccc84dff6906277e89301995a832218d1ead9f90918b"
+    },
+    {
+      "case": "loot8",
+      "culling": false,
+      "run": {
+        "name": "scale-loot8",
+        "passed": true,
+        "log": ".dev\\ares\\runs\\f116244db9644b129dad4328ea927591\\scale-loot8.log",
+        "tested_rom": ".dev\\ares\\runs\\f116244db9644b129dad4328ea927591\\DarkLantern64-scale_loot8_8014bbf7-unculled.z64",
+        "rom_sha256": "cc50348146fd00a99af45fac47f5b78922ac8a6a654f4041dd99e21896873df4",
+        "rom_bytes": 311296,
+        "settings": ".dev\\ares\\runs\\f116244db9644b129dad4328ea927591\\settings.bml",
+        "settings_source_sha256": "4b013206c69c12be9e0fdbd91b389e6c40b87816bb40835c6daadb713b18ce80",
+        "profile_report": null,
+        "elapsed_seconds": 8.812,
+        "peak_sampled_heap_bytes": 696408,
+        "max_reported_cpu_ms": 53.17,
+        "boot": "DL64 boot_ok memory=8388608 scene=\"DarkLantern64 scale study - loot8\" meshes=9 models=49 colliders=26 version=2 world=3d renderer=xyz-mesh-rdpq depth=hardware",
+        "terminal_event": "DL64 profile_end window=3"
+      },
+      "profile": {
+        "schema_version": 1,
+        "measurement": "Emulated CPU-timer elapsed time; not CPU utilization or host CPU time",
+        "source_log": ".dev\\ares\\runs\\f116244db9644b129dad4328ea927591\\scale-loot8.log",
+        "source_log_sha256": "72f61100fc90199787142ad3d9562dfcae64b112bbce67e9793a4a9156b1ac74",
+        "source_log_bytes": 5194,
+        "complete_windows": 3,
+        "frames": 54,
+        "ignored_trailing_partial_window": false,
+        "ticks_per_second": 46875000,
+        "target_fps": 30,
+        "frame_budget_ms": 33.333333333333336,
+        "debug_states": [
+          0
+        ],
+        "debug_frames": {
+          "0": 54
+        },
+        "audio_calls": 80,
+        "frame": {
+          "total_ticks": 147968362,
+          "max_ticks": 3028820,
+          "average_ms": 58.45663683950617,
+          "max_ms": 64.61482666666667,
+          "percent_of_30fps_budget": 175.3699105185185,
+          "percent_of_frame_elapsed": 100.0
+        },
+        "slots": {
+          "input": {
+            "total_ticks": 107579,
+            "max_ticks": 3962,
+            "average_ms": 0.04250034567901234,
+            "max_ms": 0.08452266666666666,
+            "percent_of_30fps_budget": 0.12750103703703702,
+            "percent_of_frame_elapsed": 0.07270405547910302
+          },
+          "gameplay": {
+            "total_ticks": 10056311,
+            "max_ticks": 192834,
+            "average_ms": 3.9728636049382717,
+            "max_ms": 4.113792,
+            "percent_of_30fps_budget": 11.918590814814817,
+            "percent_of_frame_elapsed": 6.79625756754677
+          },
+          "audio_events": {
+            "total_ticks": 26976,
+            "max_ticks": 12627,
+            "average_ms": 0.010657185185185184,
+            "max_ms": 0.269376,
+            "percent_of_30fps_budget": 0.03197155555555555,
+            "percent_of_frame_elapsed": 0.018230924256632645
+          },
+          "audio_mix": {
+            "total_ticks": 1705736,
+            "max_ticks": 145830,
+            "average_ms": 0.673871012345679,
+            "max_ms": 3.11104,
+            "percent_of_30fps_budget": 2.0216130370370373,
+            "percent_of_frame_elapsed": 1.1527707524396331
+          },
+          "cache": {
+            "total_ticks": 0,
+            "max_ticks": 0,
+            "average_ms": 0.0,
+            "max_ms": 0.0,
+            "percent_of_30fps_budget": 0.0,
+            "percent_of_frame_elapsed": 0.0
+          },
+          "transforms": {
+            "total_ticks": 25104866,
+            "max_ticks": 469489,
+            "average_ms": 9.91797175308642,
+            "max_ms": 10.015765333333333,
+            "percent_of_30fps_budget": 29.75391525925926,
+            "percent_of_frame_elapsed": 16.96637420369633
+          },
+          "lighting": {
+            "total_ticks": 7002785,
+            "max_ticks": 132466,
+            "average_ms": 2.7665323456790123,
+            "max_ms": 2.825941333333333,
+            "percent_of_30fps_budget": 8.299597037037037,
+            "percent_of_frame_elapsed": 4.7326231806228956
+          },
+          "triangles": {
+            "total_ticks": 85237384,
+            "max_ticks": 1581512,
+            "average_ms": 33.67402824691358,
+            "max_ms": 33.73892266666667,
+            "percent_of_30fps_budget": 101.02208474074074,
+            "percent_of_frame_elapsed": 57.60514129365033
+          },
+          "hud": {
+            "total_ticks": 4064715,
+            "max_ticks": 78182,
+            "average_ms": 1.6058133333333333,
+            "max_ms": 1.6678826666666666,
+            "percent_of_30fps_budget": 4.8174399999999995,
+            "percent_of_frame_elapsed": 2.7470162844676214
+          },
+          "debug_hud": {
+            "total_ticks": 0,
+            "max_ticks": 0,
+            "average_ms": 0.0,
+            "max_ms": 0.0,
+            "percent_of_30fps_budget": 0.0,
+            "percent_of_frame_elapsed": 0.0
+          },
+          "render_setup": {
+            "total_ticks": 763372,
+            "max_ticks": 15796,
+            "average_ms": 0.30157906172839505,
+            "max_ms": 0.33698133333333335,
+            "percent_of_30fps_budget": 0.9047371851851851,
+            "percent_of_frame_elapsed": 0.5159021764395824
+          },
+          "display_wait": {
+            "total_ticks": 13451807,
+            "max_ticks": 532469,
+            "average_ms": 5.31429412345679,
+            "max_ms": 11.359338666666666,
+            "percent_of_30fps_budget": 15.94288237037037,
+            "percent_of_frame_elapsed": 9.091002169774644
+          },
+          "other": {
+            "total_ticks": 446831,
+            "max_ticks": 106167,
+            "average_ms": 0.17652582716049384,
+            "max_ms": 2.264896,
+            "percent_of_30fps_budget": 0.5295774814814815,
+            "percent_of_frame_elapsed": 0.3019773916264613
+          }
+        },
+        "limitations": [
+          "Ares timing model; original N64 and M64 hardware validation remains pending.",
+          "Slot maxima are worst observed per-frame totals and must not be added together.",
+          "Submission scopes include internal queue stalls; this does not time RDP/GPU execution.",
+          "Audio callback time is attributed exclusively; other interrupts remain in the interrupted scope.",
+          "Profiling and enabled debug display add overhead. Incomplete trailing records are excluded."
+        ]
+      },
+      "work_samples": [
+        {
+          "models": 49,
+          "visible": 49,
+          "camera_vertices": 2210
+        },
+        {
+          "models": 49,
+          "visible": 49,
+          "camera_vertices": 2210
+        },
+        {
+          "models": 49,
+          "visible": 49,
+          "camera_vertices": 2210
+        }
+      ],
+      "models": 49,
+      "colliders": 26,
+      "lights": 3,
+      "static_image_bytes": 550688,
+      "source_sha256": "a2dcec2c4ae620fbf1645dae06fff888979c2ea3581c16143d2b9c731f3b0941"
+    },
+    {
+      "case": "loot8",
+      "culling": true,
+      "run": {
+        "name": "scale-loot8",
+        "passed": true,
+        "log": ".dev\\ares\\runs\\60057e72459048d89b2893e88f382cfd\\scale-loot8.log",
+        "tested_rom": ".dev\\ares\\runs\\60057e72459048d89b2893e88f382cfd\\DarkLantern64-scale_loot8_8014bbf7.z64",
+        "rom_sha256": "ca33763b6733841d4557f7e42a27530b0122643d943cb4a8f3546273e1195ef9",
+        "rom_bytes": 311296,
+        "settings": ".dev\\ares\\runs\\60057e72459048d89b2893e88f382cfd\\settings.bml",
+        "settings_source_sha256": "4b013206c69c12be9e0fdbd91b389e6c40b87816bb40835c6daadb713b18ce80",
+        "profile_report": null,
+        "elapsed_seconds": 8.297,
+        "peak_sampled_heap_bytes": 696408,
+        "max_reported_cpu_ms": 53.16,
+        "boot": "DL64 boot_ok memory=8388608 scene=\"DarkLantern64 scale study - loot8\" meshes=9 models=49 colliders=26 version=2 world=3d renderer=xyz-mesh-rdpq depth=hardware",
+        "terminal_event": "DL64 profile_end window=3"
+      },
+      "profile": {
+        "schema_version": 1,
+        "measurement": "Emulated CPU-timer elapsed time; not CPU utilization or host CPU time",
+        "source_log": ".dev\\ares\\runs\\60057e72459048d89b2893e88f382cfd\\scale-loot8.log",
+        "source_log_sha256": "356edfe66dcea58d950e97128c1f8cf11ff612fbcb5e068df01b0990c238cb48",
+        "source_log_bytes": 5185,
+        "complete_windows": 3,
+        "frames": 53,
+        "ignored_trailing_partial_window": false,
+        "ticks_per_second": 46875000,
+        "target_fps": 30,
+        "frame_budget_ms": 33.333333333333336,
+        "debug_states": [
+          0
+        ],
+        "debug_frames": {
+          "0": 53
+        },
+        "audio_calls": 77,
+        "frame": {
+          "total_ticks": 145222449,
+          "max_ticks": 3075730,
+          "average_ms": 58.454319094339624,
+          "max_ms": 65.61557333333333,
+          "percent_of_30fps_budget": 175.36295728301886,
+          "percent_of_frame_elapsed": 100.0
+        },
+        "slots": {
+          "input": {
+            "total_ticks": 102058,
+            "max_ticks": 2865,
+            "average_ms": 0.04107994968553459,
+            "max_ms": 0.06112,
+            "percent_of_30fps_budget": 0.12323984905660376,
+            "percent_of_frame_elapsed": 0.07027701343887954
+          },
+          "gameplay": {
+            "total_ticks": 9858871,
+            "max_ticks": 193859,
+            "average_ms": 3.9683505911949686,
+            "max_ms": 4.135658666666667,
+            "percent_of_30fps_budget": 11.905051773584905,
+            "percent_of_frame_elapsed": 6.788806460631992
+          },
+          "audio_events": {
+            "total_ticks": 26757,
+            "max_ticks": 12551,
+            "average_ms": 0.01077011320754717,
+            "max_ms": 0.26775466666666664,
+            "percent_of_30fps_budget": 0.03231033962264151,
+            "percent_of_frame_elapsed": 0.018424837333517217
+          },
+          "audio_mix": {
+            "total_ticks": 1647920,
+            "max_ticks": 145758,
+            "average_ms": 0.663313710691824,
+            "max_ms": 3.109504,
+            "percent_of_30fps_budget": 1.9899411320754719,
+            "percent_of_frame_elapsed": 1.1347556878069176
+          },
+          "cache": {
+            "total_ticks": 0,
+            "max_ticks": 0,
+            "average_ms": 0.0,
+            "max_ms": 0.0,
+            "percent_of_30fps_budget": 0.0,
+            "percent_of_frame_elapsed": 0.0
+          },
+          "transforms": {
+            "total_ticks": 24383498,
+            "max_ticks": 464289,
+            "average_ms": 9.814741333333334,
+            "max_ms": 9.904832,
+            "percent_of_30fps_budget": 29.444224000000002,
+            "percent_of_frame_elapsed": 16.790446771765982
+          },
+          "lighting": {
+            "total_ticks": 6740638,
+            "max_ticks": 129903,
+            "average_ms": 2.7132127798742136,
+            "max_ms": 2.771264,
+            "percent_of_30fps_budget": 8.13963833962264,
+            "percent_of_frame_elapsed": 4.6415950470577725
+          },
+          "triangles": {
+            "total_ticks": 85697483,
+            "max_ticks": 1620259,
+            "average_ms": 34.49458435220126,
+            "max_ms": 34.56552533333333,
+            "percent_of_30fps_budget": 103.48375305660377,
+            "percent_of_frame_elapsed": 59.01118152882823
+          },
+          "hud": {
+            "total_ticks": 3480100,
+            "max_ticks": 68488,
+            "average_ms": 1.400794968553459,
+            "max_ms": 1.4610773333333333,
+            "percent_of_30fps_budget": 4.202384905660377,
+            "percent_of_frame_elapsed": 2.396392585281357
+          },
+          "debug_hud": {
+            "total_ticks": 0,
+            "max_ticks": 0,
+            "average_ms": 0.0,
+            "max_ms": 0.0,
+            "percent_of_30fps_budget": 0.0,
+            "percent_of_frame_elapsed": 0.0
+          },
+          "render_setup": {
+            "total_ticks": 755278,
+            "max_ticks": 15600,
+            "average_ms": 0.30401127044025156,
+            "max_ms": 0.3328,
+            "percent_of_30fps_budget": 0.9120338113207547,
+            "percent_of_frame_elapsed": 0.5200835030677661
+          },
+          "display_wait": {
+            "total_ticks": 12086377,
+            "max_ticks": 562033,
+            "average_ms": 4.864956779874214,
+            "max_ms": 11.990037333333333,
+            "percent_of_30fps_budget": 14.594870339622641,
+            "percent_of_frame_elapsed": 8.322664356114805
+          },
+          "other": {
+            "total_ticks": 443469,
+            "max_ticks": 109636,
+            "average_ms": 0.1785032452830189,
+            "max_ms": 2.3389013333333333,
+            "percent_of_30fps_budget": 0.5355097358490567,
+            "percent_of_frame_elapsed": 0.305372208672779
+          }
+        },
+        "limitations": [
+          "Ares timing model; original N64 and M64 hardware validation remains pending.",
+          "Slot maxima are worst observed per-frame totals and must not be added together.",
+          "Submission scopes include internal queue stalls; this does not time RDP/GPU execution.",
+          "Audio callback time is attributed exclusively; other interrupts remain in the interrupted scope.",
+          "Profiling and enabled debug display add overhead. Incomplete trailing records are excluded."
+        ]
+      },
+      "work_samples": [
+        {
+          "models": 49,
+          "visible": 47,
+          "camera_vertices": 2144
+        },
+        {
+          "models": 49,
+          "visible": 47,
+          "camera_vertices": 2144
+        },
+        {
+          "models": 49,
+          "visible": 47,
+          "camera_vertices": 2144
+        }
+      ],
+      "models": 49,
+      "colliders": 26,
+      "lights": 3,
+      "static_image_bytes": 551160,
+      "source_sha256": "a2dcec2c4ae620fbf1645dae06fff888979c2ea3581c16143d2b9c731f3b0941"
+    },
+    {
+      "case": "loot32",
+      "culling": false,
+      "run": {
+        "name": "scale-loot32",
+        "passed": true,
+        "log": ".dev\\ares\\runs\\db301953ce65435085f2006f9b812ca9\\scale-loot32.log",
+        "tested_rom": ".dev\\ares\\runs\\db301953ce65435085f2006f9b812ca9\\DarkLantern64-scale_loot32_8014bbf7-unculled.z64",
+        "rom_sha256": "74e7fcc89bb9625f5379fad016c3bd373f628e3d6a864b2e681fe2d0d3b7e6e3",
+        "rom_bytes": 311296,
+        "settings": ".dev\\ares\\runs\\db301953ce65435085f2006f9b812ca9\\settings.bml",
+        "settings_source_sha256": "4b013206c69c12be9e0fdbd91b389e6c40b87816bb40835c6daadb713b18ce80",
+        "profile_report": null,
+        "elapsed_seconds": 10.562,
+        "peak_sampled_heap_bytes": 779352,
+        "max_reported_cpu_ms": 94.45,
+        "boot": "DL64 boot_ok memory=8388608 scene=\"DarkLantern64 scale study - loot32\" meshes=9 models=73 colliders=26 version=2 world=3d renderer=xyz-mesh-rdpq depth=hardware",
+        "terminal_event": "DL64 profile_end window=3"
+      },
+      "profile": {
+        "schema_version": 1,
+        "measurement": "Emulated CPU-timer elapsed time; not CPU utilization or host CPU time",
+        "source_log": ".dev\\ares\\runs\\db301953ce65435085f2006f9b812ca9\\scale-loot32.log",
+        "source_log_sha256": "ab1010c6c6de58f5e446a9c2d38331fc9b204c668537a94461cebdc927061816",
+        "source_log_bytes": 5196,
+        "complete_windows": 3,
+        "frames": 31,
+        "ignored_trailing_partial_window": false,
+        "ticks_per_second": 46875000,
+        "target_fps": 30,
+        "frame_budget_ms": 33.333333333333336,
+        "debug_states": [
+          0
+        ],
+        "debug_frames": {
+          "0": 31
+        },
+        "audio_calls": 78,
+        "frame": {
+          "total_ticks": 145011322,
+          "max_ticks": 4882558,
+          "average_ms": 99.79273772043011,
+          "max_ms": 104.16123733333333,
+          "percent_of_30fps_budget": 299.3782131612903,
+          "percent_of_frame_elapsed": 100.0
+        },
+        "slots": {
+          "input": {
+            "total_ticks": 54545,
+            "max_ticks": 1945,
+            "average_ms": 0.0375363440860215,
+            "max_ms": 0.04149333333333333,
+            "percent_of_30fps_budget": 0.11260903225806451,
+            "percent_of_frame_elapsed": 0.03761430435066305
+          },
+          "gameplay": {
+            "total_ticks": 6070171,
+            "max_ticks": 201924,
+            "average_ms": 4.177321978494624,
+            "max_ms": 4.307712,
+            "percent_of_30fps_budget": 12.531965935483871,
+            "percent_of_frame_elapsed": 4.185997973316869
+          },
+          "audio_events": {
+            "total_ticks": 20596,
+            "max_ticks": 12867,
+            "average_ms": 0.014173591397849463,
+            "max_ms": 0.274496,
+            "percent_of_30fps_budget": 0.04252077419354839,
+            "percent_of_frame_elapsed": 0.01420302891935569
+          },
+          "audio_mix": {
+            "total_ticks": 1664160,
+            "max_ticks": 218850,
+            "average_ms": 1.145228387096774,
+            "max_ms": 4.6688,
+            "percent_of_30fps_budget": 3.435685161290322,
+            "percent_of_frame_elapsed": 1.1476069434081844
+          },
+          "cache": {
+            "total_ticks": 0,
+            "max_ticks": 0,
+            "average_ms": 0.0,
+            "max_ms": 0.0,
+            "percent_of_30fps_budget": 0.0,
+            "percent_of_frame_elapsed": 0.0
+          },
+          "transforms": {
+            "total_ticks": 21794188,
+            "max_ticks": 705500,
+            "average_ms": 14.99815088172043,
+            "max_ms": 15.050666666666666,
+            "percent_of_30fps_budget": 44.994452645161296,
+            "percent_of_frame_elapsed": 15.029300953480032
+          },
+          "lighting": {
+            "total_ticks": 3962491,
+            "max_ticks": 131257,
+            "average_ms": 2.7268755268817206,
+            "max_ms": 2.800149333333333,
+            "percent_of_30fps_budget": 8.180626580645162,
+            "percent_of_frame_elapsed": 2.7325390496060713
+          },
+          "triangles": {
+            "total_ticks": 95386328,
+            "max_ticks": 3081471,
+            "average_ms": 65.64220421505377,
+            "max_ms": 65.738048,
+            "percent_of_30fps_budget": 196.9266126451613,
+            "percent_of_frame_elapsed": 65.7785383130291
+          },
+          "hud": {
+            "total_ticks": 2110998,
+            "max_ticks": 69779,
+            "average_ms": 1.452729806451613,
+            "max_ms": 1.4886186666666668,
+            "percent_of_30fps_budget": 4.358189419354838,
+            "percent_of_frame_elapsed": 1.4557470209119259
+          },
+          "debug_hud": {
+            "total_ticks": 0,
+            "max_ticks": 0,
+            "average_ms": 0.0,
+            "max_ms": 0.0,
+            "percent_of_30fps_budget": 0.0,
+            "percent_of_frame_elapsed": 0.0
+          },
+          "render_setup": {
+            "total_ticks": 448315,
+            "max_ticks": 15221,
+            "average_ms": 0.3085178494623656,
+            "max_ms": 0.32471466666666665,
+            "percent_of_30fps_budget": 0.9255535483870968,
+            "percent_of_frame_elapsed": 0.30915861866289307
+          },
+          "display_wait": {
+            "total_ticks": 13128876,
+            "max_ticks": 468572,
+            "average_ms": 9.03492541935484,
+            "max_ms": 9.996202666666667,
+            "percent_of_30fps_budget": 27.104776258064522,
+            "percent_of_frame_elapsed": 9.053690304264656
+          },
+          "other": {
+            "total_ticks": 370654,
+            "max_ticks": 106066,
+            "average_ms": 0.2550737204301075,
+            "max_ms": 2.2627413333333335,
+            "percent_of_30fps_budget": 0.7652211612903226,
+            "percent_of_frame_elapsed": 0.25560349005024585
+          }
+        },
+        "limitations": [
+          "Ares timing model; original N64 and M64 hardware validation remains pending.",
+          "Slot maxima are worst observed per-frame totals and must not be added together.",
+          "Submission scopes include internal queue stalls; this does not time RDP/GPU execution.",
+          "Audio callback time is attributed exclusively; other interrupts remain in the interrupted scope.",
+          "Profiling and enabled debug display add overhead. Incomplete trailing records are excluded."
+        ]
+      },
+      "work_samples": [
+        {
+          "models": 73,
+          "visible": 73,
+          "camera_vertices": 3362
+        },
+        {
+          "models": 73,
+          "visible": 73,
+          "camera_vertices": 3362
+        },
+        {
+          "models": 73,
+          "visible": 73,
+          "camera_vertices": 3362
+        }
+      ],
+      "models": 73,
+      "colliders": 26,
+      "lights": 3,
+      "static_image_bytes": 552512,
+      "source_sha256": "e4703bf7c7277c31eb0c197933541116aa92cbb2a6329ff8e2233cd4ce7e3aec"
+    },
+    {
+      "case": "loot32",
+      "culling": true,
+      "run": {
+        "name": "scale-loot32",
+        "passed": true,
+        "log": ".dev\\ares\\runs\\c625a8e6261d4a398dbc0d8176b10440\\scale-loot32.log",
+        "tested_rom": ".dev\\ares\\runs\\c625a8e6261d4a398dbc0d8176b10440\\DarkLantern64-scale_loot32_8014bbf7.z64",
+        "rom_sha256": "57d5b13ebe02299701c2deec105e0115135ad203e7fd41d72a6475ea488fa2ce",
+        "rom_bytes": 311296,
+        "settings": ".dev\\ares\\runs\\c625a8e6261d4a398dbc0d8176b10440\\settings.bml",
+        "settings_source_sha256": "4b013206c69c12be9e0fdbd91b389e6c40b87816bb40835c6daadb713b18ce80",
+        "profile_report": null,
+        "elapsed_seconds": 10.297,
+        "peak_sampled_heap_bytes": 779352,
+        "max_reported_cpu_ms": 98.84,
+        "boot": "DL64 boot_ok memory=8388608 scene=\"DarkLantern64 scale study - loot32\" meshes=9 models=73 colliders=26 version=2 world=3d renderer=xyz-mesh-rdpq depth=hardware",
+        "terminal_event": "DL64 profile_end window=3"
+      },
+      "profile": {
+        "schema_version": 1,
+        "measurement": "Emulated CPU-timer elapsed time; not CPU utilization or host CPU time",
+        "source_log": ".dev\\ares\\runs\\c625a8e6261d4a398dbc0d8176b10440\\scale-loot32.log",
+        "source_log_sha256": "d0856d48d504aede10b1ea1ba15c59f5529b22b78535cf01dc17fed5036b52f1",
+        "source_log_bytes": 5187,
+        "complete_windows": 3,
+        "frames": 31,
+        "ignored_trailing_partial_window": false,
+        "ticks_per_second": 46875000,
+        "target_fps": 30,
+        "frame_budget_ms": 33.333333333333336,
+        "debug_states": [
+          0
+        ],
+        "debug_frames": {
+          "0": 31
+        },
+        "audio_calls": 77,
+        "frame": {
+          "total_ticks": 145509414,
+          "max_ticks": 4789020,
+          "average_ms": 100.13551070967742,
+          "max_ms": 102.16576,
+          "percent_of_30fps_budget": 300.40653212903226,
+          "percent_of_frame_elapsed": 100.0
+        },
+        "slots": {
+          "input": {
+            "total_ticks": 64076,
+            "max_ticks": 3485,
+            "average_ms": 0.04409531182795699,
+            "max_ms": 0.07434666666666667,
+            "percent_of_30fps_budget": 0.13228593548387096,
+            "percent_of_frame_elapsed": 0.04403563882127929
+          },
+          "gameplay": {
+            "total_ticks": 6045211,
+            "max_ticks": 201226,
+            "average_ms": 4.160145204301076,
+            "max_ms": 4.292821333333333,
+            "percent_of_30fps_budget": 12.480435612903227,
+            "percent_of_frame_elapsed": 4.154515391011058
+          },
+          "audio_events": {
+            "total_ticks": 20652,
+            "max_ticks": 12900,
+            "average_ms": 0.014212129032258065,
+            "max_ms": 0.2752,
+            "percent_of_30fps_budget": 0.04263638709677419,
+            "percent_of_frame_elapsed": 0.014192896137977713
+          },
+          "audio_mix": {
+            "total_ticks": 1595876,
+            "max_ticks": 146095,
+            "average_ms": 1.098237247311828,
+            "max_ms": 3.1166933333333335,
+            "percent_of_30fps_budget": 3.294711741935484,
+            "percent_of_frame_elapsed": 1.096751032204693
+          },
+          "cache": {
+            "total_ticks": 0,
+            "max_ticks": 0,
+            "average_ms": 0.0,
+            "max_ms": 0.0,
+            "percent_of_30fps_budget": 0.0,
+            "percent_of_frame_elapsed": 0.0
+          },
+          "transforms": {
+            "total_ticks": 21693836,
+            "max_ticks": 702284,
+            "average_ms": 14.929091440860214,
+            "max_ms": 14.982058666666667,
+            "percent_of_30fps_budget": 44.78727432258064,
+            "percent_of_frame_elapsed": 14.908888300519168
+          },
+          "lighting": {
+            "total_ticks": 4032105,
+            "max_ticks": 132618,
+            "average_ms": 2.774781935483871,
+            "max_ms": 2.829184,
+            "percent_of_30fps_budget": 8.324345806451614,
+            "percent_of_frame_elapsed": 2.771026897270028
+          },
+          "triangles": {
+            "total_ticks": 104154967,
+            "max_ticks": 3363714,
+            "average_ms": 71.67653643010753,
+            "max_ms": 71.759232,
+            "percent_of_30fps_budget": 215.0296092903226,
+            "percent_of_frame_elapsed": 71.57953848951657
+          },
+          "hud": {
+            "total_ticks": 2017561,
+            "max_ticks": 67722,
+            "average_ms": 1.3884290752688173,
+            "max_ms": 1.444736,
+            "percent_of_30fps_budget": 4.165287225806452,
+            "percent_of_frame_elapsed": 1.386550151318732
+          },
+          "debug_hud": {
+            "total_ticks": 0,
+            "max_ticks": 0,
+            "average_ms": 0.0,
+            "max_ms": 0.0,
+            "percent_of_30fps_budget": 0.0,
+            "percent_of_frame_elapsed": 0.0
+          },
+          "render_setup": {
+            "total_ticks": 474298,
+            "max_ticks": 16353,
+            "average_ms": 0.326398623655914,
+            "max_ms": 0.348864,
+            "percent_of_30fps_budget": 0.979195870967742,
+            "percent_of_frame_elapsed": 0.3259569171242762
+          },
+          "display_wait": {
+            "total_ticks": 5031175,
+            "max_ticks": 189303,
+            "average_ms": 3.4623139784946235,
+            "max_ms": 4.038464,
+            "percent_of_30fps_budget": 10.386941935483872,
+            "percent_of_frame_elapsed": 3.4576285215470666
+          },
+          "other": {
+            "total_ticks": 379657,
+            "max_ticks": 111012,
+            "average_ms": 0.2612693333333333,
+            "max_ms": 2.368256,
+            "percent_of_30fps_budget": 0.7838079999999998,
+            "percent_of_frame_elapsed": 0.2609157645291596
+          }
+        },
+        "limitations": [
+          "Ares timing model; original N64 and M64 hardware validation remains pending.",
+          "Slot maxima are worst observed per-frame totals and must not be added together.",
+          "Submission scopes include internal queue stalls; this does not time RDP/GPU execution.",
+          "Audio callback time is attributed exclusively; other interrupts remain in the interrupted scope.",
+          "Profiling and enabled debug display add overhead. Incomplete trailing records are excluded."
+        ]
+      },
+      "work_samples": [
+        {
+          "models": 73,
+          "visible": 71,
+          "camera_vertices": 3296
+        },
+        {
+          "models": 73,
+          "visible": 71,
+          "camera_vertices": 3296
+        },
+        {
+          "models": 73,
+          "visible": 71,
+          "camera_vertices": 3296
+        }
+      ],
+      "models": 73,
+      "colliders": 26,
+      "lights": 3,
+      "static_image_bytes": 552984,
+      "source_sha256": "e4703bf7c7277c31eb0c197933541116aa92cbb2a6329ff8e2233cd4ce7e3aec"
+    },
+    {
+      "case": "lights1",
+      "culling": false,
+      "run": {
+        "name": "scale-lights1",
+        "passed": true,
+        "log": ".dev\\ares\\runs\\c0724cc1645d4ad28aa03df3ac686efd\\scale-lights1.log",
+        "tested_rom": ".dev\\ares\\runs\\c0724cc1645d4ad28aa03df3ac686efd\\DarkLantern64-scale_lights1_8014bbf7-unculled.z64",
+        "rom_sha256": "755c4936409e4fabdcbf12621d0cb96d47f750520c0e4d74e268af80655e6d0a",
+        "rom_bytes": 311296,
+        "settings": ".dev\\ares\\runs\\c0724cc1645d4ad28aa03df3ac686efd\\settings.bml",
+        "settings_source_sha256": "4b013206c69c12be9e0fdbd91b389e6c40b87816bb40835c6daadb713b18ce80",
+        "profile_report": null,
+        "elapsed_seconds": 8.047,
+        "peak_sampled_heap_bytes": 667048,
+        "max_reported_cpu_ms": 38.96,
+        "boot": "DL64 boot_ok memory=8388608 scene=\"DarkLantern64 scale study - lights1\" meshes=9 models=38 colliders=26 version=2 world=3d renderer=xyz-mesh-rdpq depth=hardware",
+        "terminal_event": "DL64 profile_end window=3"
+      },
+      "profile": {
+        "schema_version": 1,
+        "measurement": "Emulated CPU-timer elapsed time; not CPU utilization or host CPU time",
+        "source_log": ".dev\\ares\\runs\\c0724cc1645d4ad28aa03df3ac686efd\\scale-lights1.log",
+        "source_log_sha256": "d8aecf1843ba0658b5bc93264f6bc798f0c1bc21cbc895a8eb9f7244552af59f",
+        "source_log_bytes": 5197,
+        "complete_windows": 3,
+        "frames": 65,
+        "ignored_trailing_partial_window": false,
+        "ticks_per_second": 46875000,
+        "target_fps": 30,
+        "frame_budget_ms": 33.333333333333336,
+        "debug_states": [
+          0
+        ],
+        "debug_frames": {
+          "0": 65
+        },
+        "audio_calls": 77,
+        "frame": {
+          "total_ticks": 144486898,
+          "max_ticks": 2404381,
+          "average_ms": 47.421340882051275,
+          "max_ms": 51.29346133333333,
+          "percent_of_30fps_budget": 142.26402264615382,
+          "percent_of_frame_elapsed": 100.0
+        },
+        "slots": {
+          "input": {
+            "total_ticks": 147562,
+            "max_ticks": 3751,
+            "average_ms": 0.04843060512820513,
+            "max_ms": 0.08002133333333333,
+            "percent_of_30fps_budget": 0.14529181538461539,
+            "percent_of_frame_elapsed": 0.10212829124478816
+          },
+          "gameplay": {
+            "total_ticks": 11638911,
+            "max_ticks": 192273,
+            "average_ms": 3.819950276923077,
+            "max_ms": 4.101824,
+            "percent_of_30fps_budget": 11.45985083076923,
+            "percent_of_frame_elapsed": 8.055340076579123
+          },
+          "audio_events": {
+            "total_ticks": 44421,
+            "max_ticks": 12579,
+            "average_ms": 0.0145792,
+            "max_ms": 0.268352,
+            "percent_of_30fps_budget": 0.0437376,
+            "percent_of_frame_elapsed": 0.03074396406517081
+          },
+          "audio_mix": {
+            "total_ticks": 1700989,
+            "max_ticks": 145784,
+            "average_ms": 0.5582733128205128,
+            "max_ms": 3.1100586666666667,
+            "percent_of_30fps_budget": 1.6748199384615385,
+            "percent_of_frame_elapsed": 1.1772617611321408
+          },
+          "cache": {
+            "total_ticks": 0,
+            "max_ticks": 0,
+            "average_ms": 0.0,
+            "max_ms": 0.0,
+            "percent_of_30fps_budget": 0.0,
+            "percent_of_frame_elapsed": 0.0
+          },
+          "transforms": {
+            "total_ticks": 24122563,
+            "max_ticks": 375487,
+            "average_ms": 7.917148882051283,
+            "max_ms": 8.010389333333332,
+            "percent_of_30fps_budget": 23.75144664615385,
+            "percent_of_frame_elapsed": 16.695329011769633
+          },
+          "lighting": {
+            "total_ticks": 6474484,
+            "max_ticks": 101760,
+            "average_ms": 2.124958851282051,
+            "max_ms": 2.17088,
+            "percent_of_30fps_budget": 6.3748765538461525,
+            "percent_of_frame_elapsed": 4.481018064350721
+          },
+          "triangles": {
+            "total_ticks": 64378978,
+            "max_ticks": 996539,
+            "average_ms": 21.12951072820513,
+            "max_ms": 21.259498666666666,
+            "percent_of_30fps_budget": 63.38853218461539,
+            "percent_of_frame_elapsed": 44.55696598870854
+          },
+          "hud": {
+            "total_ticks": 4864005,
+            "max_ticks": 78203,
+            "average_ms": 1.5963913846153845,
+            "max_ms": 1.6683306666666666,
+            "percent_of_30fps_budget": 4.789174153846154,
+            "percent_of_frame_elapsed": 3.366398661282077
+          },
+          "debug_hud": {
+            "total_ticks": 0,
+            "max_ticks": 0,
+            "average_ms": 0.0,
+            "max_ms": 0.0,
+            "percent_of_30fps_budget": 0.0,
+            "percent_of_frame_elapsed": 0.0
+          },
+          "render_setup": {
+            "total_ticks": 918427,
+            "max_ticks": 15319,
+            "average_ms": 0.3014324512820513,
+            "max_ms": 0.32680533333333334,
+            "percent_of_30fps_budget": 0.9042973538461541,
+            "percent_of_frame_elapsed": 0.6356472543275169
+          },
+          "display_wait": {
+            "total_ticks": 29710098,
+            "max_ticks": 592860,
+            "average_ms": 9.751006523076923,
+            "max_ms": 12.64768,
+            "percent_of_30fps_budget": 29.25301956923077,
+            "percent_of_frame_elapsed": 20.56248588020763
+          },
+          "other": {
+            "total_ticks": 486460,
+            "max_ticks": 111550,
+            "average_ms": 0.15965866666666667,
+            "max_ms": 2.3797333333333333,
+            "percent_of_30fps_budget": 0.478976,
+            "percent_of_frame_elapsed": 0.3366810463326578
+          }
+        },
+        "limitations": [
+          "Ares timing model; original N64 and M64 hardware validation remains pending.",
+          "Slot maxima are worst observed per-frame totals and must not be added together.",
+          "Submission scopes include internal queue stalls; this does not time RDP/GPU execution.",
+          "Audio callback time is attributed exclusively; other interrupts remain in the interrupted scope.",
+          "Profiling and enabled debug display add overhead. Incomplete trailing records are excluded."
+        ]
+      },
+      "work_samples": [
+        {
+          "models": 38,
+          "visible": 38,
+          "camera_vertices": 1754
+        },
+        {
+          "models": 38,
+          "visible": 38,
+          "camera_vertices": 1754
+        },
+        {
+          "models": 38,
+          "visible": 38,
+          "camera_vertices": 1754
+        }
+      ],
+      "models": 38,
+      "colliders": 26,
+      "lights": 1,
+      "static_image_bytes": 549776,
+      "source_sha256": "05690433785c7bfa384839f0ab52602298892b13516eaf9646c58bb456dd0853"
+    },
+    {
+      "case": "lights1",
+      "culling": true,
+      "run": {
+        "name": "scale-lights1",
+        "passed": true,
+        "log": ".dev\\ares\\runs\\48b339d481ba401692dcd331792a00e3\\scale-lights1.log",
+        "tested_rom": ".dev\\ares\\runs\\48b339d481ba401692dcd331792a00e3\\DarkLantern64-scale_lights1_8014bbf7.z64",
+        "rom_sha256": "bacd0fa2175a48ca75f3993de336fa6621acaade99d525ea2624f11a9914a309",
+        "rom_bytes": 311296,
+        "settings": ".dev\\ares\\runs\\48b339d481ba401692dcd331792a00e3\\settings.bml",
+        "settings_source_sha256": "4b013206c69c12be9e0fdbd91b389e6c40b87816bb40835c6daadb713b18ce80",
+        "profile_report": null,
+        "elapsed_seconds": 7.547,
+        "peak_sampled_heap_bytes": 667032,
+        "max_reported_cpu_ms": 38.59,
+        "boot": "DL64 boot_ok memory=8388608 scene=\"DarkLantern64 scale study - lights1\" meshes=9 models=38 colliders=26 version=2 world=3d renderer=xyz-mesh-rdpq depth=hardware",
+        "terminal_event": "DL64 profile_end window=3"
+      },
+      "profile": {
+        "schema_version": 1,
+        "measurement": "Emulated CPU-timer elapsed time; not CPU utilization or host CPU time",
+        "source_log": ".dev\\ares\\runs\\48b339d481ba401692dcd331792a00e3\\scale-lights1.log",
+        "source_log_sha256": "e1077c06b095dbab8f17d68e0adfebe4bebe8ae620ee70fe335d9072cc8f36ff",
+        "source_log_bytes": 5189,
+        "complete_windows": 3,
+        "frames": 61,
+        "ignored_trailing_partial_window": false,
+        "ticks_per_second": 46875000,
+        "target_fps": 30,
+        "frame_budget_ms": 33.333333333333336,
+        "debug_states": [
+          0
+        ],
+        "debug_frames": {
+          "0": 61
+        },
+        "audio_calls": 76,
+        "frame": {
+          "total_ticks": 142144083,
+          "max_ticks": 2406023,
+          "average_ms": 49.71159186885246,
+          "max_ms": 51.32849066666667,
+          "percent_of_30fps_budget": 149.13477560655738,
+          "percent_of_frame_elapsed": 100.0
+        },
+        "slots": {
+          "input": {
+            "total_ticks": 128762,
+            "max_ticks": 3074,
+            "average_ms": 0.04503151912568306,
+            "max_ms": 0.06557866666666666,
+            "percent_of_30fps_budget": 0.13509455737704917,
+            "percent_of_frame_elapsed": 0.0905855504375796
+          },
+          "gameplay": {
+            "total_ticks": 11082553,
+            "max_ticks": 186959,
+            "average_ms": 3.8758655300546447,
+            "max_ms": 3.988458666666667,
+            "percent_of_30fps_budget": 11.627596590163934,
+            "percent_of_frame_elapsed": 7.796703715060724
+          },
+          "audio_events": {
+            "total_ticks": 28017,
+            "max_ticks": 12483,
+            "average_ms": 0.009798295081967213,
+            "max_ms": 0.266304,
+            "percent_of_30fps_budget": 0.029394885245901635,
+            "percent_of_frame_elapsed": 0.01971028227745505
+          },
+          "audio_mix": {
+            "total_ticks": 1628197,
+            "max_ticks": 92665,
+            "average_ms": 0.569424087431694,
+            "max_ms": 1.9768533333333334,
+            "percent_of_30fps_budget": 1.7082722622950821,
+            "percent_of_frame_elapsed": 1.1454553475855904
+          },
+          "cache": {
+            "total_ticks": 0,
+            "max_ticks": 0,
+            "average_ms": 0.0,
+            "max_ms": 0.0,
+            "percent_of_30fps_budget": 0.0,
+            "percent_of_frame_elapsed": 0.0
+          },
+          "transforms": {
+            "total_ticks": 22160759,
+            "max_ticks": 368811,
+            "average_ms": 7.750210797814208,
+            "max_ms": 7.867968,
+            "percent_of_30fps_budget": 23.250632393442622,
+            "percent_of_frame_elapsed": 15.590349265540656
+          },
+          "lighting": {
+            "total_ticks": 6137889,
+            "max_ticks": 102421,
+            "average_ms": 2.146584131147541,
+            "max_ms": 2.1849813333333334,
+            "percent_of_30fps_budget": 6.439752393442623,
+            "percent_of_frame_elapsed": 4.318075624716648
+          },
+          "triangles": {
+            "total_ticks": 63103258,
+            "max_ticks": 1040186,
+            "average_ms": 22.068898972677594,
+            "max_ms": 22.190634666666668,
+            "percent_of_30fps_budget": 66.20669691803279,
+            "percent_of_frame_elapsed": 44.39386900121618
+          },
+          "hud": {
+            "total_ticks": 5387200,
+            "max_ticks": 89891,
+            "average_ms": 1.884048087431694,
+            "max_ms": 1.9176746666666666,
+            "percent_of_30fps_budget": 5.652144262295082,
+            "percent_of_frame_elapsed": 3.7899572647002127
+          },
+          "debug_hud": {
+            "total_ticks": 0,
+            "max_ticks": 0,
+            "average_ms": 0.0,
+            "max_ms": 0.0,
+            "percent_of_30fps_budget": 0.0,
+            "percent_of_frame_elapsed": 0.0
+          },
+          "render_setup": {
+            "total_ticks": 894894,
+            "max_ticks": 16240,
+            "average_ms": 0.31296839344262295,
+            "max_ms": 0.34645333333333334,
+            "percent_of_30fps_budget": 0.9389051803278688,
+            "percent_of_frame_elapsed": 0.6295682388692887
+          },
+          "display_wait": {
+            "total_ticks": 31120899,
+            "max_ticks": 548955,
+            "average_ms": 10.883811672131147,
+            "max_ms": 11.71104,
+            "percent_of_30fps_budget": 32.65143501639344,
+            "percent_of_frame_elapsed": 21.893910983266185
+          },
+          "other": {
+            "total_ticks": 471655,
+            "max_ticks": 109931,
+            "average_ms": 0.16495038251366118,
+            "max_ms": 2.3451946666666665,
+            "percent_of_30fps_budget": 0.49485114754098347,
+            "percent_of_frame_elapsed": 0.3318147263294808
+          }
+        },
+        "limitations": [
+          "Ares timing model; original N64 and M64 hardware validation remains pending.",
+          "Slot maxima are worst observed per-frame totals and must not be added together.",
+          "Submission scopes include internal queue stalls; this does not time RDP/GPU execution.",
+          "Audio callback time is attributed exclusively; other interrupts remain in the interrupted scope.",
+          "Profiling and enabled debug display add overhead. Incomplete trailing records are excluded."
+        ]
+      },
+      "work_samples": [
+        {
+          "models": 38,
+          "visible": 36,
+          "camera_vertices": 1688
+        },
+        {
+          "models": 38,
+          "visible": 36,
+          "camera_vertices": 1688
+        },
+        {
+          "models": 38,
+          "visible": 36,
+          "camera_vertices": 1688
+        }
+      ],
+      "models": 38,
+      "colliders": 26,
+      "lights": 1,
+      "static_image_bytes": 550248,
+      "source_sha256": "05690433785c7bfa384839f0ab52602298892b13516eaf9646c58bb456dd0853"
+    },
+    {
+      "case": "lights8",
+      "culling": false,
+      "run": {
+        "name": "scale-lights8",
+        "passed": true,
+        "log": ".dev\\ares\\runs\\73b9dc4612ae43ef8d3f77ce99f3539a\\scale-lights8.log",
+        "tested_rom": ".dev\\ares\\runs\\73b9dc4612ae43ef8d3f77ce99f3539a\\DarkLantern64-scale_lights8_8014bbf7-unculled.z64",
+        "rom_sha256": "c29c84a9998aeef0746604a7e37ee2bc3f8fae54576f3cdf63c93177a8a51339",
+        "rom_bytes": 311296,
+        "settings": ".dev\\ares\\runs\\73b9dc4612ae43ef8d3f77ce99f3539a\\settings.bml",
+        "settings_source_sha256": "4b013206c69c12be9e0fdbd91b389e6c40b87816bb40835c6daadb713b18ce80",
+        "profile_report": null,
+        "elapsed_seconds": 8.813,
+        "peak_sampled_heap_bytes": 667032,
+        "max_reported_cpu_ms": 42.4,
+        "boot": "DL64 boot_ok memory=8388608 scene=\"DarkLantern64 scale study - lights8\" meshes=9 models=38 colliders=26 version=2 world=3d renderer=xyz-mesh-rdpq depth=hardware",
+        "terminal_event": "DL64 profile_end window=3"
+      },
+      "profile": {
+        "schema_version": 1,
+        "measurement": "Emulated CPU-timer elapsed time; not CPU utilization or host CPU time",
+        "source_log": ".dev\\ares\\runs\\73b9dc4612ae43ef8d3f77ce99f3539a\\scale-lights8.log",
+        "source_log_sha256": "9d71dada177e4e0986fe31f2bacd411f8ef49b3c66ec4ea4a0165ae4fe8bc211",
+        "source_log_bytes": 5196,
+        "complete_windows": 3,
+        "frames": 61,
+        "ignored_trailing_partial_window": false,
+        "ticks_per_second": 46875000,
+        "target_fps": 30,
+        "frame_budget_ms": 33.333333333333336,
+        "debug_states": [
+          0
+        ],
+        "debug_frames": {
+          "0": 61
+        },
+        "audio_calls": 77,
+        "frame": {
+          "total_ticks": 142677716,
+          "max_ticks": 2402683,
+          "average_ms": 49.89821761748634,
+          "max_ms": 51.257237333333336,
+          "percent_of_30fps_budget": 149.694652852459,
+          "percent_of_frame_elapsed": 100.0
+        },
+        "slots": {
+          "input": {
+            "total_ticks": 155037,
+            "max_ticks": 3736,
+            "average_ms": 0.05422059016393443,
+            "max_ms": 0.07970133333333333,
+            "percent_of_30fps_budget": 0.16266177049180328,
+            "percent_of_frame_elapsed": 0.10866237864362785
+          },
+          "gameplay": {
+            "total_ticks": 18204415,
+            "max_ticks": 304578,
+            "average_ms": 6.366571366120219,
+            "max_ms": 6.497664,
+            "percent_of_30fps_budget": 19.099714098360657,
+            "percent_of_frame_elapsed": 12.759115796330802
+          },
+          "audio_events": {
+            "total_ticks": 28667,
+            "max_ticks": 12669,
+            "average_ms": 0.010025617486338798,
+            "max_ms": 0.270272,
+            "percent_of_30fps_budget": 0.030076852459016395,
+            "percent_of_frame_elapsed": 0.020092135481058582
+          },
+          "audio_mix": {
+            "total_ticks": 1647951,
+            "max_ticks": 92707,
+            "average_ms": 0.5763325901639345,
+            "max_ms": 1.9777493333333334,
+            "percent_of_30fps_budget": 1.7289977704918034,
+            "percent_of_frame_elapsed": 1.1550163867215255
+          },
+          "cache": {
+            "total_ticks": 0,
+            "max_ticks": 0,
+            "average_ms": 0.0,
+            "max_ms": 0.0,
+            "percent_of_30fps_budget": 0.0,
+            "percent_of_frame_elapsed": 0.0
+          },
+          "transforms": {
+            "total_ticks": 22620024,
+            "max_ticks": 372705,
+            "average_ms": 7.910828065573771,
+            "max_ms": 7.95104,
+            "percent_of_30fps_budget": 23.732484196721312,
+            "percent_of_frame_elapsed": 15.853929144758666
+          },
+          "lighting": {
+            "total_ticks": 10646639,
+            "max_ticks": 177094,
+            "average_ms": 3.723414732240437,
+            "max_ms": 3.778005333333333,
+            "percent_of_30fps_budget": 11.170244196721312,
+            "percent_of_frame_elapsed": 7.462019506956503
+          },
+          "triangles": {
+            "total_ticks": 62433711,
+            "max_ticks": 1030611,
+            "average_ms": 21.83474045901639,
+            "max_ms": 21.986368,
+            "percent_of_30fps_budget": 65.50422137704916,
+            "percent_of_frame_elapsed": 43.758557923649406
+          },
+          "hud": {
+            "total_ticks": 4699375,
+            "max_ticks": 79607,
+            "average_ms": 1.6434972677595627,
+            "max_ms": 1.6982826666666666,
+            "percent_of_30fps_budget": 4.930491803278688,
+            "percent_of_frame_elapsed": 3.293699346855258
+          },
+          "debug_hud": {
+            "total_ticks": 0,
+            "max_ticks": 0,
+            "average_ms": 0.0,
+            "max_ms": 0.0,
+            "percent_of_30fps_budget": 0.0,
+            "percent_of_frame_elapsed": 0.0
+          },
+          "render_setup": {
+            "total_ticks": 876296,
+            "max_ticks": 16142,
+            "average_ms": 0.306464174863388,
+            "max_ms": 0.34436266666666665,
+            "percent_of_30fps_budget": 0.9193925245901641,
+            "percent_of_frame_elapsed": 0.6141786009526533
+          },
+          "display_wait": {
+            "total_ticks": 20908197,
+            "max_ticks": 371506,
+            "average_ms": 7.312156327868853,
+            "max_ms": 7.925461333333334,
+            "percent_of_30fps_budget": 21.93646898360656,
+            "percent_of_frame_elapsed": 14.654143328170463
+          },
+          "other": {
+            "total_ticks": 457404,
+            "max_ticks": 107417,
+            "average_ms": 0.15996642622950819,
+            "max_ms": 2.2915626666666666,
+            "percent_of_30fps_budget": 0.4798992786885245,
+            "percent_of_frame_elapsed": 0.3205854514800335
+          }
+        },
+        "limitations": [
+          "Ares timing model; original N64 and M64 hardware validation remains pending.",
+          "Slot maxima are worst observed per-frame totals and must not be added together.",
+          "Submission scopes include internal queue stalls; this does not time RDP/GPU execution.",
+          "Audio callback time is attributed exclusively; other interrupts remain in the interrupted scope.",
+          "Profiling and enabled debug display add overhead. Incomplete trailing records are excluded."
+        ]
+      },
+      "work_samples": [
+        {
+          "models": 38,
+          "visible": 38,
+          "camera_vertices": 1754
+        },
+        {
+          "models": 38,
+          "visible": 38,
+          "camera_vertices": 1754
+        },
+        {
+          "models": 38,
+          "visible": 38,
+          "camera_vertices": 1754
+        }
+      ],
+      "models": 38,
+      "colliders": 26,
+      "lights": 8,
+      "static_image_bytes": 550000,
+      "source_sha256": "73b4333ecfd1c4f677579f9214d9f9be81f71564217abd6447462cbc70361bd8"
+    },
+    {
+      "case": "lights8",
+      "culling": true,
+      "run": {
+        "name": "scale-lights8",
+        "passed": true,
+        "log": ".dev\\ares\\runs\\964ca253b8f24f3d996a419a87194ac8\\scale-lights8.log",
+        "tested_rom": ".dev\\ares\\runs\\964ca253b8f24f3d996a419a87194ac8\\DarkLantern64-scale_lights8_8014bbf7.z64",
+        "rom_sha256": "b1568f2c6983a7930de29abb2115d39ea09cc7562fb0aa741de16f1434e64c16",
+        "rom_bytes": 311296,
+        "settings": ".dev\\ares\\runs\\964ca253b8f24f3d996a419a87194ac8\\settings.bml",
+        "settings_source_sha256": "4b013206c69c12be9e0fdbd91b389e6c40b87816bb40835c6daadb713b18ce80",
+        "profile_report": null,
+        "elapsed_seconds": 8.063,
+        "peak_sampled_heap_bytes": 667048,
+        "max_reported_cpu_ms": 42.52,
+        "boot": "DL64 boot_ok memory=8388608 scene=\"DarkLantern64 scale study - lights8\" meshes=9 models=38 colliders=26 version=2 world=3d renderer=xyz-mesh-rdpq depth=hardware",
+        "terminal_event": "DL64 profile_end window=3"
+      },
+      "profile": {
+        "schema_version": 1,
+        "measurement": "Emulated CPU-timer elapsed time; not CPU utilization or host CPU time",
+        "source_log": ".dev\\ares\\runs\\964ca253b8f24f3d996a419a87194ac8\\scale-lights8.log",
+        "source_log_sha256": "8a93406475d43453d1dac10ebd85da675a1ec55f4f641d54246c30cf85c5a596",
+        "source_log_bytes": 5187,
+        "complete_windows": 3,
+        "frames": 61,
+        "ignored_trailing_partial_window": false,
+        "ticks_per_second": 46875000,
+        "target_fps": 30,
+        "frame_budget_ms": 33.333333333333336,
+        "debug_states": [
+          0
+        ],
+        "debug_frames": {
+          "0": 61
+        },
+        "audio_calls": 77,
+        "frame": {
+          "total_ticks": 142598843,
+          "max_ticks": 2402832,
+          "average_ms": 49.870633617486334,
+          "max_ms": 51.260416,
+          "percent_of_30fps_budget": 149.611900852459,
+          "percent_of_frame_elapsed": 100.0
+        },
+        "slots": {
+          "input": {
+            "total_ticks": 134821,
+            "max_ticks": 4087,
+            "average_ms": 0.04715051366120218,
+            "max_ms": 0.08718933333333333,
+            "percent_of_30fps_budget": 0.14145154098360654,
+            "percent_of_frame_elapsed": 0.0945456478914068
+          },
+          "gameplay": {
+            "total_ticks": 18190508,
+            "max_ticks": 304429,
+            "average_ms": 6.361707715846994,
+            "max_ms": 6.494485333333333,
+            "percent_of_30fps_budget": 19.085123147540983,
+            "percent_of_frame_elapsed": 12.756420471097371
+          },
+          "audio_events": {
+            "total_ticks": 28129,
+            "max_ticks": 12612,
+            "average_ms": 0.009837464480874317,
+            "max_ms": 0.269056,
+            "percent_of_30fps_budget": 0.029512393442622954,
+            "percent_of_frame_elapsed": 0.01972596650030323
+          },
+          "audio_mix": {
+            "total_ticks": 1647786,
+            "max_ticks": 92707,
+            "average_ms": 0.5762748852459016,
+            "max_ms": 1.9777493333333334,
+            "percent_of_30fps_budget": 1.728824655737705,
+            "percent_of_frame_elapsed": 1.1555395298684155
+          },
+          "cache": {
+            "total_ticks": 0,
+            "max_ticks": 0,
+            "average_ms": 0.0,
+            "max_ms": 0.0,
+            "percent_of_30fps_budget": 0.0,
+            "percent_of_frame_elapsed": 0.0
+          },
+          "transforms": {
+            "total_ticks": 22174459,
+            "max_ticks": 367501,
+            "average_ms": 7.755002054644808,
+            "max_ms": 7.8400213333333335,
+            "percent_of_30fps_budget": 23.265006163934423,
+            "percent_of_frame_elapsed": 15.550237669179406
+          },
+          "lighting": {
+            "total_ticks": 10731758,
+            "max_ticks": 178806,
+            "average_ms": 3.7531831256830603,
+            "max_ms": 3.814528,
+            "percent_of_30fps_budget": 11.259549377049181,
+            "percent_of_frame_elapsed": 7.525838060270938
+          },
+          "triangles": {
+            "total_ticks": 63013229,
+            "max_ticks": 1039864,
+            "average_ms": 22.037413420765027,
+            "max_ms": 22.183765333333334,
+            "percent_of_30fps_budget": 66.11224026229509,
+            "percent_of_frame_elapsed": 44.189158673608596
+          },
+          "hud": {
+            "total_ticks": 4830430,
+            "max_ticks": 81152,
+            "average_ms": 1.6893307103825135,
+            "max_ms": 1.7312426666666667,
+            "percent_of_30fps_budget": 5.06799213114754,
+            "percent_of_frame_elapsed": 3.387425801203731
+          },
+          "debug_hud": {
+            "total_ticks": 0,
+            "max_ticks": 0,
+            "average_ms": 0.0,
+            "max_ms": 0.0,
+            "percent_of_30fps_budget": 0.0,
+            "percent_of_frame_elapsed": 0.0
+          },
+          "render_setup": {
+            "total_ticks": 902300,
+            "max_ticks": 16376,
+            "average_ms": 0.3155584699453552,
+            "max_ms": 0.34935466666666665,
+            "percent_of_30fps_budget": 0.9466754098360657,
+            "percent_of_frame_elapsed": 0.6327540820229516
+          },
+          "display_wait": {
+            "total_ticks": 20477093,
+            "max_ticks": 365136,
+            "average_ms": 7.1613877158469945,
+            "max_ms": 7.789568,
+            "percent_of_30fps_budget": 21.484163147540983,
+            "percent_of_frame_elapsed": 14.359929273759956
+          },
+          "other": {
+            "total_ticks": 468330,
+            "max_ticks": 109065,
+            "average_ms": 0.16378754098360657,
+            "max_ms": 2.32672,
+            "percent_of_30fps_budget": 0.4913626229508197,
+            "percent_of_frame_elapsed": 0.3284248245969289
+          }
+        },
+        "limitations": [
+          "Ares timing model; original N64 and M64 hardware validation remains pending.",
+          "Slot maxima are worst observed per-frame totals and must not be added together.",
+          "Submission scopes include internal queue stalls; this does not time RDP/GPU execution.",
+          "Audio callback time is attributed exclusively; other interrupts remain in the interrupted scope.",
+          "Profiling and enabled debug display add overhead. Incomplete trailing records are excluded."
+        ]
+      },
+      "work_samples": [
+        {
+          "models": 38,
+          "visible": 36,
+          "camera_vertices": 1688
+        },
+        {
+          "models": 38,
+          "visible": 36,
+          "camera_vertices": 1688
+        },
+        {
+          "models": 38,
+          "visible": 36,
+          "camera_vertices": 1688
+        }
+      ],
+      "models": 38,
+      "colliders": 26,
+      "lights": 8,
+      "static_image_bytes": 550472,
+      "source_sha256": "73b4333ecfd1c4f677579f9214d9f9be81f71564217abd6447462cbc70361bd8"
+    },
+    {
+      "case": "lights16",
+      "culling": false,
+      "run": {
+        "name": "scale-lights16",
+        "passed": true,
+        "log": ".dev\\ares\\runs\\35179bf474d04cd18f69baa4f16f2f82\\scale-lights16.log",
+        "tested_rom": ".dev\\ares\\runs\\35179bf474d04cd18f69baa4f16f2f82\\DarkLantern64-scale_lights16_8014bbf7-unculled.z64",
+        "rom_sha256": "1c585b8d4e79b48f46e7742ece130137f5d721a7f69c0a691eaf5be0234f4a71",
+        "rom_bytes": 311296,
+        "settings": ".dev\\ares\\runs\\35179bf474d04cd18f69baa4f16f2f82\\settings.bml",
+        "settings_source_sha256": "4b013206c69c12be9e0fdbd91b389e6c40b87816bb40835c6daadb713b18ce80",
+        "profile_report": null,
+        "elapsed_seconds": 10.062,
+        "peak_sampled_heap_bytes": 667032,
+        "max_reported_cpu_ms": 47.99,
+        "boot": "DL64 boot_ok memory=8388608 scene=\"DarkLantern64 scale study - lights16\" meshes=9 models=38 colliders=26 version=2 world=3d renderer=xyz-mesh-rdpq depth=hardware",
+        "terminal_event": "DL64 profile_end window=3"
+      },
+      "profile": {
+        "schema_version": 1,
+        "measurement": "Emulated CPU-timer elapsed time; not CPU utilization or host CPU time",
+        "source_log": ".dev\\ares\\runs\\35179bf474d04cd18f69baa4f16f2f82\\scale-lights16.log",
+        "source_log_sha256": "2b57512331482cd9e4e44f32aaade33c27b3c5d2aeb4ce890d04c4f61b56f476",
+        "source_log_bytes": 5198,
+        "complete_windows": 3,
+        "frames": 61,
+        "ignored_trailing_partial_window": false,
+        "ticks_per_second": 46875000,
+        "target_fps": 30,
+        "frame_budget_ms": 33.333333333333336,
+        "debug_states": [
+          0
+        ],
+        "debug_frames": {
+          "0": 61
+        },
+        "audio_calls": 76,
+        "frame": {
+          "total_ticks": 142990366,
+          "max_ticks": 2427716,
+          "average_ms": 50.007559693989066,
+          "max_ms": 51.791274666666666,
+          "percent_of_30fps_budget": 150.0226790819672,
+          "percent_of_frame_elapsed": 100.0
+        },
+        "slots": {
+          "input": {
+            "total_ticks": 117406,
+            "max_ticks": 3277,
+            "average_ms": 0.0410600218579235,
+            "max_ms": 0.06990933333333334,
+            "percent_of_30fps_budget": 0.12318006557377051,
+            "percent_of_frame_elapsed": 0.08210762954477646
+          },
+          "gameplay": {
+            "total_ticks": 28193152,
+            "max_ticks": 469437,
+            "average_ms": 9.859900153005464,
+            "max_ms": 10.014656,
+            "percent_of_30fps_budget": 29.57970045901639,
+            "percent_of_frame_elapsed": 19.716819243612537
+          },
+          "audio_events": {
+            "total_ticks": 28399,
+            "max_ticks": 12480,
+            "average_ms": 0.009931890710382514,
+            "max_ms": 0.26624,
+            "percent_of_30fps_budget": 0.029795672131147543,
+            "percent_of_frame_elapsed": 0.019860778592594133
+          },
+          "audio_mix": {
+            "total_ticks": 1628353,
+            "max_ticks": 92141,
+            "average_ms": 0.5694786448087431,
+            "max_ms": 1.9656746666666667,
+            "percent_of_30fps_budget": 1.7084359344262292,
+            "percent_of_frame_elapsed": 1.1387851122781236
+          },
+          "cache": {
+            "total_ticks": 0,
+            "max_ticks": 0,
+            "average_ms": 0.0,
+            "max_ms": 0.0,
+            "percent_of_30fps_budget": 0.0,
+            "percent_of_frame_elapsed": 0.0
+          },
+          "transforms": {
+            "total_ticks": 22613528,
+            "max_ticks": 372505,
+            "average_ms": 7.908556240437158,
+            "max_ms": 7.946773333333334,
+            "percent_of_30fps_budget": 23.72566872131147,
+            "percent_of_frame_elapsed": 15.81472139178943
+          },
+          "lighting": {
+            "total_ticks": 14418677,
+            "max_ticks": 240528,
+            "average_ms": 5.042597420765027,
+            "max_ms": 5.131264,
+            "percent_of_30fps_budget": 15.127792262295083,
+            "percent_of_frame_elapsed": 10.083670252302172
+          },
+          "triangles": {
+            "total_ticks": 63851899,
+            "max_ticks": 1050409,
+            "average_ms": 22.33071877595628,
+            "max_ms": 22.408725333333333,
+            "percent_of_30fps_budget": 66.99215632786886,
+            "percent_of_frame_elapsed": 44.65468603668026
+          },
+          "hud": {
+            "total_ticks": 5495013,
+            "max_ticks": 92418,
+            "average_ms": 1.921753180327869,
+            "max_ms": 1.971584,
+            "percent_of_30fps_budget": 5.765259540983607,
+            "percent_of_frame_elapsed": 3.8429253338648004
+          },
+          "debug_hud": {
+            "total_ticks": 0,
+            "max_ticks": 0,
+            "average_ms": 0.0,
+            "max_ms": 0.0,
+            "percent_of_30fps_budget": 0.0,
+            "percent_of_frame_elapsed": 0.0
+          },
+          "render_setup": {
+            "total_ticks": 875936,
+            "max_ticks": 15731,
+            "average_ms": 0.3063382732240437,
+            "max_ms": 0.33559466666666665,
+            "percent_of_30fps_budget": 0.9190148196721312,
+            "percent_of_frame_elapsed": 0.6125839275073959
+          },
+          "display_wait": {
+            "total_ticks": 5290750,
+            "max_ticks": 112103,
+            "average_ms": 1.8503169398907102,
+            "max_ms": 2.3915306666666667,
+            "percent_of_30fps_budget": 5.55095081967213,
+            "percent_of_frame_elapsed": 3.700074451169668
+          },
+          "other": {
+            "total_ticks": 477253,
+            "max_ticks": 113177,
+            "average_ms": 0.16690815300546447,
+            "max_ms": 2.4144426666666665,
+            "percent_of_30fps_budget": 0.5007244590163934,
+            "percent_of_frame_elapsed": 0.33376584265823894
+          }
+        },
+        "limitations": [
+          "Ares timing model; original N64 and M64 hardware validation remains pending.",
+          "Slot maxima are worst observed per-frame totals and must not be added together.",
+          "Submission scopes include internal queue stalls; this does not time RDP/GPU execution.",
+          "Audio callback time is attributed exclusively; other interrupts remain in the interrupted scope.",
+          "Profiling and enabled debug display add overhead. Incomplete trailing records are excluded."
+        ]
+      },
+      "work_samples": [
+        {
+          "models": 38,
+          "visible": 38,
+          "camera_vertices": 1754
+        },
+        {
+          "models": 38,
+          "visible": 38,
+          "camera_vertices": 1754
+        },
+        {
+          "models": 38,
+          "visible": 38,
+          "camera_vertices": 1754
+        }
+      ],
+      "models": 38,
+      "colliders": 26,
+      "lights": 16,
+      "static_image_bytes": 550256,
+      "source_sha256": "600984c33ad14d483890b518443513e9e20f8936715c50e729f9a18a90536ed8"
+    },
+    {
+      "case": "lights16",
+      "culling": true,
+      "run": {
+        "name": "scale-lights16",
+        "passed": true,
+        "log": ".dev\\ares\\runs\\4141ba81380640cab07079be1c20fdb8\\scale-lights16.log",
+        "tested_rom": ".dev\\ares\\runs\\4141ba81380640cab07079be1c20fdb8\\DarkLantern64-scale_lights16_8014bbf7.z64",
+        "rom_sha256": "193dd89cf4aad8d8e5598ab7773c6fb8e66e6df312a78b16a6674bcfa6254c51",
+        "rom_bytes": 311296,
+        "settings": ".dev\\ares\\runs\\4141ba81380640cab07079be1c20fdb8\\settings.bml",
+        "settings_source_sha256": "4b013206c69c12be9e0fdbd91b389e6c40b87816bb40835c6daadb713b18ce80",
+        "profile_report": null,
+        "elapsed_seconds": 9.313,
+        "peak_sampled_heap_bytes": 667048,
+        "max_reported_cpu_ms": 46.57,
+        "boot": "DL64 boot_ok memory=8388608 scene=\"DarkLantern64 scale study - lights16\" meshes=9 models=38 colliders=26 version=2 world=3d renderer=xyz-mesh-rdpq depth=hardware",
+        "terminal_event": "DL64 profile_end window=3"
+      },
+      "profile": {
+        "schema_version": 1,
+        "measurement": "Emulated CPU-timer elapsed time; not CPU utilization or host CPU time",
+        "source_log": ".dev\\ares\\runs\\4141ba81380640cab07079be1c20fdb8\\scale-lights16.log",
+        "source_log_sha256": "c5f1828f6c7773471524474c6d003017fd7a618f2333c6851b60d1b1be56cb9f",
+        "source_log_bytes": 5189,
+        "complete_windows": 3,
+        "frames": 61,
+        "ignored_trailing_partial_window": false,
+        "ticks_per_second": 46875000,
+        "target_fps": 30,
+        "frame_budget_ms": 33.333333333333336,
+        "debug_states": [
+          0
+        ],
+        "debug_frames": {
+          "0": 61
+        },
+        "audio_calls": 76,
+        "frame": {
+          "total_ticks": 142832449,
+          "max_ticks": 2428027,
+          "average_ms": 49.95233189071038,
+          "max_ms": 51.79790933333334,
+          "percent_of_30fps_budget": 149.85699567213115,
+          "percent_of_frame_elapsed": 100.0
+        },
+        "slots": {
+          "input": {
+            "total_ticks": 111021,
+            "max_ticks": 2950,
+            "average_ms": 0.03882701639344262,
+            "max_ms": 0.06293333333333333,
+            "percent_of_30fps_budget": 0.11648104918032784,
+            "percent_of_frame_elapsed": 0.07772813585237903
+          },
+          "gameplay": {
+            "total_ticks": 28108116,
+            "max_ticks": 469220,
+            "average_ms": 9.830160786885246,
+            "max_ms": 10.010026666666667,
+            "percent_of_30fps_budget": 29.49048236065574,
+            "percent_of_frame_elapsed": 19.67908286722718
+          },
+          "audio_events": {
+            "total_ticks": 27976,
+            "max_ticks": 12443,
+            "average_ms": 0.009783956284153005,
+            "max_ms": 0.26545066666666667,
+            "percent_of_30fps_budget": 0.029351868852459013,
+            "percent_of_frame_elapsed": 0.01958658567844062
+          },
+          "audio_mix": {
+            "total_ticks": 1628368,
+            "max_ticks": 92184,
+            "average_ms": 0.5694838907103825,
+            "max_ms": 1.966592,
+            "percent_of_30fps_budget": 1.7084516721311478,
+            "percent_of_frame_elapsed": 1.140054666429475
+          },
+          "cache": {
+            "total_ticks": 0,
+            "max_ticks": 0,
+            "average_ms": 0.0,
+            "max_ms": 0.0,
+            "percent_of_30fps_budget": 0.0,
+            "percent_of_frame_elapsed": 0.0
+          },
+          "transforms": {
+            "total_ticks": 22176317,
+            "max_ticks": 365821,
+            "average_ms": 7.755651846994535,
+            "max_ms": 7.804181333333333,
+            "percent_of_30fps_budget": 23.266955540983606,
+            "percent_of_frame_elapsed": 15.526105696052303
+          },
+          "lighting": {
+            "total_ticks": 14510695,
+            "max_ticks": 241488,
+            "average_ms": 5.074778579234972,
+            "max_ms": 5.151744,
+            "percent_of_30fps_budget": 15.224335737704916,
+            "percent_of_frame_elapsed": 10.159242596197451
+          },
+          "triangles": {
+            "total_ticks": 61075456,
+            "max_ticks": 1004505,
+            "average_ms": 21.35972231693989,
+            "max_ms": 21.42944,
+            "percent_of_30fps_budget": 64.07916695081967,
+            "percent_of_frame_elapsed": 42.76021060172398
+          },
+          "hud": {
+            "total_ticks": 4492737,
+            "max_ticks": 75783,
+            "average_ms": 1.5712304262295083,
+            "max_ms": 1.616704,
+            "percent_of_30fps_budget": 4.7136912786885246,
+            "percent_of_frame_elapsed": 3.1454596147126206
+          },
+          "debug_hud": {
+            "total_ticks": 0,
+            "max_ticks": 0,
+            "average_ms": 0.0,
+            "max_ms": 0.0,
+            "percent_of_30fps_budget": 0.0,
+            "percent_of_frame_elapsed": 0.0
+          },
+          "render_setup": {
+            "total_ticks": 900337,
+            "max_ticks": 16224,
+            "average_ms": 0.314871956284153,
+            "max_ms": 0.346112,
+            "percent_of_30fps_budget": 0.9446158688524589,
+            "percent_of_frame_elapsed": 0.6303448595213823
+          },
+          "display_wait": {
+            "total_ticks": 9322882,
+            "max_ticks": 182517,
+            "average_ms": 3.2604614644808745,
+            "max_ms": 3.893696,
+            "percent_of_30fps_budget": 9.781384393442623,
+            "percent_of_frame_elapsed": 6.527145662817838
+          },
+          "other": {
+            "total_ticks": 478544,
+            "max_ticks": 110295,
+            "average_ms": 0.16735965027322405,
+            "max_ms": 2.35296,
+            "percent_of_30fps_budget": 0.5020789508196721,
+            "percent_of_frame_elapsed": 0.33503871378694905
+          }
+        },
+        "limitations": [
+          "Ares timing model; original N64 and M64 hardware validation remains pending.",
+          "Slot maxima are worst observed per-frame totals and must not be added together.",
+          "Submission scopes include internal queue stalls; this does not time RDP/GPU execution.",
+          "Audio callback time is attributed exclusively; other interrupts remain in the interrupted scope.",
+          "Profiling and enabled debug display add overhead. Incomplete trailing records are excluded."
+        ]
+      },
+      "work_samples": [
+        {
+          "models": 38,
+          "visible": 36,
+          "camera_vertices": 1688
+        },
+        {
+          "models": 38,
+          "visible": 36,
+          "camera_vertices": 1688
+        },
+        {
+          "models": 38,
+          "visible": 36,
+          "camera_vertices": 1688
+        }
+      ],
+      "models": 38,
+      "colliders": 26,
+      "lights": 16,
+      "static_image_bytes": 550728,
+      "source_sha256": "600984c33ad14d483890b518443513e9e20f8936715c50e729f9a18a90536ed8"
+    }
+  ],
+  "limitations": [
+    "Guard benchmarks exclude rendering, animation, inter-guard behavior and player visibility queries.",
+    "Room fixtures are hidden six-box shells, not connected navigable rooms or portal visibility tests.",
+    "Loot fixtures are static drawn models, not additional interactive pickups.",
+    "Local light fixtures test current fixed sources and startup caches, not freely moving lights."
+  ],
+  "source": "content\\moonlit_courtyard.json",
+  "source_sha256": "24cb5e9c07587a93f4977176acee6b3d23a67fbb539450c964c093e14911de8a",
+  "micro": {
+    "metadata": {
+      "version": "1",
+      "scene": "DarkLantern64 - The Moonlit Delivery Yard",
+      "clock": "cp0_count",
+      "audio": "exclusive",
+      "frame_hz": "30",
+      "guard_substeps": "4",
+      "guard_warmup_frames": "4",
+      "game_state_bytes": "124",
+      "model_bytes": "60",
+      "light_bytes": "32",
+      "collider_bytes": "32",
+      "vec3_bytes": "12",
+      "source_models": "41",
+      "source_meshes": "9",
+      "source_colliders": "26",
+      "source_lights": "3",
+      "diagnostic_storage_bytes": "10688",
+      "rendering": "excluded",
+      "guards": "independent_clones",
+      "visibility": "shared_input"
+    },
+    "cases": [
+      {
+        "name": "guard_patrol",
+        "count": 1,
+        "samples": 60,
+        "units_per_sample": 1,
+        "ticks": 3684139,
+        "max_ticks": 64364,
+        "audio_ticks": 38183,
+        "ticks_per_second": 46875000,
+        "colliders": 26,
+        "lights": 3,
+        "substeps": 4,
+        "checksum": 1.82399,
+        "average_ms": 1.3099160888888888,
+        "max_ms": 1.3730986666666667,
+        "ms_per_unit": 1.3099160888888888
+      },
+      {
+        "name": "guard_chase",
+        "count": 1,
+        "samples": 60,
+        "units_per_sample": 1,
+        "ticks": 3927351,
+        "max_ticks": 68171,
+        "audio_ticks": 38182,
+        "ticks_per_second": 46875000,
+        "colliders": 26,
+        "lights": 3,
+        "substeps": 4,
+        "checksum": 4.024304,
+        "average_ms": 1.3963914666666666,
+        "max_ms": 1.4543146666666666,
+        "ms_per_unit": 1.3963914666666666
+      },
+      {
+        "name": "guard_patrol",
+        "count": 2,
+        "samples": 60,
+        "units_per_sample": 2,
+        "ticks": 7527040,
+        "max_ticks": 128741,
+        "audio_ticks": 76368,
+        "ticks_per_second": 46875000,
+        "colliders": 26,
+        "lights": 3,
+        "substeps": 4,
+        "checksum": 3.64798,
+        "average_ms": 2.6762808888888894,
+        "max_ms": 2.746474666666667,
+        "ms_per_unit": 1.3381404444444447
+      },
+      {
+        "name": "guard_chase",
+        "count": 2,
+        "samples": 60,
+        "units_per_sample": 2,
+        "ticks": 8019775,
+        "max_ticks": 136546,
+        "audio_ticks": 76329,
+        "ticks_per_second": 46875000,
+        "colliders": 26,
+        "lights": 3,
+        "substeps": 4,
+        "checksum": 8.048609,
+        "average_ms": 2.851475555555555,
+        "max_ms": 2.912981333333333,
+        "ms_per_unit": 1.4257377777777775
+      },
+      {
+        "name": "guard_patrol",
+        "count": 4,
+        "samples": 60,
+        "units_per_sample": 4,
+        "ticks": 14847574,
+        "max_ticks": 250316,
+        "audio_ticks": 152671,
+        "ticks_per_second": 46875000,
+        "colliders": 26,
+        "lights": 3,
+        "substeps": 4,
+        "checksum": 7.29596,
+        "average_ms": 5.279137422222222,
+        "max_ms": 5.340074666666666,
+        "ms_per_unit": 1.3197843555555555
+      },
+      {
+        "name": "guard_chase",
+        "count": 4,
+        "samples": 60,
+        "units_per_sample": 4,
+        "ticks": 15820370,
+        "max_ticks": 267434,
+        "audio_ticks": 171745,
+        "ticks_per_second": 46875000,
+        "colliders": 26,
+        "lights": 3,
+        "substeps": 4,
+        "checksum": 16.097218,
+        "average_ms": 5.625020444444444,
+        "max_ms": 5.7052586666666665,
+        "ms_per_unit": 1.406255111111111
+      },
+      {
+        "name": "guard_patrol",
+        "count": 8,
+        "samples": 60,
+        "units_per_sample": 8,
+        "ticks": 28883850,
+        "max_ticks": 483348,
+        "audio_ticks": 286312,
+        "ticks_per_second": 46875000,
+        "colliders": 26,
+        "lights": 3,
+        "substeps": 4,
+        "checksum": 14.59192,
+        "average_ms": 10.269813333333333,
+        "max_ms": 10.311423999999999,
+        "ms_per_unit": 1.2837266666666667
+      },
+      {
+        "name": "guard_chase",
+        "count": 8,
+        "samples": 60,
+        "units_per_sample": 8,
+        "ticks": 30614521,
+        "max_ticks": 514466,
+        "audio_ticks": 305254,
+        "ticks_per_second": 46875000,
+        "colliders": 26,
+        "lights": 3,
+        "substeps": 4,
+        "checksum": 32.194431,
+        "average_ms": 10.885163022222223,
+        "max_ms": 10.975274666666666,
+        "ms_per_unit": 1.3606453777777778
+      },
+      {
+        "name": "guard_patrol",
+        "count": 16,
+        "samples": 60,
+        "units_per_sample": 16,
+        "ticks": 56858378,
+        "max_ticks": 950786,
+        "audio_ticks": 591526,
+        "ticks_per_second": 46875000,
+        "colliders": 26,
+        "lights": 3,
+        "substeps": 4,
+        "checksum": 29.18384,
+        "average_ms": 20.21631217777778,
+        "max_ms": 20.283434666666665,
+        "ms_per_unit": 1.2635195111111113
+      },
+      {
+        "name": "guard_chase",
+        "count": 16,
+        "samples": 60,
+        "units_per_sample": 16,
+        "ticks": 60118837,
+        "max_ticks": 1007394,
+        "audio_ticks": 629550,
+        "ticks_per_second": 46875000,
+        "colliders": 26,
+        "lights": 3,
+        "substeps": 4,
+        "checksum": 64.388863,
+        "average_ms": 21.37558648888889,
+        "max_ms": 21.491072,
+        "ms_per_unit": 1.3359741555555555
+      },
+      {
+        "name": "surface_lights",
+        "count": 1,
+        "samples": 8,
+        "units_per_sample": 32,
+        "ticks": 1309889,
+        "max_ticks": 167233,
+        "audio_ticks": 19053,
+        "ticks_per_second": 46875000,
+        "colliders": 26,
+        "lights": 1,
+        "substeps": 0,
+        "checksum": 7.679996,
+        "average_ms": 3.493037333333333,
+        "max_ms": 3.5676373333333333,
+        "ms_per_unit": 0.10915741666666666
+      },
+      {
+        "name": "visibility_lights",
+        "count": 1,
+        "samples": 8,
+        "units_per_sample": 32,
+        "ticks": 1236335,
+        "max_ticks": 156541,
+        "audio_ticks": 0,
+        "ticks_per_second": 46875000,
+        "colliders": 26,
+        "lights": 1,
+        "substeps": 0,
+        "checksum": 2.56,
+        "average_ms": 3.2968933333333332,
+        "max_ms": 3.3395413333333335,
+        "ms_per_unit": 0.10302791666666666
+      },
+      {
+        "name": "surface_lights",
+        "count": 4,
+        "samples": 8,
+        "units_per_sample": 32,
+        "ticks": 4770025,
+        "max_ticks": 598217,
+        "audio_ticks": 38110,
+        "ticks_per_second": 46875000,
+        "colliders": 26,
+        "lights": 4,
+        "substeps": 0,
+        "checksum": 7.679996,
+        "average_ms": 12.720066666666666,
+        "max_ms": 12.761962666666665,
+        "ms_per_unit": 0.3975020833333333
+      },
+      {
+        "name": "visibility_lights",
+        "count": 4,
+        "samples": 8,
+        "units_per_sample": 32,
+        "ticks": 4696347,
+        "max_ticks": 589015,
+        "audio_ticks": 38029,
+        "ticks_per_second": 46875000,
+        "colliders": 26,
+        "lights": 4,
+        "substeps": 0,
+        "checksum": 2.56,
+        "average_ms": 12.523592,
+        "max_ms": 12.565653333333334,
+        "ms_per_unit": 0.39136225
+      },
+      {
+        "name": "surface_lights",
+        "count": 8,
+        "samples": 8,
+        "units_per_sample": 32,
+        "ticks": 9516007,
+        "max_ticks": 1191851,
+        "audio_ticks": 95308,
+        "ticks_per_second": 46875000,
+        "colliders": 26,
+        "lights": 8,
+        "substeps": 0,
+        "checksum": 7.679996,
+        "average_ms": 25.376018666666667,
+        "max_ms": 25.426154666666665,
+        "ms_per_unit": 0.7930005833333333
+      },
+      {
+        "name": "visibility_lights",
+        "count": 8,
+        "samples": 8,
+        "units_per_sample": 32,
+        "ticks": 9341291,
+        "max_ticks": 1169083,
+        "audio_ticks": 95016,
+        "ticks_per_second": 46875000,
+        "colliders": 26,
+        "lights": 8,
+        "substeps": 0,
+        "checksum": 2.56,
+        "average_ms": 24.910109333333335,
+        "max_ms": 24.940437333333332,
+        "ms_per_unit": 0.7784409166666667
+      },
+      {
+        "name": "surface_lights",
+        "count": 16,
+        "samples": 8,
+        "units_per_sample": 32,
+        "ticks": 18997774,
+        "max_ticks": 2377100,
+        "audio_ticks": 190942,
+        "ticks_per_second": 46875000,
+        "colliders": 26,
+        "lights": 16,
+        "substeps": 0,
+        "checksum": 7.679996,
+        "average_ms": 50.660730666666666,
+        "max_ms": 50.71146666666667,
+        "ms_per_unit": 1.5831478333333333
+      },
+      {
+        "name": "visibility_lights",
+        "count": 16,
+        "samples": 8,
+        "units_per_sample": 32,
+        "ticks": 18593872,
+        "max_ticks": 2325446,
+        "audio_ticks": 189954,
+        "ticks_per_second": 46875000,
+        "colliders": 26,
+        "lights": 16,
+        "substeps": 0,
+        "checksum": 2.56,
+        "average_ms": 49.58365866666667,
+        "max_ms": 49.60951466666667,
+        "ms_per_unit": 1.5494893333333335
+      },
+      {
+        "name": "moving_light_vertices",
+        "count": 128,
+        "samples": 4,
+        "units_per_sample": 128,
+        "ticks": 2605214,
+        "max_ticks": 653689,
+        "audio_ticks": 19092,
+        "ticks_per_second": 46875000,
+        "colliders": 26,
+        "lights": 1,
+        "substeps": 0,
+        "checksum": 15.359987,
+        "average_ms": 13.894474666666667,
+        "max_ms": 13.945365333333333,
+        "ms_per_unit": 0.10855058333333334
+      },
+      {
+        "name": "moving_light_vertices",
+        "count": 512,
+        "samples": 4,
+        "units_per_sample": 512,
+        "ticks": 10430948,
+        "max_ticks": 2614809,
+        "audio_ticks": 95539,
+        "ticks_per_second": 46875000,
+        "colliders": 26,
+        "lights": 1,
+        "substeps": 0,
+        "checksum": 61.439835,
+        "average_ms": 55.63172266666667,
+        "max_ms": 55.782592,
+        "ms_per_unit": 0.10865570833333334
+      },
+      {
+        "name": "light_collider_scan",
+        "count": 0,
+        "samples": 8,
+        "units_per_sample": 8,
+        "ticks": 121066,
+        "max_ticks": 15226,
+        "audio_ticks": 0,
+        "ticks_per_second": 46875000,
+        "colliders": 0,
+        "lights": 4,
+        "substeps": 0,
+        "checksum": 120.063606,
+        "average_ms": 0.32284266666666667,
+        "max_ms": 0.32482133333333335,
+        "ms_per_unit": 0.04035533333333333
+      },
+      {
+        "name": "light_collider_scan",
+        "count": 16,
+        "samples": 8,
+        "units_per_sample": 8,
+        "ticks": 1129506,
+        "max_ticks": 143467,
+        "audio_ticks": 0,
+        "ticks_per_second": 46875000,
+        "colliders": 16,
+        "lights": 4,
+        "substeps": 0,
+        "checksum": 120.063606,
+        "average_ms": 3.012016,
+        "max_ms": 3.060629333333333,
+        "ms_per_unit": 0.376502
+      },
+      {
+        "name": "light_collider_scan",
+        "count": 64,
+        "samples": 8,
+        "units_per_sample": 8,
+        "ticks": 3409829,
+        "max_ticks": 428851,
+        "audio_ticks": 38190,
+        "ticks_per_second": 46875000,
+        "colliders": 64,
+        "lights": 4,
+        "substeps": 0,
+        "checksum": 120.063606,
+        "average_ms": 9.092877333333334,
+        "max_ms": 9.148821333333332,
+        "ms_per_unit": 1.1366096666666667
+      },
+      {
+        "name": "light_collider_scan",
+        "count": 256,
+        "samples": 8,
+        "units_per_sample": 8,
+        "ticks": 11925430,
+        "max_ticks": 1492369,
+        "audio_ticks": 133854,
+        "ticks_per_second": 46875000,
+        "colliders": 256,
+        "lights": 4,
+        "substeps": 0,
+        "checksum": 120.063606,
+        "average_ms": 31.801146666666668,
+        "max_ms": 31.837205333333333,
+        "ms_per_unit": 3.9751433333333335
+      }
+    ],
+    "run": {
+      "name": "scale-micro",
+      "passed": true,
+      "log": ".dev\\ares\\runs\\33d7e766d6144bef9133670f422c7aa9\\scale-micro.log",
+      "tested_rom": ".dev\\ares\\runs\\33d7e766d6144bef9133670f422c7aa9\\DarkLantern64-moonlit_courtyard-scale.z64",
+      "rom_sha256": "92917a7fb2699b0c42062dc1b1e875ce75d2f14325f87b24523117289b35a73c",
+      "rom_bytes": 196608,
+      "settings": ".dev\\ares\\runs\\33d7e766d6144bef9133670f422c7aa9\\settings.bml",
+      "settings_source_sha256": "4b013206c69c12be9e0fdbd91b389e6c40b87816bb40835c6daadb713b18ce80",
+      "profile_report": null,
+      "elapsed_seconds": 11.406,
+      "peak_sampled_heap_bytes": null,
+      "max_reported_cpu_ms": null,
+      "boot": null,
+      "terminal_event": "DL64 scale_complete cases=24 checksum=863.663086"
+    }
+  },
+  "verification": {
+    "framebuffer": {
+      "rom_sha256": "1fab2283e12a85975cfc35b712455f181180ee0623b2f7a61a509a50b5ecc6c7",
+      "run": ".dev\\ares\\runs\\363758e3bf78430abf75d5c887530a81\\capture-moonlit_courtyard.log",
+      "comparison": "Four PNG byte hashes identical to the stored pre-culling night study",
+      "views": [
+        {
+          "view": "shelter-to-courtyard",
+          "sha256": "4633bca67edc6bef2a025e9864aedcea974a9672d77dd141fcf0b77d050a6a21",
+          "matches": true
+        },
+        {
+          "view": "warm-lamp-cool-roofs",
+          "sha256": "d9ad0b08d651c39274ad60a8bcd5c669e3961d559c3a6e8c37e3c6ce8ef2edee",
+          "matches": true
+        },
+        {
+          "view": "doorway-landmark",
+          "sha256": "ee733da123c88b0b617f0bb8602dcabebcef415f001568a59a2f08dfdcb05f07",
+          "matches": true
+        },
+        {
+          "view": "doorway-open",
+          "sha256": "901184e6355af6c53e2f86489bdaef214614b60c2916948600859a572ffd39c1",
+          "matches": true
+        }
+      ]
+    },
+    "mission_smoke": {
+      "platform": "Ares emulator",
+      "status": "complete",
+      "passed": true,
+      "started_at_utc": "2026-09-06T00:11:25Z",
+      "results": [
+        {
+          "name": "smoke-4mb",
+          "passed": true,
+          "log": ".dev\\ares\\runs\\48f766695a814651a75cf5c0ec99d40e\\smoke-4mb.log",
+          "tested_rom": ".dev\\ares\\runs\\48f766695a814651a75cf5c0ec99d40e\\DarkLantern64.z64",
+          "rom_sha256": "9ca47732538a5ef23a1b2064ee041d3556f9717093f5b5a31d6a5b67d4b340b2",
+          "rom_bytes": 294912,
+          "settings": ".dev\\ares\\runs\\48f766695a814651a75cf5c0ec99d40e\\settings.bml",
+          "settings_source_sha256": "4b013206c69c12be9e0fdbd91b389e6c40b87816bb40835c6daadb713b18ce80",
+          "profile_report": null,
+          "elapsed_seconds": 3.766,
+          "peak_sampled_heap_bytes": null,
+          "max_reported_cpu_ms": null,
+          "boot": null,
+          "terminal_event": "DL64 boot_failed reason=expansion_pak memory=4194304 required=8388608"
+        },
+        {
+          "name": "smoke-8mb",
+          "passed": true,
+          "log": ".dev\\ares\\runs\\9f03f733c54245d5826195f6e819dea5\\smoke-8mb.log",
+          "tested_rom": ".dev\\ares\\runs\\9f03f733c54245d5826195f6e819dea5\\DarkLantern64-autoplay.z64",
+          "rom_sha256": "21566d1664c9b547bc0409ac228180b66d6cddccefaf6e8e61760fd54a8f7ba5",
+          "rom_bytes": 294912,
+          "settings": ".dev\\ares\\runs\\9f03f733c54245d5826195f6e819dea5\\settings.bml",
+          "settings_source_sha256": "4b013206c69c12be9e0fdbd91b389e6c40b87816bb40835c6daadb713b18ce80",
+          "profile_report": ".dev\\ares\\runs\\9f03f733c54245d5826195f6e819dea5\\profile.json",
+          "elapsed_seconds": 34.391,
+          "peak_sampled_heap_bytes": 614048,
+          "max_reported_cpu_ms": 30.1,
+          "boot": "DL64 boot_ok memory=8388608 scene=\"DarkLantern64 - The Lantern Store\" meshes=4 models=20 colliders=14 version=2 world=3d renderer=xyz-mesh-rdpq depth=hardware",
+          "terminal_event": "DL64 profile_replay_done complete=1 caught=0"
+        }
+      ],
+      "debug_overlay": false,
+      "hardware_validation": "Original N64 and M64 pending",
+      "source_sha256": "d8e73eb67179c5fb649361277e7fae1d938bc362bf57545dae5ad0b8f1a2ef4e"
+    },
+    "host_tests": "python tools/build.py --test: Python tests, portable gameplay, replay, profiler, scale diagnostic and visibility tests passed",
+    "manual_courtyard_build": {
+      "signature": "349191d2386a69257d97adb9cc2bcbab99a692a33c6abd1277a35ad21eac03a3",
+      "compiler": "mips64-elf-gcc.exe (GCC) 16.2.0",
+      "sdk": "C:\\n64-toolchain",
+      "source_sha256": "cd7f578c9876cdf9d546438a52fd05e082885a1668a70ea232c7fb9dcaffe88d",
+      "rom": "build\\DarkLantern64-moonlit_courtyard.z64",
+      "rom_bytes": 311296,
+      "rom_sha256": "b5b22edbd77f6af0bad1caa788b1afb6a851b7c0ba82d37fedad258a4b230deb",
+      "static_image_bytes": 550560,
+      "elapsed_seconds": 2.202,
+      "autoplay": false,
+      "debug_overlay": false,
+      "capture": false,
+      "scale_bench": false,
+      "model_culling": true,
+      "level": "content\\moonlit_courtyard.json",
+      "textures": {
+        "version": 1,
+        "mksprite_sha256": "82df8119bc3b59571b733195c93b9a5c507fff7dc5bd5be1caf978e24fd1caaa",
+        "flags": [
+          "-f",
+          "RGBA16",
+          "-D",
+          "NONE",
+          "-c",
+          "0"
+        ],
+        "textures": [
+          {
+            "id": "texture-b8c33a7246d7ec3a",
+            "uri": "textures/streetlight-pavingstone.jpg",
+            "width": 32,
+            "height": 32,
+            "format": "RGBA16",
+            "decoded_bytes": 2048,
+            "source_sha256": "a8bb8ca4127c7226c6d74559808fdc16b0d9e170ccffda9795b87bdecad8df09",
+            "recipe_sha256": "b8c33a7246d7ec3ac3cf9e5a286640284065e99b63155f7e9738407b21c0fb15",
+            "png_sha256": "9b86c961222a5201927571ce7b67e81ef3a32c6b954f167b4ce5c350db3db5d5",
+            "png_path": "editor-assets/textures/texture-b8c33a7246d7ec3a.png",
+            "sprite_path": "romfs/textures/texture-b8c33a7246d7ec3a.sprite",
+            "recipe": {
+              "version": 1,
+              "source_sha256": "a8bb8ca4127c7226c6d74559808fdc16b0d9e170ccffda9795b87bdecad8df09",
+              "width": 32,
+              "height": 32,
+              "format": "RGBA16",
+              "resize": "BOX",
+              "quantization": "RGB555-floor-A1-threshold128",
+              "pillow": "11.2.1",
+              "cooker_sha256": "297b21f7c787f4b9285ed7b113099a01e45c3f5e5056535f4fa76c195bf516cf"
+            },
+            "signature": "c6f194ca7b9579506ffc43962be7fea0aae8fc65eb33e8d4ed7b838ba1cb9c84",
+            "sprite_bytes": 2184,
+            "sprite_sha256": "180320fd20c4bc4711022fe8a598a8ee0f0bc51ea7ea4e5586663142f550e449"
+          },
+          {
+            "id": "texture-a07f17d201b4641d",
+            "uri": "textures/streetlight-brick.jpg",
+            "width": 64,
+            "height": 32,
+            "format": "RGBA16",
+            "decoded_bytes": 4096,
+            "source_sha256": "218f7343091f1c0d9044fd642247d23dd322087271df1b45c8f51fdff91042dd",
+            "recipe_sha256": "a07f17d201b4641d4e3db04a5a536787b26bc6787190ef6f077bf4b85402fabb",
+            "png_sha256": "4d4dfa766b60ac252ca7a19dd643d68cd6f8b13f388c1d6a8f50196ceb426623",
+            "png_path": "editor-assets/textures/texture-a07f17d201b4641d.png",
+            "sprite_path": "romfs/textures/texture-a07f17d201b4641d.sprite",
+            "recipe": {
+              "version": 1,
+              "source_sha256": "218f7343091f1c0d9044fd642247d23dd322087271df1b45c8f51fdff91042dd",
+              "width": 64,
+              "height": 32,
+              "format": "RGBA16",
+              "resize": "BOX",
+              "quantization": "RGB555-floor-A1-threshold128",
+              "pillow": "11.2.1",
+              "cooker_sha256": "297b21f7c787f4b9285ed7b113099a01e45c3f5e5056535f4fa76c195bf516cf"
+            },
+            "signature": "fca17b1da0a72f4967b669fdbfd4bd0974e4c0d62f7917a2ba1be9c74949feb4",
+            "sprite_bytes": 4232,
+            "sprite_sha256": "6ea249500909084ee07d9318bff72f207e9fe770a235b8c9905371dba5ba75bc"
+          }
+        ],
+        "decoded_bytes": 6144,
+        "sprite_bytes": 6416
+      },
+      "size_output": "   text\t   data\t    bss\t    dec\t    hex\tfilename\n 291092\t  13368\t 246100\t 550560\t  866a0\tC:/Users/hughe/dev/DarkLantern64/build/DarkLantern64-moonlit_courtyard/DarkLantern64-moonlit_courtyard.elf\n"
+    }
+  },
+  "study_command": "python tools/scale_study.py --compare-culling",
+  "date": "2026-09-05",
+  "micro_exposed_followup": {
+    "version": 1,
+    "passed": true,
+    "measurement": "Ares emulated CPU timer; hardware validation pending",
+    "render_cases": [],
+    "limitations": [
+      "Guard benchmarks exclude rendering, animation, inter-guard behavior and player visibility queries.",
+      "Room fixtures are hidden six-box shells, not connected navigable rooms or portal visibility tests.",
+      "Loot fixtures are static drawn models, not additional interactive pickups.",
+      "Local light fixtures test current fixed sources and startup caches, not freely moving lights."
+    ],
+    "source": "content\\moonlit_courtyard.json",
+    "source_sha256": "24cb5e9c07587a93f4977176acee6b3d23a67fbb539450c964c093e14911de8a",
+    "micro": {
+      "metadata": {
+        "version": "2",
+        "scene": "DarkLantern64 - The Moonlit Delivery Yard",
+        "clock": "cp0_count",
+        "audio": "exclusive",
+        "frame_hz": "30",
+        "guard_substeps": "4",
+        "guard_warmup_frames": "4",
+        "game_state_bytes": "124",
+        "model_bytes": "60",
+        "light_bytes": "32",
+        "collider_bytes": "32",
+        "vec3_bytes": "12",
+        "source_models": "41",
+        "source_meshes": "9",
+        "source_colliders": "26",
+        "source_lights": "3",
+        "diagnostic_storage_bytes": "10688",
+        "rendering": "excluded",
+        "guards": "independent_clones",
+        "visibility": "shared_input"
+      },
+      "cases": [
+        {
+          "name": "guard_patrol",
+          "count": 1,
+          "samples": 60,
+          "units_per_sample": 1,
+          "ticks": 3560173,
+          "max_ticks": 62711,
+          "audio_ticks": 38353,
+          "ticks_per_second": 46875000,
+          "colliders": 26,
+          "lights": 3,
+          "substeps": 4,
+          "checksum": 1.82399,
+          "average_ms": 1.265839288888889,
+          "max_ms": 1.3378346666666667,
+          "ms_per_unit": 1.265839288888889
+        },
+        {
+          "name": "guard_chase",
+          "count": 1,
+          "samples": 60,
+          "units_per_sample": 1,
+          "ticks": 3746281,
+          "max_ticks": 66060,
+          "audio_ticks": 38272,
+          "ticks_per_second": 46875000,
+          "colliders": 26,
+          "lights": 3,
+          "substeps": 4,
+          "checksum": 4.024304,
+          "average_ms": 1.3320110222222223,
+          "max_ms": 1.4092799999999999,
+          "ms_per_unit": 1.3320110222222223
+        },
+        {
+          "name": "guard_patrol",
+          "count": 2,
+          "samples": 60,
+          "units_per_sample": 2,
+          "ticks": 7040505,
+          "max_ticks": 121319,
+          "audio_ticks": 76640,
+          "ticks_per_second": 46875000,
+          "colliders": 26,
+          "lights": 3,
+          "substeps": 4,
+          "checksum": 3.64798,
+          "average_ms": 2.503290666666667,
+          "max_ms": 2.5881386666666666,
+          "ms_per_unit": 1.2516453333333335
+        },
+        {
+          "name": "guard_chase",
+          "count": 2,
+          "samples": 60,
+          "units_per_sample": 2,
+          "ticks": 7422432,
+          "max_ticks": 128032,
+          "audio_ticks": 76496,
+          "ticks_per_second": 46875000,
+          "colliders": 26,
+          "lights": 3,
+          "substeps": 4,
+          "checksum": 8.048609,
+          "average_ms": 2.6390869333333336,
+          "max_ms": 2.731349333333333,
+          "ms_per_unit": 1.3195434666666668
+        },
+        {
+          "name": "guard_patrol",
+          "count": 4,
+          "samples": 60,
+          "units_per_sample": 4,
+          "ticks": 13974168,
+          "max_ticks": 237317,
+          "audio_ticks": 134012,
+          "ticks_per_second": 46875000,
+          "colliders": 26,
+          "lights": 3,
+          "substeps": 4,
+          "checksum": 7.29596,
+          "average_ms": 4.968593066666666,
+          "max_ms": 5.062762666666666,
+          "ms_per_unit": 1.2421482666666666
+        },
+        {
+          "name": "guard_chase",
+          "count": 4,
+          "samples": 60,
+          "units_per_sample": 4,
+          "ticks": 14731578,
+          "max_ticks": 250180,
+          "audio_ticks": 153043,
+          "ticks_per_second": 46875000,
+          "colliders": 26,
+          "lights": 3,
+          "substeps": 4,
+          "checksum": 16.097218,
+          "average_ms": 5.2378944,
+          "max_ms": 5.337173333333333,
+          "ms_per_unit": 1.3094736
+        },
+        {
+          "name": "guard_patrol",
+          "count": 8,
+          "samples": 60,
+          "units_per_sample": 8,
+          "ticks": 27837431,
+          "max_ticks": 466767,
+          "audio_ticks": 286911,
+          "ticks_per_second": 46875000,
+          "colliders": 26,
+          "lights": 3,
+          "substeps": 4,
+          "checksum": 14.59192,
+          "average_ms": 9.897753244444445,
+          "max_ms": 9.957696,
+          "ms_per_unit": 1.2372191555555556
+        },
+        {
+          "name": "guard_chase",
+          "count": 8,
+          "samples": 60,
+          "units_per_sample": 8,
+          "ticks": 29357214,
+          "max_ticks": 495135,
+          "audio_ticks": 306083,
+          "ticks_per_second": 46875000,
+          "colliders": 26,
+          "lights": 3,
+          "substeps": 4,
+          "checksum": 32.194431,
+          "average_ms": 10.438120533333334,
+          "max_ms": 10.56288,
+          "ms_per_unit": 1.3047650666666668
+        },
+        {
+          "name": "guard_patrol",
+          "count": 16,
+          "samples": 60,
+          "units_per_sample": 16,
+          "ticks": 55586643,
+          "max_ticks": 931206,
+          "audio_ticks": 573613,
+          "ticks_per_second": 46875000,
+          "colliders": 26,
+          "lights": 3,
+          "substeps": 4,
+          "checksum": 29.18384,
+          "average_ms": 19.764139733333334,
+          "max_ms": 19.865728,
+          "ms_per_unit": 1.2352587333333334
+        },
+        {
+          "name": "guard_chase",
+          "count": 16,
+          "samples": 60,
+          "units_per_sample": 16,
+          "ticks": 58647164,
+          "max_ticks": 983678,
+          "audio_ticks": 612172,
+          "ticks_per_second": 46875000,
+          "colliders": 26,
+          "lights": 3,
+          "substeps": 4,
+          "checksum": 64.388863,
+          "average_ms": 20.852324977777776,
+          "max_ms": 20.985130666666667,
+          "ms_per_unit": 1.303270311111111
+        },
+        {
+          "name": "surface_lights",
+          "count": 1,
+          "samples": 8,
+          "units_per_sample": 32,
+          "ticks": 1322033,
+          "max_ticks": 167670,
+          "audio_ticks": 19154,
+          "ticks_per_second": 46875000,
+          "colliders": 26,
+          "lights": 1,
+          "substeps": 0,
+          "checksum": 7.679996,
+          "average_ms": 3.5254213333333335,
+          "max_ms": 3.57696,
+          "ms_per_unit": 0.11016941666666667
+        },
+        {
+          "name": "visibility_lights",
+          "count": 1,
+          "samples": 8,
+          "units_per_sample": 32,
+          "ticks": 1266286,
+          "max_ticks": 162075,
+          "audio_ticks": 19153,
+          "ticks_per_second": 46875000,
+          "colliders": 26,
+          "lights": 1,
+          "substeps": 0,
+          "checksum": 2.56,
+          "average_ms": 3.3767626666666666,
+          "max_ms": 3.4576,
+          "ms_per_unit": 0.10552383333333333
+        },
+        {
+          "name": "surface_lights",
+          "count": 4,
+          "samples": 8,
+          "units_per_sample": 32,
+          "ticks": 4909214,
+          "max_ticks": 616470,
+          "audio_ticks": 57467,
+          "ticks_per_second": 46875000,
+          "colliders": 26,
+          "lights": 4,
+          "substeps": 0,
+          "checksum": 7.679996,
+          "average_ms": 13.091237333333334,
+          "max_ms": 13.15136,
+          "ms_per_unit": 0.4091011666666667
+        },
+        {
+          "name": "visibility_lights",
+          "count": 4,
+          "samples": 8,
+          "units_per_sample": 32,
+          "ticks": 4736708,
+          "max_ticks": 594897,
+          "audio_ticks": 38207,
+          "ticks_per_second": 46875000,
+          "colliders": 26,
+          "lights": 4,
+          "substeps": 0,
+          "checksum": 2.56,
+          "average_ms": 12.631221333333333,
+          "max_ms": 12.691136,
+          "ms_per_unit": 0.39472566666666664
+        },
+        {
+          "name": "surface_lights",
+          "count": 8,
+          "samples": 8,
+          "units_per_sample": 32,
+          "ticks": 9662223,
+          "max_ticks": 1211414,
+          "audio_ticks": 95751,
+          "ticks_per_second": 46875000,
+          "colliders": 26,
+          "lights": 8,
+          "substeps": 0,
+          "checksum": 7.679996,
+          "average_ms": 25.765928,
+          "max_ms": 25.843498666666665,
+          "ms_per_unit": 0.80518525
+        },
+        {
+          "name": "visibility_lights",
+          "count": 8,
+          "samples": 8,
+          "units_per_sample": 32,
+          "ticks": 9354788,
+          "max_ticks": 1171403,
+          "audio_ticks": 95313,
+          "ticks_per_second": 46875000,
+          "colliders": 26,
+          "lights": 8,
+          "substeps": 0,
+          "checksum": 2.56,
+          "average_ms": 24.946101333333335,
+          "max_ms": 24.989930666666666,
+          "ms_per_unit": 0.7795656666666667
+        },
+        {
+          "name": "surface_lights",
+          "count": 16,
+          "samples": 8,
+          "units_per_sample": 32,
+          "ticks": 18998717,
+          "max_ticks": 2378264,
+          "audio_ticks": 210341,
+          "ticks_per_second": 46875000,
+          "colliders": 26,
+          "lights": 16,
+          "substeps": 0,
+          "checksum": 7.679996,
+          "average_ms": 50.663245333333336,
+          "max_ms": 50.73629866666666,
+          "ms_per_unit": 1.5832264166666667
+        },
+        {
+          "name": "visibility_lights",
+          "count": 16,
+          "samples": 8,
+          "units_per_sample": 32,
+          "ticks": 18441572,
+          "max_ticks": 2306836,
+          "audio_ticks": 190607,
+          "ticks_per_second": 46875000,
+          "colliders": 26,
+          "lights": 16,
+          "substeps": 0,
+          "checksum": 2.56,
+          "average_ms": 49.177525333333335,
+          "max_ms": 49.21250133333333,
+          "ms_per_unit": 1.5367976666666667
+        },
+        {
+          "name": "moving_light_vertices",
+          "count": 128,
+          "samples": 4,
+          "units_per_sample": 128,
+          "ticks": 2646666,
+          "max_ticks": 664412,
+          "audio_ticks": 38247,
+          "ticks_per_second": 46875000,
+          "colliders": 26,
+          "lights": 1,
+          "substeps": 0,
+          "checksum": 15.359987,
+          "average_ms": 14.115552,
+          "max_ms": 14.174122666666667,
+          "ms_per_unit": 0.11027775
+        },
+        {
+          "name": "moving_light_vertices",
+          "count": 512,
+          "samples": 4,
+          "units_per_sample": 512,
+          "ticks": 10572558,
+          "max_ticks": 2653101,
+          "audio_ticks": 114646,
+          "ticks_per_second": 46875000,
+          "colliders": 26,
+          "lights": 1,
+          "substeps": 0,
+          "checksum": 61.439835,
+          "average_ms": 56.386976,
+          "max_ms": 56.599488,
+          "ms_per_unit": 0.1101308125
+        },
+        {
+          "name": "light_collider_scan",
+          "count": 0,
+          "samples": 8,
+          "units_per_sample": 8,
+          "ticks": 157673,
+          "max_ticks": 19801,
+          "audio_ticks": 0,
+          "ticks_per_second": 46875000,
+          "colliders": 0,
+          "lights": 4,
+          "substeps": 0,
+          "checksum": 120.063606,
+          "average_ms": 0.42046133333333335,
+          "max_ms": 0.42242133333333337,
+          "ms_per_unit": 0.05255766666666667
+        },
+        {
+          "name": "light_collider_scan",
+          "count": 16,
+          "samples": 8,
+          "units_per_sample": 8,
+          "ticks": 985681,
+          "max_ticks": 127698,
+          "audio_ticks": 19173,
+          "ticks_per_second": 46875000,
+          "colliders": 16,
+          "lights": 4,
+          "substeps": 0,
+          "checksum": 120.063606,
+          "average_ms": 2.6284826666666667,
+          "max_ms": 2.724224,
+          "ms_per_unit": 0.32856033333333334
+        },
+        {
+          "name": "light_collider_scan",
+          "count": 64,
+          "samples": 8,
+          "units_per_sample": 8,
+          "ticks": 3118426,
+          "max_ticks": 392760,
+          "audio_ticks": 19193,
+          "ticks_per_second": 46875000,
+          "colliders": 64,
+          "lights": 4,
+          "substeps": 0,
+          "checksum": 120.063606,
+          "average_ms": 8.315802666666666,
+          "max_ms": 8.37888,
+          "ms_per_unit": 1.0394753333333333
+        },
+        {
+          "name": "light_collider_scan",
+          "count": 256,
+          "samples": 8,
+          "units_per_sample": 8,
+          "ticks": 11918106,
+          "max_ticks": 1490771,
+          "audio_ticks": 134357,
+          "ticks_per_second": 46875000,
+          "colliders": 256,
+          "lights": 4,
+          "substeps": 0,
+          "checksum": 120.063606,
+          "average_ms": 31.781616,
+          "max_ms": 31.803114666666666,
+          "ms_per_unit": 3.972702
+        },
+        {
+          "name": "surface_lights_clear",
+          "count": 1,
+          "samples": 8,
+          "units_per_sample": 32,
+          "ticks": 2403912,
+          "max_ticks": 304522,
+          "audio_ticks": 19174,
+          "ticks_per_second": 46875000,
+          "colliders": 26,
+          "lights": 1,
+          "substeps": 0,
+          "checksum": 165.628555,
+          "average_ms": 6.410432,
+          "max_ms": 6.496469333333334,
+          "ms_per_unit": 0.200326
+        },
+        {
+          "name": "surface_lights_clear",
+          "count": 4,
+          "samples": 8,
+          "units_per_sample": 32,
+          "ticks": 9381738,
+          "max_ticks": 1174825,
+          "audio_ticks": 95847,
+          "ticks_per_second": 46875000,
+          "colliders": 26,
+          "lights": 4,
+          "substeps": 0,
+          "checksum": 618.090271,
+          "average_ms": 25.017968000000003,
+          "max_ms": 25.062933333333334,
+          "ms_per_unit": 0.7818115000000001
+        },
+        {
+          "name": "surface_lights_clear",
+          "count": 8,
+          "samples": 8,
+          "units_per_sample": 32,
+          "ticks": 18665398,
+          "max_ticks": 2338171,
+          "audio_ticks": 191594,
+          "ticks_per_second": 46875000,
+          "colliders": 26,
+          "lights": 8,
+          "substeps": 0,
+          "checksum": 1207.261719,
+          "average_ms": 49.774394666666666,
+          "max_ms": 49.88098133333333,
+          "ms_per_unit": 1.5554498333333333
+        },
+        {
+          "name": "surface_lights_clear",
+          "count": 16,
+          "samples": 8,
+          "units_per_sample": 32,
+          "ticks": 37006254,
+          "max_ticks": 4629449,
+          "audio_ticks": 383329,
+          "ticks_per_second": 46875000,
+          "colliders": 26,
+          "lights": 16,
+          "substeps": 0,
+          "checksum": 2049.003662,
+          "average_ms": 98.683344,
+          "max_ms": 98.76157866666667,
+          "ms_per_unit": 3.0838545
+        },
+        {
+          "name": "moving_light_vertices_clear",
+          "count": 128,
+          "samples": 4,
+          "units_per_sample": 128,
+          "ticks": 4787947,
+          "max_ticks": 1203022,
+          "audio_ticks": 38367,
+          "ticks_per_second": 46875000,
+          "colliders": 26,
+          "lights": 1,
+          "substeps": 0,
+          "checksum": 346.741455,
+          "average_ms": 25.535717333333334,
+          "max_ms": 25.664469333333333,
+          "ms_per_unit": 0.19949779166666667
+        },
+        {
+          "name": "moving_light_vertices_clear",
+          "count": 512,
+          "samples": 4,
+          "units_per_sample": 512,
+          "ticks": 19156745,
+          "max_ticks": 4811707,
+          "audio_ticks": 191752,
+          "ticks_per_second": 46875000,
+          "colliders": 26,
+          "lights": 1,
+          "substeps": 0,
+          "checksum": 1276.564697,
+          "average_ms": 102.16930666666667,
+          "max_ms": 102.64974933333333,
+          "ms_per_unit": 0.19954942708333334
+        }
+      ],
+      "run": {
+        "name": "scale-micro",
+        "passed": true,
+        "log": ".dev\\ares\\runs\\23d0f48ce1544672875e5c89faaa3e73\\scale-micro.log",
+        "tested_rom": ".dev\\ares\\runs\\23d0f48ce1544672875e5c89faaa3e73\\DarkLantern64-moonlit_courtyard-scale.z64",
+        "rom_sha256": "8b773e3ea89f21b85f46348aed54d99e2a153067613883c770c82ce37036508c",
+        "rom_bytes": 196608,
+        "settings": ".dev\\ares\\runs\\23d0f48ce1544672875e5c89faaa3e73\\settings.bml",
+        "settings_source_sha256": "4b013206c69c12be9e0fdbd91b389e6c40b87816bb40835c6daadb713b18ce80",
+        "profile_report": null,
+        "elapsed_seconds": 13.672,
+        "peak_sampled_heap_bytes": null,
+        "max_reported_cpu_ms": null,
+        "boot": null,
+        "terminal_event": "DL64 scale_complete cases=30 checksum=7414.920898"
+      }
+    },
+    "study_command": "python tools/scale_study.py --micro-only"
+  }
+}

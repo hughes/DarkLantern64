@@ -31,17 +31,18 @@ The lamp geometry has an emissive material. Emission adds surface brightness; th
 
 ## Edit, play and capture
 
-Use VS Code's **DarkLantern64: Open courtyard editor**, **Build + Play courtyard**, and **Capture courtyard views** tasks. Save + Cook before building or capturing; those tasks read saved source content. Equivalent commands from the repository root:
+Use **DarkLantern64: Launch editor**, open **Moonlit Delivery Yard** through **Levels**, then use **Play level** to save and launch it. Captures remain a specialist command; **Save + Cook** first because the capture tool reads saved source content. Command-line alternatives from the repository root:
 
 ```powershell
-python tools/build.py --editor --run --level content/moonlit_courtyard.json
+python tools/build.py --editor --run
+# Open Moonlit Delivery Yard in Levels and Save + Cook before these commands
 python tools/build.py --run --level content/moonlit_courtyard.json
 python tools/capture_ares.py --level content/moonlit_courtyard.json
 ```
 
-The manual ROM is `build/DarkLantern64-moonlit_courtyard.z64`. Generated scene content and reports are under `build/scenes/moonlit_courtyard/`. The courtyard editor has its own layout and command queue; use `python tools/editorctl.py --level content/moonlit_courtyard.json inspect` to address it. The workshop's **Night environment**, light properties and shared material controls save canonical game values. Desktop lighting remains a LightEngine preview; judge final contrast in the game.
+The manual ROM is `build/DarkLantern64-moonlit_courtyard.z64`. Generated scene content and reports are under `build/scenes/moonlit_courtyard/`. Use `python tools/editorctl.py inspect` to inspect the running project editor and check its active source. The workshop's **Night environment**, light properties and shared material controls save canonical game values. Desktop lighting remains a LightEngine preview; judge final contrast in the game.
 
-The capture task launches a disposable Ares session, freezes simulation at each authored view, and exports the completed RDP framebuffer. PNG locations and ROM hashes are recorded in `build/scenes/moonlit_courtyard/captures.json`. They are raw 320 × 240 images before VI filtering. The pixel dump waits for graphics and writes a large log, so its timings are unsuitable for performance comparisons.
+The capture command launches a disposable Ares session, freezes simulation at each authored view, and exports the completed RDP framebuffer. PNG locations and ROM hashes are recorded in `build/scenes/moonlit_courtyard/captures.json`. They are raw 320 × 240 images before VI filtering. The pixel dump waits for graphics and writes a large log, so its timings are unsuitable for performance comparisons. See [developer tools](developer-tools.md) for the command index.
 
 ## Repeatable views
 

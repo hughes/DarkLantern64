@@ -104,7 +104,7 @@ python tools/scale_study.py --micro-only
 python tools/scale_study.py --skip-micro --cases baseline hidden12 --compare-culling
 ```
 
-The first command runs the current 30-case workload suite and all 16 render comparisons. The other commands run shorter subsets. Use the **DarkLantern64: Scale study** or **DarkLantern64: Guard + light workload study** VS Code tasks for the same workflow. Results, archived logs and generated fixture copies go into ignored build/development directories; `build/scale-study/latest.json` points to the latest completed report. The saved source and controller settings remain unchanged.
+The first command runs the current 30-case workload suite and all 16 render comparisons. The other commands run shorter subsets. These specialist studies are terminal commands, indexed in [developer tools](developer-tools.md). Results, archived logs and generated fixture copies go into ignored build/development directories; `build/scale-study/latest.json` points to the latest completed report. The saved source and controller settings remain unchanged.
 
 Validation passed: host gameplay/profiler/diagnostic tests, six-plane bounds tests including 12,000 visible-point containment cases, N64 ROM builds, the 4 MiB startup error, and the 8 MiB mission replay. All four authored courtyard framebuffers have identical PNG hashes to the stored pre-culling views, including the open gate. These are raw RDP buffers before VI filtering; capture timings are excluded from the performance study.
 

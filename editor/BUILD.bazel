@@ -1,6 +1,13 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary")
 
 cc_binary(
+    name = "darklantern64_project_editor",
+    srcs = ["main.cpp"],
+    copts = select({"@platforms//os:windows": ["/wd4005"], "//conditions:default": []}),
+    deps = ["@lightengine//:lightengine"],
+)
+
+cc_binary(
     name = "darklantern64_editor",
     srcs = ["main.cpp"],
     copts = select({"@platforms//os:windows": ["/wd4005"], "//conditions:default": []}),

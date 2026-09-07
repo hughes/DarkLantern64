@@ -293,19 +293,18 @@ def run_tests():
 def build_editor(launch, level=None):
     from setup_editor import setup
     setup()
-    level, cooked_dir, default_scene = scene_paths(level)
-    compile_level(level, cooked_dir)
+    initial_level = scene_paths(level)[0] if level is not None else None
     run([sys.executable, ROOT / "tools/estimate_audio.py", "--manifest", ROOT / "content/audio_budget.json",
          "--output", BUILD / "generated/audio_memory_report.json"])
     bazel = shutil.which("bazelisk") or shutil.which("bazel")
     if not bazel:
         raise RuntimeError("Bazelisk must be on PATH to build the LightEngine editor.")
-    target = "darklantern64_editor" if default_scene else "darklantern64_scene_editor"
+    target = "darklantern64_project_editor" if initial_level is None else "darklantern64_scene_editor"
     run([bazel, "build", "//:" + target], cwd=ROOT / "editor")
     exe = ROOT / "editor/bazel-bin" / (target + ".exe")
     if launch:
         # This is the visible, interactive editor requested by the user.
-        subprocess.Popen([str(exe), str(ROOT), str(level)], cwd=ROOT)
+        subprocess.Popen([str(exe), str(ROOT)] + ([str(initial_level)] if initial_level else []), cwd=ROOT)
     return exe
 
 

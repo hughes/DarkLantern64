@@ -1,12 +1,14 @@
 # Content and development workflow
 
-Status: initial workflow implementation, 2026-09-05. Creators can start with the [quickstart](creator-guide.md). See the [project overview](../README.md) for executable commands and prerequisites, the [editor reference](../editor/README.md) for controls, and the [architecture](architecture.md) for current limits.
+Creators can start with the [quickstart](creator-guide.md). See the [project overview](../README.md) for prerequisites, the [editor reference](../editor/README.md) for controls, the [developer tools guide](developer-tools.md) for specialist commands, and the [architecture](architecture.md) for current limits.
 
 ## Author in LightEngine
 
-LightEngine is the desktop authoring environment. The DarkLantern64 editor application lives in `editor/` and consumes the pinned engine checkout under `external/LightEngine`. Canonical scene data is `content/first_room.json`; referenced placeholder models live in `content/models/`. The compiler generates the desktop preview and runtime mesh data from the same assets.
+LightEngine is the desktop authoring environment. The DarkLantern64 editor application lives in `editor/` and consumes the pinned engine checkout under `external/LightEngine`. Canonical levels are JSON files directly inside `content/`; referenced models live in `content/models/` and `content/assets/`. The compiler generates the desktop preview and runtime mesh data from the same assets.
 
-Use the 3D viewport and object properties to place models, then **Save + Cook** to validate and update generated assets or **Build ROM** to produce the playable build. Assets use OBJ geometry with per-instance colors or UV-mapped RGBA16 textures; animation conversion remains future work. The [texture pipeline](texture-pipeline.md) and [courtyard study](night-contrast.md) describe the working textured scene. Export compatible placeholder geometry from Blender, reference it by asset ID, and preserve gameplay IDs when revising it. Rich inheritance and general Blender reimport ownership remain planned work.
+Use **DarkLantern64: Launch editor** once, then manage levels in its **Levels** panel. It registers source levels whether or not they are in the runtime bundle, and supports opening, creating, duplicating, retitling and deleting them. Switching prompts for unsaved level and audio-plan drafts. Deletion confirms and archives the saved level under `.dev/editor/deleted-levels/`, preserving shared assets. **Include in game menu** updates the explicit bundle manifest `content/level_bundle.json`; the game menu currently supports up to eight levels.
+
+Use the 3D viewport and object properties to place models, then **Save + Cook** to validate and update generated assets. **Play level** saves, cooks, builds and launches the active level at the selected **Test start**; **Play game menu** saves the active level before building and launching the bundle. **Build ROM only** builds the active level without launching. Assets use OBJ geometry with per-instance colors or UV-mapped RGBA16 textures; animation conversion remains future work. The [texture pipeline](texture-pipeline.md) and [courtyard study](night-contrast.md) describe the working textured scene. Export compatible placeholder geometry from Blender, reference it by asset ID, and preserve gameplay IDs when revising it. Rich inheritance and general Blender reimport ownership remain planned work.
 
 Stable authoring IDs must survive save, reload, and import changes. Duplication creates new identities. The compiler may remap IDs into compact runtime indices while retaining a debug mapping to the editor.
 
@@ -28,11 +30,11 @@ Per-system memory allowances and frame-time budgets remain to be established fro
 
 ## Editor commands and layout
 
-Saved levels can also be assembled into one ROM through an explicit bundle manifest. The [level-select workflow](level-select.md) supports a runtime selector, direct level/preset launches, and repeatable named test starts. Existing editor **Build ROM** commands continue to build the selected source as a standalone level.
+The two VS Code tasks are **Launch editor** and **Launch game**. **Launch game** builds the saved bundle and opens its menu; it does not save an open editor. The [level-select workflow](level-select.md) supports a runtime selector, direct level/preset launches, and repeatable named test starts. Feature verification, captures and performance studies use the [developer commands](developer-tools.md), keeping the everyday task list small.
 
 `python tools/editorctl.py inspect` reads the running editor through a local request/response interface. It also supports bounded content edits, save/build, capture, layout inspection/reset, reload, and clean quit. Use `--args-file` for structured arguments on Windows. See the editor guide for the current operation contract. Commands operate on the same canonical document as the editor UI; they do not evaluate arbitrary code.
 
-Requests have unique IDs and expirations. A timeout does not prove that a mutation failed: inspect state before retrying. Responses and captures live under `.dev/editor/`, alongside compiler/build logs and the saved layout.
+Requests have unique IDs and expirations. A timeout does not prove that a mutation failed: inspect state before retrying. The normal project session uses the stable `.dev/editor/project/` queue as you switch levels. `editorctl.py --level` addresses isolated diagnostic launches; ordinary project use omits it. Responses, captures, compiler/build logs and the saved layout live under `.dev/editor/`.
 
 New projects receive a deterministic dock layout. User rearrangements persist in a project-local ImGui settings file, and **Reset Layout** restores the project default. The supporting engine change is [PR #14](https://github.com/hughes/LightEngine/pull/14); LightEngine changes use branches and pull requests for owner review before merging to main.
 

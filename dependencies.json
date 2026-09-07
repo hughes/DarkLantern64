@@ -1,9 +1,9 @@
 {
   "lightengine": {
     "repository": "git@github.com:hughes/LightEngine.git",
-    "commit": "a6be6a0926032ebc5f02ae845ff2548e93fa43a2",
+    "commit": "dc8e3c86a0171795af3a9fe724fc8125925dbba7",
     "path": "external/LightEngine",
-    "branch": "codex/restore-saved-editor-tabs"
+    "branch": "codex/project-editor-lifecycle"
   },
   "libdragon": {
     "repository": "git@github.com:hughes/libdragon.git",

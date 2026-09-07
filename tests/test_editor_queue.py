@@ -8,11 +8,11 @@ from editorctl import command_queue
 
 
 class EditorQueueTests(unittest.TestCase):
-    def test_default_and_explicit_first_room_keep_existing_queue(self):
+    def test_project_queue_is_stable_and_isolated_sessions_keep_existing_queue(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory).resolve()
             expected = root / ".dev/editor"
-            self.assertEqual(command_queue(root), expected)
+            self.assertEqual(command_queue(root), expected / "project")
             self.assertEqual(command_queue(root, "content/first_room.json"), expected)
             self.assertEqual(command_queue(root, root / "content/first_room.json"), expected)
 

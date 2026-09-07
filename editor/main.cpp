@@ -31,6 +31,26 @@ Json ReadJson(const fs::path& path)
     return result;
 }
 
+std::string ReadText(const fs::path& path)
+{
+    std::ifstream input(path, std::ios::binary);
+    if (!input) throw std::runtime_error("Cannot read " + path.string());
+    return {std::istreambuf_iterator<char>(input), std::istreambuf_iterator<char>()};
+}
+
+struct SessionLock
+{
+    HANDLE handle = nullptr;
+    ~SessionLock() { if (handle) CloseHandle(handle); }
+    void Acquire(const fs::path& queue)
+    {
+        const auto name = L"Local\\DarkLantern64Editor-" + std::to_wstring(std::hash<std::wstring>{}(queue.wstring()));
+        handle = CreateMutexW(nullptr, FALSE, name.c_str());
+        if (!handle) throw std::runtime_error("Cannot acquire editor session lock");
+        if (GetLastError() == ERROR_ALREADY_EXISTS) throw std::runtime_error("This project editor is already open. Return to its window.");
+    }
+};
+
 void AtomicWrite(const fs::path& path, const std::string& text)
 {
     fs::create_directories(path.parent_path());
@@ -110,17 +130,28 @@ std::string Tail(const fs::path& path)
     return {std::istreambuf_iterator<char>(input), std::istreambuf_iterator<char>()};
 }
 
+Json ProjectTool(const fs::path& root, const fs::path& queue, const std::vector<std::wstring>& arguments)
+{
+    std::vector<std::wstring> command{L"python",(root/"tools/project_levels.py").wstring(),L"--root",root.wstring()};
+    command.insert(command.end(),arguments.begin(),arguments.end());
+    const auto log=queue/"project-tool.json";
+    if (Run(root,command,log,120000)) throw std::runtime_error(Tail(log));
+    return ReadJson(log);
+}
+
 bool focusProjectTabs = false;
 
 void ProjectLayout(ImGuiID root)
 {
     focusProjectTabs = true;
-    ImGuiID main = root, right, bottom, audio, inspector, objects;
+    ImGuiID main = root, right, bottom, audio, inspector, objects, levels;
+    ImGui::DockBuilderSplitNode(main, ImGuiDir_Left, .20f, &levels, &main);
     ImGui::DockBuilderSplitNode(main, ImGuiDir_Right, .29f, &right, &main);
     ImGui::DockBuilderSplitNode(main, ImGuiDir_Down, .33f, &bottom, &main);
     ImGui::DockBuilderSplitNode(bottom, ImGuiDir_Right, .60f, &audio, &bottom);
     ImGui::DockBuilderSplitNode(right, ImGuiDir_Down, .59f, &inspector, &objects);
     ImGui::DockBuilderDockWindow("Viewport", main);
+    ImGui::DockBuilderDockWindow("Levels", levels);
     ImGui::DockBuilderDockWindow("Audio Memory", audio);
     ImGui::DockBuilderDockWindow("Room Objects", objects);
     ImGui::DockBuilderDockWindow("Entity List", objects);
@@ -130,48 +161,68 @@ void ProjectLayout(ImGuiID root)
         ImGui::DockBuilderDockWindow(name, bottom);
 }
 
-struct JobResult { bool ok = false; std::string message; Json report; };
+struct JobResult { bool ok = false; std::string message; Json report; Json project; };
 
 class DemoEditor
 {
   public:
-    explicit DemoEditor(fs::path root, fs::path source) : root_(std::move(root)), queue_(root_ / ".dev/editor"), source_(fs::weakly_canonical(source))
+    explicit DemoEditor(fs::path root, fs::path source, bool isolated = false) : root_(fs::weakly_canonical(root)), queue_(root_ / ".dev/editor/project")
     {
-        const std::string stem = source_.stem().string();
-        if (stem.empty() || stem.find_first_not_of("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_-") != std::string::npos)
-            throw std::runtime_error("Level filename must use only ASCII letters, digits, underscores or hyphens");
-        if (source_.parent_path() != fs::weakly_canonical(root_/"content") || source_.extension() != ".json")
-            throw std::runtime_error("Choose a JSON level directly inside this project's content directory");
-        const bool firstRoom = source_ == fs::weakly_canonical(root_/"content/first_room.json");
-        output_ = firstRoom ? root_/"build" : root_/"build/scenes"/stem;
-        if (!firstRoom) queue_ /= fs::path("scenes") / stem;
+        if (isolated)
+        {
+            source = fs::weakly_canonical(source);
+            const auto stem=source.stem().string();
+            if (source.parent_path() != root_/"content" || source.extension() != ".json" || stem.empty() ||
+                stem.find_first_not_of("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_-")!=std::string::npos)
+                throw std::runtime_error("Choose a JSON level directly inside this project's content directory");
+            queue_ = source.filename() == "first_room.json" ? root_/".dev/editor" : root_/".dev/editor/scenes"/source.stem();
+        }
+        sessionLock_.Acquire(queue_);
         fs::create_directories(queue_ / "requests");
         fs::create_directories(queue_ / "responses");
-        document_ = ReadJson(source_);
-        if (document_.value("version", 0) != 2) throw std::runtime_error("Room Workshop requires version-2 3D content");
-        selected_ = document_["entities"][0]["id"];
+        catalog_ = ProjectCommand({L"list"});
+        if (catalog_.at("levels").empty()) throw std::runtime_error("The project needs at least one valid level in content/");
+        std::string filename = source.filename().string();
+        if (!isolated && fs::exists(queue_/"project-state.json"))
+            try { filename = ReadJson(queue_/"project-state.json").value("last_level",filename); } catch (...) {}
+        if (!LevelEntry(filename)) filename = catalog_.at("levels")[0].at("file");
+        source_ = root_/"content"/filename;
         LoadAudio();
-
     }
 
     void Initialize()
     {
-        const int cooked = Run(root_,{L"python",(root_/"tools/compile_level.py").wstring(),source_.wstring(),
-            L"--output",output_.wstring(),L"--asset-root",(root_/"content").wstring()},queue_/"compiler.log");
-        if (cooked) throw std::runtime_error(Tail(queue_/"compiler.log"));
-        // A new layout schema removes the retired map panel without overwriting
-        // the user's original layout. Subsequent deliberate v2 layouts persist.
-        engine_.SetEditorLayout(queue_ / "layout-v2.ini", ProjectLayout);
-        engine_.Init(output_ / "editor-assets", "DarkLantern64 | Room Workshop");
+        const Json cooked = ProjectCommand({L"cook",L"--level",source_.wstring()});
+        AdoptLevel(cooked);
+        engine_.SetEditorLayout(queue_ / "layout-project-v1.ini", ProjectLayout);
+        engine_.SetSceneOpenHandler([this](const std::string& path) {
+            try
+            {
+                for (const auto& level : catalog_.at("levels"))
+                    if (path == "levels/" + level.at("stem").get<std::string>() + ".json")
+                    { QueueAction({{"op","open"},{"file",level.at("file")}}); return; }
+                throw std::runtime_error("Refresh the Levels list; that level is no longer registered");
+            }
+            catch (const std::exception& error) { status_=error.what(); }
+        });
+        engine_.SetSceneSaveHandler([this] { saveRequested_=true; });
+        engine_.SetCloseRequestHandler([this] {
+            try
+            {
+                SyncPreviewTransforms();
+                if (Busy() || !captureId_.empty()) { status_="Wait for the current operation before closing."; return false; }
+                if (!pendingAction_.empty()) return false;
+                if (HasUnsaved()) { QueueAction({{"op","close"}}); return false; }
+                return true;
+            }
+            catch (const std::exception& error) { status_=error.what(); return false; }
+        });
+        engine_.Init(root_/"build/project/editor-assets", "DarkLantern64 | Project Editor");
         engine_.SetWindowSize(1440, 960);
-        engine_.RegisterLevel(scenePath_);
-        engine_.OnLevelLoaded(scenePath_, [this](Scene& scene) { BindScene(scene); });
-        engine_.OnImGui(scenePath_, [this] { Draw(); });
+        initialized_=true;
+        RegisterLevels();
         engine_.LoadScene(scenePath_);
-        if (fs::exists(output_ / "generated/level_report.json"))
-            report_ = ReadJson(output_ / "generated/level_report.json");
-        AtomicWrite(queue_ / "session.json", Json{{"pid", GetCurrentProcessId()}, {"root", root_.string()}, {"source",source_.string()}, {"output",output_.string()},
-                    {"operations", {"inspect","import_asset_pack","add_prop","set_entity","add_enemy","duplicate_enemy","add_waypoint","delete_entity","set_environment","set_material","set_preview_transform","save","build","capture","get_layout","reset_layout","reload","get_audio_memory","set_audio_config","recalculate_audio","quit"}}}.dump(2));
+        WriteSession();
     }
 
     void Loop()
@@ -181,6 +232,12 @@ class DemoEditor
             SyncPreviewTransforms();
             PollJob();
             PollCommands();
+            if (saveRequested_)
+            {
+                saveRequested_=false;
+                if (!Busy() && pendingAction_.empty()) Save(false);
+            }
+            ProcessAction();
             if (reloadPreview_) { reloadPreview_ = false; engine_.LoadScene(scenePath_); }
             engine_.Update();
             engine_.Render();
@@ -203,6 +260,7 @@ class DemoEditor
 
   private:
     fs::path root_, queue_, source_, output_;
+    SessionLock sessionLock_;
     LightEngine engine_;
     Json document_, report_, audioConfig_, audioDraft_, audioReport_;
     Json prefabs_ = Json::array();
@@ -212,7 +270,13 @@ class DemoEditor
     Scene* scene_ = nullptr;
     std::unordered_map<EntityId, std::string> previewIds_;
     std::unordered_map<EntityId, Transform> previewTransforms_;
-    const std::string scenePath_ = "levels/first_room.json";
+    std::string scenePath_;
+    Json catalog_, pendingAction_ = Json::object();
+    std::string browserLevel_, sourceSnapshot_, testStart_ = "default", actionRequestId_;
+    bool initialized_=false, saveRequested_=false, actionReady_=false, continueAfterSave_=false;
+    bool showUnsaved_=false, showNew_=false, newDuplicate_=false, showDelete_=false;
+    char newName_[65]="new_room", newTitle_[81]="New room";
+    bool newInBundle_=true;
     std::string selected_, status_ = "Edit XYZ transforms or gameplay properties, then Save + Cook.";
     std::string audioStatus_, audioScenario_;
     std::string jobId_, jobSnapshot_, captureId_;
@@ -221,6 +285,167 @@ class DemoEditor
     int frame_ = 0, captureFrame_ = 0;
 
     bool Busy() const { return job_.valid(); }
+    static std::string LevelLabel(std::string title)
+    {
+        const std::string prefix="DarkLantern64 - ";
+        if (title.starts_with(prefix)) title.erase(0,prefix.size());
+        return title;
+    }
+    bool HasUnsaved() const { return dirty_ || audioDraft_ != audioConfig_; }
+    Json ProjectCommand(const std::vector<std::wstring>& arguments) { return ProjectTool(root_,queue_,arguments); }
+    const Json* LevelEntry(const std::string& file) const
+    {
+        if (!catalog_.is_object() || !catalog_.contains("levels")) return nullptr;
+        for (const auto& level : catalog_.at("levels")) if (level.at("file")==file) return &level;
+        return nullptr;
+    }
+    void RegisterLevels()
+    {
+        if (!initialized_) return;
+        std::vector<std::pair<std::string,std::string>> levels;
+        for (const auto& level : catalog_.at("levels"))
+        {
+            const auto path="levels/"+level.at("stem").get<std::string>()+".json";
+            levels.emplace_back(path,LevelLabel(level.at("title"))+" ("+level.at("file").get<std::string>()+")");
+            engine_.OnLevelLoaded(path,[this](Scene& scene) { BindScene(scene); });
+            engine_.OnImGui(path,[this] { Draw(); });
+        }
+        engine_.SetRegisteredLevels(std::move(levels));
+    }
+    void RefreshLevels()
+    {
+        catalog_=ProjectCommand({L"list"});
+        if (!LevelEntry(browserLevel_)) browserLevel_=source_.filename().string();
+        RegisterLevels();
+    }
+    void WriteSession()
+    {
+        AtomicWrite(queue_/"project-state.json",Json{{"last_level",source_.filename().string()}}.dump(2));
+        AtomicWrite(queue_/"session.json",Json{{"pid",GetCurrentProcessId()},{"root",root_.string()},
+            {"source",source_.string()},{"output",output_.string()},{"scene_path",scenePath_},{"project_editor",true},
+            {"operations",{"inspect","list_levels","open_level","create_level","duplicate_level","delete_level","update_level","play_level","play_menu",
+                "import_asset_pack","add_prop","set_entity","add_enemy","duplicate_enemy","add_waypoint","delete_entity","set_environment","set_material",
+                "set_preview_transform","save","build","capture","get_layout","reset_layout","reload","get_audio_memory","set_audio_config","recalculate_audio","quit"}}}.dump(2));
+    }
+    void InvalidatePreviewAssets(const Json& cooked)
+    {
+        for (const auto& item : cooked.value("changed_preview_assets",Json::array()))
+        {
+            const fs::path path=item.get<std::string>();
+            if (path.extension()==".gltf") engine_.GetAssetMgr().InvalidateMeshByPath(path);
+            else engine_.GetAssetMgr().InvalidateTextureByPath(path);
+        }
+    }
+    void AdoptLevel(const Json& cooked)
+    {
+        const fs::path source=cooked.at("source").get<std::string>();
+        const auto snapshot=ReadText(source);
+        const Json document=Json::parse(snapshot);
+        source_=source; sourceSnapshot_=snapshot; document_=document;
+        output_=fs::path(cooked.at("output").get<std::string>());
+        scenePath_=cooked.at("scene_path"); report_=cooked.at("report"); catalog_=cooked.at("catalog");
+        selected_=document_.at("entities").empty()?"":document_.at("entities")[0].at("id").get<std::string>();
+        browserLevel_=source_.filename().string(); testStart_="default";
+        prefabs_=Json::array(); selectedPrefab_.clear();
+        previewIds_.clear(); previewTransforms_.clear();
+        dirty_=false; structureDirty_=false; reloadPreview_=false;
+    }
+    void OpenLevel(const std::string& file)
+    {
+        RefreshLevels();
+        const auto* level=LevelEntry(file);
+        if (!level) throw std::runtime_error("Level is no longer available; refresh the Levels list");
+        const Json cooked=ProjectCommand({L"cook",L"--level",fs::path(file).wstring(),L"--expected-sha256",fs::path(level->at("source_sha256").get<std::string>()).wstring()});
+        InvalidatePreviewAssets(cooked);
+        AdoptLevel(cooked);
+        RegisterLevels();
+        engine_.LoadScene(scenePath_);
+        WriteSession();
+        status_="Opened "+document_.at("title").get<std::string>()+".";
+    }
+    void QueueAction(Json action, const std::string& requestId={})
+    {
+        if (Busy() || !pendingAction_.empty() || !captureId_.empty()) throw std::runtime_error("Finish the current editor operation first");
+        SyncPreviewTransforms();
+        const auto op=action.at("op").get<std::string>();
+        const bool leaving=op!="update" && (op!="delete" || action.at("file")==source_.filename().string());
+        if (leaving && HasUnsaved() && !requestId.empty()) throw std::runtime_error("Unsaved changes; save/apply or discard before changing levels");
+        if ((op=="delete" || op=="update" || op=="duplicate") && action.contains("file"))
+        {
+            const auto* level=LevelEntry(action.at("file"));
+            if (!level) throw std::runtime_error("Level is no longer available");
+            action["expected_sha256"]=level->at("source_sha256");
+        }
+        pendingAction_=std::move(action); actionRequestId_=requestId;
+        actionReady_=!leaving || !HasUnsaved(); showUnsaved_=!actionReady_;
+    }
+    void ProcessAction()
+    {
+        if (!actionReady_ || pendingAction_.empty() || Busy()) return;
+        const std::string pendingOp=pendingAction_.at("op");
+        const bool leaving=pendingOp!="update" && (pendingOp!="delete" || pendingAction_.at("file")==source_.filename().string());
+        if (leaving && HasUnsaved() && !pendingAction_.value("discard",false))
+        {
+            actionReady_=false;
+            if (actionRequestId_.empty()) showUnsaved_=true;
+            else
+            {
+                Respond(actionRequestId_,false,{{"error","New unsaved edits detected; save before changing levels"}});
+                actionRequestId_.clear(); pendingAction_=Json::object();
+            }
+            return;
+        }
+        const Json action=pendingAction_;
+        const auto request=actionRequestId_;
+        pendingAction_=Json::object(); actionRequestId_.clear(); actionReady_=false;
+        try
+        {
+            const std::string op=action.at("op");
+            Json result;
+            if (action.value("discard",false)) { OpenLevel(source_.filename().string()); audioDraft_=audioConfig_; }
+            if (op=="close") { engine_.RequestExit(); result={{"closing",true}}; }
+            else if (op=="open") { OpenLevel(action.at("file")); result={{"source",source_.string()},{"scene_path",scenePath_}}; }
+            else
+            {
+                RefreshLevels();
+                std::vector<std::wstring> arguments{fs::path(op).wstring()};
+                if (op!="create")
+                {
+                    if (action.at("file")==source_.filename().string() && ReadText(source_)!=sourceSnapshot_)
+                        throw std::runtime_error("Active level changed on disk; reload or reconcile it before changing its project settings");
+                    const auto* level=LevelEntry(action.at("file"));
+                    if (!level) throw std::runtime_error("Level no longer exists");
+                    arguments.insert(arguments.end(),{L"--level",fs::path(level->at("file").get<std::string>()).wstring(),
+                        L"--expected-sha256",fs::path(action.at("expected_sha256").get<std::string>()).wstring()});
+                }
+                for (const char* key : {"name","title"}) if (action.contains(key))
+                    arguments.insert(arguments.end(),{std::wstring(L"--")+fs::path(key).wstring(),fs::path(action.at(key).get<std::string>()).wstring()});
+                if (action.contains("in_bundle")) arguments.insert(arguments.end(),{L"--in-bundle",action.at("in_bundle").get<bool>()?L"true":L"false"});
+                if (op=="delete" && action.at("file")==source_.filename().string())
+                {
+                    const auto replacement=std::find_if(catalog_.at("levels").begin(),catalog_.at("levels").end(),[&](const Json& level) { return level.at("file")!=action.at("file"); });
+                    if (replacement==catalog_.at("levels").end()) throw std::runtime_error("Keep at least one project level; create another before deleting this one");
+                    OpenLevel(replacement->at("file"));
+                }
+                result=ProjectCommand(arguments);
+                catalog_=result.at("catalog"); RegisterLevels();
+                if (op=="create" || op=="duplicate") OpenLevel(result.at("level").at("file"));
+                else if (op=="update")
+                {
+                    if (action.at("file")==source_.filename().string())
+                    {
+                        sourceSnapshot_=ReadText(source_);
+                        if (action.contains("title")) document_["title"]=action.at("title");
+                    }
+                    status_="Updated level settings.";
+                }
+                else { browserLevel_=source_.filename().string(); status_="Level removed. Recoverable copy: "+result.value("backup",std::string(".dev/editor/deleted-levels")); }
+                WriteSession();
+            }
+            Respond(request,true,result);
+        }
+        catch (const std::exception& error) { status_=error.what(); Respond(request,false,{{"error",error.what()}}); }
+    }
     Json* Entity(const std::string& id)
     {
         for (auto& entity : document_["entities"]) if (entity["id"] == id) return &entity;
@@ -229,42 +454,49 @@ class DemoEditor
     Json Layout() const
     {
         Json windows = Json::array();
-        for (const char* name : {"Audio Memory","Viewport","Room Objects","Object Properties","Build & Diagnostics",
+        for (const char* name : {"Levels","Audio Memory","Viewport","Room Objects","Object Properties","Build & Diagnostics",
                                 "Entity List","Selected Entity","Imports","Effects","Background","Image Viewer","Texture Browser","Material Library"})
             if (auto* w = ImGui::FindWindowByName(name))
                 windows.push_back({{"name",name},{"dock_id",w->DockId},{"position",{w->Pos.x,w->Pos.y}},
                                    {"size",{w->Size.x,w->Size.y}},{"active",bool(w->Active)},{"tab_id",w->TabId},{"tab_visible",bool(w->DockTabIsVisible)}});
-        return {{"settings",(queue_/"layout-v2.ini").string()},{"windows",windows}};
+        return {{"settings",(queue_/"layout-project-v1.ini").string()},{"windows",windows}};
     }
     void Respond(const std::string& id, bool ok, Json result)
     {
         if (id.empty()) return;
         AtomicWrite(queue_ / "responses" / (id + ".json"), Json{{"id",id},{"ok",ok},{"result",std::move(result)}}.dump(2));
     }
-    void Save(bool build, const std::string& requestId = {})
+    void Save(bool build, const std::string& requestId = {}, const std::string& play = {})
     {
         if (Busy()) throw std::runtime_error("Build already running");
         jobId_ = requestId;
         jobSnapshot_ = document_.dump(2) + "\n";
         status_ = build ? "Validating content, updating preview and building ROM..." : "Validating and cooking content...";
-        const auto root = root_, queue = queue_, source = source_, output = output_;
+        const auto root = root_, queue = queue_, source = source_;
         const auto snapshot = jobSnapshot_;
-        job_ = std::async(std::launch::async, [root, queue, source, output, snapshot, build]() -> JobResult
+        const auto savedSnapshot=sourceSnapshot_, preset=testStart_;
+        job_ = std::async(std::launch::async, [root, queue, source, snapshot, savedSnapshot, preset, build, play]() -> JobResult
         {
             try
             {
                 const auto stage = queue / "staging" / source.filename();
+                if (ReadText(source)!=savedSnapshot) throw std::runtime_error("Level changed on disk. Your edits are retained; reload or reconcile the saved file before saving.");
                 AtomicWrite(stage, snapshot);
-                const int cooked = Run(root, {L"python", (root/"tools/compile_level.py").wstring(), stage.wstring(), L"--output",output.wstring(), L"--asset-root", (root/"content").wstring()}, queue/"compiler.log");
-                if (cooked) return {false, "Content validation/cook failed. Source and previous valid ROM preserved.\n" + Tail(queue/"compiler.log"), {}};
+                Json cooked=ProjectTool(root,queue,{L"cook",L"--level",source.wstring(),L"--staged",stage.wstring()});
+                if (ReadText(source)!=savedSnapshot) throw std::runtime_error("Level changed during cooking; your edits are retained and the source was not overwritten.");
                 AtomicWrite(source, snapshot);
-                Json report = ReadJson(output / "generated/level_report.json");
-                if (build)
+                Json report=cooked.at("report");
+                if (build || !play.empty())
                 {
-                    const int code = Run(root, {L"python",(root/"tools/build.py").wstring(),L"--level",source.wstring()}, queue/"rom-build.log");
-                    if (code) return {false, "Content saved and cooked; ROM build failed.\n" + Tail(queue/"rom-build.log"), report};
+                    std::vector<std::wstring> arguments{L"python",(root/"tools/build.py").wstring()};
+                    if (play=="menu") arguments.insert(arguments.end(),{L"--bundle",(root/"content/level_bundle.json").wstring()});
+                    else arguments.insert(arguments.end(),{L"--level",source.wstring()});
+                    if (play=="level" && preset!="default") arguments.insert(arguments.end(),{L"--start-preset",fs::path(preset).wstring()});
+                    if (!play.empty()) arguments.push_back(L"--run");
+                    const int code=Run(root,arguments,queue/"rom-build.log");
+                    if (code) return {false,"Content saved and cooked; game build/launch failed.\n"+Tail(queue/"rom-build.log"),report,cooked};
                 }
-                return {true, build ? "Saved, cooked, and built ROM. See build outputs and log." : "Saved canonical content and refreshed LightEngine preview.", report};
+                return {true,!play.empty()?"Saved content and launched the game in Ares.":build?"Saved, cooked, and built ROM.":"Saved content and refreshed the preview.",report,cooked};
             }
             catch (const std::exception& error) { return {false,error.what(),{}}; }
         });
@@ -279,7 +511,25 @@ class DemoEditor
             report_ = result.report;
             dirty_ = document_.dump(2) + "\n" != jobSnapshot_;
             if (!dirty_) structureDirty_ = false;
+            sourceSnapshot_=jobSnapshot_;
+            InvalidatePreviewAssets(result.project);
+            try { RefreshLevels(); }
+            catch (const std::exception& error)
+            {
+                result.ok=false; result.message+="\nSaved, but the project catalog could not refresh: "+std::string(error.what()); status_=result.message;
+            }
             reloadPreview_ = true;
+        }
+        if (continueAfterSave_)
+        {
+            continueAfterSave_=false;
+            if (result.ok && !HasUnsaved())
+            {
+                if (pendingAction_.value("file",std::string())==source_.filename().string())
+                    if (const auto* level=LevelEntry(source_.filename().string())) pendingAction_["expected_sha256"]=level->at("source_sha256");
+                actionReady_=true;
+            }
+            else { pendingAction_=Json::object(); actionRequestId_.clear(); }
         }
         Respond(jobId_, result.ok, {{"message",result.message},{"report",result.report}});
         jobId_.clear();
@@ -847,15 +1097,34 @@ class DemoEditor
                 if (request.at("expires_at").get<double>() < now) throw std::runtime_error("Request expired without execution");
                 const std::string op = request.at("op");
                 const Json args = request.value("args",Json::object());
-                if (op == "inspect") { Respond(id,true,{{"document",document_},{"source",source_.string()},{"output",output_.string()},{"dirty",dirty_},{"busy",Busy()},{"status",status_},{"report",report_},{"enemy_types",EnemyTypes()},{"prefabs",prefabs_},{"preview_refresh_pending",structureDirty_},{"audio",AudioState()}}); continue; }
+                if (op == "inspect") { Respond(id,true,{{"document",document_},{"source",source_.string()},{"output",output_.string()},{"scene_path",scenePath_},{"catalog",catalog_},{"pending_action",pendingAction_},{"dirty",dirty_},{"busy",Busy()},{"status",status_},{"report",report_},{"enemy_types",EnemyTypes()},{"prefabs",prefabs_},{"preview_refresh_pending",structureDirty_},{"audio",AudioState()}}); continue; }
                 if (op == "get_audio_memory") { Respond(id,true,AudioState()); continue; }
                 if (op == "get_layout") { Respond(id,true,Layout()); continue; }
                 if (op == "reset_layout") { engine_.ResetEditorLayout(); Respond(id,true,{{"scheduled",true}}); continue; }
                 if (Busy()) throw std::runtime_error("Editor build is busy; inspect remains available");
+                if (!pendingAction_.empty()) throw std::runtime_error("A level action needs attention; inspect remains available");
                 if (op == "quit")
                 {
                     if (dirty_ || audioDraft_ != audioConfig_) throw std::runtime_error("Unsaved scene or planning changes; save/apply or discard before closing");
                     Respond(id,true,{{"closing",true}}); engine_.RequestExit();
+                }
+                else if (op=="list_levels") { RefreshLevels(); Respond(id,true,catalog_); }
+                else if (op=="open_level" || op=="create_level" || op=="duplicate_level" || op=="delete_level" || op=="update_level")
+                {
+                    Json action=args;
+                    action["op"]=op=="open_level"?"open":op=="create_level"?"create":op=="duplicate_level"?"duplicate":op=="delete_level"?"delete":"update";
+                    if (action.contains("discard")) throw std::runtime_error("Discard requires the editor's explicit unsaved-changes dialog");
+                    if (op=="delete_level" && !action.value("confirmed",false)) throw std::runtime_error("Deleting a level requires confirmed: true; its saved source is archived");
+                    QueueAction(action,id);
+                }
+                else if (op=="play_level" || op=="play_menu")
+                {
+                    if (audioDraft_!=audioConfig_) throw std::runtime_error("Apply or discard audio planning changes before playing");
+                    const std::string preset=args.value("start_preset",std::string("default"));
+                    bool found=preset=="default";
+                    for (const auto& start : document_.value("test_starts",Json::array())) if (start.at("id")==preset) found=true;
+                    if (!found) throw std::runtime_error("Unknown test start");
+                    testStart_=preset; Save(true,id,op=="play_menu"?"menu":"level");
                 }
                 else if (op == "set_entity") { SetEntity(args); Respond(id,true,{{"entity",*Entity(args.at("id"))},{"dirty",true},{"validation","pending save"}}); }
                 else if (op == "import_asset_pack") Respond(id,true,ImportAssetPack(args));
@@ -899,10 +1168,7 @@ class DemoEditor
                 }
                 else if (op == "reload")
                 {
-                    if (dirty_) throw std::runtime_error("Unsaved changes; save before reloading");
-                    document_ = ReadJson(source_); reloadPreview_ = true;
-                    prefabs_ = Json::array(); selectedPrefab_.clear();
-                    Respond(id,true,{{"reloaded",true}});
+                    QueueAction({{"op","open"},{"file",source_.filename().string()}},id);
                 }
                 else throw std::runtime_error("Unknown operation");
             }
@@ -921,6 +1187,104 @@ class DemoEditor
         if (kind=="control") return IM_COL32(84,224,139,255);
         if (kind=="light") return IM_COL32(246,174,65,255);
         return IM_COL32(197,190,232,255);
+    }
+    void DrawLevels()
+    {
+        if (ImGui::Begin("Levels"))
+        {
+            ImGui::BeginDisabled(Busy() || !pendingAction_.empty());
+            if (ImGui::Button("Refresh")) try { RefreshLevels(); } catch (const std::exception& e) { status_=e.what(); }
+            ImGui::TextWrapped("Open a level to edit it. Checked levels appear in the game menu.");
+            ImGui::BeginChild("Level list",ImVec2(0,230),ImGuiChildFlags_Borders);
+            for (const auto& level : catalog_.at("levels"))
+            {
+                const std::string file=level.at("file"), title=LevelLabel(level.at("title"));
+                const bool current=file==source_.filename().string();
+                const std::string label=(current?"> ":"")+title+(current&&dirty_?" *":"")+"##"+file;
+                if (ImGui::Selectable(label.c_str(),browserLevel_==file,ImGuiSelectableFlags_AllowDoubleClick))
+                {
+                    browserLevel_=file;
+                    if (ImGui::IsMouseDoubleClicked(0)) try { QueueAction({{"op","open"},{"file",file}}); } catch (const std::exception& e) { status_=e.what(); }
+                }
+                if (ImGui::IsItemHovered()) ImGui::SetTooltip("%s",file.c_str());
+            }
+            ImGui::EndChild();
+            const auto* selected=LevelEntry(browserLevel_);
+            if (ImGui::Button("New level")) { newDuplicate_=false; showNew_=true; }
+            ImGui::SameLine();
+            ImGui::BeginDisabled(!selected);
+            if (ImGui::Button("Duplicate")) { newDuplicate_=true; showNew_=true; }
+            if (ImGui::Button("Open")) try { QueueAction({{"op","open"},{"file",browserLevel_}}); } catch (const std::exception& e) { status_=e.what(); }
+            ImGui::SameLine(); if (ImGui::Button("Delete")) showDelete_=true;
+            if (selected)
+            {
+                ImGui::TextWrapped("%s",browserLevel_.c_str());
+                bool included=selected->at("in_bundle");
+                if (ImGui::Checkbox("Include in game menu",&included))
+                    try { QueueAction({{"op","update"},{"file",browserLevel_},{"in_bundle",included}}); } catch (const std::exception& e) { status_=e.what(); }
+            }
+            ImGui::EndDisabled();
+            ImGui::Separator();
+            ImGui::TextWrapped("Editing: %s",source_.filename().string().c_str());
+            char title[81]{};
+            const auto currentTitle=document_.at("title").get<std::string>();
+            std::copy_n(currentTitle.data(),std::min(currentTitle.size(),sizeof(title)-1),title);
+            ImGui::SetNextItemWidth(-1);
+            if (ImGui::InputText("##Level title",title,sizeof(title))) { document_["title"]=title; dirty_=true; }
+            ImGui::TextDisabled("Level title (Save + Cook to apply)");
+            ImGui::EndDisabled();
+        }
+        ImGui::End();
+        if (showNew_) { ImGui::OpenPopup("Create level"); showNew_=false; }
+        if (ImGui::BeginPopupModal("Create level",nullptr,ImGuiWindowFlags_AlwaysAutoResize))
+        {
+            ImGui::TextUnformatted(newDuplicate_?"Duplicate the selected saved level":"Start with a small playable room");
+            ImGui::InputText("Source name",newName_,sizeof(newName_));
+            ImGui::InputText("Title",newTitle_,sizeof(newTitle_));
+            ImGui::Checkbox("Include in game menu",&newInBundle_);
+            if (ImGui::Button("Create"))
+            {
+                try
+                {
+                    Json action{{"op",newDuplicate_?"duplicate":"create"},{"name",newName_},{"title",newTitle_},{"in_bundle",newInBundle_}};
+                    if (newDuplicate_) action["file"]=browserLevel_;
+                    QueueAction(action); ImGui::CloseCurrentPopup();
+                }
+                catch (const std::exception& e) { status_=e.what(); }
+            }
+            ImGui::SameLine(); if (ImGui::Button("Cancel")) ImGui::CloseCurrentPopup();
+            ImGui::EndPopup();
+        }
+        if (showDelete_) { ImGui::OpenPopup("Delete level?"); showDelete_=false; }
+        if (ImGui::BeginPopupModal("Delete level?",nullptr,ImGuiWindowFlags_AlwaysAutoResize))
+        {
+            ImGui::Text("Delete %s?",browserLevel_.c_str());
+            ImGui::TextUnformatted("Remove this level from the project and game menu.\nA recoverable copy goes to .dev/editor/deleted-levels.\nShared models and textures are kept.");
+            if (ImGui::Button("Delete level"))
+                try { QueueAction({{"op","delete"},{"file",browserLevel_}}); ImGui::CloseCurrentPopup(); } catch (const std::exception& e) { status_=e.what(); }
+            ImGui::SameLine(); if (ImGui::Button("Cancel")) ImGui::CloseCurrentPopup();
+            ImGui::EndPopup();
+        }
+        if (showUnsaved_) { ImGui::OpenPopup("Unsaved changes"); showUnsaved_=false; }
+        if (ImGui::BeginPopupModal("Unsaved changes",nullptr,ImGuiWindowFlags_AlwaysAutoResize))
+        {
+            ImGui::Text("Save changes to %s before continuing?",source_.filename().string().c_str());
+            if (audioDraft_!=audioConfig_) ImGui::TextUnformatted("Audio planning changes will also be applied or discarded.");
+            if (ImGui::Button("Save and continue"))
+            {
+                try
+                {
+                    if (audioDraft_!=audioConfig_) RecalculateAudio(audioDraft_,true);
+                    Save(false); continueAfterSave_=true; ImGui::CloseCurrentPopup();
+                }
+                catch (const std::exception& e) { status_=e.what(); }
+            }
+            ImGui::SameLine();
+            if (ImGui::Button("Discard and continue")) { pendingAction_["discard"]=true; actionReady_=true; ImGui::CloseCurrentPopup(); }
+            ImGui::SameLine();
+            if (ImGui::Button("Cancel")) { pendingAction_=Json::object(); actionRequestId_.clear(); ImGui::CloseCurrentPopup(); }
+            ImGui::EndPopup();
+        }
     }
     void DrawObjects()
     {
@@ -1263,7 +1627,22 @@ class DemoEditor
         {
             ImGui::BeginDisabled(Busy());
             if (ImGui::Button("Save + Cook")) Save(false);
-            ImGui::SameLine(); if (ImGui::Button("Build ROM")) Save(true);
+            ImGui::SameLine(); if (ImGui::Button("Play level")) Save(true,{},"level");
+            ImGui::SameLine(); if (ImGui::Button("Play game menu")) Save(true,{},"menu");
+            std::string startLabel="Default spawn";
+            for (const auto& start : document_.value("test_starts",Json::array()))
+                if (start.at("id")==testStart_) startLabel=start.value("label",testStart_);
+            if (ImGui::BeginCombo("Test start",startLabel.c_str()))
+            {
+                if (ImGui::Selectable("Default spawn",testStart_=="default")) testStart_="default";
+                for (const auto& start : document_.value("test_starts",Json::array()))
+                {
+                    const std::string id=start.at("id");
+                    if (ImGui::Selectable(start.value("label",id).c_str(),testStart_==id)) testStart_=id;
+                }
+                ImGui::EndCombo();
+            }
+            if (ImGui::Button("Build ROM only")) Save(true);
             ImGui::EndDisabled();
             ImGui::SameLine(); if (ImGui::Button("Reset Layout")) engine_.ResetEditorLayout();
             ImGui::SameLine(); ImGui::TextUnformatted(Busy()?"Working...":dirty_?"Unsaved changes":"Saved");
@@ -1273,7 +1652,7 @@ class DemoEditor
             {
                 const Json counts = report_.value("counts",Json::object());
                 ImGui::Text("Cook %.2f ms | %d models | %d triangles | %d geometry bytes",report_.value("elapsed_ms",0.0),counts.value("models",0),counts.value("instanced_triangles",0),report_.value("compiled_geometry_bytes",0));
-                ImGui::TextWrapped("Build ROM saves and builds this level. Launch the same level in Ares with its Build + Play VS Code task. Check gameplay and lighting in the game; Audio Memory saves a separate planning estimate.");
+                ImGui::TextWrapped("Play saves this level before launching Ares. Play game menu bundles the saved levels checked in Levels. Audio Memory is a separate planning estimate.");
             }
             if (ImGui::CollapsingHeader("Last compiler log")) ImGui::TextUnformatted(Tail(queue_/"compiler.log").c_str());
             if (ImGui::CollapsingHeader("Last ROM build log")) ImGui::TextUnformatted(Tail(queue_/"rom-build.log").c_str());
@@ -1392,12 +1771,15 @@ class DemoEditor
     }
     void Draw()
     {
+        DrawLevels();
+        ImGui::BeginDisabled(!pendingAction_.empty());
         DrawObjects(); DrawProperties(); DrawBuild(); DrawAudio();
+        ImGui::EndDisabled();
         // Startup warm-up frames can precede custom panel creation. Select our
         // authoring tabs once they exist, only after a default/reset layout.
         if (focusProjectTabs)
         {
-            for (const char* name : {"Room Objects","Object Properties","Build & Diagnostics","Audio Memory"})
+            for (const char* name : {"Levels","Room Objects","Object Properties","Build & Diagnostics","Audio Memory"})
                 if (auto* window = ImGui::FindWindowByName(name); window && window->DockNode)
                 {
                     window->DockNode->SelectedTabId = window->TabId;
@@ -1407,7 +1789,6 @@ class DemoEditor
             focusProjectTabs = false;
             ImGui::MarkIniSettingsDirty();
         }
-        if (!Busy() && ImGui::GetIO().KeyCtrl && ImGui::IsKeyPressed(ImGuiKey_S,false)) Save(false);
     }
 };
 } // namespace
@@ -1424,7 +1805,7 @@ int main(int argc, char** argv)
         }
         fs::current_path(root);
         const fs::path source = argc>2 ? fs::absolute(argv[2]) : root/"content/first_room.json";
-        DemoEditor editor(root,source);
+        DemoEditor editor(root,source,argc>2);
         editor.Initialize();
         editor.Loop();
         return 0;

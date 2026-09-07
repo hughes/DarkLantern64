@@ -3,7 +3,10 @@
 
 Examples:
   python tools/editorctl.py inspect
-  python tools/editorctl.py inspect --level content/moonlit_courtyard.json
+  python tools/editorctl.py list_levels
+  python tools/editorctl.py open_level --args-file open-level.json
+  python tools/editorctl.py play_level --timeout 180
+  python tools/editorctl.py play_menu --timeout 180
   python tools/editorctl.py set_entity --args '{"id":"store-guard","patch":{"speed":1.1}}'
   python tools/editorctl.py import_asset_pack --args-file asset-pack-import.json
   python tools/editorctl.py add_prop --args-file prop-placement.json
@@ -21,6 +24,11 @@ Examples:
   python tools/editorctl.py set_audio_config --args-file audio-patch.json
   python tools/editorctl.py recalculate_audio
 There is no evaluation or arbitrary command operation. Arguments are JSON data.
+The default queue follows the project editor's active level. open_level takes
+{"file":"moonlit_courtyard.json"}; create_level takes name/title/in_bundle;
+duplicate_level also takes file. delete_level requires file and confirmed:true.
+Unsaved edits must be saved before command-driven switching. --level targets
+an isolated diagnostic editor only; it does not select a level in the project UI.
 add_prop accepts an optional loot_highlight boolean (default false); set_entity
 can patch loot_highlight on a static model prop. Save + Cook before playing to
 see its gentle brightness pulse in the N64 game.
@@ -34,7 +42,7 @@ import time
 import uuid
 
 ROOT = Path(__file__).resolve().parents[1]
-OPERATIONS = ("inspect", "import_asset_pack", "add_prop", "set_entity", "add_enemy", "duplicate_enemy", "add_waypoint", "delete_entity",
+OPERATIONS = ("inspect", "list_levels", "open_level", "create_level", "duplicate_level", "delete_level", "update_level", "play_level", "play_menu", "import_asset_pack", "add_prop", "set_entity", "add_enemy", "duplicate_enemy", "add_waypoint", "delete_entity",
               "set_environment", "set_material", "set_preview_transform", "save", "build", "capture",
               "get_layout", "reset_layout", "reload", "get_audio_memory", "set_audio_config",
               "recalculate_audio", "quit")
@@ -45,7 +53,7 @@ def command_queue(root, level=None):
     root = Path(root).resolve()
     queue = root / ".dev/editor"
     if level is None:
-        return queue
+        return queue / "project"
     level = Path(level)
     source = (level if level.is_absolute() else root / level).resolve()
     if source.parent != (root / "content").resolve() or source.suffix != ".json":
@@ -64,7 +72,7 @@ def main():
     parser.add_argument("--args-file", type=Path, help="Read JSON arguments from a file (avoids shell quoting)")
     parser.add_argument("--timeout", type=float, default=30)
     parser.add_argument("--root", type=Path, default=ROOT)
-    parser.add_argument("--level", type=Path, help="Target the editor for this content/*.json level; relative paths use --root")
+    parser.add_argument("--level", type=Path, help="Target an isolated diagnostic editor launched with --level; default targets the project editor")
     parsed = parser.parse_args()
     try:
         arguments = json.loads(parsed.args_file.read_text(encoding="utf-8") if parsed.args_file else parsed.args)

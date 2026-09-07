@@ -8,7 +8,7 @@ Our development approach is to extend **LightEngine** into a productive content 
 
 **Full 3D:** reusable model assets, arbitrary XYZ transforms, varying heights, and freely placed geometry. See the [accepted world decision](docs/decisions/0002-full-3d-world.md).
 
-**Creating levels?** Start with the [creator quickstart](docs/creator-guide.md): open the editor, place and tune content, then build and play using the included VS Code tasks.
+**Creating levels?** Start with the [creator quickstart](docs/creator-guide.md): launch the project editor, manage levels in its **Levels** panel, and use **Play level** or **Play game menu** to test your changes.
 
 **Creating models?** The [Blender asset guide](docs/blender-assets.md) covers the editable loot set, exporter, material budget, prefab placement, and a direct launch at the courtyard's loot counter.
 
@@ -18,13 +18,13 @@ Our development approach is to extend **LightEngine** into a productive content 
 
 The current development host is Windows. Install Python 3.11+ with Pillow (`python -m pip install Pillow`), the Windows libdragon SDK from our fork (default `C:\n64-toolchain`, or set `N64_INST`), and Ares. Open Ares once so it creates its settings file. MSYS2/MinGW GCC is needed for host simulation tests.
 
+VS Code has two project tasks: **DarkLantern64: Launch editor** and **DarkLantern64: Launch game**. The game task (also **Ctrl+Shift+B**) builds saved levels included in `content/level_bundle.json` and opens the level selector. Save editor edits first when using that task. Within the editor, **Play level** saves and cooks the current level before a direct launch; **Play game menu** saves it before building the bundle.
+
 ```powershell
-.\build.ps1 -Test          # content validation and portable gameplay tests
-.\build.ps1 -Run           # cook, build build/DarkLantern64.z64, launch Ares
-.\build.ps1 -Autoplay      # build the input replay variant
-python tools/smoke_ares.py # exercise 4 MiB startup and 8 MiB mission replay
-python tools/build.py --level content/moonlit_courtyard.json --run # textured night study
+python tools/build.py --bundle content/level_bundle.json --run
 ```
+
+Direct launches, Blender export, profiling, captures and verification remain available as commands in the [developer tools guide](docs/developer-tools.md).
 
 N64 controller: the **stick looks left/right/up/down** (push up to look up); **C-Up/Down move forward/backward**, and **C-Left/Right strafe**. Z crouches, L jumps, A interacts, B makes noise, R restarts, and Start toggles debug. The D-pad also provides digital look controls.
 
@@ -35,16 +35,17 @@ For the LightEngine editor, also install Bazelisk, the Visual Studio C++ build t
 ```powershell
 python tools/setup_editor.py # fetch the pinned LightEngine revision if missing
 .\build.ps1 -Editor -Run
-python tools/editorctl.py inspect
 ```
 
-The engine revision is recorded in [dependencies.json](dependencies.json). Project layouts and the saved-tab startup fix have both merged into LightEngine through [PR #14](https://github.com/hughes/LightEngine/pull/14) and [PR #15](https://github.com/hughes/LightEngine/pull/15). The project retains its tested, published revision; setup checks an existing checkout without resetting it. See the [editor guide](editor/README.md) and [workflow](docs/workflow.md) for editing and automation.
+The engine revision is recorded in [dependencies.json](dependencies.json). Project layouts and the saved-tab startup fix merged through [PR #14](https://github.com/hughes/LightEngine/pull/14) and [PR #15](https://github.com/hughes/LightEngine/pull/15). Project level registration and guarded Open/Save/Close are published for review in [PR #16](https://github.com/hughes/LightEngine/pull/16); this project pins that tested revision. Setup checks an existing checkout without resetting it. See the [editor guide](editor/README.md) and [workflow](docs/workflow.md) for editing and automation.
 
 ## Start here
 
 | Document | Purpose |
 | --- | --- |
 | [Creator quickstart](docs/creator-guide.md) | A short hands-on guide for artists and level/game designers. |
+| [Developer tools](docs/developer-tools.md) | Command recipes for Blender export, direct launches, profiling, captures and verification. |
+| [Project workflow verification](docs/project-workflow-verification.md) | Tested level management, editor game launches, and the horizontal camera correction. |
 | [Level select and test starts](docs/level-select.md) | Bundle levels into one ROM, switch during testing, or launch directly into a named starting state. |
 | [Enemy authoring](docs/enemy-authoring.md) | Place multiple enemies, choose code-defined types, and author independent patrols or sentry posts. |
 | [Vision](docs/vision.md) | Game pillars, collaboration, and scope. |
@@ -66,6 +67,6 @@ The engine revision is recorded in [dependencies.json](dependencies.json). Proje
 
 ## Project status
 
-Prototype implementation in progress, dated 2026-09-05. The repository now contains a portable gameplay module, N64 runtime, content compiler, LightEngine editor application, and build/debug tools. Placeholder mesh assets are authored in `content/`; generated outputs are kept in ignored `build/` and `.dev/` directories.
+Prototype implementation in progress, dated 2026-09-06. The repository now contains a portable gameplay module, N64 runtime, content compiler, LightEngine project editor, and build/debug tools. Placeholder mesh assets are authored in `content/`; generated outputs are kept in ignored `build/` and `.dev/` directories.
 
 The 3D renderer uses CPU transforms and RDP hardware triangles/depth, with flat-color or textured models. The courtyard adds colored vertex lighting, occlusion, emissive surfaces and fog; its source texture pixels are cooked into the ROM. Collision uses upright rotated boxes; sloped mesh collision, animated assets, richer navigation, and SDK provisioning remain future work. Original N64 and M64 validation is **pending**. See [First playable](docs/first-playable.md) for acceptance details.

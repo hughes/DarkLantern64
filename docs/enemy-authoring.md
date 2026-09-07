@@ -1,6 +1,6 @@
 # Enemy placement and behavior
 
-Designers place enemies, choose their type, and author their routes in Room Workshop. Code defines reusable enemy types. Save + Cook carries these choices through the LightEngine preview and generated N64 level data; Build ROM includes the result in the game.
+Designers place enemies, choose their type, and author their routes in the project editor. Code defines reusable enemy types. Save + Cook carries these choices through the LightEngine preview and generated N64 level data; Play level builds and launches the result in the game.
 
 ## Try the workshop
 
@@ -8,15 +8,16 @@ The separate [Enemy Patrol Workshop](../content/enemy_patrols.json) contains the
 
 ![Three independently placed placeholder enemies in the LightEngine viewport](images/enemy-workshop-editor.png)
 
-Use the VS Code tasks **Open enemy workshop**, **Save + Cook enemy workshop**, and **Build + Play enemy workshop**, or run:
+Use **DarkLantern64: Launch editor**, then open **Enemy Patrol Workshop** through **Levels**. Edit enemies and routes, then use **Play level** to save, cook and launch the result. Equivalent command-line access remains available:
 
 ```powershell
-python tools/build.py --editor --run --level content/enemy_patrols.json
-python tools/editorctl.py save --level content/enemy_patrols.json
+python tools/build.py --editor --run
+# Open Enemy Patrol Workshop in Levels before saving
+python tools/editorctl.py save
 python tools/build.py --run --level content/enemy_patrols.json
 ```
 
-Save and close an old editor before rebuilding that same editor executable on Windows. The enemy workshop uses the separate scene-editor executable, so the original Lantern Store editor can remain open. See the [creator guide](creator-guide.md#place-enemies-and-author-patrols) for the placement steps.
+Save and close an old editor before rebuilding that same editor executable on Windows. Keep one project editor open and switch levels inside it. See the [creator guide](creator-guide.md#place-enemies-and-author-patrols) for the placement steps.
 
 ## What designers control
 
@@ -52,7 +53,7 @@ The runtime stores a bounded array of enemy state alongside one shared player an
 
 ## Verification
 
-`python tools/build.py --test` covers compiler contracts, independent runtime behavior, the original input-only mission and existing profiling/culling tests. `python tools/verify_enemy_editor.py` starts its own built scene editor on a new content file, exercises creation, route duplication, sentry conversion, safe deletion, defaults and gizmo persistence, then saves evidence under that scene's `.dev/editor/scenes/` directory. It never overwrites existing source or closes another editor. The generated test content is retained for inspection.
+`python tools/build.py --test` covers compiler contracts, independent runtime behavior, the original input-only mission and existing profiling/culling tests. `python tools/verify_enemy_editor.py` starts its own built scene editor on a new content file, exercises creation, route duplication, sentry conversion, safe deletion, defaults and gizmo persistence, then saves evidence under that scene's `.dev/editor/scenes/` directory. It never overwrites existing source or closes another editor. On success or failure, it archives the generated test content under the session's `evidence/` directory and removes its owned source from `content/`.
 
 `python tools/smoke_ares.py` verifies the original mission and Expansion Pak gate. `python tools/smoke_enemies.py` verifies that both workshop patrols move through their own route indices while the undisturbed sentry stays at its post in the ordinary ROM. `python tools/capture_ares.py --level content/enemy_patrols.json` exports two authored N64 views of the populated workshop. Captures freeze simulation and are not movement or performance measurements. Original N64 and M64 validation remains pending.
 

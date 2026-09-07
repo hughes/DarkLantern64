@@ -6,7 +6,9 @@ A bundle puts several saved levels in one N64 ROM. It can open a level-select sc
 
 ## Build and launch
 
-In VS Code, run **DarkLantern64: Build + Play level select**. Save + Cook each open workshop first; the bundle reads saved source files. Existing per-level Build + Play tasks continue to launch that level directly.
+In the editor, use **Play game menu** to save and cook the open level, build the included levels, and launch the selector. Use **Play level** for a direct launch at the **Test start** chosen in **Build & Diagnostics**.
+
+From VS Code, **DarkLantern64: Launch game** builds the saved bundle and opens its selector. **Save + Cook first** when using this task; it reads files on disk. Level selection lives in the editor and game menu, so there are no separate tasks for each level or test start.
 
 ```powershell
 # All three levels, starting at the selector
@@ -22,7 +24,7 @@ python tools/build.py --bundle content/level_bundle.json --start-level enemy-wor
 python tools/build.py --level content/enemy_patrols.json --start-preset scout-observation --run
 ```
 
-The PowerShell wrapper also accepts `-Bundle`, `-Level`, `-StartLevel`, and `-StartPreset`. For example, `./build.ps1 -Bundle content/level_bundle.json -Run` opens the selector. **Build + Play test start** offers a VS Code picker for the two example starts in Enemy Patrol Workshop.
+The PowerShell wrapper also accepts `-Bundle`, `-Level`, `-StartLevel`, and `-StartPreset`. For example, `./build.ps1 -Bundle content/level_bundle.json -Run` opens the selector.
 
 Build output names include the bundle, selected level and preset. This keeps a menu ROM and a directly launched testing ROM separate. The build report prints the actual ROM path. The existing no-argument build remains a direct launch into The Lantern Store.
 
@@ -39,9 +41,15 @@ During play, **hold Z and press Start** to return to the selector. Gameplay paus
 
 With the provided keyboard mapping, arrows select menu entries, **E** or **Tab** launches, and **N** resumes. **Z + Tab** opens the selector during play. In a standalone level ROM, this menu still provides that level's default spawn and any test starts.
 
-## Define a bundle
+## Manage levels and menu membership
 
-Edit [content/level_bundle.json](../content/level_bundle.json). Each entry assigns a stable ID to a source JSON directly inside `content/`:
+Open **DarkLantern64: Launch editor** and use **Levels** to open, create, duplicate, retitle or delete levels. **New level** starts a small room with a spawn, switch, door and objective; **Duplicate** copies the selected saved level. The project lists levels directly inside `content/`, including work in progress excluded from the game menu. The **Include in game menu** checkbox updates [content/level_bundle.json](../content/level_bundle.json). Excluded levels still support **Play level**. New and duplicated levels default to inclusion; uncheck that option when creating more levels than the eight-entry game menu can hold.
+
+Deletion archives the saved source under `.dev/editor/deleted-levels/` and removes its bundle entry. It leaves shared assets in place. The editor prevents deleting the last project level and deleting or excluding the last bundled level. Unsaved edits prompt for save/discard/cancel before changing levels; deletion has a separate confirmation.
+
+## Bundle file format
+
+For manual changes, save and close the editor before editing [content/level_bundle.json](../content/level_bundle.json). Each entry assigns a stable ID to a source JSON directly inside `content/`:
 
 ```json
 {
@@ -96,6 +104,6 @@ Only the active level has loaded texture sprites and lighting caches. Fresh laun
 - Repeated texture/cache swaps reach a stable heap size for the same start.
 - Bundle and standalone builds can bypass the menu into a named start.
 
-It saves hashes, logs, per-start heap samples and the actual N64 menu framebuffer under `build/bundle-smoke.json`. **DarkLantern64: Verify level switching** runs the same check from VS Code. The diagnostic menu script is compiled only with `--menu-test`; normal ROMs use controller input. Existing capture, mission replay and scale diagnostics remain standalone level builds. Original N64 and M64 checks are still pending.
+It saves hashes, logs, per-start heap samples and the actual N64 menu framebuffer under `build/bundle-smoke.json`. These specialist checks are listed in [developer tools](developer-tools.md). The diagnostic menu script is compiled only with `--menu-test`; normal ROMs use controller input. Existing capture, mission replay and scale diagnostics remain standalone level builds. Original N64 and M64 checks are still pending.
 
 The [2026-09-05 verification record](level-select-results.json) passed 85 Python tests, 26 gameplay groups, launcher/profiler/culling checks, and the original Ares mission replay. The bundled diagnostic exercised 30 fresh starts/restarts and 15 resumes. Heap usage after preparation was stable across all repetitions: 614,120 bytes for the store/workshop and 668,760 bytes for the textured yard. These heap values exclude the static image, stacks and other non-heap memory. The ordinary three-level ROM is 327,680 bytes; its static image is 572,592 bytes, including 24,156 bytes of compiled geometry arrays.

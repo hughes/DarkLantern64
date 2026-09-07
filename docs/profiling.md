@@ -6,9 +6,9 @@ The [first measured baseline](profiling-baseline.md) records the automated route
 
 ## Record and read a session
 
-1. Close the previous game window, then run **DarkLantern64: Build + Play game** in VS Code, or `python tools/build.py --run` from the repository folder.
+1. Close the previous game window, then use the editor's **Play level**, or run **DarkLantern64: Launch game** in VS Code and select a saved level. `python tools/build.py --run` still launches the saved Lantern Store directly from the repository folder.
 2. Play through the area you want to measure for several seconds. **Start** on the controller, or **Tab** on the keyboard, toggles the debug display. Profiling records continue with debug off.
-3. Run **DarkLantern64: Report game profile**, or:
+3. In a terminal at the repository root, run:
 
    ```powershell
    python tools/profile_report.py

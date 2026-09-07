@@ -1,8 +1,10 @@
 """Exercise enemy authoring through an isolated, real LightEngine editor.
 
-Requires the scene-editor executable to have been built. Creates a new content
-file (never overwrites one), saves a three-enemy example, and records evidence.
-Existing editors, emulator sessions and controller settings are untouched.
+Requires the scene-editor executable to have been built. Creates a private
+content fixture, exercises a three-enemy example, then archives its JSON under
+the session queue's evidence/ directory and removes only the source it created.
+Cleanup also runs on failure. Existing content, editors, emulator sessions and
+controller settings are untouched.
 """
 from __future__ import annotations
 
@@ -41,19 +43,8 @@ def request(queue, operation, arguments=None, *, timeout=90, expect_ok=True):
     raise TimeoutError(f"{operation}: inspect {response} before retrying")
 
 
-def verify(executable, source):
-    source = source.resolve()
-    queue = command_queue(ROOT, source)
-    if source.exists():
-        raise ValueError("Choose a new filename; existing content will never be overwritten")
-    data = json.loads((ROOT / "content/first_room.json").read_text())
-    data["title"] = "Enemy Patrol Workshop"
-    # Two camera positions let the N64 capture tool inspect both occupied rooms.
-    data["views"] = [
-        {"id": "workroom-scout", "position": [-6, 0, 2.7], "yaw": 180, "pitch": -4},
-        {"id": "store-watch", "position": [4.5, 0, -6.5], "yaw": 12, "pitch": -2},
-    ]
-    source.write_text(json.dumps(data, indent=2) + "\n", encoding="utf-8")
+def _exercise(executable, source, queue):
+    data = json.loads(source.read_text(encoding="utf-8"))
     output = ROOT / "build/scenes" / source.stem
     compile_level(source, output)
     queue.mkdir(parents=True, exist_ok=True)
@@ -132,8 +123,73 @@ def verify(executable, source):
         finally:
             if process.poll() is None:
                 process.terminate()
-                process.wait(timeout=15)
+                try:
+                    process.wait(timeout=15)
+                except subprocess.TimeoutExpired:
+                    process.kill()
+                    process.wait(timeout=15)
             (queue / "enemy-verification.json").write_text(json.dumps(evidence, indent=2) + "\n")
+    return evidence
+
+
+def archive_owned_source(source, queue):
+    """Archive an exclusively created fixture; never follow a replacement link."""
+    source, queue = Path(source).absolute(), Path(queue).absolute()
+    content = (ROOT / "content").resolve()
+    if source.resolve() != source or source.parent != content or source.suffix != ".json":
+        raise ValueError("Refusing to clean a fixture outside the canonical content directory")
+    if queue.resolve() != queue or not queue.is_relative_to((ROOT / ".dev/editor").resolve()):
+        raise ValueError("Refusing to archive outside the editor evidence directory")
+    if not source.exists():
+        return None
+    raw = source.read_bytes()
+    archive = queue / "evidence" / uuid.uuid4().hex / source.name
+    archive.parent.mkdir(parents=True, exist_ok=False)
+    with archive.open("xb") as stream:
+        stream.write(raw)
+    if source.resolve() != source or source.read_bytes() != raw:
+        raise ValueError("Fixture changed while archiving; retained its source and archived snapshot")
+    source.unlink()
+    return str(archive)
+
+
+def verify(executable, source):
+    source = Path(source).absolute()
+    if source.resolve() != source:
+        raise ValueError("Fixture source must not use a symlink or junction")
+    queue = command_queue(ROOT, source)
+    if source.exists():
+        raise ValueError("Choose a new filename; existing content will never be overwritten")
+    data = json.loads((ROOT / "content/first_room.json").read_text())
+    data["title"] = "Enemy Patrol Workshop"
+    data["views"] = [
+        {"id": "workroom-scout", "position": [-6, 0, 2.7], "yaw": 180, "pitch": -4},
+        {"id": "store-watch", "position": [4.5, 0, -6.5], "yaw": 12, "pitch": -2},
+    ]
+    owned = False
+    evidence = {"passed": False, "source": str(source), "checks": []}
+    report = queue / "enemy-verification.json"
+    try:
+        # Exclusive creation is the ownership boundary. A simultaneous creator
+        # wins without this verifier overwriting or later deleting their file.
+        with source.open("x", encoding="utf-8") as stream:
+            owned = True
+            stream.write(json.dumps(data, indent=2) + "\n")
+        queue.mkdir(parents=True, exist_ok=True)
+        report.write_text(json.dumps(evidence, indent=2) + "\n", encoding="utf-8")
+        evidence = _exercise(executable, source, queue)
+    except BaseException as error:
+        if owned and report.exists():
+            evidence = json.loads(report.read_text(encoding="utf-8"))
+        evidence["error"] = str(error)
+        raise
+    finally:
+        if owned:
+            # _exercise closes its owned editor before unwinding here; early
+            # compiler/launch failures are archived through the same path.
+            evidence["archived_source"] = archive_owned_source(source, queue)
+            evidence["content_fixture_removed"] = not source.exists()
+            report.write_text(json.dumps(evidence, indent=2) + "\n", encoding="utf-8")
     print(json.dumps(evidence, indent=2))
     return evidence
 

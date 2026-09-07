@@ -1,16 +1,24 @@
-# Room Workshop
+# Project Editor
 
 For a first editing session, follow the [creator quickstart](../docs/creator-guide.md). This page is the more detailed editor reference.
 
-The desktop C++23 editor uses the pinned LightEngine checkout in `external/LightEngine`. From the project root, run `build.ps1 -Editor -Run` to generate the content preview and audio planning report, build the editor, and open it. The executable accepts the repository directory as its first argument and an optional absolute level path as its second argument.
+Run **DarkLantern64: Launch editor** in VS Code, or `python tools/build.py --editor --run`. One project session manages all canonical levels and remembers the last opened level. Its queue, logs, and layout live in `.dev/editor/project/`. The desktop C++23 application uses the pinned LightEngine checkout in `external/LightEngine`.
 
-`MODULE.bazel` and the pinned engine revision define dependencies. The generated `MODULE.bazel.lock` stays local for now: LightEngine's module extension caches absolute Vulkan SDK and Bazel checkout paths in it. Each machine regenerates that cache from its own environment.
+**Levels** and **File > Open** list every discovered version-2 level directly inside `content/`. **New level** creates a playable starter room with a switch, door, objective, and spawn; **Duplicate** copies a saved level. Open a level to edit its title, objects, patrols, materials, and lighting. **Include in game menu** controls membership in `content/level_bundle.json`; the browser also lists levels outside that bundle.
 
-For the outdoor study, run `python tools/build.py --level content/moonlit_courtyard.json --editor --run`. Custom levels use the separate `darklantern64_scene_editor` target so the original workshop can remain open while this executable builds. Keep at most one workshop open per level. Each scene has its own compiled output, command queue, logs, captures and layout; custom scenes use `build/scenes/<level-stem>` and `.dev/editor/scenes/<level-stem>`. The original Lantern Store retains `build/` and `.dev/editor/`. The audio planning manifest remains shared across scenes.
+**Delete** asks for confirmation, removes the source and menu entry, and retains a recovery copy under `.dev/editor/deleted-levels/`. Shared assets remain available. Keep at least one project level and one bundled level. Switching or closing with unsaved changes offers **Save and continue**, **Discard and continue**, and **Cancel**, including audio planning changes.
+
+**Save + Cook**, **File > Save scene**, and **Ctrl+S** save canonical content. **Play level** saves and launches the current level at the selected **Test start**. **Play game menu** saves the current level and builds the saved bundle; **Build ROM only** saves and builds without launching. The separate **Launch game** task builds the saved bundle without requiring the editor.
+
+Generated previews use real level names and distinct asset paths under `build/project/editor-assets/`. Texture paths include pixel hashes so edited images refresh. Runtime outputs retain `build/` for Lantern Store and `build/scenes/<stem>/` for other levels. Shared source models and images stay under `content/`.
+
+`MODULE.bazel` and the pinned engine revision define dependencies. The generated `MODULE.bazel.lock` stays local because LightEngine's module extension caches absolute Vulkan SDK and Bazel checkout paths.
+
+For isolated developer checks, the executable also accepts an absolute source path after its repository argument. Those sessions retain the old per-level queues: `.dev/editor/` for first_room, `.dev/editor/scenes/<stem>/` otherwise. Everyday editing uses the project session. Do not edit one source from two sessions.
 
 ## 3D content
 
-**Room Objects** and **Object Properties** edit the selected canonical level, defaulting to `content/first_room.json`, version 2. Models are freely positioned in XYZ metres, with Euler XYZ rotation in degrees and positive XYZ scale. The Y axis points up. There is no authoritative tile grid or map brush.
+**Room Objects** and **Object Properties** edit the selected canonical version-2 level. The project restores the last opened level on launch. Models are freely positioned in XYZ metres, with Euler XYZ rotation in degrees and positive XYZ scale. The Y axis points up. There is no authoritative tile grid or map brush.
 
 The **Viewport** displays meshes cooked from the same OBJ source geometry used by the N64 content header. Use LightEngine's **Entity List** tab to select a viewport gizmo. Transform changes from the viewport or **Selected Entity** are copied back to the matching canonical object by its stable identity; Object Properties transform changes update the preview immediately. Stock structural, name, material and lighting edits remain preview-only. Use the project properties for gameplay tuning, and canonical source assets for geometry/material changes.
 
@@ -33,7 +41,7 @@ Removing enough points to leave fewer than two automatically switches the enemy 
 
 The current source/runtime capacity is 16 enemies and 32 points per route. This is an authoring bound, not a performance target. Patrol follows straight segments, without a navigation mesh or crowd avoidance; keep routes clear of walls and check encounters in the game. Sentries may retain 0–32 dormant route points while a designer prepares a patrol.
 
-**Save + Cook** validates the staged document against assets in `content/`, saves canonical content, and reloads the preview. Invalid content preserves the last valid source and generated artifacts. The current collision cook accepts upright boxes following translation, yaw and scale; tilted models need separate upright collision proxies. **Build ROM** also invokes the root build. Desktop authoring checks do not establish that the evolving 3D runtime is playable on hardware.
+**Save + Cook** validates the staged document against assets in `content/`, saves canonical content, and reloads the preview. Invalid content preserves the last valid source and generated artifacts. The current collision cook accepts upright boxes following translation, yaw and scale; tilted models need separate upright collision proxies. **Build ROM only** also invokes the root build. Desktop authoring checks do not establish that the evolving 3D runtime is playable on hardware.
 
 ## Audio Memory
 
@@ -45,13 +53,15 @@ Choose a context or transition to inspect its RAM components, active channels, r
 
 ## Local command interface
 
-`tools/editorctl.py` sends bounded JSON requests through `.dev/editor/requests` and waits for matching atomic responses. Use `--args-file` to avoid shell quoting. Requests have unique IDs and expiry times; check a timed-out request's response before retrying a mutation. No operation evaluates scripts or arbitrary commands.
+`tools/editorctl.py` sends bounded JSON requests through `.dev/editor/project/requests` and waits for atomic responses. Use `--args-file` to avoid shell quoting. IDs and expiry times bound requests; inspect a timed-out response before retrying. No operation evaluates scripts or arbitrary commands.
 
-Add `--level content/moonlit_courtyard.json` to **every command** targeting the outdoor workshop, including inspect, save, build and quit. The helper selects `.dev/editor/scenes/moonlit_courtyard/requests`; omitting `--level` always addresses the original workshop. Relative level paths are resolved against the repository (or explicit `--root`), independently of the shell's current directory. Level files must be JSON directly inside `content/`, with ASCII letters, digits, underscores or hyphens in their filename stem.
+The default queue stays fixed across level switches. Use `list_levels`, then `open_level` with `{"file":"moonlit_courtyard.json"}`. `inspect` reports source, preview path, catalog, dirty state, pending action, and canonical document. `--root` selects a project; `--level` addresses an isolated diagnostic session only.
 
-Operations: `inspect`, `set_entity`, `add_enemy`, `duplicate_enemy`, `add_waypoint`, `delete_entity`, `set_environment`, `set_material`, `set_preview_transform`, `save`, `build`, `capture`, `get_layout`, `reset_layout`, `reload`, `get_audio_memory`, `set_audio_config`, `recalculate_audio`, and `quit`.
+`create_level` takes `name`, `title`, and optional `in_bundle`; `duplicate_level` also takes saved source `file`. `update_level` takes `file` with `title` and/or `in_bundle`. `delete_level` requires `file` and `confirmed:true`. Command switching refuses unsaved edits; save/apply them first. `play_level` accepts optional `start_preset`; `play_menu` opens the bundled selector. Both save current content.
 
-`inspect` includes the in-memory canonical `document`, the code-owned `enemy_types` catalog, and `preview_refresh_pending`. `report.enemy_instances` contains the most recently cooked enemy-to-model mapping and effective tuning; recook before treating it as current after edits.
+Content operations: `import_asset_pack`, `add_prop`, `set_entity`, `add_enemy`, `duplicate_enemy`, `add_waypoint`, `delete_entity`, `set_environment`, `set_material`, `set_preview_transform`, `save`, `build`, `capture`, `get_layout`, `reset_layout`, `reload`, `get_audio_memory`, `set_audio_config`, `recalculate_audio`, and `quit`.
+
+`inspect` also includes code-owned `enemy_types` and `preview_refresh_pending`. `report.enemy_instances` describes the last cook; recook after edits before treating it as current.
 
 Enemy mutation arguments (all coordinates are XYZ metres):
 
@@ -99,6 +109,8 @@ The audio patch accepts numeric fields in `output`, `budget`, `buffer_pool`, and
 
 ## Layout and verification
 
-First launch creates a deterministic layout including Audio Memory. Subsequent deliberate layouts persist in `.dev/editor/layout-v2.ini`; Reset Layout restores defaults. The earlier `layout.ini` is retained separately.
+First launch creates a deterministic layout including Levels and Audio Memory. Deliberate layouts persist in `.dev/editor/project/layout-project-v1.ini`; Reset Layout restores defaults. Earlier layouts remain separate.
 
-Compiler tests cover version-2 validation, enemy type defaults, multiple actors and route references, collision placement, asset boundaries, dependency hashing, staged asset resolution, incremental cooking and XYZ changes reaching both targets. Run `python tools/verify_enemy_editor.py` after building the scene editor to create and retain a separate three-enemy test level, exercise the real file-command interface, and record evidence. The optional `--level content/<unused-name>.json` chooses a new filename; the verifier refuses to overwrite existing content and closes only its own editor process. Earlier live checks also cover transform synchronization, audio assumptions and preservation of invalid or externally changed plans. Restart checks verify both project tabs and deliberately saved stock tabs; Reset restores the project tabs through the next restart. These checks are distinct from native N64/M64 runtime validation.
+Compiler tests cover version-2 validation, enemy type defaults, multiple actors and route references, collision placement, asset boundaries, dependency hashing, staged asset resolution, incremental cooking and XYZ changes reaching both targets. Run `python tools/verify_enemy_editor.py` after building the scene editor to create a private three-enemy test fixture, exercise the real file-command interface, then archive its JSON under the session queue’s evidence/ directory and remove the owned source, including on failure. The optional `--level content/<unused-name>.json` chooses a new filename; the verifier refuses to overwrite existing content and closes only its own editor process. Earlier live checks also cover transform synchronization, audio assumptions and preservation of invalid or externally changed plans. Restart checks verify both project tabs and deliberately saved stock tabs; Reset restores the project tabs through the next restart. These checks are distinct from native N64/M64 runtime validation.
+
+Run `python tools/verify_project_editor.py` after building to exercise level management, unsaved edits, source conflicts, and previews in a private copied project. See the [developer tools](../docs/developer-tools.md) for specialist checks.

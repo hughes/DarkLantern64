@@ -37,7 +37,7 @@ python tools/setup_editor.py # fetch the pinned LightEngine revision if missing
 .\build.ps1 -Editor -Run
 ```
 
-The engine revision is recorded in [dependencies.json](dependencies.json). Project layouts and the saved-tab startup fix merged through [PR #14](https://github.com/hughes/LightEngine/pull/14) and [PR #15](https://github.com/hughes/LightEngine/pull/15). Project level registration and guarded Open/Save/Close are published for review in [PR #16](https://github.com/hughes/LightEngine/pull/16); this project pins that tested revision. Setup checks an existing checkout without resetting it. See the [editor guide](editor/README.md) and [workflow](docs/workflow.md) for editing and automation.
+The engine revision is recorded in [dependencies.json](dependencies.json). Project layouts and the saved-tab startup fix merged through [PR #14](https://github.com/hughes/LightEngine/pull/14) and [PR #15](https://github.com/hughes/LightEngine/pull/15). Project level registration and guarded Open/Save/Close merged through [PR #16](https://github.com/hughes/LightEngine/pull/16); this project pins that tested revision. Setup checks an existing checkout without resetting it. See the [editor guide](editor/README.md) and [workflow](docs/workflow.md) for editing and automation.
 
 ## Start here
 
@@ -48,6 +48,7 @@ The engine revision is recorded in [dependencies.json](dependencies.json). Proje
 | [Project workflow verification](docs/project-workflow-verification.md) | Tested level management, editor game launches, and the horizontal camera correction. |
 | [Level select and test starts](docs/level-select.md) | Bundle levels into one ROM, switch during testing, or launch directly into a named starting state. |
 | [Enemy authoring](docs/enemy-authoring.md) | Place multiple enemies, choose code-defined types, and author independent patrols or sentry posts. |
+| [Character animation proposal](docs/character-animation.md) | Artist-created rigs and clips, N64 deformation choices, audio events, memory and editor workflow. |
 | [Vision](docs/vision.md) | Game pillars, collaboration, and scope. |
 | [Architecture](docs/architecture.md) | Editor/runtime boundary, content model, and existing foundations. |
 | [N64 hardware guide](docs/n64-hardware-guide.md) | Processors, memory/bandwidth, graphics features, lighting, and seamless spaces. |

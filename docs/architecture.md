@@ -98,3 +98,5 @@ Keep Vulkan/editor dependencies outside the N64 target. The runtime should use b
 Implementation order and acceptance checks are in [First playable](first-playable.md).
 
 The [mission scale guide](scaling-guide.md) records the first guard/light workload measurements and hidden-room rendering comparison. Model bounds culling is implemented; spatial query candidates, separate guard perception scheduling, general actor/item arrays and 3D cell/portal visibility are the next scaling foundations.
+
+The [character animation proposal](character-animation.md) describes the next asset/runtime layer for artist-authored guards: shared skeletons and clips, independent playback state, target deformation preview, semantic foot contacts and an RSP backend evaluation. These choices remain proposed; the current pipeline exports static poses.

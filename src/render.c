@@ -2,6 +2,7 @@
 #include "dl_profile.h"
 #include "render_visibility.h"
 #include "render_shading.h"
+#include "render_camera.h"
 
 #include <libdragon.h>
 #include <math.h>
@@ -325,9 +326,8 @@ void dl_render_release_scene(void){
     visible_models=transformed_vertices=0;
 }
 static Camera make_camera(const DlGame *g){
-    float sy=sinf(g->yaw),cy=cosf(g->yaw),sp=sinf(g->pitch),cp=cosf(g->pitch);
-    return (Camera){.eye=dl_player_eye(g),.right={cy,0,-sy},
-        .up={-sy*sp,cp,-cy*sp},.forward={sy*cp,sp,cy*cp}};
+    DlCameraBasis basis=dl_camera_basis(g->yaw,g->pitch);
+    return (Camera){.eye=dl_player_eye(g),.right=basis.right,.up=basis.up,.forward=basis.forward};
 }
 
 /* Clip against all six frustum planes before perspective division. */

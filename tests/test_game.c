@@ -1,4 +1,5 @@
 #include "game.h"
+#include "render_camera.h"
 #include <math.h>
 #include <stdio.h>
 #include <string.h>
@@ -473,6 +474,65 @@ static bool invalid_start_selection_preserves_game(void) {
     CHECK(!dl_game_start(&g,&f.level,0) && memcmp(&g,&before,sizeof(g))==0);
     return true;
 }
+static float camera_dot(DlVec3 a,DlVec3 b) { return a.x*b.x+a.y*b.y+a.z*b.z; }
+static bool camera_matches_right_handed_editor(void) {
+    /* Same eye and heading as the authored loot-crate view. These asymmetric
+     * positions must retain their order in LightEngine and the N64 game. */
+    DlCameraBasis view=dl_camera_basis(PI,0);
+    const DlVec3 coins={-.25f,-.198f,-1.65f},goblet={.15f,-.198f,-1.55f};
+    float coins_x=160+164*camera_dot(coins,view.right)/camera_dot(coins,view.forward);
+    float goblet_x=160+164*camera_dot(goblet,view.right)/camera_dot(goblet,view.forward);
+    CHECK(NEAR(coins_x,135.15152f) && NEAR(goblet_x,175.87097f));
+    CHECK(coins_x<160 && goblet_x>160);
+    for(int y=0;y<13;++y) for(int p=-4;p<=4;++p) {
+        float yaw=(y-6)*.57f,pitch=p*.3f;
+        view=dl_camera_basis(yaw,pitch);
+        /* A standard right-handed lookAt's screen-right axis is forward x
+         * world-up. Normalize it independently of the runtime yaw formula. */
+        float horizontal=sqrtf(view.forward.x*view.forward.x+view.forward.z*view.forward.z);
+        DlVec3 expected_right={-view.forward.z/horizontal,0,view.forward.x/horizontal};
+        CHECK(NEAR(camera_dot(view.right,expected_right),1));
+        CHECK(NEAR(camera_dot(view.right,view.right),1) && NEAR(camera_dot(view.up,view.up),1));
+        CHECK(NEAR(camera_dot(view.forward,view.forward),1));
+        CHECK(NEAR(camera_dot(view.right,view.up),0) && NEAR(camera_dot(view.right,view.forward),0));
+        CHECK(NEAR(camera_dot(view.up,view.forward),0));
+        DlVec3 cross={view.right.y*view.up.z-view.right.z*view.up.y,
+            view.right.z*view.up.x-view.right.x*view.up.z,view.right.x*view.up.y-view.right.y*view.up.x};
+        CHECK(NEAR(camera_dot(cross,view.forward),-1));
+        CHECK(NEAR(view.forward.x,sinf(yaw)*cosf(pitch)) && NEAR(view.forward.z,cosf(yaw)*cosf(pitch)));
+    }
+    return true;
+}
+static bool player_controls_follow_screen_right(void) {
+    Fixture f; fixture_init(&f); f.level.enemy_count=0;
+    f.level.spawn=(DlVec3){-2,0,3};
+    const float headings[]={0,PI/2,PI,3*PI/2,.73f};
+    for(unsigned i=0;i<sizeof(headings)/sizeof(headings[0]);++i) {
+        f.level.spawn_yaw=headings[i];
+        DlGame g; dl_game_init(&g,&f.level);
+        DlCameraBasis view=dl_camera_basis(g.yaw,0);
+        DlVec3 start=g.player;
+        advance(&g,(DlInput){.strafe=1},.1f);
+        DlVec3 movement={g.player.x-start.x,g.player.y-start.y,g.player.z-start.z};
+        CHECK(NEAR(camera_dot(movement,view.right),.21f) && NEAR(camera_dot(movement,view.forward),0));
+        CHECK(NEAR(g.yaw,headings[i]) && clear_actors(&g));
+        dl_game_init(&g,&f.level);
+        advance(&g,(DlInput){.forward=1},.1f);
+        movement=(DlVec3){g.player.x-start.x,g.player.y-start.y,g.player.z-start.z};
+        CHECK(NEAR(camera_dot(movement,view.forward),.21f) && NEAR(camera_dot(movement,view.right),0));
+        dl_game_init(&g,&f.level);
+        advance(&g,(DlInput){.turn=1},.1f);
+        DlCameraBasis turned=dl_camera_basis(g.yaw,0);
+        CHECK(camera_dot(turned.forward,view.right)>.22f);
+        CHECK(NEAR(g.player.x,start.x) && NEAR(g.player.z,start.z));
+        advance(&g,(DlInput){.turn=-1},.1f);
+        turned=dl_camera_basis(g.yaw,0);
+        CHECK(NEAR(camera_dot(turned.forward,view.forward),1));
+        /* Runtime viewing/input must never rewrite authored placement/yaw. */
+        CHECK(NEAR(f.level.spawn.x,-2) && NEAR(f.level.spawn.z,3) && NEAR(f.level.spawn_yaw,headings[i]));
+    }
+    return true;
+}
 int main(void) {
     struct { const char *name; bool (*run)(void); } cases[]={
         {"rotated wall collision and sliding",rotated_wall_sliding},{"stairs and falling",stairs_and_falling},
@@ -494,7 +554,9 @@ int main(void) {
         {"fallen enemy resets without resetting the world",fallen_enemy_resets_independently},
         {"authored start resets the world, stance, and light meter",authored_start_resets_world_and_applies_stance_and_lighting},
         {"authored start support follows selected door state",authored_start_support_uses_selected_door_state},
-        {"invalid start selection preserves the current game",invalid_start_selection_preserves_game}
+        {"invalid start selection preserves the current game",invalid_start_selection_preserves_game},
+        {"camera matches right-handed editor and asymmetric loot placement",camera_matches_right_handed_editor},
+        {"player strafe and turning follow screen right",player_controls_follow_screen_right}
     };
     int failures=0;
     for(unsigned i=0;i<sizeof(cases)/sizeof(cases[0]);++i) {

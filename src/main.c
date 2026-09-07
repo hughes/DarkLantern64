@@ -189,7 +189,7 @@ static DlInput replay_input(const DlGame *game, float dt) {
     float error = atan2f(dx, dz) - game->yaw;
     while (error > 3.14159265f) error -= 6.28318531f;
     while (error < -3.14159265f) error += 6.28318531f;
-    float turn = error / (2.3f * dt);
+    float turn = -error / (2.3f * dt);
     input.turn = turn < -1 ? -1 : turn > 1 ? 1 : turn;
     input.forward = fabsf(error) < 0.10f ? 1 : 0;
     return input;

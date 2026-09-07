@@ -440,13 +440,15 @@ void dl_game_update(DlGame *g, const DlInput *input, float dt) {
         g->elapsed += step_dt; g->sound_age += step_dt;
         if (g->sound_age > 0.85f)
             for (int enemy = 0; enemy < g->enemy_count; ++enemy) g->enemies[enemy].heard_sound = false;
-        g->yaw = wrap_yaw(g->yaw + turn * 2.3f * step_dt);
+        /* Authored yaw grows from +Z toward +X, which is a left turn in the
+         * right-handed world. Positive player turn/strafe mean screen right. */
+        g->yaw = wrap_yaw(g->yaw - turn * 2.3f * step_dt);
         g->pitch = clampf(g->pitch + look * 1.7f * step_dt, -1.35f, 1.35f);
         float speed = g->crouched ? 1.0f : 2.1f, s = sinf(g->yaw), c = cosf(g->yaw);
         float height = g->crouched ? CROUCH_HEIGHT : STAND_HEIGHT;
         float moved = move_horizontal(g, &g->player,
-            (s * forward + c * strafe) * speed * step_dt,
-            (c * forward - s * strafe) * speed * step_dt, PLAYER_RADIUS, height, g->grounded);
+            (s * forward - c * strafe) * speed * step_dt,
+            (c * forward + s * strafe) * speed * step_dt, PLAYER_RADIUS, height, g->grounded);
         g->grounded = move_vertical(g, &g->player, &g->vertical_velocity, PLAYER_RADIUS, height, step_dt);
         if (moved > 0.00001f && g->grounded) {
             g->footstep_timer += step_dt;

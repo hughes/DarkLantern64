@@ -54,7 +54,7 @@ static bool walk_to(Playtest *test,DlVec3 destination) {
         float error=atan2f(dx,dz)-test->game.yaw;
         while(error>PI) error-=2*PI;
         while(error<-PI) error+=2*PI;
-        float turn=fmaxf(-1,fminf(1,error/(2.3f*FRAME_DT)));
+        float turn=fmaxf(-1,fminf(1,-error/(2.3f*FRAME_DT)));
         DlInput input={.crouch=true,.turn=turn,.forward=fabsf(error)<.10f?1:0};
         if(!frame(test,input)) return false;
     }

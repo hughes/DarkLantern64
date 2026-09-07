@@ -181,6 +181,18 @@ class BundleTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "hash mismatch"):
             bundle.union_assets([second], self.output)
 
+    def test_texture_union_counts_shared_palettes_once_and_active_level_totals(self):
+        first = self.texture_level("indexed-one", b"palette-sprite")
+        second = self.texture_level("indexed-two", b"palette-sprite")
+        third = self.texture_level("rgba", b"rgba-sprite", "texture-fedcba9876543210")
+        for level in (first, second):
+            level["textures"]["textures"][0].update(format="CI4", palette_bytes=32, decoded_total_bytes=2080,
+                                                  width=64, height=64)
+        report = bundle.union_assets([first, second, third], self.output)["textures"]
+        self.assertEqual((report["decoded_bytes"], report["palette_bytes"], report["decoded_total_bytes"]), (4096, 32, 4128))
+        self.assertEqual((report["maximum_level_decoded_bytes"], report["maximum_level_palette_bytes"],
+                          report["maximum_level_decoded_total_bytes"]), (2048, 32, 2080))
+
     def test_incompatible_diagnostics_fail_before_cooking(self):
         cases = [{"bundle": ROOT / "content/level_bundle.json", "level": ROOT / "content/first_room.json"},
                  {"bundle": ROOT / "content/level_bundle.json", "capture": True},

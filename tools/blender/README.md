@@ -110,3 +110,20 @@ exporter rejects pre-existing unrelated files and conflicting asset/material
 IDs elsewhere under the content root. Removing an object from the selection
 removes its entry from the new manifest but leaves its old source file on disk,
 so existing levels are not broken by automatic deletion.
+
+## Painted animated guard
+
+Open `art/guard.blend` and paint the packed image named
+`Guard | PAINT THIS painted atlas source`. The guard material uses this image;
+its `dl64_texture_export_name` property exports it as `guard-atlas-painted.png`.
+Save the Blender file, then run `python tools/guard_assets.py` and cook the level
+normally. The shared guard pack specifies the 64×64 CI4 runtime texture. The
+original `guard-atlas.png` remains a historical asset.
+
+The separately packed image named `TARGET PREVIEW` is a generated snapshot, not
+the painting source. Re-cooking in the editor creates a current target preview;
+the source image in Blender deliberately retains its authoring detail.
+`tools/blender/paint_guard_uv.py` is the one-time layout migration helper: it
+replaces the guard's UVs and should not be rerun over an artist's custom unwrap.
+`tools/blender/render_guard_atlas.py` renders source and cooked images in a
+private process without saving changes to the scene.

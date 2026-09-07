@@ -1,0 +1,169 @@
+{
+  "passed": true,
+  "private_root": ".dev/editor/character-verification/3ebece96c0e744bbbe79203c514692e1",
+  "editor": "editor/bazel-bin/darklantern64_scene_editor.exe",
+  "editor_sha256": "8611cfffdff2e7358ef73b50ab68dcf5908e64d1216516015568e5555f64dbac",
+  "checks": [
+    "Project level opens cooked character assets through the shared N64 sampler",
+    "Focus guard frames its current pose in a clear three-quarter view",
+    "Authored idle and walking poses visibly differ in the ordinary level viewport",
+    "Repeated paused clip/time produces identical skin matrices and viewport PNG",
+    "Bounded procedural head attention changes the image without moving the body root",
+    "Crossfade weight changes the sampled cooked pose",
+    "Guards share the asset while keeping independent preview playback state",
+    "Invalid clips and out-of-range preview settings are rejected atomically",
+    "Play advances the preview clock and Pause stops it",
+    "Connected-joint animation reuses one fixed-topology mesh per instance without arena growth",
+    "Artist animation re-export displays new motion while reusing the same per-instance meshes and arena storage",
+    "Clip, scrub, blend and attention controls preserve clean canonical content"
+  ],
+  "captures": [
+    {
+      "label": "idle",
+      "path": "docs/images/guard-atlas-editor-idle.png",
+      "sha256": "193e33ca8e11d52a345b48bde54b881ad0b4c823755e611a7f2510b47590c246",
+      "size": [
+        783,
+        571
+      ]
+    },
+    {
+      "label": "walk-stride",
+      "path": "docs/images/guard-atlas-editor-walk-stride.png",
+      "sha256": "82e1b73a180dcb720fe1d4eeeb8cfe16692e3b5de9cf85509a3a6d962e3c484f",
+      "size": [
+        783,
+        571
+      ]
+    },
+    {
+      "label": "walk-repeat",
+      "path": "docs/images/guard-atlas-editor-walk-stride.png",
+      "sha256": "82e1b73a180dcb720fe1d4eeeb8cfe16692e3b5de9cf85509a3a6d962e3c484f",
+      "size": [
+        783,
+        571
+      ]
+    },
+    {
+      "label": "walk-attention",
+      "path": "docs/images/guard-atlas-editor-walk-attention.png",
+      "sha256": "e97932789bd96714401ed30627d80788007a60663b5f7ab88908ef7165028705",
+      "size": [
+        783,
+        571
+      ]
+    },
+    {
+      "label": "idle-after-artist-reexport",
+      "path": "docs/images/guard-atlas-editor-idle-after-artist-reexport.png",
+      "sha256": "88cffe4c04681b1cbd6bbe9be3b8f7d9c4eac0231dbe5e3da88f6b890efec65e",
+      "size": [
+        783,
+        571
+      ]
+    }
+  ],
+  "differences": [
+    {
+      "first": "idle",
+      "second": "walk-stride",
+      "changed_pixels_over_8": 22363
+    },
+    {
+      "first": "walk-stride",
+      "second": "walk-attention",
+      "changed_pixels_over_8": 2153
+    },
+    {
+      "first": "idle",
+      "second": "idle-after-artist-reexport",
+      "changed_pixels_over_8": 13380
+    }
+  ],
+  "started_at_utc": "2026-09-07T16:07:45Z",
+  "owned_editor_pid": 34456,
+  "character": {
+    "id": "animated-patrol",
+    "asset": "basic-guard",
+    "bones": 20,
+    "clips": [
+      {
+        "duration": 2.0,
+        "events": 0,
+        "id": "idle",
+        "loop": true,
+        "samples": 61
+      },
+      {
+        "duration": 1.399999976158142,
+        "events": 0,
+        "id": "notice",
+        "loop": false,
+        "samples": 43
+      },
+      {
+        "duration": 0.800000011920929,
+        "events": 2,
+        "id": "run",
+        "loop": true,
+        "samples": 25
+      },
+      {
+        "duration": 1.600000023841858,
+        "events": 0,
+        "id": "turn",
+        "loop": false,
+        "samples": 49
+      },
+      {
+        "duration": 1.2000000476837158,
+        "events": 2,
+        "id": "walk",
+        "loop": true,
+        "samples": 37
+      }
+    ],
+    "encoded_bytes": 8820,
+    "head_bone": 13,
+    "cross_joint_triangles": 48,
+    "preview_geometry": "connected one-weight mesh"
+  },
+  "animation_reexport": {
+    "vertex_arena_count": 1512,
+    "handles": {
+      "animated-patrol": 0,
+      "animated-sentry": 1
+    },
+    "topology_sha256": "b9a4b7cfdd1c4b8a775216b0eaa943a97d44c5c40706d4127b1546717a2c3057",
+    "original_source_sha256": "b9d5a6b99f558485a86c74e51d7770f27ca1c78db9e160743a44d186bcf3c78c",
+    "changed_source_sha256": "a986acfe84fd3bb6703cda9358d32c417d8a568756add522886c768ddfa5a8ab"
+  },
+  "real_content_unchanged": true,
+  "elapsed_seconds": 28.03,
+  "evidence": ".dev/editor/character-verification/3ebece96c0e744bbbe79203c514692e1/character-editor-verification.json",
+  "tangent_frames": [
+    {
+      "id": "animated-patrol",
+      "tangent_fallback_vertices": 68,
+      "status": "ready",
+      "dynamic_mesh_handle": 0
+    },
+    {
+      "id": "animated-sentry",
+      "tangent_fallback_vertices": 68,
+      "status": "ready",
+      "dynamic_mesh_handle": 1
+    }
+  ],
+  "failure_evidence": "docs/evidence/guard-atlas-character-editor-failure.json",
+  "diagnosis_evidence": "docs/evidence/guard-atlas-character-editor-diagnosis.json",
+  "focused_cpp_tests": {
+    "passed": true,
+    "targets": [
+      "//:character_preview_material_test",
+      "//:character_preview_test"
+    ],
+    "checks": "Finite orthonormal fallback on collapsed UVs and cancelled tangent contributions; authored mesh values and valid tangent frames preserved; actual engine vertex update succeeds without arena growth."
+  }
+}

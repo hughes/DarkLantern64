@@ -1,0 +1,1666 @@
+{
+  "schema_version": 1,
+  "diagnostic_valid": true,
+  "matched_authored_gameplay_and_animation": true,
+  "matched_settings_compiler_and_rsp_library": true,
+  "same_oriented_geometry_normals_and_bones_at_1e7_precision": true,
+  "before": {
+    "diagnostic_valid": true,
+    "strict_60fps_passed": true,
+    "measurement_sha256": "19b3f965fa3c932b395d7fbb80af089a26b6601f025ae6426982d6c05ee4801b",
+    "snapshot_sha256": "e795cf994ed4663bc293dc948330542099f52a9eaf96fdf618d02864426192f4",
+    "rom_sha256": "0072e89963129d76379b82309c760a4f9a146e88d6319df107ee5d01c01bb7d1",
+    "capture_rom_sha256": "5fb45b51497e66ebb3d8f05202b2fdfc8e5e165f3594026977700eea8b7de7ec",
+    "settings_source_sha256": "010e6ec4df82b1750292c4a1e50b1e513f9e2d4b7c604d345be0c1d28b6b140a",
+    "compiler": "mips64-elf-gcc.exe (GCC) 16.2.0",
+    "renderer_library_sha256": "df33d2e57efdd0476d6a533d225cc1c1576f8645121d39a8620696d9f109281f",
+    "log_sha256": "6e1a2bc8de62f54cfd78e7196aae676bd4e636339432dbf8c82af180531e0bd6",
+    "level_sha256": "0480ac4b7343b82b1f5c709c93d3496f8fd89ea846315a6b68b96028cb9fb8fd",
+    "gameplay_source_sha256": "83f1cf981a4cddca035a80b96dbf493e239aa6560119d310deb2ea9718d89429",
+    "enemy_types_sha256": "c7dc61a6e285278279d633a0b4e41be904bc26897e78fb1f5c61b79ccffae1e4",
+    "character_sha256": "5a4b7b78522eb3e4f8986f9e37e0109441f64d3f62e0e2bbcdb90d31d4837ae2",
+    "geometry_identity": "f89fea968058541787c48ddc2aa8217c56b4fa5ddde16dfaa851c45b2edb6f79",
+    "animation_identity": "7c181d7f8dab202183b4170ece19f53de4f8b67b5f6ad0736c00f6bcd6465de4",
+    "guard_geometry": {
+      "vertices": 1009,
+      "triangles": 535,
+      "bones": 20,
+      "compiled_geometry_bytes": 26417,
+      "attribute_splits": {
+        "unique_positions": 316,
+        "with_joint_identity": 316,
+        "with_quantized_normals": 669,
+        "with_texture_coordinates": 1009,
+        "note": "Cumulative distinct attribute tuples, before any target cache scheduling. A shared position may still require separate vertices for normals or UV seams."
+      }
+    },
+    "guard_texture": {
+      "uri": "assets/guard/guard-atlas.png",
+      "width": 32,
+      "height": 32,
+      "format": "RGBA16",
+      "decoded_bytes": 2048,
+      "sprite_bytes": 2184,
+      "source_sha256": "45f3e1f49a7363965e1b2b8f7f331f5b69e344b62119e43f3e7fb8b7e139985b",
+      "recipe_sha256": "95f80c13eae4edf4655e628319fa6570b6afcd8bc6c31cd44b2d6b6d684f7f67",
+      "sprite_sha256": "8c0690447ff958b2bb870931406becdcdd672e62d18295011043cfe13773bb9f",
+      "pixel_bytes": 2048,
+      "palette_bytes": 0,
+      "decoded_total_bytes": 2048,
+      "tmem_bytes": 2048
+    },
+    "level_texture_count": 1,
+    "level_texture_pixel_bytes": 2048,
+    "level_texture_palette_bytes": 0,
+    "level_texture_decoded_total_bytes": 2048,
+    "level_sprite_bytes": 2184,
+    "static_image_bytes": 697032,
+    "sampled_heap_peak_bytes": 1007984,
+    "texture_upload_samples": {
+      "count": 30,
+      "minimum": 1,
+      "maximum": 1,
+      "scope": "Per-frame upload count sampled by ordinary one-second material logs; not every frame."
+    },
+    "work": {
+      "samples": 1800,
+      "average_ms": 10.791728865185187,
+      "min_ms": 10.284906666666666,
+      "max_ms": 15.396032,
+      "p50_ms": 10.535253333333333,
+      "p95_ms": 12.077354666666666,
+      "p99_ms": 13.801258666666667,
+      "over_budget_frames": 0,
+      "quantile_method": "nearest rank of every exact CP0-tick sample"
+    },
+    "video": {
+      "vis": 1800,
+      "presents": 1800,
+      "repeats": 0,
+      "ticks": 1410335688,
+      "tracked": true,
+      "max_gap_vis": 1,
+      "max_interval_ms": 18.253674666666665,
+      "seconds": 30.087161344,
+      "native_refresh_hz": 59.82618231809221,
+      "presented_fps": 59.82618231809221
+    },
+    "cpu_slots": {
+      "input": {
+        "total_ticks": 3769250,
+        "max_ticks": 3802,
+        "average_ms": 0.0446725925925926,
+        "max_ms": 0.08110933333333334,
+        "percent_of_frame_budget": 0.2680355555555556,
+        "percent_of_30fps_budget": 0.1340177777777778,
+        "percent_of_frame_elapsed": 0.26725918344937877
+      },
+      "gameplay": {
+        "total_ticks": 48563691,
+        "max_ticks": 32091,
+        "average_ms": 0.5755696711111111,
+        "max_ms": 0.684608,
+        "percent_of_frame_budget": 3.4534180266666668,
+        "percent_of_30fps_budget": 1.7267090133333334,
+        "percent_of_frame_elapsed": 3.4434151096233854
+      },
+      "audio_events": {
+        "total_ticks": 3722944,
+        "max_ticks": 5351,
+        "average_ms": 0.04412378074074074,
+        "max_ms": 0.11415466666666667,
+        "percent_of_frame_budget": 0.26474268444444443,
+        "percent_of_30fps_budget": 0.13237134222222222,
+        "percent_of_frame_elapsed": 0.2639758502269056
+      },
+      "audio_mix": {
+        "total_ticks": 22635318,
+        "max_ticks": 73596,
+        "average_ms": 0.2682704355555555,
+        "max_ms": 1.570048,
+        "percent_of_frame_budget": 1.6096226133333331,
+        "percent_of_30fps_budget": 0.8048113066666666,
+        "percent_of_frame_elapsed": 1.6049602986793197
+      },
+      "cache": {
+        "total_ticks": 0,
+        "max_ticks": 0,
+        "average_ms": 0.0,
+        "max_ms": 0.0,
+        "percent_of_frame_budget": 0.0,
+        "percent_of_30fps_budget": 0.0,
+        "percent_of_frame_elapsed": 0.0
+      },
+      "transforms": {
+        "total_ticks": 298173755,
+        "max_ticks": 169592,
+        "average_ms": 3.53391117037037,
+        "max_ms": 3.6179626666666667,
+        "percent_of_frame_budget": 21.20346702222222,
+        "percent_of_30fps_budget": 10.60173351111111,
+        "percent_of_frame_elapsed": 21.142050616789845
+      },
+      "lighting": {
+        "total_ticks": 461284629,
+        "max_ticks": 260729,
+        "average_ms": 5.467077084444444,
+        "max_ms": 5.562218666666666,
+        "percent_of_frame_budget": 32.802462506666664,
+        "percent_of_30fps_budget": 16.401231253333332,
+        "percent_of_frame_elapsed": 32.707449302723255
+      },
+      "triangles": {
+        "total_ticks": 26173522,
+        "max_ticks": 17934,
+        "average_ms": 0.31020470518518517,
+        "max_ms": 0.382592,
+        "percent_of_frame_budget": 1.8612282311111108,
+        "percent_of_30fps_budget": 0.9306141155555555,
+        "percent_of_frame_elapsed": 1.855837134102103
+      },
+      "hud": {
+        "total_ticks": 4764862,
+        "max_ticks": 6530,
+        "average_ms": 0.05647243851851852,
+        "max_ms": 0.13930666666666666,
+        "percent_of_frame_budget": 0.3388346311111111,
+        "percent_of_30fps_budget": 0.16941731555555556,
+        "percent_of_frame_elapsed": 0.3378531876020359
+      },
+      "debug_hud": {
+        "total_ticks": 0,
+        "max_ticks": 0,
+        "average_ms": 0.0,
+        "max_ms": 0.0,
+        "percent_of_frame_budget": 0.0,
+        "percent_of_30fps_budget": 0.0,
+        "percent_of_frame_elapsed": 0.0
+      },
+      "render_setup": {
+        "total_ticks": 17268207,
+        "max_ticks": 13172,
+        "average_ms": 0.20466023111111112,
+        "max_ms": 0.2810026666666667,
+        "percent_of_frame_budget": 1.2279613866666668,
+        "percent_of_30fps_budget": 0.6139806933333334,
+        "percent_of_frame_elapsed": 1.2244045638933068
+      },
+      "display_wait": {
+        "total_ticks": 499782950,
+        "max_ticks": 302312,
+        "average_ms": 5.923353481481481,
+        "max_ms": 6.449322666666666,
+        "percent_of_frame_budget": 35.540120888888886,
+        "percent_of_30fps_budget": 17.770060444444443,
+        "percent_of_frame_elapsed": 35.4371779847242
+      },
+      "other": {
+        "total_ticks": 24195945,
+        "max_ticks": 165310,
+        "average_ms": 0.28676675555555553,
+        "max_ms": 3.526613333333333,
+        "percent_of_frame_budget": 1.720600533333333,
+        "percent_of_30fps_budget": 0.8603002666666666,
+        "percent_of_frame_elapsed": 1.7156167681862649
+      }
+    },
+    "nested_timings": {
+      "rsp_lighting": {
+        "frames": 1800,
+        "windows": 30,
+        "average_ms_per_frame": {
+          "probe": 0.32788429037037037,
+          "normal": 2.349165499259259,
+          "color_upload": 2.507319158518518
+        },
+        "scope": "Nested CPU elapsed excluding audio; independent report windows selected inside steady interval. Do not add to parent slots."
+      },
+      "animation_profile": {
+        "frames": 1800,
+        "windows": 30,
+        "average_ms_per_frame": {
+          "sample": 1.1055042488888889,
+          "skin": 0.0
+        },
+        "scope": "Nested CPU elapsed excluding audio; independent report windows selected inside steady interval. Do not add to parent slots."
+      }
+    },
+    "runtime_allocations": [
+      {
+        "models": "2",
+        "shared_matrix_bytes": "1536",
+        "pose_scratch_arrays_bytes": "1792",
+        "normal_cache_bytes": "24216",
+        "per_enemy_motion_bytes": "8",
+        "timeline": "actual-distance",
+        "head_yaw_max": "45",
+        "head_pitch_max": "25"
+      }
+    ],
+    "renderer_startup": {
+      "geometry_ready": [
+        {
+          "models": "12",
+          "meshes": "2",
+          "vertices": "2098",
+          "triangles": "1190",
+          "depth": "hardware",
+          "transform": "xyz-euler",
+          "dynamic_lighting": "two-body-probes",
+          "objective_lighting": "emissive"
+        }
+      ],
+      "shading_ready": [
+        {
+          "smooth_vertices": "2018",
+          "scalar_smooth_cache_bytes": "16144",
+          "normal_format": "snorm8"
+        }
+      ],
+      "rsp_ready": [
+        {
+          "backend": "tiny3d",
+          "buffers": "3",
+          "cache_vertices": "70",
+          "batches": "40",
+          "vertex_loads": "2388",
+          "data_bytes": "156977",
+          "units_per_meter": "64",
+          "pose_cache_bytes": "11776"
+        }
+      ],
+      "scene_prepared": [
+        {
+          "ms": "71.25",
+          "night_cache_bytes": "0",
+          "door_states": "1",
+          "textures": "1"
+        }
+      ]
+    },
+    "workload": {
+      "frames": 1800,
+      "geometry_modes": [
+        1
+      ],
+      "full_body_coverage_measured": false,
+      "geometry_evidence": "RSP model bounds candidates and pre-clip triangle submission; full-body coverage unavailable",
+      "animated_min": 2,
+      "animated_max": 2,
+      "full_min": 0,
+      "full_max": 0,
+      "drawn_min": 2,
+      "drawn_max": 2,
+      "triangles_min": 1190,
+      "triangles_max": 1190,
+      "heads_min": 0,
+      "heads_max": 0
+    },
+    "checks": [
+      {
+        "name": "steady_window",
+        "passed": true,
+        "detail": "3 warmup windows excluded; 30 complete windows, 30.087s measured; minimum 30s"
+      },
+      {
+        "name": "complete_frame_distributions",
+        "passed": true,
+        "detail": "Every elapsed/work sample must be present; bounded-buffer overflow cannot pass"
+      },
+      {
+        "name": "16.667ms_work_budget",
+        "passed": true,
+        "detail": "All measured frames <=1000/60ms excluding display-buffer wait; includes normal audio, logging and queue stalls"
+      },
+      {
+        "name": "native_vi_presentation",
+        "passed": true,
+        "detail": "One new framebuffer per native NTSC VI, zero repeated scans, no callback gap >1.5 VI periods; native refresh is reported precisely"
+      },
+      {
+        "name": "both_guards_drawn_every_frame",
+        "passed": true,
+        "detail": "Every frame: two posed guard submissions; active attention head overlays are reported in 0..2 (quiet patrol may be zero); RSP model bounds candidates and pre-clip triangle submission; full-body coverage unavailable; image review separately proves appearance"
+      },
+      {
+        "name": "ordinary_live_workload",
+        "passed": true,
+        "detail": "Normal gameplay and audio remain active; no capture/replay/terminal/error state"
+      },
+      {
+        "name": "authored_camera",
+        "passed": true,
+        "detail": "One ordinary launch at authored two-guards preset"
+      },
+      {
+        "name": "independent_live_actors",
+        "passed": true,
+        "detail": "Patrol advances along authored route while sentry holds its post during measured interval"
+      },
+      {
+        "name": "two_character_allocations",
+        "passed": true,
+        "detail": "Two independently animated model instances"
+      },
+      {
+        "name": "actual_visible_guard_images",
+        "passed": true,
+        "detail": "Separately reviewed source-matched framebuffer images; geometry counters alone cannot satisfy this gate"
+      },
+      {
+        "name": "ordinary_rom_provenance",
+        "passed": true,
+        "detail": "Existing-log analysis alone is diagnostic; a measured ROM must match its ordinary build manifest"
+      }
+    ],
+    "image_capture_scope": "Separate fixed-phase capture ROM; raw RDP framebuffer before VI filtering, not performance timing.",
+    "captures": [
+      {
+        "view": {
+          "id": "two-guards-idle",
+          "position": [
+            -0.5,
+            0,
+            3.7
+          ],
+          "yaw": 180,
+          "pitch": -16,
+          "animation_clip": "idle",
+          "animation_time": 0,
+          "head_yaw": 0,
+          "head_pitch": 0
+        },
+        "image": "docs/images/guard-atlas/before-two-guards-idle.png",
+        "sha256": "5f044e3ca69de5d1c01d4459e3b08f005aca6bb4ca3e89156ab5a3277e98ffeb"
+      },
+      {
+        "view": {
+          "id": "two-guards-walk",
+          "position": [
+            -0.5,
+            0,
+            3.7
+          ],
+          "yaw": 180,
+          "pitch": -16,
+          "animation_clip": "walk",
+          "animation_time": 0.3,
+          "head_yaw": 0,
+          "head_pitch": 0
+        },
+        "image": "docs/images/guard-atlas/before-two-guards-walk.png",
+        "sha256": "9f85b555c7f93dd7100edc93e695c73c387734878d903c2cc4f54ceec817cc83"
+      }
+    ],
+    "source_commit_at_snapshot": "d2b9d4d229d09816e89765ef6025710f7591ac3b",
+    "source_commit_note": "File hashes describe actual working inputs, including any uncommitted changes.",
+    "source_hashes": {
+      "content/animation_workshop.json": "0480ac4b7343b82b1f5c709c93d3496f8fd89ea846315a6b68b96028cb9fb8fd",
+      "content/assets/guard/guard.character.json": "5a4b7b78522eb3e4f8986f9e37e0109441f64d3f62e0e2bbcdb90d31d4837ae2",
+      "content/assets/guard/pack.json": "47d830d24b06da3e161b290710d4b0e8450298f9d7fb455ae44b6b423921fc4d",
+      "src/animation.c": "58aa0b71836522082d5a7b13b340d7133736562f9357ceb51d88eb7cfa7d420e",
+      "src/animation.h": "c713072cc18969c4acbc8c8fba0cfe8ea2831eb578a97f38fbc1b1f6f9fda3a9",
+      "src/content_limits.h": "ec4c37638a9ee2e7bc4fb415caa1071d20a1f5b64ee60f54d1f27bcf1183a591",
+      "src/dl_profile.c": "fdc17f9433a99c2e5e8242842e15503132c2caa3207f199234a4369648ddcfa2",
+      "src/dl_profile.h": "14cac33253e708654add600681b7247712d9e8719622fcaea7270c758c55fd66",
+      "src/enemy_types.def": "c7dc61a6e285278279d633a0b4e41be904bc26897e78fb1f5c61b79ccffae1e4",
+      "src/game.c": "83f1cf981a4cddca035a80b96dbf493e239aa6560119d310deb2ea9718d89429",
+      "src/game.h": "baeccaab8a5663c0d24e48266edddc50e84f02687b2388939a3e8d1e67f662c1",
+      "src/launch.c": "aea06d3be767ab74dcea9dd524f4dfc89a0aac9f36f8136ab588f14b14b7e1ed",
+      "src/launch.h": "82711d01a50c3c05fc50289beaaa784b123ccafcb6362ea00dea3ab72b1b0449",
+      "src/lighting_bake.c": "f0dfb2c749e547adc7e25979d3b76bdd6aef8d52f864365d7e6867dc51770cd6",
+      "src/lighting_bake.h": "ac0d29317f42dd9ebea1ca8f13d35d5f967c3fa09a5792907a7ccec47355795d",
+      "src/main.c": "ce6faed71a0d0002ebfcd52fd28826d6076310d5f9d2fcc842bda5ffcc1d396f",
+      "src/render.c": "9eaa6b91fe52167916a920a6c017adf9588b02cfeb7d4564910f4e85a3f7a444",
+      "src/render.h": "4e75f62eb0d7a3a1ed1eff02dbaeeb6e6a8430bb6f4f22f8ce5bf05d4b77d8b8",
+      "src/render_batches.c": "72e25ffa0b72ce2aa6650a3db81a309e0ffcdb8807196efb8040755f2155cbb9",
+      "src/render_batches.h": "8c316c65bc4527d4396db56ea6f851d8359e4b0bc34c74b6a68ab46e7dcc2a7b",
+      "src/render_camera.h": "fe1fa0001829200ad6d6bedc53b4b61904986dc34b68910c5d1b02c7f1154108",
+      "src/render_hud_cache.inc": "7c3ebe9da6acba712731f811e73243b29474cd7f527e6e758be1127f369af1db",
+      "src/render_lighting.c": "cdbc1bd34c20f664aabb128243b6facda3be7420cf31015e6a882de5c6584792",
+      "src/render_lighting.h": "55479d327432df3d7cdf5e6bfb3856e268630800c2d44369c5b2ac1139d2a45f",
+      "src/render_shading.h": "a12a9fb4d1c8008208e755188078420d43271b5c4d1a9ecb95167985a43d314d",
+      "src/render_t3d.inc": "741fb748c5c38abb71ff01105b17b53b374c1bf6a2625ee594ca295d6015fb25",
+      "src/render_texture_packing.c": "487ddd384af8d1bab1673a3efbddc9529afc21da42d4306071e436fe9b4116d0",
+      "src/render_texture_packing.h": "9788346f3a8b17734408d339983b0327fd18eb549c320a3f0c328bda53c72cde",
+      "src/render_transform.c": "e5babbdf290016deb179de97077b34ddd2af705b576dea49aca9bacb4ecc62e2",
+      "src/render_transform.h": "0b9258c728c688184387265d74e7abfe9a6067dcb41c90d815fe3dbd9fabc655",
+      "src/render_visibility.h": "58d4a2fb1f0e1740e13ae3bed38387b0990b0118b2c2ad52ecd8a2582e2ebb59",
+      "src/scale_bench.c": "e6757e000b8fb4ef83d5f8c5b2442152475b8e781bc89b65c75125e02e00c5ec",
+      "src/scale_bench.h": "0febfeb6d49b6cbf5ea0a551a502a4e7c3b34ee4f1d7ca8db74eefa936ea7c7b",
+      "src/static_lighting.c": "68b54ef7baaab6d297b534ae690eecce40924e3304717d4991e1d717db5c2bbc",
+      "src/static_lighting.h": "411a980f5b8f6cf7f3b40734aae184f24c2406c99e685165c82e128e0da8380d",
+      "tools/build.py": "b6ea87564be1bd4716d16f8f7245b5bddf0adfcceb9b4569de205cab718fbcd5",
+      "tools/character_assets.py": "0d875fddbd43ffaadc01d38032652d22982132aaaf491d279db1478cc0cedf68",
+      "tools/compile_bundle.py": "73089cce970ca0367ad4885c462990c47b67bc211efaa51dc2f075ac76715322",
+      "tools/compile_level.py": "7d442977a7ea0830a05c79c444cf2cbd5e4da3ad48b88dfb093ecdc0205a2d9f",
+      "tools/cook_textures.py": "297b21f7c787f4b9285ed7b113099a01e45c3f5e5056535f4fa76c195bf516cf",
+      "tools/profile_report.py": "b5450990261ecf5918dabcb26ac0ab2a480cb13dedb6801777539096970aa09b",
+      "tools/smoke_ares.py": "62b255622b618bd5ed8861d6c011a6d86d03a1360af70da2ee5efc3c2a93f2c3",
+      "tools/verify_guard_performance.py": "5c4008e8d4e2e9a9be9d5d97ba77616ff3646a157e9f2bfa97833a76c47fe208",
+      "art/guard.blend": "1d3bd969d484842b352bbcec3ea2d4dc9a52c1be78179c82ef07a564a8c29804"
+    },
+    "artifacts_revalidated_locally": true,
+    "artifact_root": "build/guard-atlas-study/before",
+    "visibility_sha256": "aaa98a67ee0b0a44d7991d11090bed66580a74f5ab4c4d1716f8a85c9aa8d391"
+  },
+  "after": {
+    "diagnostic_valid": true,
+    "strict_60fps_passed": true,
+    "measurement_sha256": "51145953dc1e2d145f1be805299a36d79189bb2dfa63a02a628ac81587e8ea65",
+    "snapshot_sha256": "d9fedb706adfa6c1f92ac38258e66a7a90b1e8bef3d70dfb9dfef6d47f44b865",
+    "rom_sha256": "5d821321d57f2890117511f43540fe04e139210566a0d199dd0913fef11e0dcd",
+    "capture_rom_sha256": "d5d3cd90415cffa90ca9dd3c9d59a723d10ae70108f8c5b6c8f38aec44d127c4",
+    "settings_source_sha256": "010e6ec4df82b1750292c4a1e50b1e513f9e2d4b7c604d345be0c1d28b6b140a",
+    "compiler": "mips64-elf-gcc.exe (GCC) 16.2.0",
+    "renderer_library_sha256": "df33d2e57efdd0476d6a533d225cc1c1576f8645121d39a8620696d9f109281f",
+    "log_sha256": "67fcd9971959244ea69c2e68661b95d5648e6cc01c5e3b2238872d2b42ed0b1e",
+    "level_sha256": "0480ac4b7343b82b1f5c709c93d3496f8fd89ea846315a6b68b96028cb9fb8fd",
+    "gameplay_source_sha256": "83f1cf981a4cddca035a80b96dbf493e239aa6560119d310deb2ea9718d89429",
+    "enemy_types_sha256": "c7dc61a6e285278279d633a0b4e41be904bc26897e78fb1f5c61b79ccffae1e4",
+    "character_sha256": "b9d5a6b99f558485a86c74e51d7770f27ca1c78db9e160743a44d186bcf3c78c",
+    "geometry_identity": "f89fea968058541787c48ddc2aa8217c56b4fa5ddde16dfaa851c45b2edb6f79",
+    "animation_identity": "7c181d7f8dab202183b4170ece19f53de4f8b67b5f6ad0736c00f6bcd6465de4",
+    "guard_geometry": {
+      "vertices": 738,
+      "triangles": 535,
+      "bones": 20,
+      "compiled_geometry_bytes": 20184,
+      "attribute_splits": {
+        "unique_positions": 316,
+        "with_joint_identity": 316,
+        "with_quantized_normals": 669,
+        "with_texture_coordinates": 738,
+        "note": "Cumulative distinct attribute tuples, before any target cache scheduling. A shared position may still require separate vertices for normals or UV seams."
+      }
+    },
+    "guard_texture": {
+      "uri": "assets/guard/guard-atlas-painted.png",
+      "width": 64,
+      "height": 64,
+      "format": "CI4",
+      "decoded_bytes": 2048,
+      "pixel_bytes": 2048,
+      "palette_bytes": 32,
+      "decoded_total_bytes": 2080,
+      "sprite_bytes": 2216,
+      "source_sha256": "fe04e007dc0645929dc8e6df946e1b1acf184d59f620250bd578c54ce576ed96",
+      "recipe_sha256": "567fe103fd6724eb9545f172cecd6856f5e75b30d8c6fe63e6836564f11c073d",
+      "sprite_sha256": "b901d5b2d326039d55b3ec3b9fe228fba1aee3256bf595e4f75634e9cb1070eb",
+      "tmem_pixel_bytes": 2048,
+      "tmem_palette_reserved_bytes": 2048,
+      "tmem_bytes": 4096
+    },
+    "level_texture_count": 1,
+    "level_texture_pixel_bytes": 2048,
+    "level_texture_palette_bytes": 32,
+    "level_texture_decoded_total_bytes": 2080,
+    "level_sprite_bytes": 2216,
+    "static_image_bytes": 690520,
+    "sampled_heap_peak_bytes": 971208,
+    "texture_upload_samples": {
+      "count": 30,
+      "minimum": 1,
+      "maximum": 1,
+      "scope": "Per-frame upload count sampled by ordinary one-second material logs; not every frame."
+    },
+    "work": {
+      "samples": 1800,
+      "average_ms": 10.272725997037037,
+      "min_ms": 9.757717333333334,
+      "max_ms": 14.820565333333333,
+      "p50_ms": 10.018261333333333,
+      "p95_ms": 11.550101333333334,
+      "p99_ms": 13.239978666666667,
+      "over_budget_frames": 0,
+      "quantile_method": "nearest rank of every exact CP0-tick sample"
+    },
+    "video": {
+      "vis": 1800,
+      "presents": 1800,
+      "repeats": 0,
+      "ticks": 1410335786,
+      "tracked": true,
+      "max_gap_vis": 1,
+      "max_interval_ms": 18.209493333333334,
+      "seconds": 30.087163434666667,
+      "native_refresh_hz": 59.826178160950384,
+      "presented_fps": 59.826178160950384
+    },
+    "cpu_slots": {
+      "input": {
+        "total_ticks": 3734218,
+        "max_ticks": 3929,
+        "average_ms": 0.04425739851851852,
+        "max_ms": 0.08381866666666667,
+        "percent_of_frame_budget": 0.26554439111111117,
+        "percent_of_30fps_budget": 0.13277219555555558,
+        "percent_of_frame_elapsed": 0.26477108294072804
+      },
+      "gameplay": {
+        "total_ticks": 49067565,
+        "max_ticks": 32723,
+        "average_ms": 0.5815415111111111,
+        "max_ms": 0.6980906666666666,
+        "percent_of_frame_budget": 3.489249066666667,
+        "percent_of_30fps_budget": 1.7446245333333332,
+        "percent_of_frame_elapsed": 3.479087809633654
+      },
+      "audio_events": {
+        "total_ticks": 3557143,
+        "max_ticks": 5265,
+        "average_ms": 0.04215873185185185,
+        "max_ms": 0.11232,
+        "percent_of_frame_budget": 0.2529523911111111,
+        "percent_of_30fps_budget": 0.12647619555555556,
+        "percent_of_frame_elapsed": 0.2522157528791919
+      },
+      "audio_mix": {
+        "total_ticks": 22620550,
+        "max_ticks": 73515,
+        "average_ms": 0.2680954074074074,
+        "max_ms": 1.56832,
+        "percent_of_frame_budget": 1.6085724444444445,
+        "percent_of_30fps_budget": 0.8042862222222222,
+        "percent_of_frame_elapsed": 1.6038880215924423
+      },
+      "cache": {
+        "total_ticks": 0,
+        "max_ticks": 0,
+        "average_ms": 0.0,
+        "max_ms": 0.0,
+        "percent_of_frame_budget": 0.0,
+        "percent_of_30fps_budget": 0.0,
+        "percent_of_frame_elapsed": 0.0
+      },
+      "transforms": {
+        "total_ticks": 290696191,
+        "max_ticks": 166047,
+        "average_ms": 3.4452881896296295,
+        "max_ms": 3.542336,
+        "percent_of_frame_budget": 20.671729137777778,
+        "percent_of_30fps_budget": 10.335864568888889,
+        "percent_of_frame_elapsed": 20.61152972263931
+      },
+      "lighting": {
+        "total_ticks": 415293357,
+        "max_ticks": 236126,
+        "average_ms": 4.921995342222222,
+        "max_ms": 5.037354666666666,
+        "percent_of_frame_budget": 29.531972053333334,
+        "percent_of_30fps_budget": 14.765986026666667,
+        "percent_of_frame_elapsed": 29.445970179293333
+      },
+      "triangles": {
+        "total_ticks": 29361029,
+        "max_ticks": 20112,
+        "average_ms": 0.3479825659259259,
+        "max_ms": 0.429056,
+        "percent_of_frame_budget": 2.0878953955555555,
+        "percent_of_30fps_budget": 1.0439476977777777,
+        "percent_of_frame_elapsed": 2.081815106826683
+      },
+      "hud": {
+        "total_ticks": 4753081,
+        "max_ticks": 4600,
+        "average_ms": 0.056332811851851856,
+        "max_ms": 0.09813333333333334,
+        "percent_of_frame_budget": 0.3379968711111111,
+        "percent_of_30fps_budget": 0.16899843555555558,
+        "percent_of_frame_elapsed": 0.33701256961296816
+      },
+      "debug_hud": {
+        "total_ticks": 0,
+        "max_ticks": 0,
+        "average_ms": 0.0,
+        "max_ms": 0.0,
+        "percent_of_frame_budget": 0.0,
+        "percent_of_30fps_budget": 0.0,
+        "percent_of_frame_elapsed": 0.0
+      },
+      "render_setup": {
+        "total_ticks": 18262041,
+        "max_ticks": 14012,
+        "average_ms": 0.21643900444444444,
+        "max_ms": 0.29892266666666667,
+        "percent_of_frame_budget": 1.2986340266666665,
+        "percent_of_30fps_budget": 0.6493170133333334,
+        "percent_of_frame_elapsed": 1.2948521945633533
+      },
+      "display_wait": {
+        "total_ticks": 543595932,
+        "max_ticks": 325960,
+        "average_ms": 6.442618453333333,
+        "max_ms": 6.953813333333334,
+        "percent_of_frame_budget": 38.655710719999995,
+        "percent_of_30fps_budget": 19.32785536,
+        "percent_of_frame_elapsed": 38.543139044858755
+      },
+      "other": {
+        "total_ticks": 29416081,
+        "max_ticks": 170008,
+        "average_ms": 0.34863503407407404,
+        "max_ms": 3.6268373333333335,
+        "percent_of_frame_budget": 2.091810204444444,
+        "percent_of_30fps_budget": 1.045905102222222,
+        "percent_of_frame_elapsed": 2.0857185151595794
+      }
+    },
+    "nested_timings": {
+      "rsp_lighting": {
+        "frames": 1800,
+        "windows": 30,
+        "average_ms_per_frame": {
+          "probe": 0.3219080059259259,
+          "normal": 2.3007841066666668,
+          "color_upload": 2.0082413274074074
+        },
+        "scope": "Nested CPU elapsed excluding audio; independent report windows selected inside steady interval. Do not add to parent slots."
+      },
+      "animation_profile": {
+        "frames": 1800,
+        "windows": 30,
+        "average_ms_per_frame": {
+          "sample": 1.1084547555555555,
+          "skin": 0.0
+        },
+        "scope": "Nested CPU elapsed excluding audio; independent report windows selected inside steady interval. Do not add to parent slots."
+      }
+    },
+    "runtime_allocations": [
+      {
+        "models": "2",
+        "shared_matrix_bytes": "1536",
+        "pose_scratch_arrays_bytes": "1792",
+        "normal_cache_bytes": "17712",
+        "per_enemy_motion_bytes": "8",
+        "timeline": "actual-distance",
+        "head_yaw_max": "45",
+        "head_pitch_max": "25"
+      }
+    ],
+    "renderer_startup": {
+      "geometry_ready": [
+        {
+          "models": "12",
+          "meshes": "2",
+          "vertices": "1556",
+          "triangles": "1190",
+          "depth": "hardware",
+          "transform": "xyz-euler",
+          "dynamic_lighting": "two-body-probes",
+          "objective_lighting": "emissive"
+        }
+      ],
+      "shading_ready": [
+        {
+          "smooth_vertices": "1476",
+          "scalar_smooth_cache_bytes": "11808",
+          "normal_format": "snorm8"
+        }
+      ],
+      "rsp_ready": [
+        {
+          "backend": "tiny3d",
+          "buffers": "3",
+          "cache_vertices": "70",
+          "batches": "32",
+          "vertex_loads": "1892",
+          "data_bytes": "131017",
+          "units_per_meter": "64",
+          "pose_cache_bytes": "11776"
+        }
+      ],
+      "scene_prepared": [
+        {
+          "ms": "59.07",
+          "night_cache_bytes": "0",
+          "door_states": "1",
+          "textures": "1"
+        }
+      ]
+    },
+    "workload": {
+      "frames": 1800,
+      "geometry_modes": [
+        1
+      ],
+      "full_body_coverage_measured": false,
+      "geometry_evidence": "RSP model bounds candidates and pre-clip triangle submission; full-body coverage unavailable",
+      "animated_min": 2,
+      "animated_max": 2,
+      "full_min": 0,
+      "full_max": 0,
+      "drawn_min": 2,
+      "drawn_max": 2,
+      "triangles_min": 1190,
+      "triangles_max": 1190,
+      "heads_min": 0,
+      "heads_max": 0
+    },
+    "checks": [
+      {
+        "name": "steady_window",
+        "passed": true,
+        "detail": "3 warmup windows excluded; 30 complete windows, 30.088s measured; minimum 30s"
+      },
+      {
+        "name": "complete_frame_distributions",
+        "passed": true,
+        "detail": "Every elapsed/work sample must be present; bounded-buffer overflow cannot pass"
+      },
+      {
+        "name": "16.667ms_work_budget",
+        "passed": true,
+        "detail": "All measured frames <=1000/60ms excluding display-buffer wait; includes normal audio, logging and queue stalls"
+      },
+      {
+        "name": "native_vi_presentation",
+        "passed": true,
+        "detail": "One new framebuffer per native NTSC VI, zero repeated scans, no callback gap >1.5 VI periods; native refresh is reported precisely"
+      },
+      {
+        "name": "both_guards_drawn_every_frame",
+        "passed": true,
+        "detail": "Every frame: two posed guard submissions; active attention head overlays are reported in 0..2 (quiet patrol may be zero); RSP model bounds candidates and pre-clip triangle submission; full-body coverage unavailable; image review separately proves appearance"
+      },
+      {
+        "name": "ordinary_live_workload",
+        "passed": true,
+        "detail": "Normal gameplay and audio remain active; no capture/replay/terminal/error state"
+      },
+      {
+        "name": "authored_camera",
+        "passed": true,
+        "detail": "One ordinary launch at authored two-guards preset"
+      },
+      {
+        "name": "independent_live_actors",
+        "passed": true,
+        "detail": "Patrol advances along authored route while sentry holds its post during measured interval"
+      },
+      {
+        "name": "two_character_allocations",
+        "passed": true,
+        "detail": "Two independently animated model instances"
+      },
+      {
+        "name": "actual_visible_guard_images",
+        "passed": true,
+        "detail": "Separately reviewed source-matched framebuffer images; geometry counters alone cannot satisfy this gate"
+      },
+      {
+        "name": "ordinary_rom_provenance",
+        "passed": true,
+        "detail": "Existing-log analysis alone is diagnostic; a measured ROM must match its ordinary build manifest"
+      }
+    ],
+    "image_capture_scope": "Separate fixed-phase capture ROM; raw RDP framebuffer before VI filtering, not performance timing.",
+    "captures": [
+      {
+        "view": {
+          "id": "two-guards-idle",
+          "position": [
+            -0.5,
+            0,
+            3.7
+          ],
+          "yaw": 180,
+          "pitch": -16,
+          "animation_clip": "idle",
+          "animation_time": 0,
+          "head_yaw": 0,
+          "head_pitch": 0
+        },
+        "image": "docs/images/guard-atlas/after-two-guards-idle.png",
+        "sha256": "4ff6fd73d123c6fd80e981612899a8290f2a480735942ba34adf5d99711704ec"
+      },
+      {
+        "view": {
+          "id": "two-guards-walk",
+          "position": [
+            -0.5,
+            0,
+            3.7
+          ],
+          "yaw": 180,
+          "pitch": -16,
+          "animation_clip": "walk",
+          "animation_time": 0.3,
+          "head_yaw": 0,
+          "head_pitch": 0
+        },
+        "image": "docs/images/guard-atlas/after-two-guards-walk.png",
+        "sha256": "f6b912db8968fc796fd02ff13914e569c7d0ea079c52bb1cf1ccdc5cf0aa4ad6"
+      }
+    ],
+    "source_commit_at_snapshot": "d2b9d4d229d09816e89765ef6025710f7591ac3b",
+    "source_commit_note": "File hashes describe actual working inputs, including any uncommitted changes.",
+    "source_hashes": {
+      "art/guard.blend": "14baa8d617899538ae570d111ea20cf2c7800c8ffb5a8072dbd5979f2568be0b",
+      "content/animation_workshop.json": "0480ac4b7343b82b1f5c709c93d3496f8fd89ea846315a6b68b96028cb9fb8fd",
+      "content/assets/guard/guard.character.json": "b9d5a6b99f558485a86c74e51d7770f27ca1c78db9e160743a44d186bcf3c78c",
+      "content/assets/guard/pack.json": "88b1e3027b1c0885a3fbc630e6847bc9488b29117c03183b7a42ce27f695facd",
+      "src/animation.c": "58aa0b71836522082d5a7b13b340d7133736562f9357ceb51d88eb7cfa7d420e",
+      "src/animation.h": "c713072cc18969c4acbc8c8fba0cfe8ea2831eb578a97f38fbc1b1f6f9fda3a9",
+      "src/content_limits.h": "ec4c37638a9ee2e7bc4fb415caa1071d20a1f5b64ee60f54d1f27bcf1183a591",
+      "src/dl_profile.c": "fdc17f9433a99c2e5e8242842e15503132c2caa3207f199234a4369648ddcfa2",
+      "src/dl_profile.h": "14cac33253e708654add600681b7247712d9e8719622fcaea7270c758c55fd66",
+      "src/enemy_types.def": "c7dc61a6e285278279d633a0b4e41be904bc26897e78fb1f5c61b79ccffae1e4",
+      "src/game.c": "83f1cf981a4cddca035a80b96dbf493e239aa6560119d310deb2ea9718d89429",
+      "src/game.h": "baeccaab8a5663c0d24e48266edddc50e84f02687b2388939a3e8d1e67f662c1",
+      "src/launch.c": "aea06d3be767ab74dcea9dd524f4dfc89a0aac9f36f8136ab588f14b14b7e1ed",
+      "src/launch.h": "82711d01a50c3c05fc50289beaaa784b123ccafcb6362ea00dea3ab72b1b0449",
+      "src/lighting_bake.c": "f0dfb2c749e547adc7e25979d3b76bdd6aef8d52f864365d7e6867dc51770cd6",
+      "src/lighting_bake.h": "ac0d29317f42dd9ebea1ca8f13d35d5f967c3fa09a5792907a7ccec47355795d",
+      "src/main.c": "ce6faed71a0d0002ebfcd52fd28826d6076310d5f9d2fcc842bda5ffcc1d396f",
+      "src/render.c": "9eaa6b91fe52167916a920a6c017adf9588b02cfeb7d4564910f4e85a3f7a444",
+      "src/render.h": "4e75f62eb0d7a3a1ed1eff02dbaeeb6e6a8430bb6f4f22f8ce5bf05d4b77d8b8",
+      "src/render_batches.c": "72e25ffa0b72ce2aa6650a3db81a309e0ffcdb8807196efb8040755f2155cbb9",
+      "src/render_batches.h": "8c316c65bc4527d4396db56ea6f851d8359e4b0bc34c74b6a68ab46e7dcc2a7b",
+      "src/render_camera.h": "fe1fa0001829200ad6d6bedc53b4b61904986dc34b68910c5d1b02c7f1154108",
+      "src/render_hud_cache.inc": "7c3ebe9da6acba712731f811e73243b29474cd7f527e6e758be1127f369af1db",
+      "src/render_lighting.c": "cdbc1bd34c20f664aabb128243b6facda3be7420cf31015e6a882de5c6584792",
+      "src/render_lighting.h": "55479d327432df3d7cdf5e6bfb3856e268630800c2d44369c5b2ac1139d2a45f",
+      "src/render_shading.h": "a12a9fb4d1c8008208e755188078420d43271b5c4d1a9ecb95167985a43d314d",
+      "src/render_t3d.inc": "741fb748c5c38abb71ff01105b17b53b374c1bf6a2625ee594ca295d6015fb25",
+      "src/render_texture_packing.c": "487ddd384af8d1bab1673a3efbddc9529afc21da42d4306071e436fe9b4116d0",
+      "src/render_texture_packing.h": "9788346f3a8b17734408d339983b0327fd18eb549c320a3f0c328bda53c72cde",
+      "src/render_transform.c": "e5babbdf290016deb179de97077b34ddd2af705b576dea49aca9bacb4ecc62e2",
+      "src/render_transform.h": "0b9258c728c688184387265d74e7abfe9a6067dcb41c90d815fe3dbd9fabc655",
+      "src/render_visibility.h": "58d4a2fb1f0e1740e13ae3bed38387b0990b0118b2c2ad52ecd8a2582e2ebb59",
+      "src/scale_bench.c": "e6757e000b8fb4ef83d5f8c5b2442152475b8e781bc89b65c75125e02e00c5ec",
+      "src/scale_bench.h": "0febfeb6d49b6cbf5ea0a551a502a4e7c3b34ee4f1d7ca8db74eefa936ea7c7b",
+      "src/static_lighting.c": "68b54ef7baaab6d297b534ae690eecce40924e3304717d4991e1d717db5c2bbc",
+      "src/static_lighting.h": "411a980f5b8f6cf7f3b40734aae184f24c2406c99e685165c82e128e0da8380d",
+      "tools/build.py": "b6ea87564be1bd4716d16f8f7245b5bddf0adfcceb9b4569de205cab718fbcd5",
+      "tools/character_assets.py": "0d875fddbd43ffaadc01d38032652d22982132aaaf491d279db1478cc0cedf68",
+      "tools/compile_bundle.py": "aba1bc4bf1d63c307455d055e6a761aeb1f557adfe3ed55d22afa3bbd543d6b5",
+      "tools/compile_level.py": "19424f94d0567ec4c9dfe6539b776b877d9005001575a49cd2baaa1050130458",
+      "tools/cook_textures.py": "12f6b8f8b6b1025660541dd03f78dc1d12d6d09041cf62b8f5d1eb40c033d996",
+      "tools/profile_report.py": "b5450990261ecf5918dabcb26ac0ab2a480cb13dedb6801777539096970aa09b",
+      "tools/smoke_ares.py": "62b255622b618bd5ed8861d6c011a6d86d03a1360af70da2ee5efc3c2a93f2c3",
+      "tools/verify_guard_performance.py": "5c4008e8d4e2e9a9be9d5d97ba77616ff3646a157e9f2bfa97833a76c47fe208"
+    },
+    "artifacts_revalidated_locally": true,
+    "artifact_root": "build/guard-atlas-study/after",
+    "visibility_sha256": "a473f8d574f2adcdd3ce6046a09449e2ae9f7c44e662896c7fde353461dbaf52"
+  },
+  "changes": {
+    "guard_vertices": -271,
+    "guard_decoded_texture_bytes": 32,
+    "sampled_heap_peak_bytes": -36776,
+    "work_average_ms": -0.5190028681481493,
+    "work_max_ms": -0.5754666666666672
+  },
+  "limitations": [
+    "Ares CP0/VI model; original N64/M64 validation remains pending.",
+    "The new atlas, UV splits, texture-format support and any resulting code-layout change are measured together; speed differences are not attributed solely to palette format.",
+    "Geometry identity ignores UVs and vertex numbering, rounds positions/normals to1e-7 and preserves winding/bone ownership.",
+    "Work excludes display-buffer wait; fresh framebuffer presentation is measured independently via VI origins.",
+    "Fixed-phase image captures and sampled upload counts are not a worst-case crowd/combat benchmark.",
+    "Ignored private snapshots, raw ROMs and logs were rehashed locally during publication; checked-in hashes retain provenance, but those raw artifacts are not bundled with the repository."
+  ],
+  "commands": [
+    "python tools/guard_atlas_study.py freeze --phase before",
+    "python tools/guard_atlas_study.py capture --phase before",
+    "Inspect both images and write before/visibility.json using the official visibility-review schema.",
+    "python tools/guard_atlas_study.py measure --phase before",
+    "Publish the new art/material only after the before snapshot is secured.",
+    "python tools/guard_atlas_study.py freeze --phase after --with-sponza",
+    "python tools/guard_atlas_study.py capture --phase after",
+    "Inspect both images and write after/visibility.json using the official visibility-review schema.",
+    "python tools/guard_atlas_study.py measure --phase after",
+    "python tools/guard_atlas_study.py sponza --phase after",
+    "python tools/guard_atlas_study.py publish"
+  ],
+  "sponza": {
+    "before_scope": "Previously measured ordinary gameplay on the preserved original guard/runtime; the workshop before run was measured freshly for this study.",
+    "before_reference_sha256": "eb0c2d1ec389f639af40869b1e912f212f9f854eaef1a131c389513aadc1767b",
+    "before_raw_artifacts_revalidated_locally": true,
+    "cases": {
+      "courtyard": {
+        "before": {
+          "diagnostic_valid": true,
+          "checks": {
+            "at_least_30_seconds": true,
+            "ordinary_live_gameplay": true,
+            "exact_frame_samples": true,
+            "reliable_vi_observation": true,
+            "authored_start": true,
+            "both_guards_active": true
+          },
+          "rom_sha256": "39199f0cd478936cc5113f34d29f8ae0252a38e36e3f288c0a0a68c5dd2810f8",
+          "log_sha256": "aa6faf3a0de1056e6d7cabc5897ff1ed5dfcba47f936effde986f420df091306",
+          "level_source_sha256": "a75fb0e9415d405a1a004469048c2a7288bbcd49f34ea5db90a95c89f5a60164",
+          "settings_source_sha256": "010e6ec4df82b1750292c4a1e50b1e513f9e2d4b7c604d345be0c1d28b6b140a",
+          "renderer_library_sha256": "df33d2e57efdd0476d6a533d225cc1c1576f8645121d39a8620696d9f109281f",
+          "work": {
+            "samples": 1245,
+            "average_ms": 24.281532727175367,
+            "min_ms": 20.762538666666668,
+            "max_ms": 32.355456,
+            "p50_ms": 22.761813333333333,
+            "p95_ms": 28.653141333333334,
+            "p99_ms": 30.458112,
+            "over_budget_frames": 1245,
+            "quantile_method": "nearest rank of every exact CP0-tick sample"
+          },
+          "video": {
+            "vis": 1810,
+            "presents": 1245,
+            "repeats": 565,
+            "ticks": 1418170688,
+            "tracked": true,
+            "max_gap_vis": 2,
+            "max_interval_ms": 18.284565333333333,
+            "seconds": 30.254308010666666,
+            "native_refresh_hz": 59.826190682062666,
+            "presented_fps": 41.15116430893261
+          },
+          "cpu_slots": {
+            "input": {
+              "total_ticks": 2474795,
+              "max_ticks": 4915,
+              "average_ms": 0.042406125836680054,
+              "max_ms": 0.10485333333333334,
+              "percent_of_frame_budget": 0.25443675502008034,
+              "percent_of_30fps_budget": 0.12721837751004017,
+              "percent_of_frame_elapsed": 0.17450964014199066
+            },
+            "gameplay": {
+              "total_ticks": 320216537,
+              "max_ticks": 303765,
+              "average_ms": 5.486976805354752,
+              "max_ms": 6.48032,
+              "percent_of_frame_budget": 32.92186083212851,
+              "percent_of_30fps_budget": 16.460930416064258,
+              "percent_of_frame_elapsed": 22.580000622025032
+            },
+            "audio_events": {
+              "total_ticks": 3202985,
+              "max_ticks": 19928,
+              "average_ms": 0.05488381258366801,
+              "max_ms": 0.42513066666666666,
+              "percent_of_frame_budget": 0.32930287550200804,
+              "percent_of_30fps_budget": 0.16465143775100402,
+              "percent_of_frame_elapsed": 0.22585780225440652
+            },
+            "audio_mix": {
+              "total_ticks": 22870804,
+              "max_ticks": 126976,
+              "average_ms": 0.3918959721552878,
+              "max_ms": 2.7088213333333333,
+              "percent_of_frame_budget": 2.351375832931727,
+              "percent_of_30fps_budget": 1.1756879164658636,
+              "percent_of_frame_elapsed": 1.6127298526940617
+            },
+            "cache": {
+              "total_ticks": 0,
+              "max_ticks": 0,
+              "average_ms": 0.0,
+              "max_ms": 0.0,
+              "percent_of_frame_budget": 0.0,
+              "percent_of_30fps_budget": 0.0,
+              "percent_of_frame_elapsed": 0.0
+            },
+            "transforms": {
+              "total_ticks": 373769654,
+              "max_ticks": 351392,
+              "average_ms": 6.404620577242302,
+              "max_ms": 7.496362666666666,
+              "percent_of_frame_budget": 38.427723463453816,
+              "percent_of_30fps_budget": 19.213861731726908,
+              "percent_of_frame_elapsed": 26.356287213905137
+            },
+            "lighting": {
+              "total_ticks": 334387011,
+              "max_ticks": 365129,
+              "average_ms": 5.729790817670683,
+              "max_ms": 7.789418666666666,
+              "percent_of_frame_budget": 34.378744906024096,
+              "percent_of_30fps_budget": 17.189372453012048,
+              "percent_of_frame_elapsed": 23.579228565503758
+            },
+            "triangles": {
+              "total_ticks": 223381925,
+              "max_ticks": 254269,
+              "average_ms": 3.8276956358768404,
+              "max_ms": 5.4244053333333335,
+              "percent_of_frame_budget": 22.96617381526104,
+              "percent_of_30fps_budget": 11.483086907630522,
+              "percent_of_frame_elapsed": 15.751728666808825
+            },
+            "hud": {
+              "total_ticks": 3339669,
+              "max_ticks": 7398,
+              "average_ms": 0.05722592128514056,
+              "max_ms": 0.157824,
+              "percent_of_frame_budget": 0.3433555277108434,
+              "percent_of_30fps_budget": 0.1716777638554217,
+              "percent_of_frame_elapsed": 0.2354960452818766
+            },
+            "debug_hud": {
+              "total_ticks": 0,
+              "max_ticks": 0,
+              "average_ms": 0.0,
+              "max_ms": 0.0,
+              "percent_of_frame_budget": 0.0,
+              "percent_of_30fps_budget": 0.0,
+              "percent_of_frame_elapsed": 0.0
+            },
+            "render_setup": {
+              "total_ticks": 26300702,
+              "max_ticks": 26683,
+              "average_ms": 0.4506679860776439,
+              "max_ms": 0.5692373333333334,
+              "percent_of_frame_budget": 2.7040079164658635,
+              "percent_of_30fps_budget": 1.3520039582329317,
+              "percent_of_frame_elapsed": 1.854588376613713
+            },
+            "display_wait": {
+              "total_ticks": 1087212,
+              "max_ticks": 3335,
+              "average_ms": 0.018629603212851405,
+              "max_ms": 0.07114666666666666,
+              "percent_of_frame_budget": 0.11177761927710843,
+              "percent_of_30fps_budget": 0.055888809638554214,
+              "percent_of_frame_elapsed": 0.07666452165858342
+            },
+            "other": {
+              "total_ticks": 107110992,
+              "max_ticks": 249924,
+              "average_ms": 1.8353690730923697,
+              "max_ms": 5.331712,
+              "percent_of_frame_budget": 11.012214438554219,
+              "percent_of_30fps_budget": 5.506107219277109,
+              "percent_of_frame_elapsed": 7.5529086931126175
+            }
+          },
+          "heap_bytes": {
+            "sampled_peak": 1474808,
+            "sampled_total": 7550128
+          },
+          "static_image_bytes": 772304,
+          "counts": {
+            "entities": 239,
+            "meshes": 70,
+            "models": 114,
+            "colliders": 118,
+            "instanced_vertices": 5898,
+            "instanced_triangles": 3902,
+            "lights": 8,
+            "enemies": 2,
+            "test_starts": 5,
+            "patrol_points": 8
+          },
+          "texture_count": 10,
+          "texture_pixel_bytes": 26624,
+          "texture_palette_bytes": 0,
+          "texture_decoded_total_bytes": 26624,
+          "actor_displacement_metres": {
+            "ground-guard": 18.318782710649746,
+            "upper-guard": 18.750215998755856
+          },
+          "terminal_game_state_observed": false
+        },
+        "after": {
+          "diagnostic_valid": true,
+          "checks": {
+            "at_least_30_seconds": true,
+            "ordinary_live_gameplay": true,
+            "exact_frame_samples": true,
+            "reliable_vi_observation": true,
+            "authored_start": true,
+            "both_guards_active": true
+          },
+          "rom_sha256": "4fdcba518ed929ed4aab82553f8f6a7a4effd1670ecaf020c758babfb2c2aea9",
+          "log_sha256": "a5f7131577cb018c58591afe019ffd11b4662d54185893733b5321a974786471",
+          "level_source_sha256": "a75fb0e9415d405a1a004469048c2a7288bbcd49f34ea5db90a95c89f5a60164",
+          "settings_source_sha256": "010e6ec4df82b1750292c4a1e50b1e513f9e2d4b7c604d345be0c1d28b6b140a",
+          "renderer_library_sha256": "df33d2e57efdd0476d6a533d225cc1c1576f8645121d39a8620696d9f109281f",
+          "work": {
+            "samples": 1296,
+            "average_ms": 23.344245646090535,
+            "min_ms": 19.799424,
+            "max_ms": 32.04192,
+            "p50_ms": 21.820373333333333,
+            "p95_ms": 28.105578666666666,
+            "p99_ms": 29.777877333333333,
+            "over_budget_frames": 1296,
+            "quantile_method": "nearest rank of every exact CP0-tick sample"
+          },
+          "video": {
+            "vis": 1812,
+            "presents": 1296,
+            "repeats": 516,
+            "ticks": 1419737967,
+            "tracked": true,
+            "max_gap_vis": 2,
+            "max_interval_ms": 18.316437333333333,
+            "seconds": 30.287743296,
+            "native_refresh_hz": 59.82618058702659,
+            "presented_fps": 42.78958611522432
+          },
+          "cpu_slots": {
+            "input": {
+              "total_ticks": 2665246,
+              "max_ticks": 5162,
+              "average_ms": 0.043872362139917694,
+              "max_ms": 0.11012266666666666,
+              "percent_of_frame_budget": 0.2632341728395061,
+              "percent_of_30fps_budget": 0.1316170864197531,
+              "percent_of_frame_elapsed": 0.1877881667555956
+            },
+            "gameplay": {
+              "total_ticks": 329153665,
+              "max_ticks": 301614,
+              "average_ms": 5.418167325102881,
+              "max_ms": 6.434432,
+              "percent_of_frame_budget": 32.509003950617284,
+              "percent_of_30fps_budget": 16.254501975308642,
+              "percent_of_frame_elapsed": 23.19154154297031
+            },
+            "audio_events": {
+              "total_ticks": 3374895,
+              "max_ticks": 19725,
+              "average_ms": 0.05555382716049383,
+              "max_ms": 0.4208,
+              "percent_of_frame_budget": 0.33332296296296293,
+              "percent_of_30fps_budget": 0.16666148148148147,
+              "percent_of_frame_elapsed": 0.23778868631361824
+            },
+            "audio_mix": {
+              "total_ticks": 22904171,
+              "max_ticks": 126954,
+              "average_ms": 0.37702339094650206,
+              "max_ms": 2.708352,
+              "percent_of_frame_budget": 2.262140345679012,
+              "percent_of_30fps_budget": 1.131070172839506,
+              "percent_of_frame_elapsed": 1.6137843497923556
+            },
+            "cache": {
+              "total_ticks": 0,
+              "max_ticks": 0,
+              "average_ms": 0.0,
+              "max_ms": 0.0,
+              "percent_of_frame_budget": 0.0,
+              "percent_of_30fps_budget": 0.0,
+              "percent_of_frame_elapsed": 0.0
+            },
+            "transforms": {
+              "total_ticks": 393922277,
+              "max_ticks": 355556,
+              "average_ms": 6.484317316872428,
+              "max_ms": 7.585194666666666,
+              "percent_of_frame_budget": 38.905903901234566,
+              "percent_of_30fps_budget": 19.452951950617283,
+              "percent_of_frame_elapsed": 27.755014824905437
+            },
+            "lighting": {
+              "total_ticks": 331007327,
+              "max_ticks": 344653,
+              "average_ms": 5.448680279835391,
+              "max_ms": 7.352597333333334,
+              "percent_of_frame_budget": 32.69208167901235,
+              "percent_of_30fps_budget": 16.346040839506173,
+              "percent_of_frame_elapsed": 23.32214704383759
+            },
+            "triangles": {
+              "total_ticks": 244001252,
+              "max_ticks": 279934,
+              "average_ms": 4.016481514403292,
+              "max_ms": 5.971925333333333,
+              "percent_of_frame_budget": 24.098889086419753,
+              "percent_of_30fps_budget": 12.049444543209876,
+              "percent_of_frame_elapsed": 17.191864390435292
+            },
+            "hud": {
+              "total_ticks": 3549639,
+              "max_ticks": 7894,
+              "average_ms": 0.05843027160493827,
+              "max_ms": 0.16840533333333332,
+              "percent_of_frame_budget": 0.35058162962962963,
+              "percent_of_30fps_budget": 0.17529081481481482,
+              "percent_of_frame_elapsed": 0.2501008163802387
+            },
+            "debug_hud": {
+              "total_ticks": 0,
+              "max_ticks": 0,
+              "average_ms": 0.0,
+              "max_ms": 0.0,
+              "percent_of_frame_budget": 0.0,
+              "percent_of_30fps_budget": 0.0,
+              "percent_of_frame_elapsed": 0.0
+            },
+            "render_setup": {
+              "total_ticks": 27723138,
+              "max_ticks": 26630,
+              "average_ms": 0.456347950617284,
+              "max_ms": 0.5681066666666666,
+              "percent_of_frame_budget": 2.7380877037037044,
+              "percent_of_30fps_budget": 1.369043851851852,
+              "percent_of_frame_elapsed": 1.9533196041687668
+            },
+            "display_wait": {
+              "total_ticks": 1120329,
+              "max_ticks": 5260,
+              "average_ms": 0.01844162962962963,
+              "max_ms": 0.11221333333333333,
+              "percent_of_frame_budget": 0.11064977777777778,
+              "percent_of_30fps_budget": 0.055324888888888896,
+              "percent_of_frame_elapsed": 0.07893625169051174
+            },
+            "other": {
+              "total_ticks": 59861313,
+              "max_ticks": 222910,
+              "average_ms": 0.9853714074074074,
+              "max_ms": 4.755413333333333,
+              "percent_of_frame_budget": 5.912228444444444,
+              "percent_of_30fps_budget": 2.9561142222222223,
+              "percent_of_frame_elapsed": 4.217714322750283
+            }
+          },
+          "heap_bytes": {
+            "sampled_peak": 1442344,
+            "sampled_total": 7556640
+          },
+          "static_image_bytes": 765792,
+          "counts": {
+            "entities": 239,
+            "meshes": 70,
+            "models": 114,
+            "colliders": 118,
+            "instanced_vertices": 5356,
+            "instanced_triangles": 3902,
+            "lights": 8,
+            "enemies": 2,
+            "test_starts": 5,
+            "patrol_points": 8
+          },
+          "texture_count": 10,
+          "texture_pixel_bytes": 26624,
+          "texture_palette_bytes": 32,
+          "texture_decoded_total_bytes": 26656,
+          "actor_displacement_metres": {
+            "ground-guard": 18.329975450065394,
+            "upper-guard": 18.756145659489853
+          },
+          "terminal_game_state_observed": false
+        },
+        "matched_scene_settings_and_rsp_library": true
+      },
+      "upper-gallery": {
+        "before": {
+          "diagnostic_valid": true,
+          "checks": {
+            "at_least_30_seconds": true,
+            "ordinary_live_gameplay": true,
+            "exact_frame_samples": true,
+            "reliable_vi_observation": true,
+            "authored_start": true,
+            "both_guards_active": true
+          },
+          "rom_sha256": "fc80ab22de99cd5c3ea04b0a27501148f90a0b280cb7a998dfbf8983233bf87f",
+          "log_sha256": "161125fe030c7cd1a2676d88a572a1d2612fbd22cb1f3ffa0ac82499ba0c4ab4",
+          "level_source_sha256": "a75fb0e9415d405a1a004469048c2a7288bbcd49f34ea5db90a95c89f5a60164",
+          "settings_source_sha256": "010e6ec4df82b1750292c4a1e50b1e513f9e2d4b7c604d345be0c1d28b6b140a",
+          "renderer_library_sha256": "df33d2e57efdd0476d6a533d225cc1c1576f8645121d39a8620696d9f109281f",
+          "work": {
+            "samples": 1802,
+            "average_ms": 12.249668261931188,
+            "min_ms": 9.290752,
+            "max_ms": 18.868842666666666,
+            "p50_ms": 11.877461333333333,
+            "p95_ms": 14.831957333333333,
+            "p99_ms": 15.960064,
+            "over_budget_frames": 15,
+            "quantile_method": "nearest rank of every exact CP0-tick sample"
+          },
+          "video": {
+            "vis": 1802,
+            "presents": 1802,
+            "repeats": 0,
+            "ticks": 1411902866,
+            "tracked": true,
+            "max_gap_vis": 1,
+            "max_interval_ms": 18.293077333333333,
+            "seconds": 30.120594474666667,
+            "native_refresh_hz": 59.826176455965914,
+            "presented_fps": 59.826176455965914
+          },
+          "cpu_slots": {
+            "input": {
+              "total_ticks": 3656791,
+              "max_ticks": 3393,
+              "average_ms": 0.04329164335923048,
+              "max_ms": 0.072384,
+              "percent_of_frame_budget": 0.2597498601553829,
+              "percent_of_30fps_budget": 0.12987493007769146,
+              "percent_of_frame_elapsed": 0.25903016380247085
+            },
+            "gameplay": {
+              "total_ticks": 252665775,
+              "max_ticks": 157536,
+              "average_ms": 2.991233740288568,
+              "max_ms": 3.360768,
+              "percent_of_frame_budget": 17.947402441731406,
+              "percent_of_30fps_budget": 8.973701220865705,
+              "percent_of_frame_elapsed": 17.89767506142086
+            },
+            "audio_events": {
+              "total_ticks": 4351043,
+              "max_ticks": 13801,
+              "average_ms": 0.05151068294487606,
+              "max_ms": 0.2944213333333333,
+              "percent_of_frame_budget": 0.30906409766925635,
+              "percent_of_30fps_budget": 0.15453204883462818,
+              "percent_of_frame_elapsed": 0.30820776495063407
+            },
+            "audio_mix": {
+              "total_ticks": 19069214,
+              "max_ticks": 73551,
+              "average_ms": 0.2257546607473178,
+              "max_ms": 1.569088,
+              "percent_of_frame_budget": 1.3545279644839066,
+              "percent_of_30fps_budget": 0.6772639822419534,
+              "percent_of_frame_elapsed": 1.3507749351834355
+            },
+            "cache": {
+              "total_ticks": 0,
+              "max_ticks": 0,
+              "average_ms": 0.0,
+              "max_ms": 0.0,
+              "percent_of_frame_budget": 0.0,
+              "percent_of_30fps_budget": 0.0,
+              "percent_of_frame_elapsed": 0.0
+            },
+            "transforms": {
+              "total_ticks": 281314770,
+              "max_ticks": 196369,
+              "average_ms": 3.3304005327413986,
+              "max_ms": 4.189205333333334,
+              "percent_of_frame_budget": 19.98240319644839,
+              "percent_of_30fps_budget": 9.991201598224196,
+              "percent_of_frame_elapsed": 19.927037381451225
+            },
+            "lighting": {
+              "total_ticks": 117776187,
+              "max_ticks": 147254,
+              "average_ms": 1.394316679245283,
+              "max_ms": 3.1414186666666666,
+              "percent_of_frame_budget": 8.365900075471698,
+              "percent_of_30fps_budget": 4.182950037735849,
+              "percent_of_frame_elapsed": 8.342720437301567
+            },
+            "triangles": {
+              "total_ticks": 178776350,
+              "max_ticks": 109753,
+              "average_ms": 2.116479171291158,
+              "max_ms": 2.3413973333333336,
+              "percent_of_frame_budget": 12.698875027746949,
+              "percent_of_30fps_budget": 6.349437513873474,
+              "percent_of_frame_elapsed": 12.663689892178104
+            },
+            "hud": {
+              "total_ticks": 4749591,
+              "max_ticks": 4615,
+              "average_ms": 0.056228972253052165,
+              "max_ms": 0.09845333333333334,
+              "percent_of_frame_budget": 0.337373833518313,
+              "percent_of_30fps_budget": 0.16868691675915648,
+              "percent_of_frame_elapsed": 0.3364390622063829
+            },
+            "debug_hud": {
+              "total_ticks": 0,
+              "max_ticks": 0,
+              "average_ms": 0.0,
+              "max_ms": 0.0,
+              "percent_of_frame_budget": 0.0,
+              "percent_of_30fps_budget": 0.0,
+              "percent_of_frame_elapsed": 0.0
+            },
+            "render_setup": {
+              "total_ticks": 38055122,
+              "max_ticks": 24530,
+              "average_ms": 0.4505230869404366,
+              "max_ms": 0.5233066666666667,
+              "percent_of_frame_budget": 2.7031385216426194,
+              "percent_of_30fps_budget": 1.3515692608213097,
+              "percent_of_frame_elapsed": 2.695648858571084
+            },
+            "display_wait": {
+              "total_ticks": 377009838,
+              "max_ticks": 347402,
+              "average_ms": 4.4633055183129855,
+              "max_ms": 7.411242666666666,
+              "percent_of_frame_budget": 26.779833109877917,
+              "percent_of_30fps_budget": 13.389916554938956,
+              "percent_of_frame_elapsed": 26.70563346176552
+            },
+            "other": {
+              "total_ticks": 134299323,
+              "max_ticks": 245158,
+              "average_ms": 1.5899290921198668,
+              "max_ms": 5.230037333333334,
+              "percent_of_frame_budget": 9.5395745527192,
+              "percent_of_30fps_budget": 4.7697872763596,
+              "percent_of_frame_elapsed": 9.513142981168718
+            }
+          },
+          "heap_bytes": {
+            "sampled_peak": 1474808,
+            "sampled_total": 7550128
+          },
+          "static_image_bytes": 772304,
+          "counts": {
+            "entities": 239,
+            "meshes": 70,
+            "models": 114,
+            "colliders": 118,
+            "instanced_vertices": 5898,
+            "instanced_triangles": 3902,
+            "lights": 8,
+            "enemies": 2,
+            "test_starts": 5,
+            "patrol_points": 8
+          },
+          "texture_count": 10,
+          "texture_pixel_bytes": 26624,
+          "texture_palette_bytes": 0,
+          "texture_decoded_total_bytes": 26624,
+          "actor_displacement_metres": {
+            "ground-guard": 18.323760531070032,
+            "upper-guard": 18.7217200064524
+          },
+          "terminal_game_state_observed": false
+        },
+        "after": {
+          "diagnostic_valid": true,
+          "checks": {
+            "at_least_30_seconds": true,
+            "ordinary_live_gameplay": true,
+            "exact_frame_samples": true,
+            "reliable_vi_observation": true,
+            "authored_start": true,
+            "both_guards_active": true
+          },
+          "rom_sha256": "84aa1360e311472e45762610f87665e8f30c2f042ab6a4abdfd620a9679a3c6d",
+          "log_sha256": "c89d4ed48d80ddfa507d3c533db08123ce8f051096c5942158786e6235ed5ae5",
+          "level_source_sha256": "a75fb0e9415d405a1a004469048c2a7288bbcd49f34ea5db90a95c89f5a60164",
+          "settings_source_sha256": "010e6ec4df82b1750292c4a1e50b1e513f9e2d4b7c604d345be0c1d28b6b140a",
+          "renderer_library_sha256": "df33d2e57efdd0476d6a533d225cc1c1576f8645121d39a8620696d9f109281f",
+          "work": {
+            "samples": 1802,
+            "average_ms": 11.503911754347023,
+            "min_ms": 8.592298666666666,
+            "max_ms": 18.857706666666665,
+            "p50_ms": 11.150016,
+            "p95_ms": 14.001344,
+            "p99_ms": 15.073152,
+            "over_budget_frames": 15,
+            "quantile_method": "nearest rank of every exact CP0-tick sample"
+          },
+          "video": {
+            "vis": 1802,
+            "presents": 1802,
+            "repeats": 0,
+            "ticks": 1411902889,
+            "tracked": true,
+            "max_gap_vis": 1,
+            "max_interval_ms": 18.305408,
+            "seconds": 30.120594965333332,
+            "native_refresh_hz": 59.826175481393186,
+            "presented_fps": 59.826175481393186
+          },
+          "cpu_slots": {
+            "input": {
+              "total_ticks": 3788453,
+              "max_ticks": 4021,
+              "average_ms": 0.04485034998150203,
+              "max_ms": 0.08578133333333333,
+              "percent_of_frame_budget": 0.2691020998890122,
+              "percent_of_30fps_budget": 0.1345510499445061,
+              "percent_of_frame_elapsed": 0.2683514709905029
+            },
+            "gameplay": {
+              "total_ticks": 249224280,
+              "max_ticks": 154061,
+              "average_ms": 2.950490921198668,
+              "max_ms": 3.2866346666666666,
+              "percent_of_frame_budget": 17.702945527192007,
+              "percent_of_30fps_budget": 8.851472763596004,
+              "percent_of_frame_elapsed": 17.65356522690105
+            },
+            "audio_events": {
+              "total_ticks": 4448932,
+              "max_ticks": 13316,
+              "average_ms": 0.05266956122826489,
+              "max_ms": 0.28407466666666664,
+              "percent_of_frame_budget": 0.3160173673695893,
+              "percent_of_30fps_budget": 0.15800868368479468,
+              "percent_of_frame_elapsed": 0.31513587380831176
+            },
+            "audio_mix": {
+              "total_ticks": 18970136,
+              "max_ticks": 73611,
+              "average_ms": 0.22458170625231225,
+              "max_ms": 1.570368,
+              "percent_of_frame_budget": 1.3474902375138735,
+              "percent_of_30fps_budget": 0.6737451187569368,
+              "percent_of_frame_elapsed": 1.3437315707730557
+            },
+            "cache": {
+              "total_ticks": 0,
+              "max_ticks": 0,
+              "average_ms": 0.0,
+              "max_ms": 0.0,
+              "percent_of_frame_budget": 0.0,
+              "percent_of_30fps_budget": 0.0,
+              "percent_of_frame_elapsed": 0.0
+            },
+            "transforms": {
+              "total_ticks": 285682451,
+              "max_ticks": 200129,
+              "average_ms": 3.382108187939327,
+              "max_ms": 4.269418666666667,
+              "percent_of_frame_budget": 20.29264912763596,
+              "percent_of_30fps_budget": 10.14632456381798,
+              "percent_of_frame_elapsed": 20.236045151417287
+            },
+            "lighting": {
+              "total_ticks": 111422282,
+              "max_ticks": 140376,
+              "average_ms": 1.3190947184609692,
+              "max_ms": 2.994688,
+              "percent_of_frame_budget": 7.914568310765814,
+              "percent_of_30fps_budget": 3.9572841553829075,
+              "percent_of_frame_elapsed": 7.892491546237642
+            },
+            "triangles": {
+              "total_ticks": 183520242,
+              "max_ticks": 110346,
+              "average_ms": 2.1726406748057716,
+              "max_ms": 2.354048,
+              "percent_of_frame_budget": 13.03584404883463,
+              "percent_of_30fps_budget": 6.517922024417315,
+              "percent_of_frame_elapsed": 12.999482083381547
+            },
+            "hud": {
+              "total_ticks": 4907819,
+              "max_ticks": 7141,
+              "average_ms": 0.05810218571957084,
+              "max_ms": 0.15234133333333333,
+              "percent_of_frame_budget": 0.34861311431742503,
+              "percent_of_30fps_budget": 0.17430655715871252,
+              "percent_of_frame_elapsed": 0.34764069872455566
+            },
+            "debug_hud": {
+              "total_ticks": 0,
+              "max_ticks": 0,
+              "average_ms": 0.0,
+              "max_ms": 0.0,
+              "percent_of_frame_budget": 0.0,
+              "percent_of_30fps_budget": 0.0,
+              "percent_of_frame_elapsed": 0.0
+            },
+            "render_setup": {
+              "total_ticks": 38942737,
+              "max_ticks": 25181,
+              "average_ms": 0.4610312926378098,
+              "max_ms": 0.5371946666666667,
+              "percent_of_frame_budget": 2.7661877558268584,
+              "percent_of_30fps_budget": 1.3830938779134294,
+              "percent_of_frame_elapsed": 2.758471797946625
+            },
+            "display_wait": {
+              "total_ticks": 440029367,
+              "max_ticks": 380725,
+              "average_ms": 5.209374674065852,
+              "max_ms": 8.122133333333334,
+              "percent_of_frame_budget": 31.256248044395115,
+              "percent_of_30fps_budget": 15.628124022197557,
+              "percent_of_frame_elapsed": 31.16906238865042
+            },
+            "other": {
+              "total_ticks": 70813714,
+              "max_ticks": 224002,
+              "average_ms": 0.8383421561228265,
+              "max_ms": 4.7787093333333335,
+              "percent_of_frame_budget": 5.0300529367369595,
+              "percent_of_30fps_budget": 2.5150264683684793,
+              "percent_of_frame_elapsed": 5.016022191168999
+            }
+          },
+          "heap_bytes": {
+            "sampled_peak": 1442344,
+            "sampled_total": 7556640
+          },
+          "static_image_bytes": 765792,
+          "counts": {
+            "entities": 239,
+            "meshes": 70,
+            "models": 114,
+            "colliders": 118,
+            "instanced_vertices": 5356,
+            "instanced_triangles": 3902,
+            "lights": 8,
+            "enemies": 2,
+            "test_starts": 5,
+            "patrol_points": 8
+          },
+          "texture_count": 10,
+          "texture_pixel_bytes": 26624,
+          "texture_palette_bytes": 32,
+          "texture_decoded_total_bytes": 26656,
+          "actor_displacement_metres": {
+            "ground-guard": 18.315042997492526,
+            "upper-guard": 18.72461748607966
+          },
+          "terminal_game_state_observed": false
+        },
+        "matched_scene_settings_and_rsp_library": true
+      }
+    }
+  }
+}

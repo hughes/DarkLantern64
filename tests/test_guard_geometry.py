@@ -16,14 +16,22 @@ class GuardGeometryTests(unittest.TestCase):
         cls.mesh = cls.data['mesh']
         cls.arm = next(i for i, bone in enumerate(cls.data['bones']) if bone['id'] == 'upper_arm_r')
 
-    def tile(self, vertex):
-        u, v = self.mesh['uvs'][vertex]
-        return math.floor(u*4)+4*math.floor(v*4)
-
     def triangles(self, color):
+        # This regression concerns geometry, not an artist's atlas layout. Use
+        # the sleeve's authored height interval so a new unwrap cannot disable
+        # the check or make it mistake painted skin/metal for the cloth band.
         m = self.mesh
-        return [m['indices'][i:i+3] for i in range(0, len(m['indices']), 3)
-                if all(m['joints'][v] == self.arm and self.tile(v) == color for v in m['indices'][i:i+3])]
+        selected = []
+        for i in range(0, len(m['indices']), 3):
+            triangle = m['indices'][i:i+3]
+            if not all(m['joints'][v] == self.arm for v in triangle):
+                continue
+            ys = [round(m['vertices'][v][1], 5) for v in triangle]
+            band = min(ys) == 1.188 and max(ys) == 1.244
+            sleeve = min(ys) >= 1.17 and max(ys) <= 1.32 and not band
+            if (color == 13 and band) or (color != 13 and sleeve):
+                selected.append(triangle)
+        return selected
 
     def test_band_replaces_sleeve_surface_without_underlying_faces_or_caps(self):
         band, sleeve = self.triangles(13), self.triangles(0)

@@ -1,0 +1,129 @@
+{
+  "scope": "Existing fixed-pose capture ROMs, raw RDP framebuffer before VI filtering; not performance timing. No content or camera change.",
+  "phases": {
+    "before": {
+      "rom_sha256": "5fb45b51497e66ebb3d8f05202b2fdfc8e5e165f3594026977700eea8b7de7ec",
+      "log": "build\\guard-atlas-study\\before\\.dev\\ares\\runs\\f7286234ee7541eebf9c0ceec0f8f798\\guard-atlas-capture.log",
+      "log_sha256": "da5846cc272be0642d80c806d3f82446db5fa5978a4e10b5dea5dd2dd02f8de5",
+      "atlas_sha256": "45f3e1f49a7363965e1b2b8f7f331f5b69e344b62119e43f3e7fb8b7e139985b",
+      "captures": [
+        {
+          "view": {
+            "id": "guard-idle",
+            "position": [
+              1.45,
+              0,
+              3.4
+            ],
+            "yaw": 180,
+            "pitch": -16,
+            "animation_clip": "idle",
+            "animation_time": 0,
+            "head_yaw": 0,
+            "head_pitch": 0
+          },
+          "image": "docs/images/guard-atlas-before-guard-idle.png",
+          "sha256": "e3d085936558f5fafe041c3f87cb4cb6e644d1edd74fe8630b5d1249ba860918"
+        },
+        {
+          "view": {
+            "id": "guard-walk",
+            "position": [
+              1.45,
+              0,
+              3.4
+            ],
+            "yaw": 180,
+            "pitch": -16,
+            "animation_clip": "walk",
+            "animation_time": 0.3,
+            "head_yaw": 0,
+            "head_pitch": 0
+          },
+          "image": "docs/images/guard-atlas-before-guard-walk.png",
+          "sha256": "e473b20f7e01332a1f541eaf78ec8feafbadb07bfe83080d05c8b93eb1bb152d"
+        },
+        {
+          "view": {
+            "id": "guard-attention",
+            "position": [
+              1.45,
+              0,
+              3.4
+            ],
+            "yaw": 180,
+            "pitch": -16,
+            "animation_clip": "idle",
+            "animation_time": 0,
+            "head_yaw": 38,
+            "head_pitch": -12
+          },
+          "image": "docs/images/guard-atlas-before-guard-attention.png",
+          "sha256": "f76af28887e12cba58a87d0670ba33b0e86e08fdcd1e92da7f086c2e1d7ce668"
+        }
+      ]
+    },
+    "after": {
+      "rom_sha256": "d5d3cd90415cffa90ca9dd3c9d59a723d10ae70108f8c5b6c8f38aec44d127c4",
+      "log": "build\\guard-atlas-study\\after\\.dev\\ares\\runs\\434e2349a86a48b8a8ce7992d5ed5fd5\\guard-atlas-capture.log",
+      "log_sha256": "f11556e4ca97314a9cd659495a456aca623e6e116ec201389ea2c66c1d02356b",
+      "atlas_sha256": "fe04e007dc0645929dc8e6df946e1b1acf184d59f620250bd578c54ce576ed96",
+      "captures": [
+        {
+          "view": {
+            "id": "guard-idle",
+            "position": [
+              1.45,
+              0,
+              3.4
+            ],
+            "yaw": 180,
+            "pitch": -16,
+            "animation_clip": "idle",
+            "animation_time": 0,
+            "head_yaw": 0,
+            "head_pitch": 0
+          },
+          "image": "docs/images/guard-atlas-after-guard-idle.png",
+          "sha256": "77c6dd2e18434d6f8017a853070609702946070d5d889934ab6e3d5b87ae5cec"
+        },
+        {
+          "view": {
+            "id": "guard-walk",
+            "position": [
+              1.45,
+              0,
+              3.4
+            ],
+            "yaw": 180,
+            "pitch": -16,
+            "animation_clip": "walk",
+            "animation_time": 0.3,
+            "head_yaw": 0,
+            "head_pitch": 0
+          },
+          "image": "docs/images/guard-atlas-after-guard-walk.png",
+          "sha256": "8045e702ac56cebfa46adeb10b2c155fdcbf2535c62a6e4de6e39d405e82a36a"
+        },
+        {
+          "view": {
+            "id": "guard-attention",
+            "position": [
+              1.45,
+              0,
+              3.4
+            ],
+            "yaw": 180,
+            "pitch": -16,
+            "animation_clip": "idle",
+            "animation_time": 0,
+            "head_yaw": 38,
+            "head_pitch": -12
+          },
+          "image": "docs/images/guard-atlas-after-guard-attention.png",
+          "sha256": "5582047a1487d0ce195dadc718de23919e607fefa792d74e6e29fb5d6bb6b3d4"
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "failure_report": "docs/evidence/guard-atlas-character-editor-failure.json",
+  "cause": "ComputeTangents normalizes zero accumulated tangent vectors after skipping degenerate UV triangles; these become NaN and UpdateMeshVertices rejects them.",
+  "zero_uv_area_triangles": 69,
+  "vertices_with_no_valid_uv_contribution": 68,
+  "repair_scope": "Project editor tangent frames only; authored geometry, normal vectors, UVs and game/runtime source remain unchanged.",
+  "passing_report": "docs/evidence/guard-atlas-character-editor.json",
+  "observed_repaired_frames": [
+    {
+      "id": "animated-patrol",
+      "tangent_fallback_vertices": 68,
+      "status": "ready",
+      "dynamic_mesh_handle": 0
+    },
+    {
+      "id": "animated-sentry",
+      "tangent_fallback_vertices": 68,
+      "status": "ready",
+      "dynamic_mesh_handle": 1
+    }
+  ],
+  "fix": "PrepareCharacterPreviewTangents retains usable engine-generated tangent frames. For undefined zero/nonfinite frames, it chooses the least-parallel canonical axis and constructs finite orthonormal tangent and bitangent vectors from the authored normal. Albedo, UVs, geometry, animation and target runtime data are unchanged.",
+  "original_failure": {
+    "path": "build/guard-atlas-study/character-preview-failure.json",
+    "sha256": "36d70f530ec1875fd32cb2d948ddb970e6f707e684a1d29454eb7cf3d6ddc474",
+    "note": "Raw report remains byte-for-byte preserved here. Committed JSON evidence uses UTF-8 LF with the same original failure data."
+  }
+}

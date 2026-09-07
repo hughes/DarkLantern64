@@ -1,0 +1,16 @@
+{
+  "passed": false,
+  "private_root": "C:/Users/hughe/dev/DarkLantern64/.dev/editor/character-verification/a9922190b7b446f1a17df65c7d99b24c",
+  "editor": "C:/Users/hughe/_bazel_hughe/nw7efple/execroot/_main/bazel-out/x64_windows-fastbuild/bin/darklantern64_scene_editor.exe",
+  "editor_sha256": "2eb7fb692f0e630bd9098d68e44a3d2295880a497a884eebe8439092ab040e66",
+  "checks": [],
+  "captures": [],
+  "differences": [],
+  "started_at_utc": "2026-09-07T16:01:39Z",
+  "owned_editor_pid": 30092,
+  "error": "Unsupported character preview",
+  "traceback": "Traceback (most recent call last):\n  File \"C:\\Users\\hughe\\dev\\DarkLantern64\\tools\\verify_character_editor.py\", line 84, in verify\n    require(all(item[\"status\"] == \"ready\" for item in animation[\"instances\"]), \"Unsupported character preview\")\n  File \"C:\\Users\\hughe\\dev\\DarkLantern64\\tools\\verify_project_editor.py\", line 31, in require\n    raise AssertionError(message)\nAssertionError: Unsupported character preview\n",
+  "real_content_unchanged": true,
+  "elapsed_seconds": 9.03,
+  "evidence": "C:/Users/hughe/dev/DarkLantern64/.dev/editor/character-verification/a9922190b7b446f1a17df65c7d99b24c/character-editor-verification.json"
+}

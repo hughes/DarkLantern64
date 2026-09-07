@@ -11,10 +11,10 @@ import tempfile
 
 try:
     from compile_level import compile_level, identifier, require, validate, atomic_write, character_c
-    from cook_textures import cook_sprites
+    from cook_textures import cook_sprites, texture_memory_summary
 except ModuleNotFoundError:
     from tools.compile_level import compile_level, identifier, require, validate, atomic_write, character_c
-    from tools.cook_textures import cook_sprites
+    from tools.cook_textures import cook_sprites, texture_memory_summary
 
 ROOT = Path(__file__).resolve().parents[1]
 MAX_LEVELS = 8
@@ -132,9 +132,14 @@ def union_assets(levels, output):
         os.replace(stage, destination)
     textures = [records[key] for key in sorted(records)]
     texture_report = {"version": 1, "textures": textures,
-            "decoded_bytes": sum(t["decoded_bytes"] for t in textures),
+            **texture_memory_summary(textures),
             "sprite_bytes": sum(t["sprite_bytes"] for t in textures),
             "maximum_level_decoded_bytes": max((level["textures"]["decoded_bytes"] for level in levels), default=0),
+            "maximum_level_palette_bytes": max((sum(t.get("palette_bytes", 0) for t in level["textures"]["textures"])
+                                                  for level in levels), default=0),
+            "maximum_level_decoded_total_bytes": max((sum(t["decoded_bytes"] + t.get("palette_bytes", 0)
+                                                          for t in level["textures"]["textures"])
+                                                        for level in levels), default=0),
             "maximum_level_sprite_bytes": max((level["textures"]["sprite_bytes"] for level in levels), default=0)}
     lighting = [lighting_records[key] for key in sorted(lighting_records)]
     assets = [{"path": key, "sha256": hashlib.sha256(payload).hexdigest(), "bytes": len(payload),

@@ -79,6 +79,21 @@ class AssetPackTests(unittest.TestCase):
                     load_pack("pack.json", self.root)
                 texture.clear(); texture.update(original)
 
+    def test_linked_palette_formats_use_indexed_tmem_budget(self):
+        texture = self.pack["materials"][0]["texture"]
+        texture.update(width=64, height=64, format="CI4")
+        texture["palette"] = ["#000000", "#FFFFFF"]
+        self.write_pack()
+        self.assertEqual(load_pack("pack.json", self.root)["materials"][0]["texture"]["format"], "CI4")
+        self.assertEqual(load_pack("pack.json", self.root)["materials"][0]["texture"]["palette"], texture["palette"])
+        texture["format"] = "CI8"
+        self.write_pack()
+        with self.assertRaisesRegex(ValueError, "TMEM"):
+            load_pack("pack.json", self.root)
+        texture["height"] = 32
+        self.write_pack()
+        self.assertEqual(load_pack("pack.json", self.root)["materials"][0]["texture"]["format"], "CI8")
+
     def test_place_uses_prefab_scale_and_explicit_transform(self):
         document, prefabs = merge_pack(self.level, "pack.json", self.root)
         placed = place_prop(document, prefabs, "loot", "goblet-1", [2, .8, -3], rotation=[0, 37, 0])

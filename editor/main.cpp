@@ -18,12 +18,54 @@
 #include <nlohmann/json.hpp>
 #include <util/MatrixUtils.h>
 #include "character_preview.h"
+#include "character_preview_mesh.h"
 
 namespace fs = std::filesystem;
 using Json = nlohmann::json;
 
 namespace
 {
+struct TextureMemory
+{
+    int pixels, palette, tile, tileLimit;
+};
+
+TextureMemory TextureFootprint(const Json& texture)
+{
+    const std::string format = texture.value("format", "");
+    if (format != "RGBA16" && format != "CI4" && format != "CI8")
+        throw std::runtime_error("Texture format must be RGBA16, CI4 or CI8");
+    for (const char* axis : {"width", "height"})
+        if (!texture.contains(axis) || !texture.at(axis).is_number_integer() ||
+            texture.at(axis) < 1 || texture.at(axis) > 64 ||
+            (texture.at(axis).get<int>() & (texture.at(axis).get<int>() - 1)))
+            throw std::runtime_error("Texture dimensions must be powers of two from 1 to 64");
+    if (texture.contains("palette"))
+    {
+        const auto& palette=texture.at("palette");
+        const int limit=format=="CI4"?16:256;
+        if (format=="RGBA16" || !palette.is_array() || palette.empty() || palette.size()>limit)
+            throw std::runtime_error("An authored palette requires CI4 (up to 16 colors) or CI8 (up to 256 colors)");
+        for (const auto& entry : palette)
+        {
+            if (!entry.is_string()) throw std::runtime_error("Palette colors must be #RRGGBB strings");
+            const std::string color=entry.get<std::string>();
+            if (color.size()!=7 || color[0]!='#' || !std::all_of(color.begin()+1,color.end(),[](char c) {
+                    return (c>='0'&&c<='9') || (c>='a'&&c<='f') || (c>='A'&&c<='F'); }))
+                throw std::runtime_error("Palette colors must be #RRGGBB strings");
+        }
+    }
+    const int width = texture.at("width"), height = texture.at("height");
+    const int bits = format == "CI4" ? 4 : format == "CI8" ? 8 : 16;
+    const int palette = format == "CI4" ? 32 : format == "CI8" ? 512 : 0;
+    const int row = (width * bits + 7) / 8;
+    const TextureMemory memory{row * height, palette, ((row + 7) & ~7) * height, palette ? 2048 : 4096};
+    if (memory.tile > memory.tileLimit)
+        throw std::runtime_error(palette ? "Indexed texture exceeds the 2 KiB pixel area; palettes use upper TMEM" :
+                                          "RGBA16 texture exceeds the 4 KiB texture memory budget");
+    return memory;
+}
+
 Json ReadJson(const fs::path& path)
 {
     std::ifstream input(path);
@@ -281,6 +323,7 @@ class DemoEditor
         std::vector<std::pair<EntityId,int>> joints;
         std::optional<MeshHandle> dynamicMesh;
         std::vector<Vertex> bindVertices, posedVertices;
+        size_t tangentFallbackVertices = 0;
         int clip=0, blendClip=-1;
         float time=0, blend=0, headYaw=0, headPitch=0;
         bool playing=false;
@@ -662,7 +705,7 @@ class DemoEditor
                         value.texcoord={uv.u,uv.v};
                         mesh.vertices.push_back(value);
                     }
-                    ComputeTangents(mesh);
+                    instance.tangentFallbackVertices=PrepareCharacterPreviewTangents(mesh);
                     instance.bindVertices=mesh.vertices; instance.posedVertices=mesh.vertices;
                     const auto uri="gen://dl64-character/"+source_.stem().string()+"/"+sourceId+"/"+data.topologyHash;
                     instance.dynamicMesh=engine_.GetAssetMgr().RegisterImportedMesh(uri,std::move(mesh));
@@ -756,6 +799,7 @@ class DemoEditor
                 {"cross_joint_triangles",instance.data->crossJointTriangles},
                 {"source_sha256",instance.data->sourceHash},{"topology_sha256",instance.data->topologyHash},
                 {"dynamic_mesh_handle",instance.dynamicMesh?Json(*instance.dynamicMesh):Json(nullptr)},
+                {"tangent_fallback_vertices",instance.tangentFallbackVertices},
                 {"clip",instance.clip<0?"rest":asset.clips[instance.clip].id},{"time",instance.time},{"playing",instance.playing},
                 {"blend_clip",instance.blendClip<0?"rest":asset.clips[instance.blendClip].id},{"blend",instance.blend},
                 {"head_yaw",instance.headYaw},{"head_pitch",instance.headPitch},{"head_supported",asset.head_bone>=0},{"head_bone",asset.head_bone},
@@ -1295,14 +1339,9 @@ class DemoEditor
             else if (key == "texture")
             {
                 if (value.is_null()) { candidate.erase(key); continue; }
-                if (!value.is_object() || !value.contains("uri") || !value.at("uri").is_string() || value.value("format","") != "RGBA16")
-                    throw std::runtime_error("Texture requires a content-relative URI, width, height and RGBA16 format");
-                for (const char* size : {"width","height"})
-                    if (!value.contains(size) || !value.at(size).is_number_integer() || value.at(size).get<int>() < 1 ||
-                        value.at(size).get<int>() > 64 || (value.at(size).get<int>() & (value.at(size).get<int>() - 1)))
-                        throw std::runtime_error("Texture dimensions must be powers of two from 1 to 64");
-                if (value.at("width").get<int>() * value.at("height").get<int>() * 2 > 4096)
-                    throw std::runtime_error("RGBA16 texture exceeds the 4 KiB texture memory budget");
+                if (!value.is_object() || !value.contains("uri") || !value.at("uri").is_string())
+                    throw std::runtime_error("Texture requires a content-relative URI, width, height and format");
+                TextureFootprint(value);
             }
             else throw std::runtime_error("Unsupported material field: " + key);
             candidate[key] = value;
@@ -2003,6 +2042,18 @@ class DemoEditor
         {
             Json texture = material->at("texture");
             ImGui::TextWrapped("Texture: %s",texture.at("uri").get<std::string>().c_str());
+            if (ImGui::BeginCombo("Pixel format",texture.value("format","RGBA16").c_str()))
+            {
+                for (const char* option : {"RGBA16","CI4","CI8"})
+                    if (ImGui::Selectable(option,texture.value("format","RGBA16")==option))
+                    {
+                        texture["format"]=option;
+                        if (texture["format"]=="RGBA16") texture.erase("palette");
+                        try { SetMaterial({{"id",id},{"patch",{{"texture",texture}}}}); }
+                        catch (const std::exception& error) { status_=error.what(); }
+                    }
+                ImGui::EndCombo();
+            }
             for (const auto& [key,label] : std::vector<std::pair<const char*,const char*>>{{"width","Cooked width"},{"height","Cooked height"}})
             {
                 int size = texture.at(key);
@@ -2018,7 +2069,12 @@ class DemoEditor
                     ImGui::EndCombo();
                 }
             }
-            ImGui::Text("RGBA16 tile: %d / 4096 bytes",material->at("texture").at("width").get<int>()*material->at("texture").at("height").get<int>()*2);
+            const auto memory=TextureFootprint(material->at("texture"));
+            ImGui::Text("Resident pixels + palette: %d bytes",memory.pixels+memory.palette);
+            ImGui::Text("TMEM pixels: %d / %d bytes",memory.tile,memory.tileLimit);
+            if (memory.palette) ImGui::TextWrapped("%d-byte palette; indexed textures use the upper 2 KiB of TMEM for palette lookup.",memory.palette);
+            if (material->at("texture").contains("palette"))
+                ImGui::Text("Authored palette: %d colors (edit source resource)",static_cast<int>(material->at("texture").at("palette").size()));
         }
         ImGui::EndDisabled();
     }

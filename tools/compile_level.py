@@ -28,11 +28,11 @@ except ModuleNotFoundError:
     from tools.character_assets import load_character, emit_c as character_c, joint_meshes
 
 try:
-    from cook_textures import prepare_texture, validate_texture
+    from cook_textures import prepare_texture, validate_texture, texture_memory_summary
     from cook_lighting import prepare_lighting
     from asset_pack import resolve_asset_packs
 except ModuleNotFoundError:
-    from tools.cook_textures import prepare_texture, validate_texture
+    from tools.cook_textures import prepare_texture, validate_texture, texture_memory_summary
     from tools.cook_lighting import prepare_lighting
     from tools.asset_pack import resolve_asset_packs
 
@@ -721,8 +721,7 @@ def compile_level(source=ROOT/"content/first_room.json",output=ROOT/"build",asse
         "patrol_ids":state["enemies"][0]["patrol_ids"] if state["enemies"] else [],
         "changed_artifacts":changed, "elapsed_ms":round((time.perf_counter()-started)*1000,2),
     }
-    texture_report={"version":1,"textures":state["textures"],"decoded_bytes":sum(t["decoded_bytes"] for t in state["textures"]),
-                    "memory_note":"Unique decoded pixel bytes only. Sprite headers, allocation overhead and renderer buffers are additional; TMEM holds one texture at a time."}
+    texture_report={"version":1,"textures":state["textures"], **texture_memory_summary(state["textures"])}
     report["textures"]=texture_report
     atomic_write(output/"generated/character_report.json", json.dumps({"version": 1, "characters": report["characters"]}, indent=2)+"\n")
     atomic_write(output/"generated/texture_report.json",json.dumps(texture_report,indent=2)+"\n")

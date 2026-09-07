@@ -1,6 +1,8 @@
 # Guard animation prototype
 
-The first animated guard proves the Blender → cooked asset → LightEngine → N64 ROM path. It has **20 bones, five editable Actions, a 32 × 32 texture atlas, and connected elbow and knee geometry**. Simple compression reduces its animation keys from **120,400 to 8,820 bytes** with a maximum sampled vertex error of **0.144 mm**.
+The first animated guard proved the Blender → cooked asset → LightEngine → N64 ROM path with **20 bones, five editable Actions, a 32 × 32 texture atlas, and connected elbow and knee geometry**. Simple compression reduced its animation keys from **120,400 to 8,820 bytes** with a maximum sampled vertex error of **0.144 mm**.
+
+The current saved guard uses a **64 × 64 painted CI4 atlas and 738 attribute vertices**. Its 535 triangles, skeleton and animation clips are unchanged from the sleeve-corrected model. See the [painted guard study](guard-atlas-study.md) for the current artwork, palette, export workflow and comparison measurements. The earlier captures and measurements below retain their tested revisions.
 
 This began as a correctness and budgeting experiment. The initial CPU reference renderer took about **99.64 ms per frame, roughly 10 fps**, in the measured two-guard workshop. That historical measurement establishes the asset workflow, not a production guard budget. The subsequent Tiny3D backend and its performance acceptance criteria are described in [Guard renderer architecture and performance evidence](guard-renderer-performance.md). Original N64 and M64 testing remains pending.
 
@@ -31,13 +33,13 @@ The Actions are named **Guard | idle**, **Guard | walk**, **Guard | run**, **Gua
 
 Keep stable bone names and the Action custom properties `dl64_clip_id`, `dl64_frame_start`, `dl64_frame_end`, `dl64_loop`, and `dl64_stride_length`. Loop ranges include a final pose matching the first. `foot-left` and `foot-right` pose markers identify contacts; do not duplicate a marker at the loop endpoint. The exporter evaluates the selected frame range at the scene frame rate, currently 30 Hz.
 
-**Save the `.blend` before exporting.** The command reads the saved file in a background Blender process:
+After texture painting, use **Image → Save All Images** to repack edited images, then **save the `.blend` before exporting**. The command reads the saved file in a background Blender process; it cannot read unsaved paint or pose edits in the open application. [Blender image-saving reference](https://docs.blender.org/manual/en/dev/editors/image/editing.html)
 
 ```powershell
 python tools/guard_assets.py
 ```
 
-This exports [guard.character.json](../content/assets/guard/guard.character.json) and [guard-atlas.png](../content/assets/guard/guard-atlas.png). Return to the project editor and use **Save + Cook** to refresh the preview, then **Play level** to test the ROM. Every supplied level references these assets through the [shared guard pack](shared-guard-resources.md), so no new prefab import is needed.
+This exports [guard.character.json](../content/assets/guard/guard.character.json) and [guard-atlas-painted.png](../content/assets/guard/guard-atlas-painted.png). Paint the active packed authoring image in Blender; the material's texture export-name property selects the painted filename. The original [guard-atlas.png](../content/assets/guard/guard-atlas.png) remains a historical asset. Return to the project editor and use **Save + Cook** to refresh the preview, then **Play level** to test the ROM. Every supplied level references these assets through the [shared guard pack](shared-guard-resources.md), so no new prefab import is needed.
 
 The exporter is currently tailored to this guard's tagged mesh, rig, named hand/head sockets and first material. It requires applied mesh/armature object transforms, one full-strength bone assignment per vertex, UVs, and rigid bone transforms. Extra weights and animated scale are rejected. Constraints can help author motion, but the current exporter traverses all bones in this rig; it does not strip a separate control rig. Keep the exported rig within the 32-bone limit. General character import, retargeting, richer materials and a reusable animation-export UI remain future work.
 
@@ -69,7 +71,7 @@ The initial CPU reference renderer performs this deformation on the CPU and send
 
 The saving is avoiding extra weighted deformation math at the connection. Matrix commands, vertex loads, cache management and triangle rasterization still have costs. Cache capacity and allowed load offsets depend on the selected microcode; an SM64 exporter's parent/child restrictions are not a universal N64 hardware rule.
 
-The guard has only **316 distinct bind positions**, but normals increase the distinct attribute combinations to **669**, and UV seams raise the final vertex count to **1,009**. Each elbow/knee connection references 24 such vertices. Those counts matter when designing matrix groups and cache batches: a visually shared point can occupy several target vertices. The initial connected revision added 48 vertices and a net 16 triangles to the earlier model, costing **1,248 extra geometry/joint-index bytes** without increasing clip storage.
+The sleeve-corrected palette-atlas revision had only **316 distinct bind positions**, but normals increased the distinct attribute combinations to **669**, and UV seams raised the final vertex count to **1,009**. Each elbow/knee connection referenced 24 such vertices. Those counts matter when designing matrix groups and cache batches: a visually shared point can occupy several target vertices. The initial connected revision added 48 vertices and a net 16 triangles to the earlier model, costing **1,248 extra geometry/joint-index bytes** without increasing clip storage. The later [continuous painted unwrap](guard-atlas-study.md) reduces UV duplication without changing those triangle positions, normals or bone assignments.
 
 The subsequent [sleeve correction](evidence/guard-armband-fix.json) replaces an intersecting armband shell with a red strip on one continuous sleeve surface. Smooth normals continue across the stripe, and there are no hidden olive faces beneath it. This adds 12 attribute vertices and four triangles (312 shared geometry/joint bytes), preserving the rig, all clips and all 48 joint triangles. Blender parity was rechecked at 425 poses, along with saved-source export, editor playback and N64 captures.
 
@@ -102,6 +104,8 @@ There are two separate correctness comparisons. [Blender parity](evidence/guard-
 
 ## Shared assets and working memory
 
+This table records the historical 1,009-vertex guard with its 32 × 32 RGBA16 atlas and CPU deformation cache. It is retained for comparison; the [painted-atlas study](guard-atlas-study.md) records the current resource and buffer costs.
+
 | Cost | Bytes | Scope |
 | --- | ---: | --- |
 | Positions, normals, UVs and triangle indices | 26,417 | Once per unique character |
@@ -115,7 +119,7 @@ There are two separate correctness comparisons. [Blender parity](evidence/guard-
 | Deformed normal cache | **12,108 per guard** | 1,009 float3 normals; 24,216 for two guards |
 | Added motion-distance/speed fields | 8 per enemy | Additional fields, not the full enemy state |
 
-The shared asset rows total **40,198 bytes including atlas pixels**, before string storage, linker alignment and sprite/allocator overhead. Do not multiply them by the guard count. Conversely, the normal cache and existing renderer instance buffers do grow with placed actors. The current 6,144-instanced-vertex limit leaves 2,108 vertices for scenery after four copies of this guard; eight copies exceed it. This is an allocation budget, not a measured crowd frame rate.
+For that revision, the shared asset rows total **40,198 bytes including atlas pixels**, before string storage, linker alignment and sprite/allocator overhead. Do not multiply them by the guard count. Conversely, the normal cache and existing renderer instance buffers do grow with placed actors. The 6,144-instanced-vertex limit leaves 2,108 vertices for scenery after four copies of the 1,009-vertex guard; eight copies exceed it. This is a historical allocation example, not a measured crowd frame rate or the current painted guard's cost.
 
 ## Initial CPU runtime measurement and next work
 

@@ -1,0 +1,244 @@
+{
+  "version": 1,
+  "passed": true,
+  "scope": "Painted guard UV/source and saved-Blender export proof. Blender images use nearest texture sampling and neutral desktop lights; they do not claim final RDP filtering, game lighting, or performance.",
+  "artifacts": [
+    {
+      "path": "art/guard.blend",
+      "sha256": "14baa8d617899538ae570d111ea20cf2c7800c8ffb5a8072dbd5979f2568be0b",
+      "bytes": 2494208
+    },
+    {
+      "path": "art/guard-atlas-painted-source.png",
+      "sha256": "ad8cb8fa975810e42fc7afdf1e454e5c17e0c333753abb22bce98112daec99e1",
+      "bytes": 2097861
+    },
+    {
+      "path": "content/assets/guard/guard.character.json",
+      "sha256": "b9d5a6b99f558485a86c74e51d7770f27ca1c78db9e160743a44d186bcf3c78c",
+      "bytes": 1401493
+    },
+    {
+      "path": "content/assets/guard/guard-atlas-painted.png",
+      "sha256": "fe04e007dc0645929dc8e6df946e1b1acf184d59f620250bd578c54ce576ed96",
+      "bytes": 2263129
+    },
+    {
+      "path": "content/assets/guard/pack.json",
+      "sha256": "88b1e3027b1c0885a3fbc630e6847bc9488b29117c03183b7a42ce27f695facd",
+      "bytes": 1222
+    },
+    {
+      "path": "tools/blender/paint_guard_uv.py",
+      "sha256": "5c7eb7aa1ab92631e9ebed63329c4c69c0f5f9751393e202ab0c75595e852022",
+      "bytes": 10379
+    },
+    {
+      "path": "tools/blender/guard_character.py",
+      "sha256": "550bb7efcad9cafc8b0b982a74c4659042b5a42b3117c41a88345899d9b16331",
+      "bytes": 29638
+    },
+    {
+      "path": "tools/blender/verify_guard_paint_export.py",
+      "sha256": "48d05644d4f509459bb59a2f3e7c7ec1344a4025b5433a3f7354c5d0b13a6cf7",
+      "bytes": 8269
+    }
+  ],
+  "baseline": {
+    "path": "build/guard-atlas-study/before/content/assets/guard/guard.character.json",
+    "sha256": "5a4b7b78522eb3e4f8986f9e37e0109441f64d3f62e0e2bbcdb90d31d4837ae2",
+    "bytes": 1474069
+  },
+  "geometry": {
+    "triangles": 535,
+    "original_vertices": 1009,
+    "revised_vertices": 738,
+    "bones": 20,
+    "cross_joint_triangles": 48,
+    "expanded_triangle_positions_normals_joints_identical": true,
+    "bones_clips_sockets_identical": true
+  },
+  "texture": {
+    "width": 64,
+    "height": 64,
+    "format": "CI4",
+    "palette": [
+      "#100C08",
+      "#212410",
+      "#333613",
+      "#454723",
+      "#5A5736",
+      "#293139",
+      "#4A5252",
+      "#737B7B",
+      "#6B4229",
+      "#946331",
+      "#BD8C52",
+      "#29180C",
+      "#4A2818",
+      "#630808",
+      "#8C6318",
+      "#D6AD63"
+    ],
+    "pixel_bytes": 2048,
+    "palette_bytes": 32,
+    "decoded_total_bytes": 2080,
+    "tmem_bytes": 4096,
+    "cooked_preview_png_sha256": "77b24a3b488f806bc775c283dcb2fab59eb850c73c02026fa3911eef2b15302e",
+    "source_editability": "Active high-resolution authoring image is packed and paintable. Export honors material filename metadata. Separately packed generated target image is only a snapshot; editor cook provides the current preview."
+  },
+  "blender_pose_roundtrip": {
+    "passed": true,
+    "blender_version": "5.3.0 Alpha",
+    "clips": [
+      {
+        "id": "idle",
+        "tested_poses": 121,
+        "source_key_max_error_m": 6.248508218341318e-07,
+        "half_frame_bake_max_error_m": 5.623090941939713e-07,
+        "worst_half_frame_time": 1.05
+      },
+      {
+        "id": "notice",
+        "tested_poses": 85,
+        "source_key_max_error_m": 7.402743308767212e-07,
+        "half_frame_bake_max_error_m": 6.10083821294733e-07,
+        "worst_half_frame_time": 0.6166666666666667
+      },
+      {
+        "id": "run",
+        "tested_poses": 49,
+        "source_key_max_error_m": 7.795920979944745e-07,
+        "half_frame_bake_max_error_m": 7.463979593734857e-07,
+        "worst_half_frame_time": 0.2833333333333333
+      },
+      {
+        "id": "turn",
+        "tested_poses": 97,
+        "source_key_max_error_m": 6.034510353599962e-07,
+        "half_frame_bake_max_error_m": 5.448611169690556e-07,
+        "worst_half_frame_time": 0.6833333333333333
+      },
+      {
+        "id": "walk",
+        "tested_poses": 73,
+        "source_key_max_error_m": 6.573844478958581e-07,
+        "half_frame_bake_max_error_m": 6.542950391799256e-07,
+        "worst_half_frame_time": 0.4166666666666667
+      }
+    ],
+    "saved_source_roundtrip_identical": true,
+    "source_sha256": "b9d5a6b99f558485a86c74e51d7770f27ca1c78db9e160743a44d186bcf3c78c",
+    "scope": "Source keys and half-frame poses against Blender evaluated mesh; compression error measured separately."
+  },
+  "paint_export": {
+    "passed": true,
+    "packed_authoring_image": true,
+    "painted_pixels_exported": true,
+    "invalid_export_filename_rejected_before_write": true,
+    "character_roundtrip_identical": true,
+    "canonical_files_unchanged": true,
+    "canonical_sha256": {
+      "C:\\Users\\hughe\\dev\\DarkLantern64\\art\\guard.blend": "14baa8d617899538ae570d111ea20cf2c7800c8ffb5a8072dbd5979f2568be0b",
+      "C:\\Users\\hughe\\dev\\DarkLantern64\\content\\assets\\guard\\guard.character.json": "b9d5a6b99f558485a86c74e51d7770f27ca1c78db9e160743a44d186bcf3c78c",
+      "C:\\Users\\hughe\\dev\\DarkLantern64\\content\\assets\\guard\\guard-atlas.png": "45f3e1f49a7363965e1b2b8f7f331f5b69e344b62119e43f3e7fb8b7e139985b",
+      "C:\\Users\\hughe\\dev\\DarkLantern64\\content\\assets\\guard\\guard-atlas-painted.png": "fe04e007dc0645929dc8e6df946e1b1acf184d59f620250bd578c54ce576ed96",
+      "C:\\Users\\hughe\\dev\\DarkLantern64\\content\\assets\\guard\\pack.json": "88b1e3027b1c0885a3fbc630e6847bc9488b29117c03183b7a42ce27f695facd"
+    },
+    "private_save": {
+      "image_save_operation": "bpy.ops.image.save_all_modified",
+      "packed_after_save": true,
+      "source": "C:\\Users\\hughe\\dev\\DarkLantern64\\build\\guard-atlas-study\\paint-export\\saved-project\\art\\painted-guard.blend",
+      "source_sha256": "40396ed47ac0bc36c48406a7d9fa8f311f6a92165ac304881c4b67f729c06a66",
+      "pixel_top_left_xy": [
+        627,
+        626
+      ],
+      "expected_rgba8": [
+        0,
+        255,
+        255,
+        255
+      ]
+    },
+    "saved_file_workflow": {
+      "passed": true,
+      "fresh_process_guard_assets_cli": true,
+      "packed_paint_survives_save_reopen_export": true,
+      "exported_rgba8": [
+        0,
+        255,
+        255,
+        255
+      ],
+      "character_roundtrip_identical": true,
+      "canonical_files_unchanged": true,
+      "private_exported_texture": "C:\\Users\\hughe\\dev\\DarkLantern64\\build\\guard-atlas-study\\paint-export\\saved-project\\content\\assets\\guard\\guard-atlas-painted.png",
+      "private_exported_texture_sha256": "d7c8e6ac5443b1fa1bd6c572f09e52e116cd42fc1d527e7eea788801f8b695c8",
+      "copied_cli_and_worker_sha256": {
+        "tools/guard_assets.py": "041851b28eb47083cd4c0f9e78f89c85d004c4508acf431906b68d19c5b2cbd7",
+        "tools/blender_assets.py": "3747c2d2b920a1c02c46823749368a25b210a59d5d77e441ab7af37bb05deeae",
+        "tools/blender/guard_character.py": "550bb7efcad9cafc8b0b982a74c4659042b5a42b3117c41a88345899d9b16331"
+      },
+      "logs": [
+        "build/guard-atlas-study/paint-export/private-save.log",
+        "build/guard-atlas-study/paint-export/fresh-cli-export.log"
+      ]
+    }
+  },
+  "regressions": {
+    "guard_geometry_tests": 3,
+    "character_asset_tests": 10,
+    "passed": true,
+    "note": "Geometry tests identify the integrated sleeve band using positions and bone bindings, independently of atlas coordinates."
+  },
+  "final_skin_uv_provenance": {
+    "note": "Finalization observed 22 skin UV values differing from the earlier verified JSON. The incoming saved file had a later modification timestamp, at08:48:20 before finalization08:49. The changes were preserved, visually reviewed, and verified by a fresh-process saved-source export; no attribution of that intervening save is established. Geometry and all animation remained identical.",
+    "incoming_saved_source": {
+      "path": "build/guard-atlas-study/incoming-before-finalization.blend",
+      "sha256": "42e83df7f4bf6c8622f8c2bc8b0504fd5eec84b0fd007aabaa462ce7f643c3d8",
+      "bytes": 2318201
+    }
+  },
+  "images": [
+    {
+      "path": "docs/images/guard-painted-ci4-blender.png",
+      "sha256": "4764879c7700fd3b9c8931104035c4a56fcb4d6e5e92b99277c28cdfb5c373b4",
+      "bytes": 362281
+    },
+    {
+      "path": "docs/images/guard-painted-source-blender.png",
+      "sha256": "44b67eac23ca5bf532a07ee58c8f8a01f982138c70143d8b3d65cb56fbc2111d",
+      "bytes": 390795
+    },
+    {
+      "path": "docs/images/guard-painted-face-blender.png",
+      "sha256": "ad7b651f535620f094afd67105657beb3c3be3f8d74de6013fdabb2292bd6429",
+      "bytes": 350100
+    }
+  ],
+  "logs": [
+    {
+      "path": "build/guard-atlas-study/final-roundtrip.log",
+      "sha256": "108c9b43e4ae8340e017579d19401868eaeebebf46bbcd03c1ef2d97fb0c248a",
+      "bytes": 2516
+    },
+    {
+      "path": "build/guard-atlas-study/uv-render-final.log",
+      "sha256": "35e33f2eaa8fa0553439c61f83547f23d4a48b402d696c8dd417c9f8cfe5deb4",
+      "bytes": 1656
+    },
+    {
+      "path": "build/guard-atlas-study/paint-export/private-save.log",
+      "sha256": "d8fb70acf8223bb931eb7585a0c82c27749503d27b6c999aa177617da0a1c758",
+      "bytes": 1871
+    },
+    {
+      "path": "build/guard-atlas-study/paint-export/fresh-cli-export.log",
+      "sha256": "2a95fd8030b940170a2a15ee736ec65da9b59a57e29f8bdf6d3b07f1b918f8aa",
+      "bytes": 737
+    }
+  ],
+  "interactive_user_processes_modified": false,
+  "paint_export_command": "python tools/blender/verify_guard_paint_export.py"
+}

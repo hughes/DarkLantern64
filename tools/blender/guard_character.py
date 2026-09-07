@@ -423,6 +423,9 @@ def export(scene=None, output=None):
     if len(objects)!=1: raise ValueError('Expected one basic-guard mesh in the active scene')
     obj=objects[0];rig=obj.find_armature()
     if rig is None: raise ValueError('Character needs its armature modifier')
+    texture_name=obj.data.materials[0].get('dl64_texture_export_name','guard-atlas.png')
+    if Path(texture_name).name != texture_name or Path(texture_name).suffix.lower() != '.png':
+        raise ValueError('Texture export name must be a PNG filename')
     if obj.matrix_world != Matrix.Identity(4) or rig.matrix_world != Matrix.Identity(4):
         raise ValueError('Apply character/armature object transforms before exporting')
     bones=list(rig.data.bones);bone_ids={b.name:i for i,b in enumerate(bones)}
@@ -480,6 +483,6 @@ def export(scene=None, output=None):
     _json_write(output/'guard.character.json',data)
     # Persist packed source texture changes on export without modifying .blend.
     image=next(n.image for n in obj.data.materials[0].node_tree.nodes if n.type=='TEX_IMAGE' and n.image)
-    image.filepath_raw=str(output/'guard-atlas.png');image.file_format='PNG';image.save()
+    image.filepath_raw=str(output/texture_name);image.file_format='PNG';image.save()
     return {'character':str(output/'guard.character.json'),'bones':len(bones),'vertices':len(verts),'triangles':len(indices)//3,
             'clips':[{ 'id':c['id'],'frames':len(c['frames'])} for c in clips]}

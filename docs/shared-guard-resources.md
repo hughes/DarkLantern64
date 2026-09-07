@@ -13,7 +13,7 @@ The previous levels already shared `content/models/guard.obj`, and their gamepla
 
 ## One visual definition
 
-[The shared guard pack](../content/assets/guard/pack.json) defines the character asset, material and visual defaults. It references the same [character source](../content/assets/guard/guard.character.json) and [atlas](../content/assets/guard/guard-atlas.png) used by the animation workshop. Watchman and scout currently share this appearance while retaining their distinct gameplay types.
+[The shared guard pack](../content/assets/guard/pack.json) defines the character asset, material and visual defaults. It references the same [character source](../content/assets/guard/guard.character.json) and [painted atlas](../content/assets/guard/guard-atlas-painted.png) used by the animation workshop. The pack cooks the artwork to 64 × 64 CI4 with an authored 16-color palette. Watchman and scout currently share this appearance while retaining their distinct gameplay types. The [painted guard study](guard-atlas-study.md) covers the current artist workflow and its measured costs.
 
 Each supplied level links the pack through:
 
@@ -23,7 +23,7 @@ Each supplied level links the pack through:
 
 The pack and its asset URIs are relative to the content directory. Entities retain stable `model` and `material` IDs; the cooker resolves their definitions from the linked resource. Saving a level retains the link and instance data instead of copying shared definitions into the level file. Conflicting resource IDs are errors, so importing a pack cannot silently overwrite a hand-authored definition.
 
-The four supplied levels use this resource. Migration preserves guard IDs, positions, rotations, scales, patrols and tuning. The animated mesh is about 1.845 m tall versus the earlier 1.6 m placeholder; both use a feet-at-ground origin, so visual height changes without moving the authored actor or changing gameplay collision.
+All supplied levels use this resource. The original four-level migration preserved guard IDs, positions, rotations, scales, patrols and tuning. The animated mesh is about 1.845 m tall versus the earlier 1.6 m placeholder; both use a feet-at-ground origin, so visual height changes without moving the authored actor or changing gameplay collision.
 
 ## Editor workflow
 
@@ -37,7 +37,7 @@ After updating the editor executable, reopen the editor and level to load the ne
 
 The bundle compiler already shares character geometry and compressed clip data across levels. Resource sharing therefore does not require a separate copy of the guard asset for every level. Each live guard still owns its AI state, animation pose, lighting and buffered RSP submission data; sharing a definition does not make additional guards free.
 
-After the sleeve correction, the supplied scenes contain up to 4,701 instanced attribute vertices. The scene limit is 6,144 vertices; an individual mesh remains limited to 4,096. Separating these limits keeps per-model lighting/fog scratch unchanged and adds only 24 KiB to the default renderer's world-position cache. The CPU reference path also retains camera coordinates and clip codes, adding 50 KiB there. The triangle limit remains 4,096. These are allocation limits, not guarantees about frame rate or supported crowd size.
+After the sleeve correction, the four migrated scenes contained up to 4,701 instanced attribute vertices. That historical count used the 1,009-vertex guard; the [painted unwrap](guard-atlas-study.md) now uses 738 vertices with the same 535 triangles. The scene limit is 6,144 vertices; an individual mesh remains limited to 4,096. Separating these limits keeps per-model lighting/fog scratch unchanged and adds only 24 KiB to the default renderer's world-position cache. The CPU reference path also retains camera coordinates and clip codes, adding 50 KiB there. The triangle limit remains 4,096. These are allocation limits, not guarantees about frame rate or supported crowd size.
 
 ## Verification
 

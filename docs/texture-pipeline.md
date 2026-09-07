@@ -1,6 +1,6 @@
 # Textures from LightEngine to the N64
 
-Status: **first working slice, 2026-09-05.** The Moonlit Delivery Yard cooks the StreetLight brick and paving images into the ROM and renders them on fully 3D UV-mapped models. Canonical materials persist source references and target dimensions; the GUI edits existing texture dimensions, color and emission. New source assignment currently uses JSON or the editing API. The preview uses the same quantized PNG pixels sent to libdragon's texture converter; Ares captures verify the actual N64 output.
+Status: **RGBA16, CI4 and CI8 supported, 2026-09-07.** The Moonlit Delivery Yard cooks the StreetLight brick and paving images into the ROM and renders them on fully 3D UV-mapped models. Canonical materials persist source references, target dimensions and format; the GUI edits existing texture dimensions, format, color and emission. New source assignment currently uses JSON or the editing API. The preview uses the same quantized PNG pixels sent to libdragon's texture converter; indexed sprite pixels and palettes are checked against that preview before publication. The [painted guard study](guard-atlas-study.md) exercises the CI4 path on an animated character.
 
 ## What makes the StreetLight example work
 
@@ -44,11 +44,15 @@ To assign a new image, save and close its workshop, add the source file under `c
 }
 ```
 
-The initial format is **RGBA16 only**, with power-of-two dimensions up to 64 and a 4 KiB per-texture limit. The cooker BOX-resizes, quantizes to RGB555 plus one alpha bit, and emits a PNG for the editor and converter. OBJ UV seams survive mesh export; image V orientation is converted once and shared by preview and runtime. The game uses perspective-correct texture coordinates, wrapping, bilinear filtering, Gouraud color modulation and hardware depth testing. Its clipping interpolates UV and color alongside position.
+Formats are **RGBA16**, **CI4** (16 palette entries) and **CI8** (256 entries), with power-of-two dimensions up to 64. The cooker BOX-resizes and quantizes to RGB555 plus one alpha bit. Indexed textures additionally use deterministic median-cut color reduction and nearest-palette assignment without dithering; transparent pixels retain a separate palette entry. Alternatively, an optional `texture.palette` array of `#RRGGBB` strings supplies an authored opaque palette (up to 16 or 256 colors); those entries are snapped to RGB555 and used directly. Authored palettes reject transparent pixels rather than silently discarding their alpha. The cooker emits a full indexed PNG palette, allowing `mksprite` to preserve the cooked indices and colors rather than quantizing again. Each native indexed sprite is decoded and compared with its preview indices and RGB5551 palette before publication. An incompatible converter output fails cooking.
+
+Validation includes eight-byte TMEM row alignment. RGBA16 texels must fit 4 KiB; CI texels must fit the lower 2 KiB, with the upper half used for palette lookup. Thus 64 × 64 CI4 fits, while 64 × 64 CI8 and RGBA16 do not. A 64 × 32 RGBA16 texture fits. These limits describe the current whole-texture renderer; larger tiled materials and mipmaps require additional pipeline work.
+
+OBJ UV seams survive mesh export; image V orientation is converted once and shared by preview and runtime. The game uses perspective-correct texture coordinates, wrapping, N64 three-point filtering, Gouraud color modulation and hardware depth testing. Its clipping interpolates UV and color alongside position. Libdragon's sprite upload activates CI palette lookup and disables it again for non-indexed textures, allowing the existing renderers to switch between these formats.
 
 The installed SDK already provides `mksprite` for PNG conversion, palette quantization, dithering, mipmaps and compression, plus `mkdfs` for the ROM filesystem. The JPEG sources therefore need an offline resize/PNG conversion step. Despite its name, libdragon's `.sprite` container also holds textures for 3D models. At runtime, `sprite_load` loads an asset into memory and `rdpq_sprite_upload` prepares it for textured triangles, including its palette. [Image assets](https://libdragon.dev/ref/sprite_8h.html), [texture upload](https://libdragon.dev/ref/rdpq__sprite_8h.html).
 
-The cooker records source/recipe/PNG/sprite hashes, converter identity, actual sprite bytes, decoded pixel bytes and TMEM fit. Invalid assets fail cooking before publication. Source-image, recipe or converter changes invalidate the relevant asset and ROM cache. The courtyard reports live under `build/scenes/moonlit_courtyard/generated/`: `texture_report.json` describes cooked pixels; `texture_runtime_report.json` records actual SDK output. Pixels are loaded once per scene; this first slice has no texture streaming.
+The cooker records source/recipe/PNG/sprite hashes, converter identity, actual sprite bytes, decoded pixel bytes, palette bytes and TMEM fit. `decoded_bytes` retains its original pixels-only meaning; `decoded_total_bytes` includes pixels plus the source palette. Reports also distinguish row-aligned TMEM pixels from the palette's reserved TMEM area. Invalid assets fail cooking before publication. Source-image, recipe or converter changes invalidate the relevant asset and ROM cache. The courtyard reports live under `build/scenes/moonlit_courtyard/generated/`: `texture_report.json` describes cooked pixels; `texture_runtime_report.json` records actual SDK output. Pixels are loaded once per scene; there is no texture streaming.
 
 ## Three different memory costs
 
@@ -63,7 +67,9 @@ Calculated examples below exclude headers, alignment, mipmaps and allocator over
 | General texture, 32 × 32 RGBA16 | 2,048 bytes | 2,048 bytes |
 | Courtyard brick, 64 × 32 RGBA16 | 4,096 bytes | 4,096 bytes |
 
-The CI4 rows are future candidates; palette support and quality still need implementation and review. The courtyard uses **6,144 pixel bytes** across brick and paving. The two uncompressed SDK sprite files total **6,416 bytes**, including their headers; filesystem and allocator overhead are additional. The brick and paving occupy TMEM successively, not simultaneously. All resident assets compete with audio and other systems within our 8 MiB RDRAM baseline. Reusing a material reuses its resident texture; each upload still costs bandwidth. Runtime logs include a per-frame upload count.
+The CI4 examples are supported. The courtyard's original brick and paving pair uses **6,144 pixel bytes**; their two uncompressed SDK sprites total **6,416 bytes** including headers. Later additions such as guard and loot atlases are extra. Filesystem and allocator overhead are additional. Brick and paving occupy TMEM successively. All resident assets compete with audio and other systems within our 8 MiB RDRAM baseline. Reusing a material reuses its resident texture; each upload still costs bandwidth. Runtime logs include a per-frame upload count.
+
+The current implementation accepts at most 64 materials/textures per scene. This is a software capacity limit, not a separately reserved texture-RAM budget. A shared guard skin is loaded once regardless of guard count. Multiple materials within one character and streaming larger images are future extensions; whole-instance skin selection already uses the normal material reference.
 
 ## Fidelity steps
 
@@ -72,7 +78,7 @@ The [night contrast study](night-contrast.md) combines the working texture path 
 The next improvements are:
 
 - Bake stable crevice shading and ambient occlusion into compact textures. Keep switchable illumination separate so extinguished lamps do not leave painted light pools.
-- Move static vertex-light preparation offline or add small lightmaps. Currently the game prepares static corner colors for both gate states at startup; moving actors use a bounded number of runtime probes. Freely moving or switchable lamps need an explicit update policy before adding them.
+- Extend lighting deliberately: [static corner colors for both gate states are already baked offline](level-loading.md), while moving actors retain runtime lighting. Small lightmaps or freely moving/switchable lamps would need an explicit update policy and additional texture budgets.
 - Spend geometry on silhouettes and large surface changes; represent small masonry relief through texture shading.
 - Evaluate mipmaps, detail textures and dynamic shadow approximations against measured cost. Emission currently adds surface brightness; it does not automatically create a light source or bloom.
 

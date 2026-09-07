@@ -12,6 +12,11 @@ import math
 from pathlib import Path
 import re
 
+try:
+    from cook_textures import texture_memory, validate_palette
+except ModuleNotFoundError:
+    from tools.cook_textures import texture_memory, validate_palette
+
 ROOT = Path(__file__).resolve().parents[1]
 ID = re.compile(r"[A-Za-z][A-Za-z0-9_-]{0,63}\Z")
 
@@ -93,14 +98,16 @@ def load_pack(uri, asset_root=ROOT / "content"):
             require(type(item["double_sided"]) is bool, "double_sided must be boolean")
         if "texture" in item:
             texture = item["texture"]
-            fields(texture, {"uri", "width", "height", "format"}, set(), "Texture")
-            require(texture["format"] == "RGBA16", "Texture format must be RGBA16")
+            fields(texture, {"uri", "width", "height", "format"}, {"palette"}, "Texture")
+            require(texture["format"] in ("RGBA16", "CI4", "CI8"), "Texture format must be RGBA16, CI4 or CI8")
+            if "palette" in texture:
+                validate_palette(texture["palette"], texture["format"])
             for axis in ("width", "height"):
                 n = texture[axis]
                 require(type(n) is int and 1 <= n <= 64 and not n & (n - 1),
                         "Texture dimensions must be powers of two from 1 to 64")
-            require(texture["width"] * texture["height"] * 2 <= 4096,
-                    "Texture exceeds the 4 KiB TMEM limit")
+            require(texture_memory(texture["width"], texture["height"], texture["format"])["tmem_bytes"] <= 4096,
+                    "Texture exceeds the 4 KiB TMEM limit after row alignment and indexed palette reservation")
             content_path(texture["uri"], asset_root, {".png", ".jpg", ".jpeg"})
     models = {item["id"] for item in pack["assets"]}
     materials = {item["id"] for item in pack["materials"]}

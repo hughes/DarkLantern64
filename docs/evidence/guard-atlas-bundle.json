@@ -1,0 +1,122 @@
+{
+  "passed": true,
+  "scope": "Final ordinary five-level menu bundle builds and boots. This smoke test does not exercise every menu transition.",
+  "run": {
+    "log": ".dev/ares/runs/13d5c4b8b3484e328ee4fdd4ef142ea3/painted-guard-menu.log",
+    "log_sha256": "8ab7bfbef0683ac2e9071f6718401f41a118603e4241394e5f56a26d0474a377",
+    "rom": ".dev/ares/runs/13d5c4b8b3484e328ee4fdd4ef142ea3/DarkLantern64-bundle-level_bundle-menu-t3d.z64",
+    "rom_sha256": "213e9341741cdf3cecee18818dd2be76e1b3dad25cb34f8f6f2b8c78da4005f7",
+    "settings": ".dev/ares/runs/13d5c4b8b3484e328ee4fdd4ef142ea3/settings.bml",
+    "settings_sha256": "62e804f24acd295c82b37e81c03d9d0339368555d4c343450017fd1446a6122c",
+    "terminal_event": "DL64 menu_ready levels=5 initial=lantern-store mode=menu"
+  },
+  "manifest": "build/DarkLantern64-bundle-level_bundle-menu-t3d/build.json",
+  "manifest_sha256": "9c3665557850e6491f80142675bc5540d1a6bc5f08bd029db5caeb56b64f4b1b",
+  "rom_bytes": 573440,
+  "shared_guard_texture": {
+    "id": "texture-567fe103fd6724eb",
+    "uri": "assets/guard/guard-atlas-painted.png",
+    "width": 64,
+    "height": 64,
+    "format": "CI4",
+    "decoded_bytes": 2048,
+    "pixel_bytes": 2048,
+    "palette_bytes": 32,
+    "decoded_total_bytes": 2080,
+    "row_bytes": 32,
+    "tmem_row_bytes": 32,
+    "tmem_pixel_bytes": 2048,
+    "tmem_palette_reserved_bytes": 2048,
+    "tmem_bytes": 4096,
+    "palette_colors": 16,
+    "palette_used_colors": 15,
+    "palette_unique_colors": 16,
+    "palette_mode": "explicit",
+    "palette_sha256": "6cdcdf2025f3022ebcf5d3198e8299888367811baf3284d167ca7aa3e00887b9",
+    "source_sha256": "fe04e007dc0645929dc8e6df946e1b1acf184d59f620250bd578c54ce576ed96",
+    "recipe_sha256": "567fe103fd6724eb9545f172cecd6856f5e75b30d8c6fe63e6836564f11c073d",
+    "png_sha256": "77b24a3b488f806bc775c283dcb2fab59eb850c73c02026fa3911eef2b15302e",
+    "png_path": "editor-assets/textures/texture-567fe103fd6724eb.png",
+    "sprite_path": "romfs/textures/texture-567fe103fd6724eb.sprite",
+    "recipe": {
+      "version": 2,
+      "source_sha256": "fe04e007dc0645929dc8e6df946e1b1acf184d59f620250bd578c54ce576ed96",
+      "width": 64,
+      "height": 64,
+      "format": "CI4",
+      "resize": "BOX",
+      "quantization": "RGB555-floor-A1-threshold128",
+      "pillow": "11.2.1",
+      "cooker_sha256": "12f6b8f8b6b1025660541dd03f78dc1d12d6d09041cf62b8f5d1eb40c033d996",
+      "palette_quantization": "explicit-RGB555-first-unique-nearest-v1",
+      "palette_colors": 16,
+      "transparency": "opaque-only",
+      "dither": "NONE",
+      "png": "indexed-full-palette",
+      "palette": [
+        "#100C08",
+        "#212410",
+        "#333613",
+        "#454723",
+        "#5A5736",
+        "#293139",
+        "#4A5252",
+        "#737B7B",
+        "#6B4229",
+        "#946331",
+        "#BD8C52",
+        "#29180C",
+        "#4A2818",
+        "#630808",
+        "#8C6318",
+        "#D6AD63"
+      ]
+    },
+    "signature": "2c79f8b3897df24d6c281c1f2ea840620ae120e7d943bc5b322a27f339813ea4",
+    "flags": [
+      "-f",
+      "CI4",
+      "-D",
+      "NONE",
+      "-c",
+      "0"
+    ],
+    "palette_verified": true,
+    "sprite_bytes": 2216,
+    "sprite_sha256": "b901d5b2d326039d55b3ec3b9fe228fba1aee3256bf595e4f75634e9cb1070eb"
+  },
+  "texture_memory": {
+    "decoded_bytes": 32768,
+    "palette_bytes": 32,
+    "decoded_total_bytes": 32800,
+    "sprite_bytes": 34432
+  },
+  "levels": [
+    {
+      "id": "lantern-store",
+      "title": "DarkLantern64 - The Lantern Store",
+      "uses_shared_painted_guard": true
+    },
+    {
+      "id": "moonlit-yard",
+      "title": "DarkLantern64 - The Moonlit Delivery Yard",
+      "uses_shared_painted_guard": true
+    },
+    {
+      "id": "enemy-workshop",
+      "title": "Enemy Patrol Workshop",
+      "uses_shared_painted_guard": true
+    },
+    {
+      "id": "animation_workshop",
+      "title": "DarkLantern64 - Guard Animation Workshop",
+      "uses_shared_painted_guard": true
+    },
+    {
+      "id": "sponza",
+      "title": "DarkLantern64 - Sponza After Hours",
+      "uses_shared_painted_guard": true
+    }
+  ],
+  "report_note": "Recovered from preserved successful smoke log after a report-only title-key error. The owned emulator completed and was closed by the harness."
+}

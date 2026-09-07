@@ -1,0 +1,128 @@
+{
+  "original_cooker_sha256": "297b21f7c787f4b9285ed7b113099a01e45c3f5e5056535f4fa76c195bf516cf",
+  "rgba16_assets_compared": 12,
+  "textures": [
+    {
+      "uri": "assets/loot/mat-loot-atlas.png",
+      "width": 32,
+      "height": 32,
+      "png_sha256": "f5f52818b0caf13b5aeb7698224019df4b0d0fd5a72ac9bfdbc8ac196229dc2d",
+      "unchanged_png_bytes": true,
+      "unchanged_sprite_bytes": true,
+      "sprite_bytes": 2184,
+      "sprite_sha256": "cbf5330e91db96a294a6d389557f353852f38d12c0acb95ec3f5a286a77edab0"
+    },
+    {
+      "uri": "textures/streetlight-pavingstone.jpg",
+      "width": 32,
+      "height": 32,
+      "png_sha256": "9b86c961222a5201927571ce7b67e81ef3a32c6b954f167b4ce5c350db3db5d5",
+      "unchanged_png_bytes": true,
+      "unchanged_sprite_bytes": true,
+      "sprite_bytes": 2184,
+      "sprite_sha256": "180320fd20c4bc4711022fe8a598a8ee0f0bc51ea7ea4e5586663142f550e449"
+    },
+    {
+      "uri": "textures/streetlight-brick.jpg",
+      "width": 64,
+      "height": 32,
+      "png_sha256": "4d4dfa766b60ac252ca7a19dd643d68cd6f8b13f388c1d6a8f50196ceb426623",
+      "unchanged_png_bytes": true,
+      "unchanged_sprite_bytes": true,
+      "sprite_bytes": 4232,
+      "sprite_sha256": "6ea249500909084ee07d9318bff72f207e9fe770a235b8c9905371dba5ba75bc"
+    },
+    {
+      "uri": "assets/guard/guard-atlas.png",
+      "width": 32,
+      "height": 32,
+      "png_sha256": "33d9851289ae2c91912d20b3bcd2742f9df5587dc803bb7969509db3c812ce8a",
+      "unchanged_png_bytes": true,
+      "unchanged_sprite_bytes": true,
+      "sprite_bytes": 2184,
+      "sprite_sha256": "8c0690447ff958b2bb870931406becdcdd672e62d18295011043cfe13773bb9f"
+    },
+    {
+      "uri": "assets/sponza/textures/sponza-stone.png",
+      "width": 64,
+      "height": 32,
+      "png_sha256": "95d23627f257fcc48de7d0b05c4a5ceeac173b4c497b7a1ec4d96a1afc55831d",
+      "unchanged_png_bytes": true,
+      "unchanged_sprite_bytes": true,
+      "sprite_bytes": 4232,
+      "sprite_sha256": "4ea34a68abf63791460d0993aae2f93af0e193949722b6691447fe2df5a9d6ba"
+    },
+    {
+      "uri": "assets/sponza/textures/sponza-trim.png",
+      "width": 64,
+      "height": 32,
+      "png_sha256": "4aa74726c91fa3d0099b4d80a897957abf39d00d3ffc95f2a274cf21005d6bd4",
+      "unchanged_png_bytes": true,
+      "unchanged_sprite_bytes": true,
+      "sprite_bytes": 4232,
+      "sprite_sha256": "8451e8fa915c428e0f3ca237771f8051d04400b1ac08c5a863cfed44e40e0fd2"
+    },
+    {
+      "uri": "assets/sponza/textures/sponza-plaster.png",
+      "width": 32,
+      "height": 32,
+      "png_sha256": "8193f077a649d65a02b89fd0c8967cdbfd7d840a76b86b8af3867ea51d526e50",
+      "unchanged_png_bytes": true,
+      "unchanged_sprite_bytes": true,
+      "sprite_bytes": 2184,
+      "sprite_sha256": "3caeb269d3202eb1cca17dc9aa076141dea380ec922c3c766d6805379d0f81e4"
+    },
+    {
+      "uri": "assets/sponza/textures/sponza-brick.png",
+      "width": 32,
+      "height": 32,
+      "png_sha256": "e831300f4ec8ffa88520de12f0da2dd869e1ce3e8ec466d35a155a322daa48e2",
+      "unchanged_png_bytes": true,
+      "unchanged_sprite_bytes": true,
+      "sprite_bytes": 2184,
+      "sprite_sha256": "e4b3b080de3cb070ff0c4c196f423fd0aeb66b5e6ce262bb1d5d7bce8b4e0a0f"
+    },
+    {
+      "uri": "assets/sponza/textures/sponza-wood.png",
+      "width": 32,
+      "height": 32,
+      "png_sha256": "b94c35666aae4f58dd8207babc9ad4db7559366792526fe202e25362d1cba454",
+      "unchanged_png_bytes": true,
+      "unchanged_sprite_bytes": true,
+      "sprite_bytes": 2184,
+      "sprite_sha256": "aba6f1cf18359cd22742f67bac7562c458ab7d48fffa402cfc41658aa41a2a3e"
+    },
+    {
+      "uri": "assets/sponza/textures/sponza-floor.png",
+      "width": 64,
+      "height": 32,
+      "png_sha256": "67087e91831c3ef7a0ffb1991659f153d6908d21a4e9a391fb7b5dbcf5253aa8",
+      "unchanged_png_bytes": true,
+      "unchanged_sprite_bytes": true,
+      "sprite_bytes": 4232,
+      "sprite_sha256": "1234b4a545ef40e350c3f8277bdf1ccbe0a0f59f7a035913aab1f7cd0bbbb5bc"
+    },
+    {
+      "uri": "assets/sponza/textures/sponza-relief.png",
+      "width": 32,
+      "height": 32,
+      "png_sha256": "745e3fab5a71d15f046afdfebf8cfed3c49ce840acef4caccbe89e065a03fd1c",
+      "unchanged_png_bytes": true,
+      "unchanged_sprite_bytes": true,
+      "sprite_bytes": 2184,
+      "sprite_sha256": "d3c508b810009e79283dc911efe4f7f2b0625a8124b83a9539d1068436683f25"
+    },
+    {
+      "uri": "assets/sponza/textures/sponza-roof.png",
+      "width": 32,
+      "height": 32,
+      "png_sha256": "b8cf9ec88ef9c1dd37212fb60f753384da25d125c298b7e6fa304d028ceffb2e",
+      "unchanged_png_bytes": true,
+      "unchanged_sprite_bytes": true,
+      "sprite_bytes": 2184,
+      "sprite_sha256": "ed1bb489f4ac5045caaa8006774ba1b8f65f6f831fc58d9019eba52e43b2ce92"
+    }
+  ],
+  "native_rgba16_sprite_assets_compared": 12,
+  "mksprite_sha256": "82df8119bc3b59571b733195c93b9a5c507fff7dc5bd5be1caf978e24fd1caaa"
+}

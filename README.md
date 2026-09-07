@@ -14,7 +14,7 @@ Our development approach is to extend **LightEngine** into a productive content 
 
 **Animating characters?** The [guard animation study](docs/guard-animation-prototype.md) covers the editable Blender guard, five Actions, connected joints, editor playback/head attention and measured N64 costs. Its clips compress to 8.61 KiB. The default renderer now uses Tiny3D on the RSP for model transforms and rigid skeletal deformation.
 
-The two-guard workshop [sustains every native refresh in Ares](docs/guard-renderer-performance.md): 1,800 fresh frames over 30 seconds, with no repeats and a 16.369 ms maximum CPU work sample after the shared-resource and sleeve corrections. Original hardware validation remains pending.
+The two-guard workshop [sustains every native refresh in Ares](docs/guard-renderer-performance.md): 1,800 fresh frames over 30 seconds, with no repeats and a 16.480 ms maximum CPU work sample after the shared-resource, sleeve and depth corrections. Original hardware validation remains pending.
 
 ## Build and play
 
@@ -59,6 +59,7 @@ The engine revision is recorded in [dependencies.json](dependencies.json). Proje
 | [Guard animation prototype](docs/guard-animation-prototype.md) | Edit/export the Blender guard, preview clips and head attention, and inspect measured compression and runtime costs. |
 | [Shared guard resources](docs/shared-guard-resources.md) | One guard model/material/animation definition across levels, with independent placement and behavior. |
 | [Resolution and antialiasing study](docs/video-quality-study.md) | Measured 320 × 240 AA at 60 fps and coherently paced 640 × 480i AA at 30 fps, with memory costs. |
+| [Depth precision correction](docs/depth-precision.md) | Reproduce and fix the warehouse window regression without moving its geometry. |
 | [Character animation architecture](docs/character-animation.md) | Implemented foundations and proposed N64 deformation, audio events, memory and editor extensions. |
 | [Vision](docs/vision.md) | Game pillars, collaboration, and scope. |
 | [Architecture](docs/architecture.md) | Editor/runtime boundary, content model, and existing foundations. |

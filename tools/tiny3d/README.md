@@ -17,9 +17,11 @@ Tiny3D is the default; `--renderer cpu` retains the original output names. Tiny3
 `-t3d` to its ROM and build directory and records the renderer, dependency pin,
 and library hash in `build.json`, so measurements can identify the exact backend.
 Normal game builds run the dependency's incremental local make without fetching.
-The local cache also fingerprints SDK/toolchain contents and build flags. A
-changed identity invalidates its disposable objects and generated RSP metadata,
-so switching SDKs cannot silently retain a library from the previous compiler.
+The helper copies the pristine checkout to `build/tiny3d-source` and applies the
+reviewed patches in `tools/tiny3d/patches` there. Neither the checkout nor the
+installed SDK is changed. The local cache fingerprints patches, SDK/toolchain
+contents, build flags and staged source contents. A changed identity rebuilds
+the disposable stage, including objects and generated RSP metadata.
 
 The reviewed pin is Tiny3D
 [`ec557373e986b5e041cc102a7ff787eb07921937`](https://github.com/HailToDodongo/tiny3d/tree/ec557373e986b5e041cc102a7ff787eb07921937)
@@ -33,10 +35,18 @@ locally and revalidate the whole game, including audio and profiling.
 
 Integration inputs:
 
-- Include directory: `external/tiny3d/src`.
-- Link input, before `-ldragon`: `external/tiny3d/build_sdk_main/libt3d.a`.
+- Include directory: `build/tiny3d-source/src`.
+- Link input, before `-ldragon`: `build/tiny3d-source/build_sdk_main/libt3d.a`.
 - Build callable: `build_tiny3d.build_library(sdk)` returns that library path.
-- Dependency report: `build/tiny3d-dependency.json` includes revision and library hash.
+- Dependency report: `build/tiny3d-dependency.json` includes revision, patches and library hash.
+
+The perspective patch refines the RSP's reciprocal approximation and backports
+the upstream viewport-scale precision correction. It preserves the 70-entry
+vertex cache and current game lighting/fog. To fit the RSP instruction memory,
+this build excludes Tiny3D's native point-light handler and explicitly rejects
+`t3d_light_set_point`, including release builds. DarkLantern64's CPU light probes
+and dynamic vertex colors remain supported. See the patch notes and depth study
+beside this guide for the math, reproduction and measured scope.
 
 The upstream Makefile produces an ELF relocatable object named `libt3d.a`,
 rather than an `ar` archive. Pass it directly to the linker. The underscore in

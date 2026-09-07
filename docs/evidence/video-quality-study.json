@@ -198,5 +198,116 @@
     "sessions": 7,
     "remaining": 0,
     "verified": "Final Win32 process inspection matched only the seven isolated video-study run IDs."
+  },
+  "followup_after_shared_guard_and_depth_fix": {
+    "scope": "Separate fresh frozen baseline after shared resource migration, sleeve correction and RSP reciprocal/viewport precision fix; original6264ca3 series above remains historical.",
+    "baseline_verification": "build/guard-60fps/depth-verification.json",
+    "baseline_rom_sha256": "6bcb5aafab401c16f512f4dc7f1b5886725f4c59ef81f441ab01b79d1e1a8731",
+    "baseline_signature": "337650140d69666064b1e41a676505f62613da6c4e5c90c9217c1615e28423f6",
+    "tiny3d_library_sha256": "df33d2e57efdd0476d6a533d225cc1c1576f8645121d39a8620696d9f109281f",
+    "tiny3d_patches": [
+      {
+        "path": "tools/tiny3d/patches/0001-perspective-precision.patch",
+        "sha256": "17cc9d4b54cd7dd92d87049ab5f028212d805d7a93a88ca207f0c988eb430934"
+      }
+    ],
+    "baseline_320_no_aa": {
+      "work": {
+        "samples": 1800,
+        "average_ms": 11.687906524444445,
+        "min_ms": 11.033408,
+        "max_ms": 16.480021333333333,
+        "p50_ms": 11.529002666666667,
+        "p95_ms": 12.992981333333333,
+        "p99_ms": 14.84224,
+        "over_budget_frames": 0,
+        "quantile_method": "nearest rank of every exact CP0-tick sample"
+      },
+      "video": {
+        "vis": 1800,
+        "presents": 1800,
+        "repeats": 0,
+        "ticks": 1410335734,
+        "tracked": true,
+        "max_gap_vis": 1,
+        "max_interval_ms": 18.15569066666667,
+        "seconds": 30.087162325333335,
+        "native_refresh_hz": 59.82618036678066,
+        "presented_fps": 59.82618036678066
+      }
+    },
+    "commands": [
+      "python tools/video_study.py 320-aa --verification build/guard-60fps/depth-verification.json --output build/video-study-depth --windows 30 --run",
+      "python tools/video_study.py 640-aa --verification build/guard-60fps/depth-verification.json --output build/video-study-depth --field-pacing 2 --windows 30 --run"
+    ],
+    "measurements": [
+      {
+        "mode": "320-aa",
+        "diagnostic_valid": true,
+        "rom_sha256": "82e55e2322961caf3396ea9d11297eca0c6a3127c7e2ea8ff506380417134d89",
+        "width": 320,
+        "height": 240,
+        "interlaced": false,
+        "rdp_aa": "standard",
+        "vi_filters": "resample_antialias",
+        "measured_seconds": 30.087166869333334,
+        "measured_game_frames": 1800,
+        "work_average_ms": 11.74640773925926,
+        "work_max_ms": 16.732309333333333,
+        "work_over_budget_frames": 2,
+        "work_budget_fps": 60,
+        "meets_work_budget": false,
+        "video_fields": 1800,
+        "native_field_hz": 59.82617133136152,
+        "source_changes": 1800,
+        "source_changes_per_second": 59.82617133136152,
+        "unchanged_source_fields": 0,
+        "max_source_gap_fields": 1,
+        "coherent_source_pairs": 0,
+        "incomplete_sources": 0,
+        "coherent_pairs_per_second": null,
+        "coherent_30fps_gate": null,
+        "unknown_origins": 0,
+        "peak_sampled_heap_bytes": 1007984,
+        "local_report": "build/video-study-depth/320-aa/measurement.json",
+        "source_log_sha256": "4a20c9ff5be6289bd1de30d801b68653e7db41fe90c8fcb852b0adde150bec9b"
+      },
+      {
+        "mode": "640-aa-paced",
+        "diagnostic_valid": true,
+        "rom_sha256": "c4f00e4565964e271d72c81ab5d9c9f06bd1098599c1fe6b7cea2a3662cbc2ff",
+        "width": 640,
+        "height": 480,
+        "interlaced": true,
+        "rdp_aa": "standard",
+        "vi_filters": "resample_antialias",
+        "measured_seconds": 30.063328832,
+        "measured_game_frames": 901,
+        "work_average_ms": 12.795262437291898,
+        "work_max_ms": 17.49096533333333,
+        "work_over_budget_frames": 0,
+        "work_budget_fps": 30,
+        "meets_work_budget": true,
+        "video_fields": 1802,
+        "native_field_hz": 59.94013537456024,
+        "source_changes": 901,
+        "source_changes_per_second": 29.97006768728012,
+        "unchanged_source_fields": 901,
+        "max_source_gap_fields": 2,
+        "coherent_source_pairs": 901,
+        "incomplete_sources": 0,
+        "coherent_pairs_per_second": 29.97006768728012,
+        "coherent_30fps_gate": true,
+        "unknown_origins": 0,
+        "peak_sampled_heap_bytes": 2851184,
+        "local_report": "build/video-study-depth/640-aa-paced/measurement.json",
+        "source_log_sha256": "459d3b739b6840a1dd96a0dd8c2e238fa048f560c20a7f10bfce5fc972b7aab9"
+      }
+    ],
+    "interpretation": [
+      "AA320 presented every observed progressive frame, but2/1800 CPUwork samples exceeded16.667ms. Presentation is clean; strictCPU headroom gate is not.",
+      "Paced640AA passed completefield-pair and33.333ms work-budget gates.",
+      "These remain staged diagnostic modes with unscaled640HUD, originalN64/M64 unverified; no defaultgamevideo settings changed."
+    ]
   }
 }

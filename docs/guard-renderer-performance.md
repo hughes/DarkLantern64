@@ -6,15 +6,15 @@ The two-guard workshop **passes the sustained 60 fps target in Ares**, presentin
 
 | Steady measurement | Result |
 | --- | ---: |
-| Average CPU work | 11.657 ms |
-| 95th / 99th percentile work | 12.982 / 14.779 ms |
-| Maximum CPU work | 16.369 ms |
+| Average CPU work | 11.688 ms |
+| 95th / 99th percentile work | 12.993 / 14.842 ms |
+| Maximum CPU work | 16.480 ms |
 | Work samples exceeding 16.667 ms | 0 / 1,800 |
 | Fresh framebuffers / VI scans | 1,800 / 1,800 |
-| Average transforms / lighting / triangle submission | 3.001 / 6.197 / 0.373 ms |
-| Average normal HUD | 0.057 ms |
+| Average transforms / lighting / triangle submission | 2.998 / 6.206 / 0.367 ms |
+| Average normal HUD | 0.056 ms |
 
-Work includes audio, reporting and queue stalls, and excludes display-buffer waiting. The debug overlay is off; profiling continues in the background. Two posed guards and 1,190 candidate scene triangles were submitted in every measured frame. The patrol moves along its route while the sentry holds position. This quiet scene has no active attention overlays and does not establish crowded combat, worst-case audio or original N64/M64 performance. This recheck includes the shared-resource migration and integrated sleeve stripe. The verified ROM SHA-256 is `c3e5c3d297aeb818f5aa905b1e6cf3e4009e5c362caefc07d771416ae93263ff`.
+Work includes audio, reporting and queue stalls, and excludes display-buffer waiting. The debug overlay is off; profiling continues in the background. Two posed guards and 1,190 candidate scene triangles were submitted in every measured frame. The patrol moves along its route while the sentry holds position. This quiet scene has no active attention overlays and does not establish crowded combat, worst-case audio or original N64/M64 performance. This recheck includes the shared-resource migration, integrated sleeve stripe and [perspective precision correction](depth-precision.md). The verified ROM SHA-256 is `6bcb5aafab401c16f512f4dc7f1b5886725f4c59ef81f441ab01b79d1e1a8731`.
 
 The earlier [animation prototype measurement](evidence/guard-runtime.json) averaged **99.64 ms per frame** with the CPU reference renderer. That is a historical workflow/correctness measurement, not a controlled speedup denominator: the final authored camera was adjusted to frame the two guards. Short diagnostic runs and reciprocal CPU work time do not establish presentation throughput; the final result checks actual scanout changes separately.
 
@@ -109,7 +109,9 @@ Source inspection and disassembly of the installed `libdragon.a` establish the f
 
 The [inspected libdragon fork](https://github.com/hughes/libdragon/tree/7a82f8e50e82ad4601d530801630d8bd0d2fcd00) matches the relevant installed headers. Queue sizes are defined in [RSPQ constants](https://github.com/hughes/libdragon/blob/7a82f8e50e82ad4601d530801630d8bd0d2fcd00/include/rspq_constants.h) and [RDPQ constants](https://github.com/hughes/libdragon/blob/7a82f8e50e82ad4601d530801630d8bd0d2fcd00/include/rdpq_constants.h). [RSPQ buffer reuse](https://github.com/hughes/libdragon/blob/7a82f8e50e82ad4601d530801630d8bd0d2fcd00/src/rspq/rspq.c#L920) waits for RSP completion; [RDP command submission](https://github.com/hughes/libdragon/blob/7a82f8e50e82ad4601d530801630d8bd0d2fcd00/include/rsp_queue.inc#L750) can itself wait for the RDP DMA queue to drain. A delay charged to HUD submission can therefore be backpressure from preceding geometry.
 
-No Tiny3D fork was needed for this integration. Two bounded future changes remain candidates, not implemented optimizations:
+The initial 60 fps integration needed no Tiny3D fork. The subsequent depth regression fix applies a [reviewed project patch](../tools/tiny3d/patches/README.md) to a disposable copy of this pin, leaving the source checkout and SDK unchanged. It refines the RSP reciprocal and viewport precision, preserving the existing cache/lighting/fog contract. The production library hash is `df33d2e57efdd0476d6a533d225cc1c1576f8645121d39a8620696d9f109281f`. Patch hashes, staged source contents and SDK identity all participate in build provenance. Its native RSP point-light handler is excluded to fit instruction memory; that API fails explicitly while our CPU light probes remain supported.
+
+Two further changes remain candidates:
 
 - **An RSP vertex effect for RGB fog**, preserving the scalar path's order and 80% cap, could remove distant animated-vertex depth calculations. It needs microcode timing, register-space, precision and visual-parity evidence.
 - **Larger CPU low-priority queues in libdragon**, if measured submission bursts justify them. Two 8 KiB buffers would add 12 KiB RAM. No public size-setting API exists; a staged replacement of the matching C queue object appears feasible without a global SDK installation, but requires separate link/ABI and runtime validation. Enlarging these queues cannot improve sustained RDP throughput and may only move the wait. Changing the RDP buffer size would also require matching microcode changes; a CPU allocation patch alone is insufficient.

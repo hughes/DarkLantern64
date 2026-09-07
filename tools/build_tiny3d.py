@@ -20,8 +20,23 @@ URL = DEPENDENCY["repository"]
 SOURCE = (ROOT / DEPENDENCY["path"]).resolve()
 if not SOURCE.is_relative_to(ROOT) or SOURCE == ROOT:
     raise ValueError("Tiny3D dependency path must stay inside the project")
-LIBRARY = SOURCE / "build_sdk_main/libt3d.a"
+BUILD_SOURCE = ROOT / "build/tiny3d-source"
+LIBRARY = BUILD_SOURCE / "build_sdk_main/libt3d.a"
+PATCH_DIRECTORY = ROOT / "tools/tiny3d/patches"
 GENERATED_METADATA = ("src/t3d/rsp/rsp_tiny3d.h", "src/t3d/rsp/rsp_tinypx.h")
+
+
+def patch_inputs() -> list[Path]:
+    return sorted(PATCH_DIRECTORY.glob("*.patch"))
+
+
+def staged_source_hashes() -> dict:
+    # Generated overlay addresses are also compile inputs. Hash their bytes so
+    # a changed header cannot be accepted just because make considers it newer.
+    paths = [BUILD_SOURCE / "Makefile"]
+    paths.extend(path for path in (BUILD_SOURCE / "src").rglob("*") if path.is_file())
+    return {path.relative_to(BUILD_SOURCE).as_posix(): _sha256(path) for path in sorted(paths)
+            if path.is_file()}
 
 
 def _sha256(path: Path) -> str:
@@ -41,7 +56,7 @@ def library_identity(sdk: Path, bash: Path, env: dict) -> dict:
     """
     target = env.get("N64_TARGET", "mips64-elf")
     prefix = Path(env.get("N64_GCCPREFIX", str(sdk))).resolve()
-    inputs = {Path(__file__).resolve(), SOURCE / "Makefile", bash.resolve()}
+    inputs = {Path(__file__).resolve(), SOURCE / "Makefile", bash.resolve(), *patch_inputs()}
     for directory in (sdk / "include", sdk / target / "include",
                       prefix / "lib/gcc", prefix / "libexec/gcc"):
         if directory.is_dir():
@@ -62,23 +77,66 @@ def library_identity(sdk: Path, bash: Path, env: dict) -> dict:
                   "CPATH", "C_INCLUDE_PATH", "CPLUS_INCLUDE_PATH", "LIBRARY_PATH"}
     flags = {key: value for key, value in env.items()
              if key in flag_names or (key.startswith("N64_") and key != "N64_INST")}
-    return {"version": 1, "revision": REVISION, "sdk": str(sdk.resolve()),
+    return {"version": 3, "revision": REVISION, "sdk": str(sdk.resolve()),
             "compiler_prefix": str(prefix), "inputs_sha256": digest.hexdigest(),
-            "environment": flags}
+            "environment": flags,
+            "patches": [{"path": path.relative_to(ROOT).as_posix(), "sha256": _sha256(path)}
+                        for path in patch_inputs()]}
 
 
 def _invalidate_library() -> None:
-    # Delete only this dependency's disposable outputs, never source or SDK files.
-    # Resolve every target before doing any deletion, including junction targets.
-    source = SOURCE.resolve()
-    targets = [LIBRARY.parent.resolve(), *((SOURCE / name).resolve() for name in GENERATED_METADATA)]
-    if (source == ROOT.resolve() or not source.is_relative_to(ROOT.resolve()) or
-            any(path == source or not path.is_relative_to(source) for path in targets)):
-        raise RuntimeError("Tiny3D cache outputs must stay inside its project checkout")
-    if targets[0].exists():
-        shutil.rmtree(targets[0])
-    for path in targets[1:]:
-        path.unlink(missing_ok=True)
+    # Resolve and check the complete disposable stage before recursive deletion.
+    # The pristine checkout and its older build outputs are never modified.
+    build_root = (ROOT / "build").resolve()
+    stage = BUILD_SOURCE.resolve()
+    targets = [LIBRARY.resolve(), *((BUILD_SOURCE / name).resolve() for name in GENERATED_METADATA)]
+    if (not build_root.is_relative_to(ROOT.resolve()) or stage == build_root or not stage.is_relative_to(build_root) or
+            stage == SOURCE.resolve() or any(not path.is_relative_to(stage) for path in targets)):
+        raise RuntimeError("Tiny3D cache outputs must stay inside its disposable project build stage")
+    if stage.exists():
+        shutil.rmtree(stage)
+
+
+def copy_pinned_inputs(destination: Path) -> None:
+    """Copy the pinned checkout's tracked build inputs to an absent directory."""
+    # A clean tracked checkout may still contain experimental, untracked
+    # headers. Copy only paths belonging to the pinned commit, not the whole
+    # working directory, so those files cannot shadow SDK or project includes.
+    names = run(["git", "-C", SOURCE, "ls-tree", "-r", "--name-only", "-z", "HEAD", "--", "Makefile", "src"],
+                capture_output=True).stdout.split("\0")
+    inputs = []
+    for name in filter(None, names):
+        relative = Path(name)
+        source = (SOURCE / relative).resolve()
+        if (relative.is_absolute() or ".." in relative.parts or
+                (name != "Makefile" and not name.startswith("src/")) or
+                not source.is_relative_to(SOURCE.resolve())):
+            raise RuntimeError("Tiny3D tracked inputs must stay inside its pinned checkout")
+        if name not in GENERATED_METADATA:
+            inputs.append(relative)
+    if Path("Makefile") not in inputs or not any(path.parts[0] == "src" for path in inputs):
+        raise RuntimeError("Tiny3D pinned commit is missing build inputs")
+    destination.mkdir(parents=True)
+    for relative in inputs:
+        target = destination / relative
+        target.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(SOURCE / relative, target)
+
+
+def prepare_source() -> None:
+    """Copy pristine inputs, then apply reviewed patches only under build/."""
+    copy_pinned_inputs(BUILD_SOURCE)
+    prefix = BUILD_SOURCE.resolve().relative_to(ROOT.resolve()).as_posix()
+    for patch in patch_inputs():
+        # Explicit --directory makes patch paths relative to our checked stage,
+        # independent of git's repository discovery from a nested directory.
+        for line in patch.read_text(encoding="utf-8").splitlines():
+            if line.startswith(("--- ", "+++ ")):
+                name = line[4:].split("\t", 1)[0]
+                if not name.startswith(("a/src/", "b/src/")) or ".." in Path(name).parts:
+                    raise RuntimeError("Tiny3D patches may only change staged src/ files")
+        run(["git", "apply", "--check", "--directory=" + prefix, patch], cwd=ROOT)
+        run(["git", "apply", "--directory=" + prefix, patch], cwd=ROOT)
 
 
 def run(args, **kwargs):
@@ -121,10 +179,12 @@ def build_library(sdk: Path, *, fetch: bool = False, bash: Path | None = None) -
         cached = {}
     reusable = (isinstance(cached, dict) and cached.get("identity") == identity and
                 LIBRARY.is_file() and cached.get("library_sha256") == _sha256(LIBRARY) and
-                all((SOURCE / name).is_file() for name in GENERATED_METADATA))
+                all((BUILD_SOURCE / name).is_file() for name in GENERATED_METADATA) and
+                cached.get("staged_sources") == staged_source_hashes())
     if not reusable:
         print("[tiny3d] SDK/toolchain identity changed or cache is incomplete; rebuilding dependency", flush=True)
         _invalidate_library()
+        prepare_source()
     temporary = ROOT / ".dev/tiny3d-tmp"
     temporary.mkdir(parents=True, exist_ok=True)
     # Pass paths as positional arguments, not interpolated shell code. MSYS2's
@@ -138,18 +198,20 @@ export TEMP="$TMPDIR" TMP="$TMPDIR"
 cd "$(cygpath -u "$2")"
 make -j4 all BUILD_DIR=build_sdk_main
 """
-    run([bash, "-c", script, "tiny3d-build", sdk, SOURCE, temporary], env=env)
+    run([bash, "-c", script, "tiny3d-build", sdk, BUILD_SOURCE, temporary], env=env)
     if not LIBRARY.is_file():
         raise RuntimeError("Tiny3D build did not produce its library")
     library_sha256 = _sha256(LIBRARY)
     pending_stamp = stamp.with_suffix(".tmp")
-    pending_stamp.write_text(json.dumps({"identity": identity, "library_sha256": library_sha256}, indent=2) + "\n")
+    pending_stamp.write_text(json.dumps({"identity": identity, "library_sha256": library_sha256,
+                                         "staged_sources": staged_source_hashes()}, indent=2) + "\n")
     pending_stamp.replace(stamp)
     report = {
         "revision": REVISION, "source_url": URL, "sdk": str(sdk),
-        "library": str(LIBRARY), "include": str(SOURCE / "src"),
+        "library": str(LIBRARY), "include": str(BUILD_SOURCE / "src"),
         "library_sha256": library_sha256, "build_identity": identity,
-        "dependency_cache_rebuilt": not reusable,
+        "dependency_cache_rebuilt": not reusable, "patches": identity["patches"],
+        "pristine_checkout_modified": False,
         "sdk_modified": False,
     }
     (ROOT / "build").mkdir(exist_ok=True)
@@ -166,7 +228,7 @@ def build_proof(sdk: Path, library: Path) -> Path:
     run([bins / "mips64-elf-gcc.exe", "-march=vr4300", "-mtune=vr4300", "-mabi=o64",
          "-std=gnu17", "-O2", "-g", "-Wall", "-Wextra", "-Werror", "-DN64",
          "-ffunction-sections", "-fdata-sections", "-I" + str(sdk / "mips64-elf/include"),
-         "-I" + str(SOURCE / "src"), "-c", ROOT / "tools/tiny3d/proof.c", "-o", obj], env=env)
+         "-I" + str(BUILD_SOURCE / "src"), "-c", ROOT / "tools/tiny3d/proof.c", "-o", obj], env=env)
     run([bins / "mips64-elf-g++.exe", "-mabi=o64", "-g", "-o", elf, obj, library,
          "-L" + str(lib), "-lc", "-ldragon", "-lm", "-ldragonsys",
          "-Wl,-T," + str(lib / "n64.ld"), "-Wl,--gc-sections,--wrap,__do_global_ctors",

@@ -4,9 +4,9 @@
   "profile": {
     "schema_version": 2,
     "measurement": "Emulated CPU-timer elapsed time; not CPU utilization or host CPU time",
-    "source_log": ".dev/ares/runs/9dfab25dc6864e668d8ead26cf57f811/guard-performance.log",
-    "source_log_sha256": "7e7f121de0e4288047b573861634cf3a5e29071b7824a2c5f368fc4961b57a7f",
-    "source_log_bytes": 109582,
+    "source_log": ".dev/ares/runs/567cf3157fe2434ab92dc3134ce7568b/guard-performance.log",
+    "source_log_sha256": "73e08cdce2c06df155ffe625c139a8636e7d5e2c464f050c02b66666fdf181bd",
+    "source_log_bytes": 109584,
     "complete_windows": 30,
     "selected_window_ids": [
       4,
@@ -55,50 +55,50 @@
     },
     "audio_calls": 754,
     "frame": {
-      "total_ticks": 1410331327,
-      "max_ticks": 863569,
-      "average_ms": 16.71503794962963,
-      "max_ms": 18.422805333333333,
-      "percent_of_frame_budget": 100.29022769777778,
-      "percent_of_30fps_budget": 50.14511384888888,
+      "total_ticks": 1410333537,
+      "max_ticks": 865652,
+      "average_ms": 16.71506414222222,
+      "max_ms": 18.467242666666667,
+      "percent_of_frame_budget": 100.29038485333334,
+      "percent_of_30fps_budget": 50.14519242666667,
       "percent_of_frame_elapsed": 100.0
     },
     "slots": {
       "input": {
-        "total_ticks": 3665701,
-        "max_ticks": 3435,
-        "average_ms": 0.04344534518518518,
-        "max_ms": 0.07328,
-        "percent_of_frame_budget": 0.2606720711111111,
-        "percent_of_30fps_budget": 0.13033603555555556,
-        "percent_of_frame_elapsed": 0.25991771790232665
+        "total_ticks": 3667390,
+        "max_ticks": 3639,
+        "average_ms": 0.04346536296296296,
+        "max_ms": 0.077632,
+        "percent_of_frame_budget": 0.26079217777777775,
+        "percent_of_30fps_budget": 0.13039608888888887,
+        "percent_of_frame_elapsed": 0.2600370695148548
       },
       "gameplay": {
-        "total_ticks": 94335261,
-        "max_ticks": 61250,
-        "average_ms": 1.1180475377777779,
-        "max_ms": 1.3066666666666666,
-        "percent_of_frame_budget": 6.708285226666668,
-        "percent_of_30fps_budget": 3.354142613333334,
-        "percent_of_frame_elapsed": 6.688872266679786
+        "total_ticks": 96670308,
+        "max_ticks": 63189,
+        "average_ms": 1.1457221688888888,
+        "max_ms": 1.348032,
+        "percent_of_frame_budget": 6.874333013333333,
+        "percent_of_30fps_budget": 3.4371665066666663,
+        "percent_of_frame_elapsed": 6.854428790343656
       },
       "audio_events": {
-        "total_ticks": 4129440,
-        "max_ticks": 12970,
-        "average_ms": 0.048941511111111106,
-        "max_ms": 0.27669333333333335,
-        "percent_of_frame_budget": 0.2936490666666666,
-        "percent_of_30fps_budget": 0.1468245333333333,
-        "percent_of_frame_elapsed": 0.29279928205125944
+        "total_ticks": 4129893,
+        "max_ticks": 12384,
+        "average_ms": 0.04894688,
+        "max_ms": 0.264192,
+        "percent_of_frame_budget": 0.29368128,
+        "percent_of_30fps_budget": 0.14684064,
+        "percent_of_frame_elapsed": 0.2928309432947988
       },
       "audio_mix": {
-        "total_ticks": 22314513,
-        "max_ticks": 73120,
-        "average_ms": 0.26446830222222223,
-        "max_ms": 1.5598933333333334,
-        "percent_of_frame_budget": 1.5868098133333333,
-        "percent_of_30fps_budget": 0.7934049066666666,
-        "percent_of_frame_elapsed": 1.582217779099223
+        "total_ticks": 22313110,
+        "max_ticks": 73111,
+        "average_ms": 0.26445167407407405,
+        "max_ms": 1.5597013333333334,
+        "percent_of_frame_budget": 1.5867100444444442,
+        "percent_of_30fps_budget": 0.7933550222222221,
+        "percent_of_frame_elapsed": 1.582115819741724
       },
       "cache": {
         "total_ticks": 0,
@@ -110,40 +110,40 @@
         "percent_of_frame_elapsed": 0.0
       },
       "transforms": {
-        "total_ticks": 253250956,
-        "max_ticks": 145844,
-        "average_ms": 3.001492811851852,
-        "max_ms": 3.1113386666666667,
-        "percent_of_frame_budget": 18.00895687111111,
-        "percent_of_30fps_budget": 9.004478435555555,
-        "percent_of_frame_elapsed": 17.956841144463922
+        "total_ticks": 252941358,
+        "max_ticks": 147820,
+        "average_ms": 2.997823502222222,
+        "max_ms": 3.1534933333333335,
+        "percent_of_frame_budget": 17.98694101333333,
+        "percent_of_30fps_budget": 8.993470506666666,
+        "percent_of_frame_elapsed": 17.934860893831242
       },
       "lighting": {
-        "total_ticks": 522905383,
-        "max_ticks": 297200,
-        "average_ms": 6.197397131851852,
-        "max_ms": 6.3402666666666665,
-        "percent_of_frame_budget": 37.184382791111105,
-        "percent_of_30fps_budget": 18.592191395555556,
-        "percent_of_frame_elapsed": 37.076775718532986
+        "total_ticks": 523626825,
+        "max_ticks": 296861,
+        "average_ms": 6.205947555555555,
+        "max_ms": 6.333034666666666,
+        "percent_of_frame_budget": 37.235685333333336,
+        "percent_of_30fps_budget": 18.617842666666668,
+        "percent_of_frame_elapsed": 37.12787161779023
       },
       "triangles": {
-        "total_ticks": 31440834,
-        "max_ticks": 20896,
-        "average_ms": 0.3726321066666667,
-        "max_ms": 0.4457813333333333,
-        "percent_of_frame_budget": 2.23579264,
-        "percent_of_30fps_budget": 1.11789632,
-        "percent_of_frame_elapsed": 2.22932252854935
+        "total_ticks": 30932933,
+        "max_ticks": 20222,
+        "average_ms": 0.36661253925925924,
+        "max_ms": 0.43140266666666666,
+        "percent_of_frame_budget": 2.1996752355555556,
+        "percent_of_30fps_budget": 1.0998376177777778,
+        "percent_of_frame_elapsed": 2.19330620654453
       },
       "hud": {
-        "total_ticks": 4810419,
-        "max_ticks": 4556,
-        "average_ms": 0.05701237333333333,
-        "max_ms": 0.09719466666666667,
-        "percent_of_frame_budget": 0.34207424,
-        "percent_of_30fps_budget": 0.17103712,
-        "percent_of_frame_elapsed": 0.34108431883396717
+        "total_ticks": 4743203,
+        "max_ticks": 4540,
+        "average_ms": 0.05621573925925926,
+        "max_ms": 0.09685333333333333,
+        "percent_of_frame_budget": 0.33729443555555555,
+        "percent_of_30fps_budget": 0.16864721777777777,
+        "percent_of_frame_elapsed": 0.3363178195485257
       },
       "debug_hud": {
         "total_ticks": 0,
@@ -155,31 +155,31 @@
         "percent_of_frame_elapsed": 0.0
       },
       "render_setup": {
-        "total_ticks": 16554311,
-        "max_ticks": 13213,
-        "average_ms": 0.1961992414814815,
-        "max_ms": 0.2818773333333333,
-        "percent_of_frame_budget": 1.177195448888889,
-        "percent_of_30fps_budget": 0.5885977244444445,
-        "percent_of_frame_elapsed": 1.1737887887106404
+        "total_ticks": 16685507,
+        "max_ticks": 12499,
+        "average_ms": 0.19775415703703705,
+        "max_ms": 0.26664533333333335,
+        "percent_of_frame_budget": 1.1865249422222224,
+        "percent_of_30fps_budget": 0.5932624711111112,
+        "percent_of_frame_elapsed": 1.1830894297169365
       },
       "display_wait": {
-        "total_ticks": 426800783,
-        "max_ticks": 267733,
-        "average_ms": 5.05837965037037,
-        "max_ms": 5.711637333333333,
-        "percent_of_frame_budget": 30.350277902222224,
-        "percent_of_30fps_budget": 15.175138951111112,
-        "percent_of_frame_elapsed": 30.262447896401298
+        "total_ticks": 424166424,
+        "max_ticks": 267070,
+        "average_ms": 5.027157617777778,
+        "max_ms": 5.697493333333333,
+        "percent_of_frame_budget": 30.16294570666667,
+        "percent_of_30fps_budget": 15.081472853333334,
+        "percent_of_frame_elapsed": 30.07561068867924
       },
       "other": {
-        "total_ticks": 30123726,
-        "max_ticks": 169310,
-        "average_ms": 0.3570219377777778,
-        "max_ms": 3.611946666666667,
-        "percent_of_frame_budget": 2.142131626666667,
-        "percent_of_30fps_budget": 1.0710658133333335,
-        "percent_of_frame_elapsed": 2.1359325587752473
+        "total_ticks": 30456586,
+        "max_ticks": 172170,
+        "average_ms": 0.3609669451851852,
+        "max_ms": 3.67296,
+        "percent_of_frame_budget": 2.1658016711111108,
+        "percent_of_30fps_budget": 1.0829008355555556,
+        "percent_of_frame_elapsed": 2.1595307209942636
       }
     },
     "limitations": [
@@ -193,23 +193,23 @@
     "distributions": {
       "elapsed": {
         "samples": 1800,
-        "average_ms": 16.71503794962963,
-        "min_ms": 15.023658666666666,
-        "max_ms": 18.422805333333333,
-        "p50_ms": 16.703829333333335,
-        "p95_ms": 17.367018666666667,
-        "p99_ms": 18.329258666666668,
-        "over_budget_frames": 1151,
+        "average_ms": 16.71506414222222,
+        "min_ms": 15.028736,
+        "max_ms": 18.467242666666667,
+        "p50_ms": 16.709418666666668,
+        "p95_ms": 17.393408,
+        "p99_ms": 18.332501333333333,
+        "over_budget_frames": 1109,
         "quantile_method": "nearest rank of every exact CP0-tick sample"
       },
       "work": {
         "samples": 1800,
-        "average_ms": 11.65665829925926,
-        "min_ms": 11.008384,
-        "max_ms": 16.368981333333334,
-        "p50_ms": 11.490453333333333,
-        "p95_ms": 12.982058666666667,
-        "p99_ms": 14.779008,
+        "average_ms": 11.687906524444445,
+        "min_ms": 11.033408,
+        "max_ms": 16.480021333333333,
+        "p50_ms": 11.529002666666667,
+        "p95_ms": 12.992981333333333,
+        "p99_ms": 14.84224,
         "over_budget_frames": 0,
         "quantile_method": "nearest rank of every exact CP0-tick sample"
       }
@@ -218,13 +218,13 @@
       "vis": 1800,
       "presents": 1800,
       "repeats": 0,
-      "ticks": 1410335133,
+      "ticks": 1410335734,
       "tracked": true,
       "max_gap_vis": 1,
-      "max_interval_ms": 18.272085333333333,
-      "seconds": 30.087149504,
-      "native_refresh_hz": 59.82620586110011,
-      "presented_fps": 59.82620586110011
+      "max_interval_ms": 18.15569066666667,
+      "seconds": 30.087162325333335,
+      "native_refresh_hz": 59.82618036678066,
+      "presented_fps": 59.82618036678066
     },
     "workload": {
       "frames": 1800,
@@ -360,7 +360,7 @@
       },
       {
         "position": [
-          -2.13,
+          -2.12,
           0.0,
           1.2
         ],
@@ -459,7 +459,7 @@
       },
       {
         "position": [
-          -2.09,
+          -2.08,
           0.0,
           1.2
         ],
@@ -468,7 +468,7 @@
       },
       {
         "position": [
-          -1.29,
+          -1.28,
           0.0,
           1.2
         ],
@@ -477,7 +477,7 @@
       },
       {
         "position": [
-          -1.34,
+          -1.36,
           0.0,
           1.2
         ],
@@ -486,7 +486,7 @@
       },
       {
         "position": [
-          -2.15,
+          -2.16,
           0.0,
           1.2
         ],
@@ -495,7 +495,7 @@
       },
       {
         "position": [
-          -1.82,
+          -1.79,
           0.0,
           1.2
         ],
@@ -504,7 +504,7 @@
       },
       {
         "position": [
-          -1.02,
+          -0.99,
           0.0,
           1.2
         ],
@@ -513,7 +513,7 @@
       },
       {
         "position": [
-          -1.62,
+          -1.65,
           0.0,
           1.2
         ],
@@ -522,7 +522,7 @@
       },
       {
         "position": [
-          -2.34,
+          -2.31,
           0.0,
           1.2
         ],
@@ -531,7 +531,7 @@
       },
       {
         "position": [
-          -1.54,
+          -1.51,
           0.0,
           1.2
         ],
@@ -540,7 +540,7 @@
       },
       {
         "position": [
-          -1.1,
+          -1.12,
           0.0,
           1.2
         ],
@@ -549,7 +549,7 @@
       },
       {
         "position": [
-          -1.91,
+          -1.93,
           0.0,
           1.2
         ],
@@ -558,7 +558,7 @@
       },
       {
         "position": [
-          -2.06,
+          -2.03,
           0.0,
           1.2
         ],
@@ -567,7 +567,7 @@
       },
       {
         "position": [
-          -1.25,
+          -1.23,
           0.0,
           1.2
         ],
@@ -865,9 +865,9 @@
       "frames": 1800,
       "windows": 30,
       "average_ms_per_frame": {
-        "probe": 1.0554736118518517,
-        "normal": 2.2283649896296294,
-        "color_upload": 2.5288499792592596
+        "probe": 1.0632195555555555,
+        "normal": 2.2405383703703703,
+        "color_upload": 2.5384616059259257
       },
       "scope": "Nested CPU elapsed excluding audio; independent report windows selected inside steady interval. Do not add to parent slots."
     },
@@ -875,7 +875,7 @@
       "frames": 1800,
       "windows": 30,
       "average_ms_per_frame": {
-        "sample": 1.06457248,
+        "sample": 1.055949025185185,
         "skin": 0.0
       },
       "scope": "Nested CPU elapsed excluding audio; independent report windows selected inside steady interval. Do not add to parent slots."
@@ -894,28 +894,35 @@
   "run": {
     "name": "guard-performance",
     "passed": true,
-    "log": ".dev\\ares\\runs\\9dfab25dc6864e668d8ead26cf57f811\\guard-performance.log",
-    "tested_rom": ".dev\\ares\\runs\\9dfab25dc6864e668d8ead26cf57f811\\DarkLantern64-animation_workshop-preset-two-guards-t3d.z64",
-    "rom_sha256": "c3e5c3d297aeb818f5aa905b1e6cf3e4009e5c362caefc07d771416ae93263ff",
+    "log": ".dev\\ares\\runs\\567cf3157fe2434ab92dc3134ce7568b\\guard-performance.log",
+    "tested_rom": ".dev\\ares\\runs\\567cf3157fe2434ab92dc3134ce7568b\\DarkLantern64-animation_workshop-preset-two-guards-t3d.z64",
+    "rom_sha256": "6bcb5aafab401c16f512f4dc7f1b5886725f4c59ef81f441ab01b79d1e1a8731",
     "rom_bytes": 376832,
-    "settings": ".dev\\ares\\runs\\9dfab25dc6864e668d8ead26cf57f811\\settings.bml",
+    "settings": ".dev\\ares\\runs\\567cf3157fe2434ab92dc3134ce7568b\\settings.bml",
     "settings_source_sha256": "792881a14980e13000dbc3d59ea5439507e0379fb162fcdfaa7dd54067fa5047",
     "profile_report": null,
-    "elapsed_seconds": 37.047,
+    "elapsed_seconds": 37.062,
     "peak_sampled_heap_bytes": 1007984,
-    "max_reported_cpu_ms": 12.63,
+    "max_reported_cpu_ms": 12.71,
     "boot": "DL64 boot_ok memory=8388608 scene=\"DarkLantern64 - Guard Animation Workshop\" meshes=2 models=12 colliders=8 version=2 world=3d renderer=rsp-tiny3d depth=hardware",
     "terminal_event": "DL64 profile_end window=33"
   },
   "manifest": {
-    "signature": "8b7dd9a999a18b8a9198b1f1155894e2b866b4838d4aa20c38dc2f8e7868df9f",
+    "signature": "337650140d69666064b1e41a676505f62613da6c4e5c90c9217c1615e28423f6",
     "compiler": "mips64-elf-gcc.exe (GCC) 16.2.0",
     "sdk": "C:\\n64-toolchain",
     "renderer": "t3d",
     "renderer_dependency": {
       "revision": "ec557373e986b5e041cc102a7ff787eb07921937",
-      "library": "external/tiny3d/build_sdk_main/libt3d.a",
-      "library_sha256": "f4ac41f4d9ada8e80bdca3d68a7484e57ca02cdf8b6b01fb43024f940327d819"
+      "library": "build/tiny3d-source/build_sdk_main/libt3d.a",
+      "include": "build/tiny3d-source/src",
+      "patches": [
+        {
+          "path": "tools/tiny3d/patches/0001-perspective-precision.patch",
+          "sha256": "17cc9d4b54cd7dd92d87049ab5f028212d805d7a93a88ca207f0c988eb430934"
+        }
+      ],
+      "library_sha256": "df33d2e57efdd0476d6a533d225cc1c1576f8645121d39a8620696d9f109281f"
     },
     "kernel_flags": {
       "render_lighting.c": [
@@ -928,9 +935,9 @@
     "source_sha256": "aedfc172e12a9364f00ec7198a4d801d6f7e48480f9d72056803fd0cadfbf459",
     "rom": "build\\DarkLantern64-animation_workshop-preset-two-guards-t3d.z64",
     "rom_bytes": 376832,
-    "rom_sha256": "c3e5c3d297aeb818f5aa905b1e6cf3e4009e5c362caefc07d771416ae93263ff",
-    "static_image_bytes": 678800,
-    "elapsed_seconds": 7.509,
+    "rom_sha256": "6bcb5aafab401c16f512f4dc7f1b5886725f4c59ef81f441ab01b79d1e1a8731",
+    "static_image_bytes": 678736,
+    "elapsed_seconds": 7.497,
     "autoplay": false,
     "debug_overlay": false,
     "capture": false,
@@ -1952,7 +1959,7 @@
               "patrol-right"
             ],
             "changed_artifacts": [],
-            "elapsed_ms": 63.8,
+            "elapsed_ms": 30.73,
             "textures": {
               "version": 1,
               "textures": [
@@ -2508,33 +2515,34 @@
       "decoded_bytes": 2048,
       "sprite_bytes": 2184
     },
-    "size_output": "   text\t   data\t    bss\t    dec\t    hex\tfilename\n 362948\t  32672\t 283180\t 678800\t  a5b90\tC:/Users/hughe/dev/DarkLantern64/build/DarkLantern64-animation_workshop-preset-two-guards-t3d/DarkLantern64-animation_workshop-preset-two-guards-t3d.elf\n"
+    "size_output": "   text\t   data\t    bss\t    dec\t    hex\tfilename\n 362980\t  32576\t 283180\t 678736\t  a5b50\tC:/Users/hughe/dev/DarkLantern64/build/DarkLantern64-animation_workshop-preset-two-guards-t3d/DarkLantern64-animation_workshop-preset-two-guards-t3d.elf\n"
   },
   "baseline_report": "build/guard-60fps/baseline-two-guards.json",
   "visibility_evidence": {
     "path": "docs/evidence/guard-60fps-visibility.json",
-    "sha256": "bd4a99d49e0c7f5e2cd01ad171e98cfa9618b65a9b7faa1d1596597187f4f8a1",
+    "sha256": "f2d0b63d6843052b290761054c3d54d3e858eab5ffa51c86915ae5ac388022f7",
     "method": "separate-framebuffer-visual-review",
     "preset": "two-guards",
     "renderer": "t3d",
     "source_sha256": "0480ac4b7343b82b1f5c709c93d3496f8fd89ea846315a6b68b96028cb9fb8fd",
     "asset_sha256": "5a4b7b78522eb3e4f8986f9e37e0109441f64d3f62e0e2bbcdb90d31d4837ae2",
-    "capture_rom_sha256": "ab13e6c6e765efe6933f2958bf511633ccbe8c4544a4d3881875f2a74eca2739",
+    "capture_rom_sha256": "661b2e115fb2f0e3fde2f9efb93954496706460c2b39437a2d6daf07823e8aa0",
     "images": [
       {
         "path": "../images/guard-rsp-two-idle.png",
-        "sha256": "db8949b54f93b3533539acce1754b130e761f22a45de7b722cb84e4750809c75"
+        "sha256": "5f044e3ca69de5d1c01d4459e3b08f005aca6bb4ca3e89156ab5a3277e98ffeb"
       },
       {
         "path": "../images/guard-rsp-two-walk.png",
-        "sha256": "77c3ffa2cb77c529633894949e27ad9a37fcbe1f167bd7c902c5e37d23521b4f"
+        "sha256": "9f85b555c7f93dd7100edc93e695c73c387734878d903c2cc4f54ceec817cc83"
       }
     ],
     "visible_guards": [
       "animated-patrol",
       "animated-sentry"
     ],
-    "reviewer": "Codex: inspected both raw RDP framebuffer exports after the shared-resource migration and integrated sleeve stripe fix. Both articulated, textured guards and the HUD are visible. The right guard has extremities near the viewport edge; full-body coverage is not an acceptance claim.",
-    "limitations": "Separate frozen animation-phase captures prove visible geometry. The performance run independently uses live patrol movement, idle sentry, normal audio and gameplay; capture synchronization/logging is excluded from that run."
+    "reviewer": "Codex: inspected both raw RDP framebuffer exports after integrating the reciprocal/viewport correction and shared sleeve asset. Both articulated, textured guards and the HUD are visible. The right guard has extremities near the viewport edge; full-body coverage is not an acceptance claim.",
+    "limitations": "Separate frozen animation-phase captures prove visible geometry. The performance run independently uses live patrol movement, idle sentry, normal audio and gameplay; capture synchronization/logging is excluded from that run.",
+    "renderer_library_sha256": "df33d2e57efdd0476d6a533d225cc1c1576f8645121d39a8620696d9f109281f"
   }
 }

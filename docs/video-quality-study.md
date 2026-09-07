@@ -4,7 +4,7 @@ The [verified two-guard renderer](guard-renderer-performance.md) provides a usef
 
 The Ares experiments support **320 × 240 at 60 fps with hardware AA**, and **640 × 480 at 30 fps with hardware AA and deliberate interlaced presentation pacing**. These are measured workshop diagnostics; the default game remains 320 × 240 without AA.
 
-The [measurement record](evidence/video-quality-study.json) freezes commit `6264ca3`, before the shared-resource migration and subsequent sleeve/depth work. Its hashes identify the exact baseline; these results are not a performance certification of later revisions.
+The first series in the [measurement record](evidence/video-quality-study.json) freezes commit `6264ca3`, before the shared-resource migration and subsequent sleeve/depth work. Its hashes identify that historical baseline. A separate fresh-baseline recheck below measures those later changes.
 
 | Measured mode | Presentation over roughly 30 seconds | Average / maximum CPU work |
 | --- | --- | ---: |
@@ -15,6 +15,37 @@ The [measurement record](evidence/video-quality-study.json) freezes commit `6264
 The progressive modes measured 59.8262 images/s; paced 480i measured 29.9701 complete images/s at a 59.9401 Hz field rate. Both AA runs had zero CPU work samples exceeding their respective 16.667/33.333 ms budgets. The 320 AA worst sample is very close to its budget, so it does not establish spare capacity for more guards or heavier gameplay. Small average differences between runs are not evidence that AA speeds up the CPU.
 
 An unpaced 640 × 480 trial rendered a new source every video field but replaced every source before its other row parity appeared. Merely pacing render starts to 30 Hz also left incomplete images because graphics completion varied. The successful version queues only RDP-completed surfaces and publishes one on a fixed alternating VI callback phase, before libdragon selects its next scanout buffer. It needs no Tiny3D or SDK patch. Waiting remains recorded in `display_wait` and in total elapsed frame samples.
+
+## Recheck after shared guards and the depth fix
+
+A second snapshot includes the shared guard resources, corrected sleeve mesh, and
+[RSP reciprocal/viewport fix](depth-precision.md). It starts from the separately
+verified ordinary ROM `6bcb5aaf…` and patched library `df33d2e5…`; the evidence
+records their full hashes. This snapshot was frozen before subsequent Sponza
+work, under `build/video-study-depth`.
+
+| Corrected-renderer mode | Presentation over roughly 30 seconds | Average / maximum CPU work |
+| --- | --- | ---: |
+| 320 × 240, no AA | 1,800 fresh images / 1,800 scans; no repeats | 11.688 / 16.480 ms |
+| 320 × 240, standard AA | 1,800 fresh images / 1,800 scans; no repeats | 11.746 / 16.732 ms |
+| 640 × 480i, standard AA, paced | 901 complete images / 1,802 fields; no incomplete images | 12.795 / 17.491 ms |
+
+The updated 320 AA run kept every observed presentation fresh, but **two of its
+1,800 CPU work samples exceeded 16.667 ms**. Its strict work-budget check therefore
+does not pass; the presentation result and available CPU margin must be reported
+separately. This remains a narrow-margin option, with no claim of spare capacity
+for a heavier scene. The paced 640 AA run passed both the complete-field-pair
+check and the 33.333 ms work budget. Its sampled heap was 2,851,184 bytes; the
+corresponding 320 AA heap was 1,007,984 bytes.
+
+These checks retain the diagnostic limitations below, including the unscaled
+640 HUD and pending original N64/M64 validation. They do not change the default
+game video mode. Reproduce the separate series with:
+
+```powershell
+python tools/video_study.py 320-aa --verification build/guard-60fps/depth-verification.json --output build/video-study-depth --windows 30 --run
+python tools/video_study.py 640-aa --verification build/guard-60fps/depth-verification.json --output build/video-study-depth --field-pacing 2 --windows 30 --run
+```
 
 ## Hardware and memory tradeoffs
 

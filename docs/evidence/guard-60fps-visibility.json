@@ -4,21 +4,22 @@
   "renderer": "t3d",
   "source_sha256": "0480ac4b7343b82b1f5c709c93d3496f8fd89ea846315a6b68b96028cb9fb8fd",
   "asset_sha256": "5a4b7b78522eb3e4f8986f9e37e0109441f64d3f62e0e2bbcdb90d31d4837ae2",
-  "capture_rom_sha256": "ab13e6c6e765efe6933f2958bf511633ccbe8c4544a4d3881875f2a74eca2739",
+  "capture_rom_sha256": "661b2e115fb2f0e3fde2f9efb93954496706460c2b39437a2d6daf07823e8aa0",
   "images": [
     {
       "path": "../images/guard-rsp-two-idle.png",
-      "sha256": "db8949b54f93b3533539acce1754b130e761f22a45de7b722cb84e4750809c75"
+      "sha256": "5f044e3ca69de5d1c01d4459e3b08f005aca6bb4ca3e89156ab5a3277e98ffeb"
     },
     {
       "path": "../images/guard-rsp-two-walk.png",
-      "sha256": "77c3ffa2cb77c529633894949e27ad9a37fcbe1f167bd7c902c5e37d23521b4f"
+      "sha256": "9f85b555c7f93dd7100edc93e695c73c387734878d903c2cc4f54ceec817cc83"
     }
   ],
   "visible_guards": [
     "animated-patrol",
     "animated-sentry"
   ],
-  "reviewer": "Codex: inspected both raw RDP framebuffer exports after the shared-resource migration and integrated sleeve stripe fix. Both articulated, textured guards and the HUD are visible. The right guard has extremities near the viewport edge; full-body coverage is not an acceptance claim.",
-  "limitations": "Separate frozen animation-phase captures prove visible geometry. The performance run independently uses live patrol movement, idle sentry, normal audio and gameplay; capture synchronization/logging is excluded from that run."
+  "reviewer": "Codex: inspected both raw RDP framebuffer exports after integrating the reciprocal/viewport correction and shared sleeve asset. Both articulated, textured guards and the HUD are visible. The right guard has extremities near the viewport edge; full-body coverage is not an acceptance claim.",
+  "limitations": "Separate frozen animation-phase captures prove visible geometry. The performance run independently uses live patrol movement, idle sentry, normal audio and gameplay; capture synchronization/logging is excluded from that run.",
+  "renderer_library_sha256": "df33d2e57efdd0476d6a533d225cc1c1576f8645121d39a8620696d9f109281f"
 }

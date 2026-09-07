@@ -130,15 +130,17 @@ def build_rom(sdk, autoplay=False, debug_overlay=False, level=None, capture=Fals
     renderer_dependency = None
     if renderer == "t3d":
         try:
-            from build_tiny3d import build_library, SOURCE as t3d_source, REVISION as t3d_revision
+            from build_tiny3d import build_library, BUILD_SOURCE as t3d_source, REVISION as t3d_revision, patch_inputs
         except ModuleNotFoundError:
-            from tools.build_tiny3d import build_library, SOURCE as t3d_source, REVISION as t3d_revision
+            from tools.build_tiny3d import build_library, BUILD_SOURCE as t3d_source, REVISION as t3d_revision, patch_inputs
         t3d_library = build_library(sdk)
         renderer_libraries.append(t3d_library)
-        renderer_inputs = [t3d_library, ROOT / "tools/build_tiny3d.py", ROOT / "dependencies.json"]
+        renderer_inputs = [t3d_library, ROOT / "tools/build_tiny3d.py", ROOT / "dependencies.json", *patch_inputs()]
         renderer_inputs += sorted((t3d_source / "src").rglob("*.h"))
         common += ["-DDL_RENDER_T3D=1", "-I" + str(t3d_source / "src")]
-        renderer_dependency = {"revision": t3d_revision, "library": str(t3d_library),
+        renderer_dependency = {"revision": t3d_revision, "library": str(t3d_library), "include": str(t3d_source / "src"),
+                               "patches": [{"path": path.relative_to(ROOT).as_posix(), "sha256": hashlib.sha256(path.read_bytes()).hexdigest()}
+                                           for path in patch_inputs()],
                                "library_sha256": hashlib.sha256(t3d_library.read_bytes()).hexdigest()}
     if autoplay:
         common += ["-DDL_AUTOPLAY=1"]

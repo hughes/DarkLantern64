@@ -3,3 +3,5 @@
 *.blend binary
 *.png binary
 *.jpg binary
+# Unified patches use a leading context marker on otherwise empty lines.
+tools/tiny3d/patches/*.patch whitespace=-blank-at-eol

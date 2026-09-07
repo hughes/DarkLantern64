@@ -1,0 +1,752 @@
+{
+  "version": 1,
+  "platform": "Ares emulator; original N64 and M64 pending",
+  "purpose": "Isolate and verify the optimized renderer window-depth regression without moving geometry or changing normal clipping planes",
+  "fixture": {
+    "source_inputs": {
+      "content\\moonlit_courtyard.json": "412ec992cefcfc7dc714aeabd0618cfc50e57b22e268fd30c3346bd86a03ff8e",
+      "content\\models\\night_facade.obj": "e661ae8918f8210c54c79e28fb4ef3e9481aa683f70f4734a7bed8dc640b3995",
+      "content\\models\\night_block.obj": "fb496232e638971313cbd22da8014067610af89a00661eda29273d89a50f059a"
+    },
+    "gap_metres": 0.04749999999999943,
+    "wall_triangles": 16,
+    "window_triangles": 2,
+    "cameras": 60,
+    "distances_metres": [
+      3,
+      6,
+      10,
+      18
+    ],
+    "angles_degrees": [
+      -60,
+      -30,
+      0,
+      30,
+      60
+    ],
+    "position_jitters": 3,
+    "draw_orders": 2,
+    "normal_near_metres": 0.12,
+    "diagnostic_near_metres": [
+      0.24,
+      0.4
+    ],
+    "gpu_units_per_metre": 64,
+    "packed_units_per_metre": 1024,
+    "surfaces": "Original positive localZ OBJ faces and entity transforms; pure colors, no unrelated geometry, textures, fog or AA",
+    "metric": "Lost expected window pixels versus the same backend/camera window-only mask"
+  },
+  "variants": [
+    {
+      "id": "pinned",
+      "rom_sha256": "0c10509f4407fd6e28d107cb3286718137897084c295d055cbd9bcdbe3856563",
+      "library_sha256": "f4ac41f4d9ada8e80bdca3d68a7484e57ca02cdf8b6b01fb43024f940327d819",
+      "main_source_sha256": "6de61b9778cb86e405e7477835f818605e7381e6e737f0dd0db1a393f8a1fe0c",
+      "fixture_sha256": "83626dd1e676930d712ea542f7a0d314b42da487afe26b964276ecce9a6f5a76",
+      "report": "build/depth-study/pinned/measurement.json",
+      "summaries": [
+        {
+          "backend": "cpu",
+          "near_mm": 120,
+          "cases": 120,
+          "cases_with_bleed": 0,
+          "lost_pixels": 0,
+          "worst_lost_pixels": 0,
+          "worst_lost_fraction": 0.0
+        },
+        {
+          "backend": "cpu",
+          "near_mm": 240,
+          "cases": 120,
+          "cases_with_bleed": 0,
+          "lost_pixels": 0,
+          "worst_lost_pixels": 0,
+          "worst_lost_fraction": 0.0
+        },
+        {
+          "backend": "cpu",
+          "near_mm": 400,
+          "cases": 120,
+          "cases_with_bleed": 0,
+          "lost_pixels": 0,
+          "worst_lost_pixels": 0,
+          "worst_lost_fraction": 0.0
+        },
+        {
+          "backend": "t3d",
+          "near_mm": 120,
+          "cases": 120,
+          "cases_with_bleed": 66,
+          "lost_pixels": 2799,
+          "worst_lost_pixels": 153,
+          "worst_lost_fraction": 1.0
+        },
+        {
+          "backend": "t3d",
+          "near_mm": 240,
+          "cases": 120,
+          "cases_with_bleed": 45,
+          "lost_pixels": 1649,
+          "worst_lost_pixels": 149,
+          "worst_lost_fraction": 1.0
+        },
+        {
+          "backend": "t3d",
+          "near_mm": 400,
+          "cases": 120,
+          "cases_with_bleed": 32,
+          "lost_pixels": 1174,
+          "worst_lost_pixels": 138,
+          "worst_lost_fraction": 1.0
+        }
+      ]
+    },
+    {
+      "id": "viewport-precision",
+      "rom_sha256": "45baa8958cc77e09e091fb3405405bee6b59bbdab8ae674a7861679d899ab62a",
+      "library_sha256": "2ef4954f496be30bf44bfa49978f75e45630203d808bbff0212a12a1c388e467",
+      "main_source_sha256": "6de61b9778cb86e405e7477835f818605e7381e6e737f0dd0db1a393f8a1fe0c",
+      "fixture_sha256": "83626dd1e676930d712ea542f7a0d314b42da487afe26b964276ecce9a6f5a76",
+      "report": "build/depth-study/viewport-precision/measurement.json",
+      "summaries": [
+        {
+          "backend": "cpu",
+          "near_mm": 120,
+          "cases": 120,
+          "cases_with_bleed": 0,
+          "lost_pixels": 0,
+          "worst_lost_pixels": 0,
+          "worst_lost_fraction": 0.0
+        },
+        {
+          "backend": "cpu",
+          "near_mm": 240,
+          "cases": 120,
+          "cases_with_bleed": 0,
+          "lost_pixels": 0,
+          "worst_lost_pixels": 0,
+          "worst_lost_fraction": 0.0
+        },
+        {
+          "backend": "cpu",
+          "near_mm": 400,
+          "cases": 120,
+          "cases_with_bleed": 0,
+          "lost_pixels": 0,
+          "worst_lost_pixels": 0,
+          "worst_lost_fraction": 0.0
+        },
+        {
+          "backend": "t3d",
+          "near_mm": 120,
+          "cases": 120,
+          "cases_with_bleed": 66,
+          "lost_pixels": 2809,
+          "worst_lost_pixels": 156,
+          "worst_lost_fraction": 1.0
+        },
+        {
+          "backend": "t3d",
+          "near_mm": 240,
+          "cases": 120,
+          "cases_with_bleed": 47,
+          "lost_pixels": 1622,
+          "worst_lost_pixels": 152,
+          "worst_lost_fraction": 1.0
+        },
+        {
+          "backend": "t3d",
+          "near_mm": 400,
+          "cases": 120,
+          "cases_with_bleed": 31,
+          "lost_pixels": 1133,
+          "worst_lost_pixels": 141,
+          "worst_lost_fraction": 1.0
+        }
+      ]
+    },
+    {
+      "id": "pinned-quantized-cpu",
+      "rom_sha256": "5752e33f7d395683676b47f100e3d379f7b73526b841c59fca46775e2c9fad64",
+      "library_sha256": "f4ac41f4d9ada8e80bdca3d68a7484e57ca02cdf8b6b01fb43024f940327d819",
+      "main_source_sha256": "468ccd7220010902c7106deaa49e847ca45af89af800534399cba4b1e53cf73e",
+      "fixture_sha256": "83626dd1e676930d712ea542f7a0d314b42da487afe26b964276ecce9a6f5a76",
+      "report": "build/depth-study/pinned-quantized-cpu/measurement.json",
+      "summaries": [
+        {
+          "backend": "cpu",
+          "near_mm": 120,
+          "cases": 120,
+          "cases_with_bleed": 0,
+          "lost_pixels": 0,
+          "worst_lost_pixels": 0,
+          "worst_lost_fraction": 0.0
+        },
+        {
+          "backend": "cpu",
+          "near_mm": 240,
+          "cases": 120,
+          "cases_with_bleed": 0,
+          "lost_pixels": 0,
+          "worst_lost_pixels": 0,
+          "worst_lost_fraction": 0.0
+        },
+        {
+          "backend": "cpu",
+          "near_mm": 400,
+          "cases": 120,
+          "cases_with_bleed": 0,
+          "lost_pixels": 0,
+          "worst_lost_pixels": 0,
+          "worst_lost_fraction": 0.0
+        },
+        {
+          "backend": "t3d",
+          "near_mm": 120,
+          "cases": 120,
+          "cases_with_bleed": 66,
+          "lost_pixels": 2799,
+          "worst_lost_pixels": 153,
+          "worst_lost_fraction": 1.0
+        },
+        {
+          "backend": "t3d",
+          "near_mm": 240,
+          "cases": 120,
+          "cases_with_bleed": 45,
+          "lost_pixels": 1649,
+          "worst_lost_pixels": 149,
+          "worst_lost_fraction": 1.0
+        },
+        {
+          "backend": "t3d",
+          "near_mm": 400,
+          "cases": 120,
+          "cases_with_bleed": 32,
+          "lost_pixels": 1174,
+          "worst_lost_pixels": 138,
+          "worst_lost_fraction": 1.0
+        }
+      ]
+    },
+    {
+      "id": "newton-probe",
+      "rom_sha256": "3cb803b02a6155f85fffdc873808f1e2b200f9a2fbab99ee0cdcdee77e1e5ccf",
+      "library_sha256": "26c1968bb7c8915634d2f2c32c75f38ec08f0fc74d67df60a9fb9dae814c354d",
+      "main_source_sha256": "468ccd7220010902c7106deaa49e847ca45af89af800534399cba4b1e53cf73e",
+      "fixture_sha256": "83626dd1e676930d712ea542f7a0d314b42da487afe26b964276ecce9a6f5a76",
+      "report": "build/depth-study/newton-probe/measurement.json",
+      "summaries": [
+        {
+          "backend": "cpu",
+          "near_mm": 120,
+          "cases": 120,
+          "cases_with_bleed": 0,
+          "lost_pixels": 0,
+          "worst_lost_pixels": 0,
+          "worst_lost_fraction": 0.0
+        },
+        {
+          "backend": "cpu",
+          "near_mm": 240,
+          "cases": 120,
+          "cases_with_bleed": 0,
+          "lost_pixels": 0,
+          "worst_lost_pixels": 0,
+          "worst_lost_fraction": 0.0
+        },
+        {
+          "backend": "cpu",
+          "near_mm": 400,
+          "cases": 120,
+          "cases_with_bleed": 0,
+          "lost_pixels": 0,
+          "worst_lost_pixels": 0,
+          "worst_lost_fraction": 0.0
+        },
+        {
+          "backend": "t3d",
+          "near_mm": 120,
+          "cases": 120,
+          "cases_with_bleed": 5,
+          "lost_pixels": 32,
+          "worst_lost_pixels": 15,
+          "worst_lost_fraction": 0.26785714285714285
+        },
+        {
+          "backend": "t3d",
+          "near_mm": 240,
+          "cases": 120,
+          "cases_with_bleed": 0,
+          "lost_pixels": 0,
+          "worst_lost_pixels": 0,
+          "worst_lost_fraction": 0.0
+        },
+        {
+          "backend": "t3d",
+          "near_mm": 400,
+          "cases": 120,
+          "cases_with_bleed": 0,
+          "lost_pixels": 0,
+          "worst_lost_pixels": 0,
+          "worst_lost_fraction": 0.0
+        }
+      ]
+    },
+    {
+      "id": "newton-viewport-probe51",
+      "rom_sha256": "816bbd5ee3d5ea7169095361e58ef1af7b3112d4f0f5bbfe322ebd504548e2e8",
+      "library_sha256": "32611e12da6944a5bd9f456956f48f38f4bdf8c0a2571fc17336aa385b243f97",
+      "main_source_sha256": "4cfb27fcdf7871ee657069b487b045bf68b3b7ebe03e5e1c82e65fc78fbc347b",
+      "fixture_sha256": "83626dd1e676930d712ea542f7a0d314b42da487afe26b964276ecce9a6f5a76",
+      "report": "build/depth-study/newton-viewport-probe51/measurement.json",
+      "summaries": [
+        {
+          "backend": "cpu",
+          "near_mm": 120,
+          "cases": 120,
+          "cases_with_bleed": 0,
+          "lost_pixels": 0,
+          "worst_lost_pixels": 0,
+          "worst_lost_fraction": 0.0
+        },
+        {
+          "backend": "cpu",
+          "near_mm": 240,
+          "cases": 120,
+          "cases_with_bleed": 0,
+          "lost_pixels": 0,
+          "worst_lost_pixels": 0,
+          "worst_lost_fraction": 0.0
+        },
+        {
+          "backend": "cpu",
+          "near_mm": 400,
+          "cases": 120,
+          "cases_with_bleed": 0,
+          "lost_pixels": 0,
+          "worst_lost_pixels": 0,
+          "worst_lost_fraction": 0.0
+        },
+        {
+          "backend": "t3d",
+          "near_mm": 120,
+          "cases": 120,
+          "cases_with_bleed": 4,
+          "lost_pixels": 25,
+          "worst_lost_pixels": 14,
+          "worst_lost_fraction": 0.25
+        },
+        {
+          "backend": "t3d",
+          "near_mm": 240,
+          "cases": 120,
+          "cases_with_bleed": 0,
+          "lost_pixels": 0,
+          "worst_lost_pixels": 0,
+          "worst_lost_fraction": 0.0
+        },
+        {
+          "backend": "t3d",
+          "near_mm": 400,
+          "cases": 120,
+          "cases_with_bleed": 0,
+          "lost_pixels": 0,
+          "worst_lost_pixels": 0,
+          "worst_lost_fraction": 0.0
+        }
+      ]
+    },
+    {
+      "id": "newton-refined-probe51",
+      "rom_sha256": "0826eb91c056606f632a062bda57917ebfcb320be46fac8d8d6cfc4e01a117f9",
+      "library_sha256": "397949c45bffdab1f908e2fb283822b259ae8ad427a5d79c054ad285c9a2ff1e",
+      "main_source_sha256": "4cfb27fcdf7871ee657069b487b045bf68b3b7ebe03e5e1c82e65fc78fbc347b",
+      "fixture_sha256": "83626dd1e676930d712ea542f7a0d314b42da487afe26b964276ecce9a6f5a76",
+      "report": "build/depth-study/newton-refined-probe51/measurement.json",
+      "summaries": [
+        {
+          "backend": "cpu",
+          "near_mm": 120,
+          "cases": 120,
+          "cases_with_bleed": 0,
+          "lost_pixels": 0,
+          "worst_lost_pixels": 0,
+          "worst_lost_fraction": 0.0
+        },
+        {
+          "backend": "cpu",
+          "near_mm": 240,
+          "cases": 120,
+          "cases_with_bleed": 0,
+          "lost_pixels": 0,
+          "worst_lost_pixels": 0,
+          "worst_lost_fraction": 0.0
+        },
+        {
+          "backend": "cpu",
+          "near_mm": 400,
+          "cases": 120,
+          "cases_with_bleed": 0,
+          "lost_pixels": 0,
+          "worst_lost_pixels": 0,
+          "worst_lost_fraction": 0.0
+        },
+        {
+          "backend": "t3d",
+          "near_mm": 120,
+          "cases": 120,
+          "cases_with_bleed": 2,
+          "lost_pixels": 5,
+          "worst_lost_pixels": 4,
+          "worst_lost_fraction": 0.08163265306122448
+        },
+        {
+          "backend": "t3d",
+          "near_mm": 240,
+          "cases": 120,
+          "cases_with_bleed": 0,
+          "lost_pixels": 0,
+          "worst_lost_pixels": 0,
+          "worst_lost_fraction": 0.0
+        },
+        {
+          "backend": "t3d",
+          "near_mm": 400,
+          "cases": 120,
+          "cases_with_bleed": 0,
+          "lost_pixels": 0,
+          "worst_lost_pixels": 0,
+          "worst_lost_fraction": 0.0
+        }
+      ]
+    },
+    {
+      "id": "newton-refined-viewport-probe51",
+      "rom_sha256": "95906acf4c02baddbb90effa87501e2011f96f354b9ffacd2a33d1c56df70f96",
+      "library_sha256": "df33d2e57efdd0476d6a533d225cc1c1576f8645121d39a8620696d9f109281f",
+      "main_source_sha256": "4cfb27fcdf7871ee657069b487b045bf68b3b7ebe03e5e1c82e65fc78fbc347b",
+      "fixture_sha256": "83626dd1e676930d712ea542f7a0d314b42da487afe26b964276ecce9a6f5a76",
+      "report": "build/depth-study/newton-refined-viewport-probe51/measurement.json",
+      "summaries": [
+        {
+          "backend": "cpu",
+          "near_mm": 120,
+          "cases": 120,
+          "cases_with_bleed": 0,
+          "lost_pixels": 0,
+          "worst_lost_pixels": 0,
+          "worst_lost_fraction": 0.0
+        },
+        {
+          "backend": "cpu",
+          "near_mm": 240,
+          "cases": 120,
+          "cases_with_bleed": 0,
+          "lost_pixels": 0,
+          "worst_lost_pixels": 0,
+          "worst_lost_fraction": 0.0
+        },
+        {
+          "backend": "cpu",
+          "near_mm": 400,
+          "cases": 120,
+          "cases_with_bleed": 0,
+          "lost_pixels": 0,
+          "worst_lost_pixels": 0,
+          "worst_lost_fraction": 0.0
+        },
+        {
+          "backend": "t3d",
+          "near_mm": 120,
+          "cases": 120,
+          "cases_with_bleed": 0,
+          "lost_pixels": 0,
+          "worst_lost_pixels": 0,
+          "worst_lost_fraction": 0.0
+        },
+        {
+          "backend": "t3d",
+          "near_mm": 240,
+          "cases": 120,
+          "cases_with_bleed": 0,
+          "lost_pixels": 0,
+          "worst_lost_pixels": 0,
+          "worst_lost_fraction": 0.0
+        },
+        {
+          "backend": "t3d",
+          "near_mm": 400,
+          "cases": 120,
+          "cases_with_bleed": 0,
+          "lost_pixels": 0,
+          "worst_lost_pixels": 0,
+          "worst_lost_fraction": 0.0
+        }
+      ]
+    }
+  ],
+  "baseline_cache_probe": {
+    "camera": 33,
+    "vertices": 36,
+    "rom_sha256": "c50f303ff636b0bb202b98899ecb428a44c8b6960155d0b05d9cdf9b19858508",
+    "max_relative_half_reciprocal_error": 0.0014407469184195467,
+    "analytical_depth_error_after_exact_reciprocal": [
+      -0.17055042498395778,
+      0.690601675396465
+    ],
+    "representative_vertices": [
+      {
+        "model": 1.0,
+        "vertex": 0.0,
+        "depth": 10.23360538,
+        "exact_z": 32412.82623854,
+        "cache_z": 32435.0,
+        "cache_x": 615.0,
+        "cache_y": 463.0,
+        "clip_z": 640.78643799,
+        "clip_w": 0.3197937,
+        "inv_w": 1.56573486
+      },
+      {
+        "model": 1.0,
+        "vertex": 2.0,
+        "depth": 9.82683468,
+        "exact_z": 32396.89117798,
+        "cache_z": 32419.0,
+        "cache_x": 665.0,
+        "cache_y": 411.0,
+        "clip_z": 614.69308472,
+        "clip_w": 0.30708313,
+        "inv_w": 1.63056946
+      }
+    ],
+    "interpretation": "The analytical reconstruction changes only reciprocal W in the recorded pinned screenZ mapping; it is diagnosis, not a separate hardware run"
+  },
+  "conclusion": {
+    "final_candidate": "newton-refined-viewport-probe51",
+    "normal_near_cases": 120,
+    "normal_near_cases_with_bleed": 0,
+    "normal_near_lost_pixels": 0,
+    "near_plane_changed": false,
+    "art_gap_changed": false,
+    "initial_integer_z_hypothesis": "Secondary precision concern, but not the dominant reproduced cause; integerZ CPU diagnostic still loses no pixels",
+    "fix": "Refine approximate reciprocal W on RSP in ordinary and clipped vertex paths; combine with upstream viewport-scale precision correction",
+    "specialization": "Candidate removes unused native RSP point-light code to fit IMEM; game uses existing CPU light probes. No SDK install or edits."
+  },
+  "limitations": [
+    "Correctness fixture is deliberately synchronous and does not measure performance.",
+    "Not a proof for arbitrary geometry, clipping configurations, content distances, or real-console behavior.",
+    "Full textured courtyard capture and ordinary60fps production verification passed separately, recorded below."
+  ],
+  "representative_images": {
+    "camera": 33,
+    "distance_metres": 10,
+    "angle_degrees": -30,
+    "near_metres": 0.12,
+    "order": "wall then window",
+    "cpu": "docs/images/depth-window-cpu.png",
+    "prior": "docs/images/depth-window-prior.png",
+    "corrected": "docs/images/depth-window-corrected.png",
+    "corrected_capture_rom_sha256": "7e940aa1d6a4d11639ab1599676b5c9b4c0ec991c42afbaa3c4aef30e9dfdaf1",
+    "corrected_capture_library_sha256": "df33d2e57efdd0476d6a533d225cc1c1576f8645121d39a8620696d9f109281f",
+    "corrected_capture_lost_pixels": 0
+  },
+  "production_verification": {
+    "passed": true,
+    "report": "build/guard-60fps/depth-verification.json",
+    "rom_sha256": "6bcb5aafab401c16f512f4dc7f1b5886725f4c59ef81f441ab01b79d1e1a8731",
+    "renderer_dependency": {
+      "revision": "ec557373e986b5e041cc102a7ff787eb07921937",
+      "library_sha256": "df33d2e57efdd0476d6a533d225cc1c1576f8645121d39a8620696d9f109281f",
+      "patches": [
+        {
+          "path": "tools/tiny3d/patches/0001-perspective-precision.patch",
+          "sha256": "17cc9d4b54cd7dd92d87049ab5f028212d805d7a93a88ca207f0c988eb430934"
+        }
+      ]
+    },
+    "frames": 1800,
+    "video": {
+      "vis": 1800,
+      "presents": 1800,
+      "repeats": 0,
+      "ticks": 1410335734,
+      "tracked": true,
+      "max_gap_vis": 1,
+      "max_interval_ms": 18.15569066666667,
+      "seconds": 30.087162325333335,
+      "native_refresh_hz": 59.82618036678066,
+      "presented_fps": 59.82618036678066
+    },
+    "work": {
+      "samples": 1800,
+      "average_ms": 11.687906524444445,
+      "min_ms": 11.033408,
+      "max_ms": 16.480021333333333,
+      "p50_ms": 11.529002666666667,
+      "p95_ms": 12.992981333333333,
+      "p99_ms": 14.84224,
+      "over_budget_frames": 0,
+      "quantile_method": "nearest rank of every exact CP0-tick sample"
+    },
+    "checks": [
+      {
+        "name": "steady_window",
+        "passed": true
+      },
+      {
+        "name": "complete_frame_distributions",
+        "passed": true
+      },
+      {
+        "name": "16.667ms_work_budget",
+        "passed": true
+      },
+      {
+        "name": "native_vi_presentation",
+        "passed": true
+      },
+      {
+        "name": "both_guards_drawn_every_frame",
+        "passed": true
+      },
+      {
+        "name": "ordinary_live_workload",
+        "passed": true
+      },
+      {
+        "name": "authored_camera",
+        "passed": true
+      },
+      {
+        "name": "independent_live_actors",
+        "passed": true
+      },
+      {
+        "name": "two_character_allocations",
+        "passed": true
+      },
+      {
+        "name": "actual_visible_guard_images",
+        "passed": true
+      },
+      {
+        "name": "ordinary_rom_provenance",
+        "passed": true
+      }
+    ]
+  },
+  "full_courtyard_capture": {
+    "passed": true,
+    "rom_sha256": "9e390d10a5cbb329f5cfedb8b109fe7390f2fee8ab79ff769cea4ceb8b54f233",
+    "source_report": "build/scenes/moonlit_courtyard/captures-t3d.json",
+    "view_count": 7,
+    "images": [
+      {
+        "view": {
+          "id": "shelter-to-courtyard",
+          "position": [
+            -2.8,
+            0,
+            4.9
+          ],
+          "yaw": 153,
+          "pitch": 5
+        },
+        "path": ".dev/ares/runs/f9de798796da476fa7d3c6702716ea74/shelter-to-courtyard.png",
+        "sha256": "961c5ff4c881418139165e3a2af788b6b1ce4308b17717e324ef9afbf7a36062"
+      },
+      {
+        "view": {
+          "id": "warm-lamp-cool-roofs",
+          "position": [
+            1.0,
+            0,
+            -1.1
+          ],
+          "yaw": 298,
+          "pitch": 9
+        },
+        "path": ".dev/ares/runs/f9de798796da476fa7d3c6702716ea74/warm-lamp-cool-roofs.png",
+        "sha256": "8ad54ada87c433487167a4a22524ec46e6fc1878eb2e02559069117553f8baf9"
+      },
+      {
+        "view": {
+          "id": "doorway-landmark",
+          "position": [
+            -1.2,
+            0,
+            -1.8
+          ],
+          "yaw": 155,
+          "pitch": 2
+        },
+        "path": ".dev/ares/runs/f9de798796da476fa7d3c6702716ea74/doorway-landmark.png",
+        "sha256": "579ae02a0faab46eab4f483793b359053bcf719aabfb447be7256f3bdaa2b181"
+      },
+      {
+        "view": {
+          "id": "doorway-open",
+          "position": [
+            -1.2,
+            0,
+            -1.8
+          ],
+          "yaw": 155,
+          "pitch": 2,
+          "door_open": true
+        },
+        "path": ".dev/ares/runs/f9de798796da476fa7d3c6702716ea74/doorway-open.png",
+        "sha256": "9d74965d94d9ae048de263d66b141af36569cc1c767571eaed425e6a8cd29ee3"
+      },
+      {
+        "view": {
+          "id": "blender-loot-counter",
+          "position": [
+            -3.45,
+            0,
+            5.18
+          ],
+          "yaw": 180,
+          "pitch": -8
+        },
+        "path": ".dev/ares/runs/f9de798796da476fa7d3c6702716ea74/blender-loot-counter.png",
+        "sha256": "80cac0525eeb9486d1b81d9b938b455604e6bc9d35bb8c09b7b6ff6b738705bb"
+      },
+      {
+        "view": {
+          "id": "loot-pulse-phase-a",
+          "position": [
+            -3.45,
+            0,
+            5.18
+          ],
+          "yaw": 180,
+          "pitch": -8,
+          "animation_time": 0.9
+        },
+        "path": ".dev/ares/runs/f9de798796da476fa7d3c6702716ea74/loot-pulse-phase-a.png",
+        "sha256": "b94459a790ae141921e11d84043398ebe3a05c97c81760d1728a187bc9fee563"
+      },
+      {
+        "view": {
+          "id": "loot-pulse-phase-b",
+          "position": [
+            -3.45,
+            0,
+            5.18
+          ],
+          "yaw": 180,
+          "pitch": -8,
+          "animation_time": 2.7
+        },
+        "path": ".dev/ares/runs/f9de798796da476fa7d3c6702716ea74/loot-pulse-phase-b.png",
+        "sha256": "1f5eccb1ea8c1d384a93288edb1cf07b85a68eecfa589d867e936c9a05bd908a"
+      }
+    ],
+    "visual_review": "All seven raw framebuffer images inspected; coherent textured geometry, roofs, lit window, closed/open doorway, and close-up loot. Static viewpoints do not prove all possible player motion is artifact-free.",
+    "performance_use": "None; capture ROM waits for graphics and serializes images."
+  }
+}

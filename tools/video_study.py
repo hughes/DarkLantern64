@@ -83,7 +83,8 @@ def snapshot(output, verification):
         raise ValueError("Tiny3D library differs from the verified baseline")
     destination.mkdir(parents=True)
     shutil.copytree(ROOT / "src", destination / "src")
-    shutil.copytree(ROOT / "external/tiny3d/src", destination / "tiny3d/src")
+    includes = Path(manifest["renderer_dependency"].get("include", str(ROOT / "external/tiny3d/src")))
+    shutil.copytree(includes, destination / "tiny3d/src")
     shutil.copytree(work / "catalog", destination / "catalog")
     (destination / "objects").mkdir()
     for name in OBJECTS:

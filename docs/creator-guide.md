@@ -1,6 +1,6 @@
 # Creator quickstart
 
-For artists and level/game designers with the Windows environment already set up. One project editor manages all levels, including **The Lantern Store**, **Moonlit Delivery Yard**, and **Enemy Patrol Workshop**.
+For artists and level/game designers with the Windows environment already set up. One project editor manages all levels, including **The Lantern Store**, **Moonlit Delivery Yard**, **Enemy Patrol Workshop**, and **Guard Animation Workshop**.
 
 ## 1. Open the editor
 
@@ -42,7 +42,7 @@ Use **Save + Cook**, **File → Save scene**, or **Ctrl+S** to save canonical le
 
 ### Place enemies and author patrols
 
-1. In **Room Objects**, click **Add enemy**. Choose **Enemy type** in Object Properties: **Watchman** or **Scout**. Both use the placeholder guard model; the Scout has faster movement and longer perception ranges.
+1. In **Room Objects**, click **Add enemy**. Choose **Enemy type** in Object Properties: **Watchman** or **Scout**. Both use the level's guard asset; the Scout has faster movement and longer perception ranges. Guard Animation Workshop supplies the animated model, while the earlier levels retain their blockout guard.
 2. Edit **position** to place its feet on a floor. New enemies start at an existing actor or waypoint, so move them apart. **Save + Cook** creates the viewport model; select it in **Entity List** to use the normal transform gizmo.
 3. Leave **Behavior** on **Sentry** for a stationary lookout. Set the middle **rotation** value to choose its facing: `0` faces +Z, `90` faces +X. It can investigate and chase, then returns to its post.
 4. For a patrol, click **Create + append waypoint** in the enemy's properties. Click the route entry to edit that waypoint's XYZ position. Reselect the enemy and repeat. With at least two points, choose **Patrol**. The ordered route loops, including the segment from the last point back to the first.
@@ -82,11 +82,15 @@ On an N64 controller, the **stick looks in both axes** (up looks up). **C-Up/Dow
 
 For Blender-made props, use the [Blender asset workflow](blender-assets.md): edit and save the `.blend`, export an asset pack, import it into the level editor, and place reusable prefab instances. The supplied loot pack shares one small atlas across five modeled props. Enemies and waypoints have the controls described above.
 
+For animated characters, start with [the guard animation workflow](guard-animation-prototype.md). Open **Guard Animation Workshop**, select a guard in **Room Objects**, and use **Character animation → Focus guard**. Choose a clip, play or scrub it, experiment with **Blend preview**, and adjust **Attention yaw/pitch**. These controls preview motion without changing saved behavior. The current game uses idle and walking; its CPU animation renderer is still a slow prototype.
+
+Edit and save [art/guard.blend](../art/guard.blend), then run `python tools/guard_assets.py` from the repository root. Return to the editor and **Save + Cook**, then **Play level**. The exporter reads the saved Blender file, including its five named Actions and atlas; unsaved Blender edits are not exported.
+
 For manual source editing, use the source shown in **Levels**; [content/first_room.json](../content/first_room.json) is The Lantern Store example. **Save and close the editor first.**
 
 Duplicate `rotated-crate` in the `entities` array, name the copy `crate-two`, and set its position to `[-5, 0.65, -2]`. Every ID must be unique. Preserve existing gameplay IDs and their links; this prototype requires exactly one player start, door, control and objective, and allows zero through 16 enemies.
 
-For your own prop, export a triangulated, Y-up OBJ in metres to `content/models/`. Add `{"id":"mesh-my-prop","uri":"models/my-prop.obj"}` to `assets`, then use `mesh-my-prop` in a static object's `model` field. Textured models need OBJ UV coordinates on every face. Add source images under `content/textures/` and reference them in the material's **texture** recipe, then Save + Cook; see the [texture guide](texture-pipeline.md). Animation remains future work. Adjust its box collider (`half_size` means half width/height/depth before scaling), or omit collision for decoration.
+For your own static prop, export a triangulated, Y-up OBJ in metres to `content/models/`. Add `{"id":"mesh-my-prop","uri":"models/my-prop.obj"}` to `assets`, then use `mesh-my-prop` in a static object's `model` field. Textured models need OBJ UV coordinates on every face. Add source images under `content/textures/` and reference them in the material's **texture** recipe, then Save + Cook; see the [texture guide](texture-pipeline.md). Animated characters use the separate typed asset described in the guard workflow. Adjust the prop's box collider (`half_size` means half width/height/depth before scaling), or omit collision for decoration.
 
 Save the JSON, run `python tools/compile_level.py content/first_room.json --validate-only` (substitute your source), then **Launch editor** and open the level to inspect it. Author in `content/`; generated previews in `build/` and `.dev/` are refreshed from source.
 

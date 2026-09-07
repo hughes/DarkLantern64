@@ -1,0 +1,145 @@
+{
+  "passed": true,
+  "private_root": "C:/Users/hughe/dev/DarkLantern64/.dev/editor/character-verification/ebbd2517855b4f959b9780815097119d",
+  "editor": "C:/Users/hughe/_bazel_hughe/nw7efple/execroot/_main/bazel-out/x64_windows-fastbuild/bin/darklantern64_project_editor.exe",
+  "editor_sha256": "b2ed5f238a002391c8582fed9cd76fdbb23e0a796de1a282e4eac6e8fecd6eb4",
+  "checks": [
+    "Project level opens cooked character assets through the shared N64 sampler",
+    "Focus guard frames its current pose in a clear three-quarter view",
+    "Authored idle and walking poses visibly differ in the ordinary level viewport",
+    "Repeated paused clip/time produces identical skin matrices and viewport PNG",
+    "Bounded procedural head attention changes the image without moving the body root",
+    "Crossfade weight changes the sampled cooked pose",
+    "Guards share the asset while keeping independent preview playback state",
+    "Invalid clips and out-of-range preview settings are rejected atomically",
+    "Play advances the preview clock and Pause stops it",
+    "Connected-joint animation reuses one fixed-topology mesh per instance without arena growth",
+    "Artist animation re-export displays new motion while reusing the same per-instance meshes and arena storage",
+    "Clip, scrub, blend and attention controls preserve clean canonical content"
+  ],
+  "captures": [
+    {
+      "label": "idle",
+      "path": "C:/Users/hughe/dev/DarkLantern64/.dev/editor/character-verification/ebbd2517855b4f959b9780815097119d/.dev/editor/project/captures/3645411b34a0407b906262f71f81c9b0.png",
+      "sha256": "b9fd4da18d9ae544dbd4080dd1e42b9f7bc867ce91a92de2e2a24f70e9562298",
+      "size": [
+        783,
+        571
+      ]
+    },
+    {
+      "label": "walk-stride",
+      "path": "C:/Users/hughe/dev/DarkLantern64/.dev/editor/character-verification/ebbd2517855b4f959b9780815097119d/.dev/editor/project/captures/0980f8fa462d4e23b2b890d5d8065211.png",
+      "sha256": "3e696c8e10e2beb7fcf2d55d70d03da65cd744332fe3bc4c4cca58a11dbab25d",
+      "size": [
+        783,
+        571
+      ]
+    },
+    {
+      "label": "walk-repeat",
+      "path": "C:/Users/hughe/dev/DarkLantern64/.dev/editor/character-verification/ebbd2517855b4f959b9780815097119d/.dev/editor/project/captures/9b024a5549fe48d19afb097f5948dd89.png",
+      "sha256": "3e696c8e10e2beb7fcf2d55d70d03da65cd744332fe3bc4c4cca58a11dbab25d",
+      "size": [
+        783,
+        571
+      ]
+    },
+    {
+      "label": "walk-attention",
+      "path": "C:/Users/hughe/dev/DarkLantern64/.dev/editor/character-verification/ebbd2517855b4f959b9780815097119d/.dev/editor/project/captures/a5c3e07ef49142de84099bfbf4120795.png",
+      "sha256": "7758a61404e9f0824d5b915e6800d8b64785231b5bf0a751e7aff75d2d5714df",
+      "size": [
+        783,
+        571
+      ]
+    },
+    {
+      "label": "idle-after-artist-reexport",
+      "path": "C:/Users/hughe/dev/DarkLantern64/.dev/editor/character-verification/ebbd2517855b4f959b9780815097119d/.dev/editor/project/captures/dc64b057e39e4ad18a63623f72455ffa.png",
+      "sha256": "ab2980e343da81cac47b7fc51ae328f4547ad6bc029d1ba45d0bc4d9781e008b",
+      "size": [
+        783,
+        571
+      ]
+    }
+  ],
+  "differences": [
+    {
+      "first": "idle",
+      "second": "walk-stride",
+      "changed_pixels_over_8": 23589
+    },
+    {
+      "first": "walk-stride",
+      "second": "walk-attention",
+      "changed_pixels_over_8": 2042
+    },
+    {
+      "first": "idle",
+      "second": "idle-after-artist-reexport",
+      "changed_pixels_over_8": 13207
+    }
+  ],
+  "started_at_utc": "2026-09-07T02:03:05Z",
+  "owned_editor_pid": 22952,
+  "character": {
+    "id": "animated-patrol",
+    "asset": "basic-guard",
+    "bones": 20,
+    "clips": [
+      {
+        "duration": 2.0,
+        "events": 0,
+        "id": "idle",
+        "loop": true,
+        "samples": 61
+      },
+      {
+        "duration": 1.399999976158142,
+        "events": 0,
+        "id": "notice",
+        "loop": false,
+        "samples": 43
+      },
+      {
+        "duration": 0.800000011920929,
+        "events": 2,
+        "id": "run",
+        "loop": true,
+        "samples": 25
+      },
+      {
+        "duration": 1.600000023841858,
+        "events": 0,
+        "id": "turn",
+        "loop": false,
+        "samples": 49
+      },
+      {
+        "duration": 1.2000000476837158,
+        "events": 2,
+        "id": "walk",
+        "loop": true,
+        "samples": 37
+      }
+    ],
+    "encoded_bytes": 8820,
+    "head_bone": 13,
+    "cross_joint_triangles": 48,
+    "preview_geometry": "connected one-weight mesh"
+  },
+  "animation_reexport": {
+    "vertex_arena_count": 2030,
+    "handles": {
+      "animated-patrol": 0,
+      "animated-sentry": 1
+    },
+    "topology_sha256": "6aad6e8a4279b41027d3f8eca07bac846762559bead8e7dc2dfa788a03f825c1",
+    "original_source_sha256": "7bbe1f1db855f133579428a1bff19a39a7ed423891c8a3a6cb40b3ec1b6d63af",
+    "changed_source_sha256": "069bb802d52ab13973e4e610d394de15b4a21040eb83d035a51d2eb939f30c78"
+  },
+  "real_content_unchanged": true,
+  "elapsed_seconds": 26.36,
+  "evidence": "C:/Users/hughe/dev/DarkLantern64/.dev/editor/character-verification/ebbd2517855b4f959b9780815097119d/character-editor-verification.json"
+}

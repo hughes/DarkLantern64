@@ -23,6 +23,11 @@ import sys
 import time
 
 try:
+    from character_assets import load_character, emit_c as character_c, joint_meshes
+except ModuleNotFoundError:
+    from tools.character_assets import load_character, emit_c as character_c, joint_meshes
+
+try:
     from cook_textures import prepare_texture, validate_texture
 except ModuleNotFoundError:
     from tools.cook_textures import prepare_texture, validate_texture
@@ -279,7 +284,7 @@ def validate(data, source_dir=None):
     require(isinstance(assets,list) and 1<=len(assets)<=64,"assets: expected 1-64 assets")
     require(isinstance(materials,list) and 1<=len(materials)<=64,"materials: expected 1-64 materials")
     require(isinstance(entities,list) and 1<=len(entities)<=256,"entities: expected 1-256 objects")
-    seen, meshes, dependencies, mesh_paths = set(),{},[],{}
+    seen, meshes, dependencies, mesh_paths, characters = set(),{},[],{},{}
     textures, texture_artifacts, texture_indices = [], {}, {}
     environment = data.get("environment")
     if environment is not None:
@@ -302,10 +307,20 @@ def validate(data, source_dir=None):
     for asset in assets:
         ident=unique(asset,"asset")
         uri=asset.get("uri")
-        require(isinstance(uri,str) and Path(uri).suffix.lower()==".obj",f"{ident}.uri: expected a relative OBJ path")
+        character = asset.get("type") == "character"
+        require(asset.get("type", "mesh") in ("mesh", "character"), f"{ident}.type: expected mesh or character")
+        require(isinstance(uri,str) and Path(uri).suffix.lower()==(".json" if character else ".obj"),
+                f"{ident}.uri: expected a relative {'character JSON' if character else 'OBJ'} path")
         path=(source_dir/uri).resolve()
         require(path.is_relative_to(source_dir) and path.is_file(),f"{ident}.uri: missing model or path outside content directory")
-        meshes[ident]=read_obj(path)
+        if character:
+            try:
+                characters[ident] = load_character(path)
+            except ValueError as error:
+                raise ContentError(f"{ident}: {error}") from error
+            meshes[ident] = characters[ident]["mesh"]
+        else:
+            meshes[ident]=read_obj(path)
         mesh_paths[ident]=path
         dependencies.append((uri,path))
     material_map={}
@@ -390,7 +405,8 @@ def validate(data, source_dir=None):
     for enemy in enemies:
         enemy["model_index"] = next(i for i, e in enumerate(models) if e["id"] == enemy["id"])
     for model in {e["model"] for e in models if "texture" in material_map[e["material"]]}:
-        meshes[model] = read_obj(mesh_paths[model], textured=True)
+        if model not in characters:
+            meshes[model] = read_obj(mesh_paths[model], textured=True)
     boxes=[collider(e) for e in entities if "collider" in e]
     require(1<=len(boxes)<=256,"colliders: expected 1-256 boxes")
     require(len(models)<=128,"models: maximum 128 instances")
@@ -413,7 +429,7 @@ def validate(data, source_dir=None):
     dependencies.append(("code:src/enemy_types.def", ENEMY_TYPES_PATH))
     return {"by_id":by_id,"kinds":kinds,"meshes":meshes,"materials":material_map,"models":models,"colliders":boxes,"dependencies":dependencies,
             "textures":textures,"texture_artifacts":texture_artifacts,"texture_indices":texture_indices,
-            "enemy_types":enemy_types,"enemies":enemies,"test_starts":test_starts}
+            "enemy_types":enemy_types,"enemies":enemies,"test_starts":test_starts,"characters":characters}
 
 
 def atomic_write(path, data):
@@ -436,8 +452,17 @@ def vec(values): return "{"+", ".join(f(v) for v in values)+"}"
 def header(data, state):
     lines=['/* Generated 3D content. Edit canonical sources, not this file. */','#ifndef DL_DEMO_LEVEL_GENERATED_H','#define DL_DEMO_LEVEL_GENERATED_H','#include <stddef.h>','#include "game.h"']
     mesh_ids=list(state["meshes"])
+    if state["characters"]:
+        lines.append('#include "animation.h"')
+        emitted = set()
+        for character in state["characters"].values():
+            if character["symbol"] not in emitted:
+                lines.append(character_c(character, declarations=state.get("shared_characters", False)))
+                emitted.add(character["symbol"])
     enemy_indices = {e["id"]:e["enemy_index"] for e in state["enemies"]}
     for i,mesh in enumerate(state["meshes"].values()):
+        if mesh_ids[i] in state["characters"]:
+            continue
         lines.append(f"static const DlVec3 dl_vertices_{i}[] = {{\n"+",\n".join("    "+vec(v) for v in mesh["vertices"])+"\n};")
         lines.append(f"static const uint16_t dl_indices_{i}[] = {{"+",".join(map(str,mesh["indices"]))+"};")
         if "uvs" in mesh:
@@ -445,7 +470,17 @@ def header(data, state):
         if "normals" in mesh:
             lines.append(f"static const DlNormal dl_normals_{i}[] = {{"+", ".join(
                 "{"+", ".join(map(str,quantize_normal(normal)))+"}" for normal in mesh["normals"])+"};")
-    lines.append("static const DlMesh dl_demo_meshes[] = {\n"+",\n".join(f"    {{dl_vertices_{i}, {len(m['vertices'])}, dl_indices_{i}, {len(m['indices'])}, "+(f"dl_uvs_{i}" if "uvs" in m else "NULL")+", "+(f"dl_normals_{i}" if "normals" in m else "NULL")+"}" for i,m in enumerate(state["meshes"].values()))+"\n};")
+    mesh_rows = []
+    for i, (ident, mesh) in enumerate(state["meshes"].items()):
+        character = state["characters"].get(ident)
+        if character:
+            s = character["symbol"]
+            mesh_rows.append(f"    {{{s}_vertices, {len(mesh['vertices'])}, {s}_indices, {len(mesh['indices'])}, {s}_uvs, {s}_normals, &{s}}}")
+        else:
+            mesh_rows.append(f"    {{dl_vertices_{i}, {len(mesh['vertices'])}, dl_indices_{i}, {len(mesh['indices'])}, "+
+                             (f"dl_uvs_{i}" if "uvs" in mesh else "NULL")+", "+
+                             (f"dl_normals_{i}" if "normals" in mesh else "NULL")+", NULL}")
+    lines.append("static const DlMesh dl_demo_meshes[] = {\n"+",\n".join(mesh_rows)+"\n};")
     if state["textures"]:
         lines.append("static const DlTexture dl_demo_textures[] = {\n"+",\n".join(
             "    {"+json.dumps("rom:/textures/"+t["id"]+".sprite")+f", {t['width']}, {t['height']}"+"}"
@@ -551,20 +586,62 @@ def preview_scene(data,state):
     return {"entities":entities,"materials":materials,"effects":[]}
 
 
-def compile_level(source=ROOT/"content/first_room.json",output=ROOT/"build",asset_root=None):
+def compile_level(source=ROOT/"content/first_room.json",output=ROOT/"build",asset_root=None, *, shared_characters=None):
     started=time.perf_counter(); source,output=Path(source),Path(output)
     raw=source.read_bytes(); data=json.loads(raw)
     state=validate(data,asset_root or source.parent)
+    state["shared_characters"] = shared_characters is not None
+    if shared_characters is not None:
+        for character in state["characters"].values():
+            shared_characters[character["symbol"]] = character
     digest=hashlib.sha256(raw)
     for uri,path in state["dependencies"]: digest.update(uri.encode()); digest.update(b"\0"); digest.update(path.read_bytes())
     artifacts={output/"generated/demo_level.h":header(data,state),output/"editor-assets/levels/first_room.json":json.dumps(preview_scene(data,state),indent=2)+"\n"}
     artifacts.update((output/path,png) for path,png in state["texture_artifacts"].items())
     for ident,mesh in state["meshes"].items(): artifacts[output/f"editor-assets/meshes/{ident}.gltf"]=json.dumps(mesh_gltf(mesh),separators=(",",":"))+"\n"
+    for ident, character in state["characters"].items():
+        preview = {k: character[k] for k in ("id", "head_bone", "bounds_center", "bounds_radius", "encoded_bytes")}
+        bind_mesh = {key: character["mesh"][key] for key in ("vertices", "uvs", "indices")}
+        # Dynamic editor skinning consumes the target normal directions, not
+        # the higher-precision Blender normals discarded by the N64 format.
+        bind_mesh["normals"] = []
+        for normal in character["mesh"]["normals"]:
+            target = quantize_normal(normal)
+            length = math.sqrt(sum(v*v for v in target))
+            bind_mesh["normals"].append([v/length for v in target])
+        preview.update(schema_version=1, source_sha256=character["source_sha256"], vertex_bones=character["mesh"]["joints"],
+                       bind_mesh=bind_mesh,
+                       bones=[{"name": b["id"], "parent": b["parent"],
+                               "rest": {k: b[k] for k in ("translation", "rotation")}, "inverse_bind": b["inverse_bind"]}
+                              for b in character["bones"]], sockets=character["sockets"], clips=[], joint_meshes=[],
+                       cross_joint_triangles=character["report"]["cross_joint_triangles"])
+        # Animation, skin weights and bind attributes can change in-place in a
+        # fixed-topology preview. Only the vertex count and index sequence need
+        # a different GPU allocation; a full source hash would leak one mesh
+        # per character instance on every artist animation re-export.
+        preview["topology_sha256"] = hashlib.sha256(json.dumps(
+            {"vertex_count": len(character["mesh"]["vertices"]), "indices": character["mesh"]["indices"]},
+            separators=(",", ":")).encode("utf-8")).hexdigest()
+        for clip in character["clips"]:
+            cooked_clip = {k: clip[k] for k in ("id", "duration", "stride_length", "translation_scale", "sample_count", "loop")}
+            cooked_clip["tracks"] = [{**t, "channel": "rotation" if t["channel"] == 0 else "translation"} for t in clip["tracks"]]
+            cooked_clip["events"] = [{**e, "kind": "foot_left" if e["kind"] == 0 else "foot_right"} for e in clip["events"]]
+            preview["clips"].append(cooked_clip)
+        for joint, mesh in joint_meshes(character).items():
+            uri = f"meshes/{ident}-joint-{joint}.gltf"
+            artifacts[output/"editor-assets"/uri] = json.dumps(mesh_gltf(mesh), separators=(",", ":"))+"\n"
+            preview["joint_meshes"].append({"joint": joint, "uri": uri})
+        artifacts[output/f"editor-assets/characters/{ident}.json"] = json.dumps(preview, separators=(",", ":"))+"\n"
     changed=[str(path.relative_to(output)) for path,text in artifacts.items() if atomic_write(path,text)]
     vertices=sum(len(state["meshes"][e["model"]]["vertices"]) for e in state["models"])
     triangles=sum(len(state["meshes"][e["model"]]["indices"])//3 for e in state["models"])
-    normal_bytes=sum(len(m.get("normals",[]))*3 for m in state["meshes"].values())
-    arrays=sum(len(m["vertices"])*12+len(m["indices"])*2+len(m.get("uvs",[]))*8 for m in state["meshes"].values())+normal_bytes
+    # Two local aliases of one character share the emitted source-hash arrays.
+    # Static OBJ aliases retain their existing independently emitted arrays.
+    compiled_meshes = [mesh for ident, mesh in state["meshes"].items() if ident not in state["characters"]]
+    unique_characters = {c["source_sha256"]: c for c in state["characters"].values()}
+    compiled_meshes.extend(c["mesh"] for c in unique_characters.values())
+    normal_bytes=sum(len(m.get("normals",[]))*3 for m in compiled_meshes)
+    arrays=sum(len(m["vertices"])*12+len(m["indices"])*2+len(m.get("uvs",[]))*8 for m in compiled_meshes)+normal_bytes
     report={
         "version":2, "source_sha256":digest.hexdigest(), "title":data["title"],
         "dependencies":[{"uri":uri,"sha256":hashlib.sha256(path.read_bytes()).hexdigest()} for uri,path in state["dependencies"]],
@@ -575,6 +652,7 @@ def compile_level(source=ROOT/"content/first_room.json",output=ROOT/"build",asse
                   "patrol_points":sum(len(enemy["patrol_ids"]) for enemy in state["enemies"])},
         "compiled_geometry_bytes":arrays,
         "compiled_normal_bytes":normal_bytes,
+        "characters": {ident: character["report"] for ident, character in state["characters"].items()},
         "memory_note":"Geometry arrays only; runtime buffers, state and other data need separate RDRAM measurement. Baseline 8 MiB.",
         "ids":{e["id"]:{"kind":e["kind"],"source_index":i,"transform":e["transform"],
                          "loot_highlight":e.get("loot_highlight", False),
@@ -591,6 +669,7 @@ def compile_level(source=ROOT/"content/first_room.json",output=ROOT/"build",asse
     texture_report={"version":1,"textures":state["textures"],"decoded_bytes":sum(t["decoded_bytes"] for t in state["textures"]),
                     "memory_note":"Unique decoded pixel bytes only. Sprite headers, allocation overhead and renderer buffers are additional; TMEM holds one texture at a time."}
     report["textures"]=texture_report
+    atomic_write(output/"generated/character_report.json", json.dumps({"version": 1, "characters": report["characters"]}, indent=2)+"\n")
     atomic_write(output/"generated/texture_report.json",json.dumps(texture_report,indent=2)+"\n")
     atomic_write(output/"generated/level_report.json",json.dumps(report,indent=2)+"\n")
     return report

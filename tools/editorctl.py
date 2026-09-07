@@ -21,6 +21,9 @@ Examples:
   python tools/editorctl.py capture
   python tools/editorctl.py get_layout
   python tools/editorctl.py get_audio_memory
+  python tools/editorctl.py get_animation
+  python tools/editorctl.py set_animation --args-file character-pose.json
+  python tools/editorctl.py focus_character --args-file character-id.json
   python tools/editorctl.py set_audio_config --args-file audio-patch.json
   python tools/editorctl.py recalculate_audio
 There is no evaluation or arbitrary command operation. Arguments are JSON data.
@@ -32,6 +35,10 @@ an isolated diagnostic editor only; it does not select a level in the project UI
 add_prop accepts an optional loot_highlight boolean (default false); set_entity
 can patch loot_highlight on a static model prop. Save + Cook before playing to
 see its gentle brightness pulse in the N64 game.
+set_animation takes id plus clip/time/playing, blend_clip/blend, and bounded
+head_yaw/head_pitch in degrees. It changes preview playback only. Set playing
+false before deterministic captures; get_animation includes sampled matrices.
+focus_character takes id and frames its current pose in the editor viewport.
 """
 import argparse
 import json
@@ -43,7 +50,7 @@ import uuid
 
 ROOT = Path(__file__).resolve().parents[1]
 OPERATIONS = ("inspect", "list_levels", "open_level", "create_level", "duplicate_level", "delete_level", "update_level", "play_level", "play_menu", "import_asset_pack", "add_prop", "set_entity", "add_enemy", "duplicate_enemy", "add_waypoint", "delete_entity",
-              "set_environment", "set_material", "set_preview_transform", "save", "build", "capture",
+              "set_environment", "set_material", "set_preview_transform", "get_animation", "set_animation", "focus_character", "save", "build", "capture",
               "get_layout", "reset_layout", "reload", "get_audio_memory", "set_audio_config",
               "recalculate_audio", "quit")
 

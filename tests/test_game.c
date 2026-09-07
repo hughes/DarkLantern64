@@ -533,6 +533,26 @@ static bool player_controls_follow_screen_right(void) {
     }
     return true;
 }
+static bool animation_tracks_real_horizontal_travel(void) {
+    Fixture f;fixture_init(&f);
+    f.enemies[0].spawn=(DlVec3){-5,0,5};f.enemies[0].speed=1;
+    f.patrol[0]=(DlVec3){-5,0,10};f.enemies[0].patrol_count=1;
+    DlGame g;dl_game_init(&g,&f.level);
+    advance(&g,(DlInput){0},.5f);
+    CHECK(NEAR(g.enemies[0].animation_distance,.5f));
+    CHECK(g.enemies[0].animation_speed>.99f);
+    /* An obstructed path cannot keep playing walking motion at intended speed. */
+    box(&f,(DlVec3){-5,1,6},(DlVec3){1,1,.1f},0,false);
+    advance(&g,(DlInput){0},2);
+    float stopped_distance=g.enemies[0].animation_distance;
+    CHECK(stopped_distance>.6f&&stopped_distance<.71f);
+    CHECK(g.enemies[0].animation_speed<.001f);
+    advance(&g,(DlInput){0},.5f);
+    CHECK(NEAR(g.enemies[0].animation_distance,stopped_distance));
+    dl_game_init(&g,&f.level);
+    CHECK(g.enemies[0].animation_distance==0&&g.enemies[0].animation_speed==0);
+    return true;
+}
 int main(void) {
     struct { const char *name; bool (*run)(void); } cases[]={
         {"rotated wall collision and sliding",rotated_wall_sliding},{"stairs and falling",stairs_and_falling},
@@ -556,7 +576,8 @@ int main(void) {
         {"authored start support follows selected door state",authored_start_support_uses_selected_door_state},
         {"invalid start selection preserves the current game",invalid_start_selection_preserves_game},
         {"camera matches right-handed editor and asymmetric loot placement",camera_matches_right_handed_editor},
-        {"player strafe and turning follow screen right",player_controls_follow_screen_right}
+        {"player strafe and turning follow screen right",player_controls_follow_screen_right},
+        {"animation follows actual travel and stops at blocked routes",animation_tracks_real_horizontal_travel}
     };
     int failures=0;
     for(unsigned i=0;i<sizeof(cases)/sizeof(cases[0]);++i) {

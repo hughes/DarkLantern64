@@ -8,6 +8,7 @@
 #include "bundle.h"
 #include "launch.h"
 #include "dl_profile.h"
+#include "animation.h"
 #ifdef DL_SCALE_BENCH
 #include "scale_bench.h"
 #endif
@@ -25,6 +26,7 @@ typedef struct {
 static Voice voices[VOICE_COUNT];
 static uint32_t random_state = 0x64d4a7u;
 static int sample_rate;
+static const DlAnimClip *guard_step_clips[DL_MAX_ENEMIES];
 
 /* The callback runs under an AI interrupt: bounded integer synthesis only,
  * with no allocation, logging, game access or floating-point instructions. */
@@ -215,6 +217,15 @@ static void start_level(DlGame *game, const DlLauncher *launcher, DlRenderStats 
     assertf(dl_game_start(game, level, launcher->active_start), "Invalid level start preset");
     dl_render_prepare_scene(game);
     memset(guard_step, 0, sizeof(float) * DL_MAX_ENEMIES);
+    memset(guard_step_clips, 0, sizeof(guard_step_clips));
+    for(int model=0;model<level->model_count;++model){
+        const DlModelInstance *instance=&level->models[model];
+        if(instance->role!=DL_MODEL_GUARD||instance->enemy_index<0||instance->enemy_index>=game->enemy_count)continue;
+        const DlAnimationAsset *asset=level->meshes[instance->mesh].animation;
+        int clip=dl_animation_find_clip(asset,"walk");
+        if(clip>=0&&asset->clips[clip].stride_length>0&&asset->clips[clip].event_count)
+            guard_step_clips[instance->enemy_index]=&asset->clips[clip];
+    }
     for (int i = 0; i < game->enemy_count; ++i) previous_guard[i] = game->enemies[i].position;
     stats->frames = 0; stats->frame_ms = 16.67f; stats->cpu_ms = 0;
     heap_stats_t heap;
@@ -393,6 +404,8 @@ int main(void) {
         game.door_open=dl_capture_views[view].door_open;
         /* Reproducible visual phase, not simulation/saved-game advancement. */
         game.elapsed=dl_capture_views[view].animation_time;
+        dl_render_set_animation_preview(dl_capture_views[view].animation_clip,game.elapsed,
+            dl_capture_views[view].head_yaw,dl_capture_views[view].head_pitch);
         game.visibility=dl_visibility(&game,dl_player_eye(&game));
         input=(DlInput){0};dt=0;
         if(stats.frames<DL_CAPTURE_VIEW_COUNT*30&&stats.frames%30==29)
@@ -425,10 +438,23 @@ int main(void) {
             const DlEnemy *enemy=&game.enemies[i];
             float dx=enemy->position.x-previous_guard[i].x,dy=enemy->position.y-previous_guard[i].y;
             float dz=enemy->position.z-previous_guard[i].z;
-            guard_step[i]+=sqrtf(dx*dx+dy*dy+dz*dz);
+            float accumulated_step=guard_step[i]+sqrtf(dx*dx+dy*dy+dz*dz);
             previous_guard[i]=enemy->position;
-            if(guard_step[i]>0.72f){
-                guard_step[i]=0;
+            bool foot_contact=accumulated_step>0.72f,animated_contacts=false;
+            const DlAnimClip *walk=guard_step_clips[i];
+            if(walk){
+                float to=enemy->animation_distance/walk->stride_length*walk->duration;
+                /* Markers follow real travel even while the guard is culled.
+                 * This existing sound path remains presentation-only: friendly
+                 * guard sounds do not trigger today's player-noise AI hook. */
+                foot_contact=dl_animation_event_count(walk,guard_step[i],to,DL_ANIM_FOOT_LEFT)>0||
+                    dl_animation_event_count(walk,guard_step[i],to,DL_ANIM_FOOT_RIGHT)>0;
+                guard_step[i]=to;
+                animated_contacts=true;
+            }
+            if(!animated_contacts)guard_step[i]=accumulated_step;
+            if(foot_contact){
+                if(!animated_contacts)guard_step[i]=0;
                 DlVec3 source=enemy->position;source.y+=0.10f;
                 world_sound(&game,source,62,0.12f,2300,165);
             }
@@ -469,6 +495,7 @@ int main(void) {
             debugf("DL64 materials textures=%d uploads=%d\n",game.level->texture_count,dl_render_texture_upload_count());
             debugf("DL64 scene_work models=%d visible=%d camera_vertices=%d\n",
                 dl_render_model_count(),dl_render_visible_model_count(),dl_render_transformed_vertex_count());
+            dl_render_report_animation();
             next_report = frame_start + TICKS_PER_SECOND;
         }
         float update_ms = (float)(uint32_t)(TICKS_READ() - frame_start) * (1000.0f / TICKS_PER_SECOND);

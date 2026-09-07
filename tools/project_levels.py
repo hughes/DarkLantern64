@@ -398,13 +398,21 @@ class ProjectLevels:
                                 return f"{prefix}{path.stem}/" + name
                     return value
                 scene_path = f"levels/{path.stem}.json"
-                for folder in ("meshes", "textures"):
+                for folder in ("meshes", "textures", "characters"):
                     source_folder = cooked / "editor-assets" / folder
                     if source_folder.exists():
                         for item in source_folder.iterdir():
                             require(item.is_file(), "Unexpected nested compiler preview output")
                             name = texture_names[item.name] if folder == "textures" else item.name
-                            changes[asset_root / folder / path.stem / name] = item.read_bytes()
+                            payload = item.read_bytes()
+                            if folder == "characters":
+                                character = json.loads(payload)
+                                for joint in character["joint_meshes"]:
+                                    require(joint["uri"].startswith("meshes/") and "/" not in joint["uri"][7:],
+                                            "Unexpected character joint preview URI")
+                                    joint["uri"] = f"meshes/{path.stem}/" + joint["uri"][7:]
+                                payload = json_bytes(character)
+                            changes[asset_root / folder / path.stem / name] = payload
                 # Scene descriptor appears only after its referenced files exist.
                 changes[asset_root / scene_path] = json_bytes(namespace(preview))
                 changes = {self.safe(target): payload for target, payload in changes.items()}

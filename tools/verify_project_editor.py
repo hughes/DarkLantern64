@@ -129,6 +129,10 @@ def verify(executable, root=ROOT):
         shutil.copytree(root / folder, private / folder,
                         ignore=shutil.ignore_patterns("__pycache__", "*.pyc"))
     private_content = private / "content"
+    expected_levels = {path.name for path in private_content.glob("*.json")
+                       if json.loads(path.read_bytes()).get("version") == 2}
+    expected_menu = {entry["source"] for entry in
+                     json.loads((private_content / "level_bundle.json").read_bytes())["levels"]}
     queue = private / ".dev/editor/project"
     copied_before = tree_hashes(private_content)
     report = {"passed": False, "private_root": private.as_posix(), "editor": executable.as_posix(),
@@ -176,14 +180,13 @@ def verify(executable, root=ROOT):
             initial = client.request("inspect")
             catalog = client.request("list_levels")
             levels = {entry["file"]: entry for entry in catalog["levels"]}
-            require(set(levels) == {"first_room.json", "moonlit_courtyard.json", "enemy_patrols.json"},
-                    "Expected the three initial project levels")
+            require(set(levels) == expected_levels, "Initial project catalog differs from copied source levels")
             require(not initial["dirty"], "Fresh editor unexpectedly starts dirty")
             for filename, entry in levels.items():
                 saved = json.loads((private_content / filename).read_bytes())
                 require(entry["title"] == saved["title"], "Catalog title differs from its canonical level")
-                require(entry["in_bundle"] is True, "Initial shipped level is absent from the game menu")
-            passed("One project session discovers all three canonical levels with their real titles")
+                require(entry["in_bundle"] == (filename in expected_menu), "Initial menu membership differs from the manifest")
+            passed(f"One project session discovers all {len(levels)} canonical levels with their real titles")
 
             for filename in ("first_room.json", "moonlit_courtyard.json", "enemy_patrols.json"):
                 state = open_level(client, filename)
@@ -201,7 +204,8 @@ def verify(executable, root=ROOT):
             starter_entities = state["document"]["entities"]
             require(all(any(entity["kind"] == kind for entity in starter_entities) for kind in ("spawn", "door", "control", "objective", "light")),
                     "Starter lacks required playable objects")
-            require(len(client.request("list_levels")["levels"]) == 4, "New level was not registered")
+            registered = client.request("list_levels")["levels"]
+            require(len(registered) == len(expected_levels) + 1, "New level was not registered")
             passed("Create saves, registers and opens a playable starter using shared project models")
 
             added_enemy = client.request("add_enemy", {"id": "starter-enemy", "position": [2, 0, 2]})["entity"]
@@ -306,7 +310,8 @@ def verify(executable, root=ROOT):
                     "Deleting the active level did not retain its source")
             state = client.request("inspect")
             require(Path(state["source"]).name in levels and not state["dirty"], "Deleting the active level did not open a surviving level")
-            require(len(client.request("list_levels")["levels"]) == 3, "Temporary test levels remain in the catalog")
+            require({entry["file"] for entry in client.request("list_levels")["levels"]} == expected_levels,
+                    "Temporary test levels remain in the catalog")
             after_deletions = tree_hashes(private_content)
             for filename, digest in copied_before.items():
                 if filename != "level_bundle.json":

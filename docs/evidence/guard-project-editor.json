@@ -1,0 +1,80 @@
+{
+  "passed": true,
+  "private_root": "C:/Users/hughe/dev/DarkLantern64/.dev/editor/project-verification/784ff8863abc49edb1a0e1e79c84b567",
+  "editor": "C:/Users/hughe/_bazel_hughe/nw7efple/execroot/_main/bazel-out/x64_windows-fastbuild/bin/darklantern64_project_editor.exe",
+  "editor_sha256": "42c155b266d7232faa608ed300b840ac4d096c083c3379166c92fa8480c99dc2",
+  "checks": [
+    "One project session discovers all 4 canonical levels with their real titles",
+    "Switching loads distinct namespaced scenes and visibly different level geometry",
+    "Create saves, registers and opens a playable starter using shared project models",
+    "A new starter supports Add enemy, runtime export, and removal without an existing enemy template",
+    "Dirty switching is rejected without data loss; Save writes edits to the active level",
+    "Duplicate preserves saved authored content and keeps the original unchanged",
+    "Live title and menu updates preserve dirty object edits and survive the next Save",
+    "Traversal, bad names and case-insensitive collisions reject without publishing changes",
+    "External source edits block Save; restoring the known snapshot permits a safe retry",
+    "Deletion requires confirmation, archives exact source bytes, and removes catalog and menu entries",
+    "Deleting the active level opens a survivor and preserves every original source and shared asset",
+    "Repeated switching retains correct scene identity; an invalid test start cannot launch a game",
+    "Relaunch restores the last selected project level and both owned sessions exit cleanly"
+  ],
+  "captures": [
+    {
+      "label": "first_room.json",
+      "path": "C:/Users/hughe/dev/DarkLantern64/.dev/editor/project-verification/784ff8863abc49edb1a0e1e79c84b567/.dev/editor/project/captures/3e7953d196694277a835d6986e1cae95.png",
+      "sha256": "b87991ec1f2065e0169b2ae33938979c925fbd1b6bc0e63a38467b6cad39f1cf",
+      "size": [
+        783,
+        571
+      ]
+    },
+    {
+      "label": "moonlit_courtyard.json",
+      "path": "C:/Users/hughe/dev/DarkLantern64/.dev/editor/project-verification/784ff8863abc49edb1a0e1e79c84b567/.dev/editor/project/captures/8e9f8a9ee3074449981801e0e87b0397.png",
+      "sha256": "5231c4618f3fb3c87cea99f416aaf245997233e808dc4783ccef80e8cc7cbee9",
+      "size": [
+        783,
+        571
+      ]
+    },
+    {
+      "label": "enemy_patrols.json",
+      "path": "C:/Users/hughe/dev/DarkLantern64/.dev/editor/project-verification/784ff8863abc49edb1a0e1e79c84b567/.dev/editor/project/captures/a2b9196c90f34c54b626a7f6169d7e58.png",
+      "sha256": "a2551b80c576266a6ed8ffa604a161b94ccdd4ac1f1417f03ebc36643320bdec",
+      "size": [
+        783,
+        571
+      ]
+    },
+    {
+      "label": "courtyard-after-repeated-switching",
+      "path": "C:/Users/hughe/dev/DarkLantern64/.dev/editor/project-verification/784ff8863abc49edb1a0e1e79c84b567/.dev/editor/project/captures/3f6e5c2e27304519b7af3a51b06885f2.png",
+      "sha256": "5231c4618f3fb3c87cea99f416aaf245997233e808dc4783ccef80e8cc7cbee9",
+      "size": [
+        783,
+        571
+      ]
+    }
+  ],
+  "owned_editor_pids": [
+    10316,
+    4792
+  ],
+  "game_launch": "Not exercised here; use the separate final Ares validation.",
+  "started_at_utc": "2026-09-07T01:57:19Z",
+  "capture_difference": {
+    "first": "first_room.json",
+    "second": "moonlit_courtyard.json",
+    "changed_pixels_over_8": 109931,
+    "bounds": [
+      153,
+      106,
+      629,
+      412
+    ]
+  },
+  "deleted_source_backup": "C:/Users/hughe/dev/DarkLantern64/.dev/editor/project-verification/784ff8863abc49edb1a0e1e79c84b567/.dev/editor/deleted-levels/20260907T015936Z-d3737c8cb393/editor_created.json",
+  "real_content_unchanged": true,
+  "elapsed_seconds": 200.61,
+  "evidence": "C:/Users/hughe/dev/DarkLantern64/.dev/editor/project-verification/784ff8863abc49edb1a0e1e79c84b567/project-editor-verification.json"
+}

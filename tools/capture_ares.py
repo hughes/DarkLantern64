@@ -53,6 +53,13 @@ def validate_views(data):
         animation_time = view.get("animation_time", 0)
         if type(animation_time) not in (int, float) or not math.isfinite(animation_time) or not 0 <= animation_time <= 3600:
             raise ValueError(f"Capture view {name} animation_time must be finite seconds in 0..3600")
+        clip = view.get("animation_clip", "")
+        if not isinstance(clip, str) or (clip and not re.fullmatch(r"[A-Za-z][A-Za-z0-9_-]{0,63}", clip)):
+            raise ValueError(f"Capture view {name} animation_clip must be a safe ASCII clip ID")
+        for key, maximum in (("head_yaw", 45), ("head_pitch", 25)):
+            angle = view.get(key, 0)
+            if type(angle) not in (int, float) or not math.isfinite(angle) or abs(angle) > maximum:
+                raise ValueError(f"Capture view {name} {key} must be finite degrees within +/-{maximum}")
     return views
 
 

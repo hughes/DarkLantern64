@@ -3,3 +3,23 @@ bazel_dep(name = "rules_cc", version = "0.2.14")
 bazel_dep(name = "platforms", version = "0.0.10")
 bazel_dep(name = "lightengine", version = "0.1.0")
 local_path_override(module_name = "lightengine", path = "../external/LightEngine")
+
+# Compile exactly the portable sampler used by the ROM; do not maintain an
+# editor-specific animation implementation or a copied set of runtime headers.
+new_local_repository = use_repo_rule("@bazel_tools//tools/build_defs/repo:local.bzl", "new_local_repository")
+new_local_repository(
+    name = "dl64_animation",
+    path = "..",
+    build_file_content = """
+load("@rules_cc//cc:defs.bzl", "cc_library")
+cc_library(
+    name = "animation",
+    srcs = ["src/animation.c"],
+    hdrs = ["src/animation.h", "src/game.h", "src/enemy_types.def"],
+    includes = ["src"],
+    visibility = ["//visibility:public"],
+)
+""",
+)
+lightengine_deps = use_extension("@lightengine//bazel:deps_ext.bzl", "lightengine_deps")
+use_repo(lightengine_deps, "nlohmann_json")

@@ -3,11 +3,13 @@
 #include "render_visibility.h"
 #include "render_shading.h"
 #include "render_camera.h"
+#include "animation.h"
 
 #include <libdragon.h>
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 /* Full XYZ meshes: CPU affine/view transforms and frustum clipping, followed
  * by the RDP triangle rasterizer and hardware depth buffer. No grid dependency. */
@@ -17,7 +19,8 @@ static const float focal=164.0f, horizon=(VIEW_TOP+VIEW_BOTTOM)*0.5f;
 static const float near_plane=0.12f, far_plane=64.0f;
 
 typedef struct {
-    int vertex_start,triangle_start,smooth_start;
+    int vertex_start,triangle_start,smooth_start,animation_normal_start;
+    int idle_clip,walk_clip,run_clip;
     float hinge_x,hinge_z,bounds_radius;
     DlVec3 scaled_center,bounds_center;
     bool visible;
@@ -48,6 +51,18 @@ static const DlLevel *texture_level;
 static int texture_uploads;
 static int visible_models,transformed_vertices;
 static DlRenderFrustum frustum;
+static DlAnimMatrix animation_skin[DL_ANIMATION_MAX_BONES]; /* reused per model */
+static DlVec3 *animation_normals;
+static int animation_normal_count,animation_model_count;
+static uint64_t animation_sample_ticks,animation_skin_ticks;
+static uint32_t animation_frames,animation_poses,animation_sample_max,animation_skin_max;
+#ifdef DL_CAPTURE
+static const char *animation_preview_clip;
+static float animation_preview_time,animation_preview_yaw,animation_preview_pitch;
+void dl_render_set_animation_preview(const char *clip,float time,float yaw,float pitch){
+    animation_preview_clip=clip;animation_preview_time=time;animation_preview_yaw=yaw;animation_preview_pitch=pitch;
+}
+#endif
 
 static float clampf(float v,float lo,float hi){return v<lo?lo:v>hi?hi:v;}
 static DlVec3 add(DlVec3 a,DlVec3 b){return (DlVec3){a.x+b.x,a.y+b.y,a.z+b.z};}
@@ -56,6 +71,10 @@ static DlVec3 mul(DlVec3 a,float s){return (DlVec3){a.x*s,a.y*s,a.z*s};}
 static float dot(DlVec3 a,DlVec3 b){return a.x*b.x+a.y*b.y+a.z*b.z;}
 static DlVec3 cross(DlVec3 a,DlVec3 b){
     return (DlVec3){a.y*b.z-a.z*b.y,a.z*b.x-a.x*b.z,a.x*b.y-a.y*b.x};
+}
+static uint32_t animation_elapsed_ticks(DlProfileMark start){
+    DlProfileMark end=dl_profile_mark();
+    return (end.ticks-start.ticks)-(end.audio_ticks-start.audio_ticks);
 }
 static const DlEnemy *model_enemy(const DlGame *g,const DlModelInstance *model){
     return model->role==DL_MODEL_GUARD&&model->enemy_index>=0&&model->enemy_index<g->enemy_count?
@@ -109,14 +128,71 @@ static ModelPose update_model_pose(const DlGame *g,int index){
     models[index].bounds_center=transform_scaled_point(models[index].scaled_center,&models[index],&pose);
     return pose;
 }
+static void sample_model_animation(const DlGame *g,int index){
+    const DlModelInstance *model=&g->level->models[index];
+    const DlAnimationAsset *asset=g->level->meshes[model->mesh].animation;
+    const ModelCache *cache=&models[index];
+    const DlEnemy *enemy=model_enemy(g,model);
+    int first=cache->idle_clip,second=cache->walk_clip;
+    float first_time=g->elapsed,second_time=0,blend=0,head_yaw=0,head_pitch=0;
+    if(enemy){
+        if(second>=0){
+            const DlAnimClip *walk=&asset->clips[second];
+            float stride=walk->stride_length>0.01f?walk->stride_length:1.44f;
+            second_time=enemy->animation_distance/stride*walk->duration;
+            blend=clampf(enemy->animation_speed/0.4f,0,1);
+            if(first<0)first=second;
+        }
+        if(enemy->sees_player||enemy->state==DL_INVESTIGATE||enemy->state==DL_CHASE){
+            DlVec3 target=enemy->sees_player?dl_player_eye(g):enemy->investigate_target;
+            if(!enemy->sees_player)target.y+=1.5f;
+            DlVec3 eye=enemy->position;eye.y+=1.6f;
+            DlVec3 delta=sub(target,eye);
+            head_yaw=remainderf(atan2f(delta.x,delta.z)-enemy->yaw,6.283185307f);
+            head_pitch=-atan2f(delta.y,sqrtf(delta.x*delta.x+delta.z*delta.z));
+        }
+    }
+#ifdef DL_CAPTURE
+    if(animation_preview_clip&&*animation_preview_clip){
+        first=dl_animation_find_clip(asset,animation_preview_clip);
+        assertf(first>=0,"Unknown animation preview clip %s",animation_preview_clip);
+        first_time=animation_preview_time;blend=0;
+        head_yaw=animation_preview_yaw;head_pitch=animation_preview_pitch;
+    }
+#endif
+    bool valid=dl_animation_pose(asset,first,first_time,second,second_time,blend,head_yaw,head_pitch,animation_skin);
+    assertf(valid,"Invalid animation skeleton");
+}
 static void transform_model_vertices(const DlGame *g,int index,const ModelPose *pose){
     const DlModelInstance *model=&g->level->models[index];
     const DlMesh *mesh=&g->level->meshes[model->mesh];
     const ModelCache *cache=&models[index];
+    DlProfileMark animation_mark={0};
+    if(mesh->animation){
+        animation_mark=dl_profile_mark();
+        sample_model_animation(g,index);
+        uint32_t ticks=animation_elapsed_ticks(animation_mark);
+        animation_sample_ticks+=ticks;if(ticks>animation_sample_max)animation_sample_max=ticks;
+        ++animation_poses;animation_mark=dl_profile_mark();
+    }
     for(int i=0;i<mesh->vertex_count;++i){
         DlVec3 p=mesh->vertices[i];
+        if(mesh->animation){
+            const DlAnimMatrix *skin=&animation_skin[mesh->animation->vertex_bones[i]];
+            p=dl_animation_point(skin,p);
+            if(mesh->normals){
+                DlNormal n=mesh->normals[i];
+                DlVec3 normal=dl_animation_normal(skin,(DlVec3){n.x,n.y,n.z});
+                animation_normals[cache->animation_normal_start+i]=
+                    dl_render_normal_vector(normal,model->scale,pose->sine,pose->cosine,pose->door_open);
+            }
+        }
         p.x*=model->scale.x;p.y*=model->scale.y;p.z*=model->scale.z;
         world_vertices[cache->vertex_start+i]=transform_scaled_point(p,cache,pose);
+    }
+    if(mesh->animation){
+        uint32_t ticks=animation_elapsed_ticks(animation_mark);
+        animation_skin_ticks+=ticks;if(ticks>animation_skin_max)animation_skin_max=ticks;
     }
 }
 static void transform_model(const DlGame *g,int index){
@@ -178,7 +254,8 @@ static void light_model(const DlGame *g,int index,bool illuminate){
     if(illuminate&&mesh->normals)pose=update_model_pose(g,index);
     if(illuminate&&mesh->normals&&!g->level->environment.enabled){
         for(int v=0;v<mesh->vertex_count;++v){
-            DlVec3 normal=dl_render_normal(mesh->normals[v],model->scale,pose.sine,pose.cosine,pose.door_open);
+            DlVec3 normal=mesh->animation?animation_normals[cache->animation_normal_start+v]:
+                dl_render_normal(mesh->normals[v],model->scale,pose.sine,pose.cosine,pose.door_open);
             DlVec3 point=world_vertices[cache->vertex_start+v],back_normal=mul(normal,-1);
             float front_light=model_light,back_light=model_light;
             if(model_light<0){
@@ -207,14 +284,27 @@ static void light_model(const DlGame *g,int index,bool illuminate){
                 /* Body probes already represent the whole actor. Reuse their
                  * display color instead of repeating identical square roots
                  * for every face corner and side. */
-                for(int corner=0;corner<3;++corner)colors->front[corner]=colors->back[corner]=actor_color;
+                for(int corner=0;corner<3;++corner){
+                    color_t front=actor_color,back=actor_color;
+                    if(mesh->animation){
+                        DlVec3 normal=mesh->normals?animation_normals[cache->animation_normal_start+mesh->indices[t*3+corner]]:face->normal;
+                        float shape=0.70f+0.30f*fmaxf(0,dot(normal,(DlVec3){0.30f,0.81f,-0.50f}));
+                        float back_shape=0.70f+0.30f*fmaxf(0,-dot(normal,(DlVec3){0.30f,0.81f,-0.50f}));
+                        front=rgb((int)(front.r*shape),(int)(front.g*shape),(int)(front.b*shape));
+                        back=rgb((int)(back.r*back_shape),(int)(back.g*back_shape),(int)(back.b*back_shape));
+                    }
+                    colors->front[corner]=front;colors->back[corner]=back;
+                }
                 continue;
             }
             DlVec3 points[]={a,b,c};
             for(int corner=0;corner<3;++corner){
                 DlVec3 front=actor_light,back=actor_light;
-                DlVec3 shading_normal=mesh->normals?
-                    dl_render_normal(mesh->normals[mesh->indices[t*3+corner]],model->scale,pose.sine,pose.cosine,pose.door_open):face->normal;
+                int vertex=mesh->indices[t*3+corner];
+                DlVec3 shading_normal=face->normal;
+                if(mesh->normals)shading_normal=mesh->animation?
+                    animation_normals[cache->animation_normal_start+vertex]:
+                    dl_render_normal(mesh->normals[vertex],model->scale,pose.sine,pose.cosine,pose.door_open);
                 if(model->role!=DL_MODEL_GUARD&&model->role!=DL_MODEL_OBJECTIVE){
                     front=dl_surface_light(g,add(points[corner],mul(shading_normal,0.035f)),shading_normal);
                     back=model->double_sided?dl_surface_light(g,add(points[corner],mul(shading_normal,-0.035f)),mul(shading_normal,-1)):front;
@@ -251,7 +341,43 @@ static void build_cache(const DlGame *g){
     uint32_t start=TICKS_READ();
     load_textures(g);
     vertex_count=triangle_count=smooth_vertex_count=0;
+    animation_normal_count=animation_model_count=0;
     assertf(g->level->model_count<=MAX_MODELS,"Scene exceeds %d model instances",MAX_MODELS);
+    for(int i=0;i<g->level->model_count;++i){
+        const DlModelInstance *model=&g->level->models[i];
+        assertf(model->mesh<g->level->mesh_count,"Bad model mesh index");
+        const DlMesh *mesh=&g->level->meshes[model->mesh];
+        models[i].animation_normal_start=-1;
+        models[i].idle_clip=models[i].walk_clip=models[i].run_clip=-1;
+        if(!mesh->animation)continue;
+        assertf(mesh->vertex_count>0&&mesh->vertex_count<=MAX_VERTICES,"Invalid animated vertex count");
+        assertf(dl_animation_validate(mesh->animation,mesh->vertex_count),"Invalid animated mesh");
+        ++animation_model_count;
+        models[i].idle_clip=dl_animation_find_clip(mesh->animation,"idle");
+        models[i].walk_clip=dl_animation_find_clip(mesh->animation,"walk");
+        models[i].run_clip=dl_animation_find_clip(mesh->animation,"run");
+        if(mesh->normals){
+            assertf(animation_normal_count+mesh->vertex_count<=MAX_VERTICES,"Animated normal cache exceeds scene vertex budget");
+            models[i].animation_normal_start=animation_normal_count;animation_normal_count+=mesh->vertex_count;
+        }
+        bool first=true;
+        for(int j=0;j<i;++j)if(g->level->meshes[g->level->models[j].mesh].animation==mesh->animation)first=false;
+        if(first){
+            const DlAnimationAsset *asset=mesh->animation;
+            unsigned descriptors=sizeof(*asset)+sizeof(DlAnimBone)*asset->bone_count+
+                sizeof(DlAnimClip)*asset->clip_count+sizeof(DlAnimSocket)*asset->socket_count;
+            for(int clip=0;clip<asset->clip_count;++clip)descriptors+=sizeof(DlAnimTrack)*asset->clips[clip].track_count+
+                sizeof(DlAnimEvent)*asset->clips[clip].event_count;
+            debugf("DL64 animation_asset id=%s bones=%d clips=%d encoded_bytes=%lu table_bytes_without_strings=%u skeleton_bytes=%u vertex_binding_bytes=%d bone_limit=%d\n",
+                asset->id,asset->bone_count,asset->clip_count,(unsigned long)asset->encoded_bytes,descriptors,
+                (unsigned)(sizeof(DlAnimBone)*asset->bone_count),mesh->vertex_count,DL_ANIMATION_MAX_BONES);
+        }
+    }
+    free(animation_normals);animation_normals=NULL;
+    if(animation_normal_count){
+        animation_normals=malloc(sizeof(DlVec3)*animation_normal_count);
+        assertf(animation_normals,"Cannot allocate animated normal cache");
+    }
     for(int i=0;i<g->level->model_count;++i){
         const DlModelInstance *model=&g->level->models[i];
         assertf(model->mesh<g->level->mesh_count,"Bad model mesh index");
@@ -275,6 +401,11 @@ static void build_cache(const DlGame *g){
         models[i].scaled_center=(DlVec3){center.x*model->scale.x,center.y*model->scale.y,center.z*model->scale.z};
         half=(DlVec3){half.x*model->scale.x,half.y*model->scale.y,half.z*model->scale.z};
         models[i].bounds_radius=sqrtf(dot(half,half));
+        if(mesh->animation){
+            DlVec3 c=mesh->animation->bounds_center;
+            models[i].scaled_center=(DlVec3){c.x*model->scale.x,c.y*model->scale.y,c.z*model->scale.z};
+            models[i].bounds_radius=mesh->animation->bounds_radius*fmaxf(fabsf(model->scale.x),fmaxf(fabsf(model->scale.y),fabsf(model->scale.z)));
+        }
         vertex_count+=mesh->vertex_count;triangle_count+=mesh->index_count/3;
         transform_model(g,i);
     }
@@ -310,6 +441,11 @@ static void build_cache(const DlGame *g){
         g->level->environment.enabled?2:1,g->level->texture_count);
     debugf("DL64 shading_ready smooth_vertices=%d scalar_smooth_cache_bytes=%d normal_format=snorm8\n",
         smooth_vertex_count,smooth_colors?(int)(sizeof(VertexColors)*smooth_vertex_count):0);
+    debugf("DL64 animation_ready models=%d shared_matrix_bytes=%u pose_scratch_arrays_bytes=%lu normal_cache_bytes=%u per_enemy_motion_bytes=%u timeline=actual-distance head_yaw_max=45 head_pitch_max=25\n",
+        animation_model_count,(unsigned)sizeof(animation_skin),(unsigned long)dl_animation_scratch_bytes(),
+        (unsigned)(animation_normal_count*sizeof(DlVec3)),(unsigned)(2*sizeof(float)));
+    animation_sample_ticks=animation_skin_ticks=0;
+    animation_frames=animation_poses=animation_sample_max=animation_skin_max=0;
 }
 void dl_render_prepare_scene(const DlGame *game){if(cached_level!=game->level)build_cache(game);}
 void dl_render_release_scene(void){
@@ -320,10 +456,21 @@ void dl_render_release_scene(void){
     for(int i=0;i<64;++i){if(textures[i])sprite_free(textures[i]);textures[i]=NULL;}
     for(int i=0;i<2;++i){free(night_colors[i]);night_colors[i]=NULL;}
     free(smooth_colors);smooth_colors=NULL;smooth_vertex_count=0;
+    dl_render_report_animation();
+    free(animation_normals);animation_normals=NULL;animation_normal_count=animation_model_count=0;
     cached_level=texture_level=NULL;
     cached_door=false;
     vertex_count=triangle_count=submitted_triangles=texture_uploads=0;
     visible_models=transformed_vertices=0;
+}
+void dl_render_report_animation(void){
+    if(!animation_frames)return;
+    if(animation_model_count)debugf("DL64 animation_profile frames=%lu poses=%lu sample_ticks=%llu per_pose_sample_max_ticks=%lu skin_ticks=%llu per_pose_skin_max_ticks=%lu ticks_per_second=%lu nested_in=transforms skin_scope=deform_normals_instance\n",
+        (unsigned long)animation_frames,(unsigned long)animation_poses,(unsigned long long)animation_sample_ticks,
+        (unsigned long)animation_sample_max,(unsigned long long)animation_skin_ticks,(unsigned long)animation_skin_max,
+        (unsigned long)TICKS_PER_SECOND);
+    animation_frames=animation_poses=animation_sample_max=animation_skin_max=0;
+    animation_sample_ticks=animation_skin_ticks=0;
 }
 static Camera make_camera(const DlGame *g){
     DlCameraBasis basis=dl_camera_basis(g->yaw,g->pitch);
@@ -408,12 +555,13 @@ static void geometry(const DlGame *g){
         mark=dl_profile_mark();build_cache(g);dl_profile_record(DL_PROFILE_CACHE,mark);
     }
     bool lighting_changed=cached_door!=g->door_open;
+    ++animation_frames;
     mark=dl_profile_mark();
     Camera camera=make_camera(g);
     visible_models=transformed_vertices=0;
     for(int i=0;i<g->level->model_count;++i){
         DlModelRole role=g->level->models[i].role;
-        bool dynamic=role==DL_MODEL_GUARD||role==DL_MODEL_OBJECTIVE;
+        bool dynamic=role==DL_MODEL_GUARD||role==DL_MODEL_OBJECTIVE||g->level->meshes[g->level->models[i].mesh].animation;
         ModelPose pose;
         if(dynamic||(lighting_changed&&role==DL_MODEL_DOOR)){
             pose=update_model_pose(g,i);
@@ -435,7 +583,7 @@ static void geometry(const DlGame *g){
     mark=dl_profile_mark();
     for(int i=0;i<g->level->model_count;++i){
         DlModelRole role=g->level->models[i].role;
-        bool dynamic=role==DL_MODEL_GUARD||role==DL_MODEL_OBJECTIVE;
+        bool dynamic=role==DL_MODEL_GUARD||role==DL_MODEL_OBJECTIVE||g->level->meshes[g->level->models[i].mesh].animation;
         if((dynamic&&models[i].visible)||(!dynamic&&lighting_changed)){
             bool illuminate=dynamic||!g->level->environment.enabled;
             if(illuminate||role==DL_MODEL_DOOR){

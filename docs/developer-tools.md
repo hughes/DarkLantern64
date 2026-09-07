@@ -32,11 +32,17 @@ python tools/blender_assets.py --open          # Open art/loot.blend
 python tools/blender_assets.py                 # Export its saved meshes/materials
 python tools/blender_assets.py --package-addon # Package the reusable Blender add-on
 
+# Open/export the saved guard rig and its five Actions
+python tools/guard_assets.py --open
+python tools/guard_assets.py
+
 # Export another saved source into its own asset pack
 python tools/blender_assets.py --source art/my_props.blend --output content/assets/my_props
 ```
 
 After export, import or reimport the pack through the editor's asset controls, place props, then **Play level**. The [Blender asset guide](blender-assets.md) describes materials, smooth normals and prefab placement. `python tools/blender_assets.py --make-demo` recreates the example source and **overwrites `art/loot.blend`**; use it only when deliberately rebuilding that example, after preserving art edits elsewhere.
+
+The [guard animation study](guard-animation-prototype.md) describes the separate character export. Guard Animation Workshop already references its exported source; use **Save + Cook** after exporting, then preview clips or **Play level**. `python tools/character_assets.py content/assets/guard/guard.character.json` prints its compression and deformation-error comparison.
 
 ## Profiles, captures and budgets
 

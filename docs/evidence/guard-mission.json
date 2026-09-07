@@ -1,0 +1,43 @@
+{
+  "platform": "Ares emulator",
+  "status": "complete",
+  "passed": true,
+  "started_at_utc": "2026-09-07T01:51:45Z",
+  "results": [
+    {
+      "name": "smoke-4mb",
+      "passed": true,
+      "log": ".dev\\ares\\runs\\a9a7962b741b4c37a9f0502654aeb587\\smoke-4mb.log",
+      "tested_rom": ".dev\\ares\\runs\\a9a7962b741b4c37a9f0502654aeb587\\DarkLantern64.z64",
+      "rom_sha256": "f763cca14257e9500e44a990ea6be152c3e225794430f761119fc6d11bef9db4",
+      "rom_bytes": 327680,
+      "settings": ".dev\\ares\\runs\\a9a7962b741b4c37a9f0502654aeb587\\settings.bml",
+      "settings_source_sha256": "f7bb747f78c0dc059ca1c5c003c2a1af282105752c483514d265c14b61c67e06",
+      "profile_report": null,
+      "elapsed_seconds": 4.281,
+      "peak_sampled_heap_bytes": null,
+      "max_reported_cpu_ms": null,
+      "boot": null,
+      "terminal_event": "DL64 boot_failed reason=expansion_pak memory=4194304 required=8388608"
+    },
+    {
+      "name": "smoke-8mb",
+      "passed": true,
+      "log": ".dev\\ares\\runs\\77d32a2f4321451ab424f52668110f27\\smoke-8mb.log",
+      "tested_rom": ".dev\\ares\\runs\\77d32a2f4321451ab424f52668110f27\\DarkLantern64-autoplay.z64",
+      "rom_sha256": "0c921242ecfed187e7cdaca6b9d8449394e958d9d2e87e907838b3539002c3f3",
+      "rom_bytes": 327680,
+      "settings": ".dev\\ares\\runs\\77d32a2f4321451ab424f52668110f27\\settings.bml",
+      "settings_source_sha256": "f7bb747f78c0dc059ca1c5c003c2a1af282105752c483514d265c14b61c67e06",
+      "profile_report": ".dev\\ares\\runs\\77d32a2f4321451ab424f52668110f27\\profile.json",
+      "elapsed_seconds": 42.922,
+      "peak_sampled_heap_bytes": 621160,
+      "max_reported_cpu_ms": 60.29,
+      "boot": "DL64 boot_ok memory=8388608 scene=\"DarkLantern64 - The Lantern Store\" meshes=9 models=25 colliders=14 version=2 world=3d renderer=xyz-mesh-rdpq depth=hardware",
+      "terminal_event": "DL64 profile_replay_done complete=1 caught=0"
+    }
+  ],
+  "debug_overlay": false,
+  "hardware_validation": "Original N64 and M64 pending",
+  "source_sha256": "38afc6d393b6a224dc8cb7ec6b5fe5cfbe5afeead82ed1d16e13c3f826bf8a98"
+}

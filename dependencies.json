@@ -1,9 +1,9 @@
 {
   "lightengine": {
     "repository": "git@github.com:hughes/LightEngine.git",
-    "commit": "dc8e3c86a0171795af3a9fe724fc8125925dbba7",
+    "commit": "04d693a654460b776cf0f9a314f6b268f96c139d",
     "path": "external/LightEngine",
-    "branch": "codex/project-editor-lifecycle"
+    "branch": "codex/character-animation-preview"
   },
   "libdragon": {
     "repository": "git@github.com:hughes/libdragon.git",

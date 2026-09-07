@@ -16,6 +16,8 @@
 #include <imgui.h>
 #include <imgui_internal.h>
 #include <nlohmann/json.hpp>
+#include <util/MatrixUtils.h>
+#include "character_preview.h"
 
 namespace fs = std::filesystem;
 using Json = nlohmann::json;
@@ -270,6 +272,23 @@ class DemoEditor
     Scene* scene_ = nullptr;
     std::unordered_map<EntityId, std::string> previewIds_;
     std::unordered_map<EntityId, Transform> previewTransforms_;
+    struct CharacterInstance
+    {
+        EntityId parent;
+        CharacterPreviewAsset* data;
+        std::optional<MeshRenderer> originalRenderer;
+        std::vector<std::pair<EntityId,int>> joints;
+        std::optional<MeshHandle> dynamicMesh;
+        std::vector<Vertex> bindVertices, posedVertices;
+        int clip=0, blendClip=-1;
+        float time=0, blend=0, headYaw=0, headPitch=0;
+        bool playing=false;
+        std::string diagnostic;
+        DlAnimMatrix skin[DL_ANIMATION_MAX_BONES]{};
+    };
+    std::unordered_map<std::string,std::unique_ptr<CharacterPreviewAsset>> characterAssets_;
+    std::unordered_map<std::string,CharacterInstance> characters_;
+    Json characterDiagnostics_=Json::object();
     std::string scenePath_;
     Json catalog_, pendingAction_ = Json::object();
     std::string browserLevel_, sourceSnapshot_, testStart_ = "default", actionRequestId_;
@@ -308,6 +327,7 @@ class DemoEditor
             const auto path="levels/"+level.at("stem").get<std::string>()+".json";
             levels.emplace_back(path,LevelLabel(level.at("title"))+" ("+level.at("file").get<std::string>()+")");
             engine_.OnLevelLoaded(path,[this](Scene& scene) { BindScene(scene); });
+            engine_.OnUpdate(path,[this](Scene& scene,bool,FrameContext& frame) { UpdateCharacters(scene,frame.dt); });
             engine_.OnImGui(path,[this] { Draw(); });
         }
         engine_.SetRegisteredLevels(std::move(levels));
@@ -325,7 +345,7 @@ class DemoEditor
             {"source",source_.string()},{"output",output_.string()},{"scene_path",scenePath_},{"project_editor",true},
             {"operations",{"inspect","list_levels","open_level","create_level","duplicate_level","delete_level","update_level","play_level","play_menu",
                 "import_asset_pack","add_prop","set_entity","add_enemy","duplicate_enemy","add_waypoint","delete_entity","set_environment","set_material",
-                "set_preview_transform","save","build","capture","get_layout","reset_layout","reload","get_audio_memory","set_audio_config","recalculate_audio","quit"}}}.dump(2));
+                "set_preview_transform","get_animation","set_animation","focus_character","save","build","capture","get_layout","reset_layout","reload","get_audio_memory","set_audio_config","recalculate_audio","quit"}}}.dump(2));
     }
     void InvalidatePreviewAssets(const Json& cooked)
     {
@@ -577,7 +597,243 @@ class DemoEditor
                 scene.transforms[id] = PreviewTransform(entity->at("transform"));
                 previewTransforms_[id] = scene.transforms[id];
             }
+        BindCharacters(scene);
         scene.renderablesDirty = true;
+    }
+    static bool UniformScale(const Transform& transform)
+    {
+        return transform.scale.x>0 && std::abs(transform.scale.x-transform.scale.y)<.00001f &&
+               std::abs(transform.scale.x-transform.scale.z)<.00001f;
+    }
+    fs::path CharacterAssetPath(const std::string& uri) const
+    {
+        const fs::path base=fs::weakly_canonical(root_/"build/project/editor-assets");
+        const fs::path relative=uri.starts_with("file://")?uri.substr(7):uri;
+        if (relative.is_absolute() || relative.has_root_name() || relative.empty())
+            throw std::runtime_error("Character preview mesh must use a project asset URI");
+        for (const auto& part : relative) if (part=="..") throw std::runtime_error("Character preview mesh escapes project assets");
+        const auto path=fs::weakly_canonical(base/relative);
+        const auto child=path.lexically_relative(base);
+        if (child.empty() || *child.begin()==".." || !fs::is_regular_file(path))
+            throw std::runtime_error("Cooked character preview mesh is missing or outside project assets");
+        return path;
+    }
+    void BindCharacters(Scene& scene)
+    {
+        characters_.clear(); characterAssets_.clear(); characterDiagnostics_=Json::object();
+        for (const auto& [id,sourceId] : previewIds_)
+        {
+            const auto* entity=Entity(sourceId);
+            if (!entity || !entity->contains("model")) continue;
+            const auto model=entity->at("model").get<std::string>();
+            const auto& assets=document_.at("assets");
+            const auto source=std::find_if(assets.begin(),assets.end(),[&](const Json& row) { return row.at("id")==model; });
+            if (source==assets.end() || source->value("type",std::string())!="character") continue;
+            try
+            {
+                if (!characterAssets_.contains(model))
+                {
+                    const auto path=root_/"build/project/editor-assets/characters"/source_.stem()/(model+".json");
+                    if (!fs::exists(path)) throw std::runtime_error("Cooked character preview is pending. Save + Cook this level.");
+                    auto data=std::make_unique<CharacterPreviewAsset>(ReadJson(path));
+                    if (data->crossJointTriangles && data->bindPositions.empty())
+                        throw std::runtime_error("Connected character preview is pending. Save + Cook to export its full bind mesh.");
+                    if (!data->crossJointTriangles && data->meshes.empty())
+                        throw std::runtime_error("Cooked character joint meshes are missing. Save + Cook this level.");
+                    for (const auto& mesh : data->meshes) CharacterAssetPath(mesh.uri);
+                    characterAssets_.emplace(model,std::move(data));
+                }
+                if (!scene.meshRenderers[id] || !scene.materialSrc[id]) throw std::runtime_error("Character bind-pose material is unavailable");
+                CharacterInstance instance{};
+                instance.parent=id; instance.data=characterAssets_.at(model).get();
+                instance.originalRenderer=scene.meshRenderers[id];
+                if (instance.data->crossJointTriangles)
+                {
+                    MeshData mesh;
+                    const auto& data=*instance.data;
+                    mesh.indices=data.indices;
+                    for (size_t vertex=0;vertex<data.bindPositions.size();++vertex)
+                    {
+                        Vertex value;
+                        const auto& p=data.bindPositions[vertex]; const auto& n=data.bindNormals[vertex];
+                        value.position={p.x,p.y,p.z}; value.normal={n.x,n.y,n.z};
+                        const auto uv=CharacterPreviewAsset::ToLightEngineUv(data.bindUvs[vertex]);
+                        value.texcoord={uv.u,uv.v};
+                        mesh.vertices.push_back(value);
+                    }
+                    ComputeTangents(mesh);
+                    instance.bindVertices=mesh.vertices; instance.posedVertices=mesh.vertices;
+                    const auto uri="gen://dl64-character/"+source_.stem().string()+"/"+sourceId+"/"+data.topologyHash;
+                    instance.dynamicMesh=engine_.GetAssetMgr().RegisterImportedMesh(uri,std::move(mesh));
+                    scene.meshSrc[id]=uri;
+                    scene.meshRenderers[id]->mesh=*instance.dynamicMesh;
+                    scene.meshRenderers[id]->state=MeshRendererState::Ready;
+                }
+                else for (const auto& mesh : instance.data->meshes)
+                {
+                    const auto part=scene.NewEntity(sourceId+" / "+instance.data->asset.bones[mesh.joint].name);
+                    scene.isImported[part.id]=true;
+                    scene.meshSrc[part.id]=mesh.uri.starts_with("file://")?mesh.uri:"file://"+mesh.uri;
+                    scene.materialSrc[part.id]=scene.materialSrc[id];
+                    scene.entityMaterialId[part.id]=scene.entityMaterialId[id];
+                    scene.materialOverrides[part.id]=scene.materialOverrides[id];
+                    scene.shadowsEnabled[part.id]=scene.shadowsEnabled[id];
+                    scene.meshRenderers[part.id]=MeshRenderer{};
+                    instance.joints.emplace_back(part.id,mesh.joint);
+                }
+                characters_.emplace(sourceId,std::move(instance));
+            }
+            catch (const std::exception& error) { characterDiagnostics_[sourceId]=error.what(); }
+        }
+        UpdateCharacters(scene,0);
+    }
+    void UpdateCharacters(Scene& scene,float dt)
+    {
+        for (auto& [name,instance] : characters_)
+        {
+            if (instance.parent>=scene.alive.size() || !scene.alive[instance.parent]) continue;
+            const auto& asset=instance.data->asset;
+            if (instance.playing && instance.clip>=0)
+            {
+                const auto& clip=asset.clips[instance.clip];
+                instance.time+=std::clamp(dt,0.f,.1f);
+                if (clip.loop) instance.time=std::fmod(instance.time,clip.duration);
+                else if (instance.time>=clip.duration) { instance.time=clip.duration; instance.playing=false; }
+            }
+            const bool uniform=instance.dynamicMesh.has_value() || UniformScale(scene.transforms[instance.parent]);
+            instance.diagnostic=uniform?"":"Animation preview needs uniform XYZ scale. The bind pose remains visible.";
+            const bool sampled=dl_animation_pose(&asset,instance.clip,instance.time,instance.blendClip,instance.time,
+                instance.blend,glm::radians(instance.headYaw),glm::radians(instance.headPitch),instance.skin);
+            if (!sampled) instance.diagnostic="The N64 pose sampler rejected the preview state.";
+            if (instance.dynamicMesh && sampled)
+            {
+                for (size_t vertex=0;vertex<instance.bindVertices.size();++vertex)
+                {
+                    const auto& source=instance.bindVertices[vertex];
+                    auto& output=instance.posedVertices[vertex];
+                    const auto& skin=instance.skin[asset.vertex_bones[vertex]];
+                    const auto point=dl_animation_point(&skin,{source.position.x,source.position.y,source.position.z});
+                    output.position={point.x,point.y,point.z};
+                    const auto direction=[&](glm::vec3 input) {
+                        const auto result=dl_animation_normal(&skin,{input.x,input.y,input.z});
+                        return glm::vec3(result.x,result.y,result.z);
+                    };
+                    output.normal=direction(source.normal); output.tangent=direction(source.tangent);
+                    output.bitangent=direction(source.bitangent);
+                }
+                if (!engine_.GetAssetMgr().UpdateMeshVertices(*instance.dynamicMesh,instance.posedVertices))
+                    instance.diagnostic="LightEngine rejected the fixed-topology character deformation.";
+            }
+            else if (!uniform || !sampled) scene.meshRenderers[instance.parent]=instance.originalRenderer;
+            else scene.meshRenderers[instance.parent].reset();
+            const auto parent=ComposeModelMatrix(scene.transforms[instance.parent]);
+            for (const auto& [id,bone] : instance.joints)
+            {
+                scene.alive[id]=uniform && sampled;
+                if (!scene.alive[id]) continue;
+                glm::mat4 skin(1.f);
+                for (int row=0;row<3;++row) for (int column=0;column<4;++column) skin[column][row]=instance.skin[bone].m[row*4+column];
+                DecomposeModelMatrix(parent*skin,scene.transforms[id]);
+            }
+            scene.renderablesDirty=true;
+        }
+    }
+    Json AnimationState()
+    {
+        Json instances=Json::array();
+        for (const auto& [id,instance] : characters_)
+        {
+            const auto& asset=instance.data->asset;
+            Json clips=Json::array(),matrices=Json::array();
+            for (int i=0;i<asset.clip_count;++i)
+                clips.push_back({{"id",asset.clips[i].id},{"duration",asset.clips[i].duration},{"loop",asset.clips[i].loop},
+                    {"samples",asset.clips[i].sample_count},{"events",asset.clips[i].event_count}});
+            for (int i=0;i<asset.bone_count;++i) matrices.push_back(std::vector<float>(instance.skin[i].m,instance.skin[i].m+12));
+            instances.push_back({{"id",id},{"asset",asset.id},{"status",instance.diagnostic.empty()?"ready":"unsupported"},
+                {"diagnostic",instance.diagnostic},{"bones",asset.bone_count},{"encoded_bytes",asset.encoded_bytes},{"clips",clips},
+                {"preview_geometry",instance.dynamicMesh?"connected one-weight mesh":"rigid joint parts"},
+                {"cross_joint_triangles",instance.data->crossJointTriangles},
+                {"source_sha256",instance.data->sourceHash},{"topology_sha256",instance.data->topologyHash},
+                {"dynamic_mesh_handle",instance.dynamicMesh?Json(*instance.dynamicMesh):Json(nullptr)},
+                {"clip",instance.clip<0?"rest":asset.clips[instance.clip].id},{"time",instance.time},{"playing",instance.playing},
+                {"blend_clip",instance.blendClip<0?"rest":asset.clips[instance.blendClip].id},{"blend",instance.blend},
+                {"head_yaw",instance.headYaw},{"head_pitch",instance.headPitch},{"head_supported",asset.head_bone>=0},{"head_bone",asset.head_bone},
+                {"skin_matrices",matrices}});
+        }
+        return {{"implementation","shared N64 sampler / one-weight preview"},{"instances",instances},{"diagnostics",characterDiagnostics_},
+            {"vertex_arena_count",initialized_?engine_.GetAssetMgr().VertexArena().size():0}};
+    }
+    void SetAnimation(const Json& args)
+    {
+        if (!args.is_object() || !args.contains("id")) throw std::runtime_error("set_animation requires a character entity id");
+        const auto id=args.at("id").get<std::string>();
+        if (!characters_.contains(id)) throw std::runtime_error("Character preview unavailable; inspect get_animation diagnostics");
+        auto next=characters_.at(id);
+        const auto& asset=next.data->asset;
+        for (const auto& [key,value] : args.items())
+        {
+            if (key=="id") continue;
+            if (key=="clip" || key=="blend_clip")
+            {
+                const auto clip=value.get<std::string>();
+                const int index=clip=="rest"?-1:dl_animation_find_clip(&asset,clip.c_str());
+                if (index<0 && clip!="rest") throw std::runtime_error("Unknown character animation clip");
+                (key=="clip"?next.clip:next.blendClip)=index;
+            }
+            else if (key=="playing") next.playing=value.get<bool>();
+            else
+            {
+                if (!value.is_number() || !std::isfinite(value.get<float>())) throw std::runtime_error("Animation settings need finite numbers");
+                const float number=value.get<float>();
+                if (key=="time" && number>=0 && number<=600) next.time=number;
+                else if (key=="blend" && number>=0 && number<=1) next.blend=number;
+                else if (key=="head_yaw" && number>=-45 && number<=45) next.headYaw=number;
+                else if (key=="head_pitch" && number>=-25 && number<=25) next.headPitch=number;
+                else throw std::runtime_error("Unknown or out-of-range animation setting: "+key);
+            }
+        }
+        characters_.at(id)=std::move(next);
+        if (scene_) UpdateCharacters(*scene_,0);
+    }
+    void FocusCharacter(const std::string& id)
+    {
+        if (!scene_ || !scene_->cameraId || !characters_.contains(id))
+            throw std::runtime_error("Select a cooked character with an available editor camera");
+        auto& instance=characters_.at(id);
+        UpdateCharacters(*scene_,0);
+        if (!instance.diagnostic.empty()) throw std::runtime_error(instance.diagnostic);
+        glm::vec3 lower(std::numeric_limits<float>::max()),upper(-std::numeric_limits<float>::max());
+        bool found=false;
+        // Current sampled-part bounds frame the actual pose, avoiding the much
+        // looser conservative all-animation sphere used by the runtime culler.
+        auto parts=instance.joints;
+        if (instance.dynamicMesh) parts.emplace_back(instance.parent,0);
+        for (const auto& [part,bone] : parts)
+        {
+            const auto& renderer=scene_->meshRenderers[part];
+            if (!renderer || renderer->state!=MeshRendererState::Ready) continue;
+            const auto& mesh=engine_.GetAssetMgr().GetMesh(renderer->mesh);
+            const auto transform=ComposeModelMatrix(scene_->transforms[part]);
+            for (int corner=0;corner<8;++corner)
+            {
+                const glm::vec3 point=transform*glm::vec4(corner&1?mesh.localMax.x:mesh.localMin.x,
+                    corner&2?mesh.localMax.y:mesh.localMin.y,corner&4?mesh.localMax.z:mesh.localMin.z,1);
+                lower=glm::min(lower,point); upper=glm::max(upper,point); found=true;
+            }
+        }
+        if (!found) throw std::runtime_error("Character preview is still loading; try Focus guard again");
+        const auto cameraId=*scene_->cameraId;
+        if (!scene_->cameras[cameraId]) throw std::runtime_error("Active editor camera is unavailable");
+        auto& camera=*scene_->cameras[cameraId];
+        auto& transform=scene_->transforms[cameraId];
+        const glm::vec3 target=(lower+upper)*.5f;
+        const float radius=std::max(.25f,glm::length(upper-lower)*.5f);
+        const float distance=radius/std::sin(glm::radians(std::clamp(camera.fov,20.f,100.f))*.5f)*1.15f;
+        const glm::vec3 direction=scene_->transforms[instance.parent].rotation*glm::normalize(glm::vec3(.38f,.14f,1.f));
+        transform.position=target+direction*distance;
+        transform.rotation=glm::quatLookAt(glm::normalize(target-transform.position),glm::vec3(0,1,0));
+        camera.orbitDistance=distance;
+        selected_=id;
     }
     void PushTransform(const std::string& id)
     {
@@ -1079,26 +1335,35 @@ class DemoEditor
     }
     void PollCommands()
     {
-        int processed = 0;
+        // Snapshot paths before consuming requests. A live Windows directory
+        // iterator can expose the same entry twice when files are removed;
+        // an asynchronous capture has no response yet on that second visit.
+        std::set<fs::path> requests;
         for (const auto& entry : fs::directory_iterator(queue_/"requests"))
         {
-            if (++processed > 8) break;
             if (!entry.is_regular_file() || entry.path().extension() != ".json") continue;
-            const std::string id = entry.path().stem().string();
+            requests.insert(entry.path());
+            if (requests.size()>=8) break;
+        }
+        for (const auto& path : requests)
+        {
+            const std::string id = path.stem().string();
             if (id.size() != 32 || id.find_first_not_of("0123456789abcdef") != std::string::npos) continue;
-            if (fs::exists(queue_/"responses"/(id+".json"))) { fs::remove(entry.path()); continue; }
+            if (fs::exists(queue_/"responses"/(id+".json"))) { fs::remove(path); continue; }
+            if (id==captureId_ || id==jobId_ || id==actionRequestId_) continue;
             try
             {
-                if (entry.file_size() > 65536) throw std::runtime_error("Request exceeds 64 KiB");
-                const Json request = ReadJson(entry.path());
-                fs::remove(entry.path());
+                if (fs::file_size(path) > 65536) throw std::runtime_error("Request exceeds 64 KiB");
+                const Json request = ReadJson(path);
+                fs::remove(path);
                 if (request.at("id") != id) throw std::runtime_error("Request ID mismatch");
                 const double now = std::chrono::duration<double>(std::chrono::system_clock::now().time_since_epoch()).count();
                 if (request.at("expires_at").get<double>() < now) throw std::runtime_error("Request expired without execution");
                 const std::string op = request.at("op");
                 const Json args = request.value("args",Json::object());
-                if (op == "inspect") { Respond(id,true,{{"document",document_},{"source",source_.string()},{"output",output_.string()},{"scene_path",scenePath_},{"catalog",catalog_},{"pending_action",pendingAction_},{"dirty",dirty_},{"busy",Busy()},{"status",status_},{"report",report_},{"enemy_types",EnemyTypes()},{"prefabs",prefabs_},{"preview_refresh_pending",structureDirty_},{"audio",AudioState()}}); continue; }
+                if (op == "inspect") { Respond(id,true,{{"document",document_},{"source",source_.string()},{"output",output_.string()},{"scene_path",scenePath_},{"catalog",catalog_},{"pending_action",pendingAction_},{"dirty",dirty_},{"busy",Busy()},{"status",status_},{"report",report_},{"enemy_types",EnemyTypes()},{"prefabs",prefabs_},{"preview_refresh_pending",structureDirty_},{"audio",AudioState()},{"animation",AnimationState()}}); continue; }
                 if (op == "get_audio_memory") { Respond(id,true,AudioState()); continue; }
+                if (op == "get_animation") { Respond(id,true,AnimationState()); continue; }
                 if (op == "get_layout") { Respond(id,true,Layout()); continue; }
                 if (op == "reset_layout") { engine_.ResetEditorLayout(); Respond(id,true,{{"scheduled",true}}); continue; }
                 if (Busy()) throw std::runtime_error("Editor build is busy; inspect remains available");
@@ -1136,6 +1401,8 @@ class DemoEditor
                 else if (op == "set_environment") { SetEnvironment(args.at("patch")); Respond(id,true,{{"environment",document_["environment"]},{"dirty",true},{"validation","pending save"}}); }
                 else if (op == "set_material") { SetMaterial(args); Respond(id,true,{{"material",*Material(args.at("id"))},{"dirty",true},{"validation","pending save"}}); }
                 else if (op == "set_preview_transform") { SetPreviewTransform(args); Respond(id,true,{{"entity",*Entity(args.at("id"))},{"dirty",dirty_}}); }
+                else if (op == "set_animation") { SetAnimation(args); Respond(id,true,AnimationState()); }
+                else if (op == "focus_character") { FocusCharacter(args.at("id").get<std::string>()); Respond(id,true,AnimationState()); }
                 else if (op == "set_audio_config")
                 {
                     if (audioConfig_.empty()) throw std::runtime_error("Audio planning manifest is missing");
@@ -1175,7 +1442,7 @@ class DemoEditor
             catch (const std::exception& error)
             {
                 Respond(id,false,{{"error",error.what()}});
-                std::error_code ignored; fs::remove(entry.path(),ignored);
+                std::error_code ignored; fs::remove(path,ignored);
             }
         }
     }
@@ -1463,6 +1730,58 @@ class DemoEditor
         ImGui::TextWrapped("Select a route point above to edit XYZ. Save + Cook adds its viewport marker; use Entity List to select its gizmo. Points are visited in order, then the route loops. Keep each segment clear of walls: navigation currently follows straight segments.");
         ImGui::TextWrapped("Existing waypoints may be shared by several routes. Editing one moves it for all users. Removing a route entry keeps the waypoint object; Delete waypoint refuses points still in use.");
     }
+    void DrawCharacter(const std::string& id)
+    {
+        if (characterDiagnostics_.contains(id))
+        {
+            ImGui::SeparatorText("Character animation");
+            ImGui::TextWrapped("%s",characterDiagnostics_.at(id).get<std::string>().c_str());
+            return;
+        }
+        const auto found=characters_.find(id);
+        if (found==characters_.end()) return;
+        auto& instance=found->second;
+        const auto& asset=instance.data->asset;
+        if (!ImGui::CollapsingHeader("Character animation",ImGuiTreeNodeFlags_DefaultOpen)) return;
+        if (ImGui::Button("Focus guard"))
+            try { FocusCharacter(id); } catch (const std::exception& error) { status_=error.what(); }
+        ImGui::TextDisabled("N64 cooked keys / shared runtime sampler");
+        if (!instance.diagnostic.empty()) ImGui::TextWrapped("%s",instance.diagnostic.c_str());
+        const auto chooser=[&](const char* label,int& selected) {
+            if (ImGui::BeginCombo(label,selected<0?"Rest pose":asset.clips[selected].id))
+            {
+                if (ImGui::Selectable("Rest pose",selected<0)) selected=-1;
+                for (int i=0;i<asset.clip_count;++i)
+                    if (ImGui::Selectable(asset.clips[i].id,selected==i)) selected=i;
+                ImGui::EndCombo();
+            }
+        };
+        const int previous=instance.clip;
+        chooser("Clip",instance.clip);
+        if (previous!=instance.clip) { instance.time=0; instance.playing=false; }
+        ImGui::BeginDisabled(instance.clip<0);
+        if (ImGui::Button(instance.playing?"Pause animation":"Play animation")) instance.playing=!instance.playing;
+        ImGui::SameLine();
+        if (ImGui::Button("Reset pose time")) { instance.time=0; instance.playing=false; }
+        const float duration=instance.clip<0?1.f:asset.clips[instance.clip].duration;
+        if (ImGui::SliderFloat("Time (seconds)",&instance.time,0,duration,"%.3f")) instance.playing=false;
+        ImGui::EndDisabled();
+        if (ImGui::TreeNode("Blend preview"))
+        {
+            chooser("Blend toward",instance.blendClip);
+            ImGui::SliderFloat("Blend weight",&instance.blend,0,1,"%.2f");
+            ImGui::TextWrapped("Both clips sample the displayed time. This tests transitions; gameplay chooses its own clip times and weights.");
+            ImGui::TreePop();
+        }
+        ImGui::BeginDisabled(asset.head_bone<0);
+        ImGui::SliderFloat("Attention yaw",&instance.headYaw,-45,45,"%.1f deg");
+        ImGui::SliderFloat("Attention pitch",&instance.headPitch,-25,25,"%.1f deg");
+        ImGui::EndDisabled();
+        if (asset.head_bone<0) ImGui::TextDisabled("This rig has no head attention joint.");
+        ImGui::Text("%u bones | %u clips | %.2f KiB key payload",asset.bone_count,asset.clip_count,asset.encoded_bytes/1024.f);
+        ImGui::TextWrapped("Preview controls do not change saved gameplay behavior. %s. Lighting remains the desktop preview; Play level checks the N64 result.",
+            instance.dynamicMesh?"Connected triangles use exact one-weight deformation":"Rigid joint parts need uniform entity scale");
+    }
     void DrawProperties()
     {
         if (ImGui::Begin("Object Properties"))
@@ -1532,6 +1851,7 @@ class DemoEditor
                         ImGui::EndCombo();
                     }
                 }
+                DrawCharacter(selected_);
                 if (entity->at("kind") == "guard") DrawEnemy(selected_);
                 ImGui::EndDisabled();
             }

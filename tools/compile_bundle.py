@@ -10,10 +10,10 @@ import shutil
 import tempfile
 
 try:
-    from compile_level import compile_level, identifier, require, validate, atomic_write
+    from compile_level import compile_level, identifier, require, validate, atomic_write, character_c
     from cook_textures import cook_sprites
 except ModuleNotFoundError:
-    from tools.compile_level import compile_level, identifier, require, validate, atomic_write
+    from tools.compile_level import compile_level, identifier, require, validate, atomic_write, character_c
     from tools.cook_textures import cook_sprites
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -141,14 +141,14 @@ def prepare_bundle(entries, title, output, sdk, *, start_level=None, start_prese
     for entry in entries:
         source = Path(entry["source"])
         validate(json.loads(source.read_text(encoding="utf-8")), source.parent)
-    levels, units = [], []
+    levels, units, shared_characters = [], [], {}
     generated = output / "generated"
     for index, entry in enumerate(entries):
         source = Path(entry["source"]).resolve()
         # Index qualification also avoids Windows device-name directories such
         # as CON and keeps storage identity independent from display IDs.
         cooked = Path(cooked_dirs[index] if cooked_dirs else output / "levels" / f"{index}-{entry['id']}").resolve()
-        report = compile_level(source, cooked)
+        report = compile_level(source, cooked, shared_characters=shared_characters)
         textures = cook_sprites(cooked, sdk)
         unit = generated / "levels" / str(index) / f"bundle_level_{index}.c"
         # An explicit relative include is independent of global -I order and
@@ -158,6 +158,11 @@ def prepare_bundle(entries, title, output, sdk, *, start_level=None, start_prese
         units.append(unit)
         levels.append({"id": entry["id"], "source": str(source), "cooked_dir": str(cooked),
                        "content": report, "textures": textures})
+    if shared_characters:
+        unit = generated / "shared_characters.c"
+        atomic_write(unit, '#include <stddef.h>\n#include "animation.h"\n'+
+                     "\n".join(character_c(c, shared=True) for c in shared_characters.values())+"\n")
+        units.append(unit)
     textures = union_textures(levels, output)
     header = generated / "bundle.h"
     atomic_write(header, '#ifndef DL_GENERATED_BUNDLE_H\n#define DL_GENERATED_BUNDLE_H\n#include "launch.h"\nextern const DlBundle dl_bundle;\n#endif\n')
@@ -175,5 +180,16 @@ def prepare_bundle(entries, title, output, sdk, *, start_level=None, start_prese
               "initial_start": initial_start, "start_in_menu": start_in_menu, "textures": textures,
               "resident_geometry_bytes": sum(level["content"]["compiled_geometry_bytes"] for level in levels),
               "memory_note": "All bundled geometry and descriptors are resident. Only the active level's sprites are loaded; maximum_level_sprite_bytes excludes allocator overhead. Renderer, game, audio and display buffers are additional."}
+    duplicated_character_geometry = sum(sum({c["source_sha256"]: c["geometry_bytes"]
+                                             for c in level["content"].get("characters", {}).values()}.values())
+                                        for level in levels)
+    unique_character_geometry = sum(c["report"]["geometry_bytes"] for c in shared_characters.values())
+    report["resident_geometry_bytes"] += unique_character_geometry-duplicated_character_geometry
+    report["characters"] = {"unique_assets": len(shared_characters),
+                            "shared_geometry_bytes": unique_character_geometry,
+                            "geometry_duplication_avoided_bytes": duplicated_character_geometry-unique_character_geometry,
+                            "shared_key_bytes": sum(c["encoded_bytes"] for c in shared_characters.values()),
+                            "assets": [c["report"] for c in shared_characters.values()],
+                            "memory_note": "Character geometry, skeletons, clips and sockets are emitted once per content hash in a dedicated C unit, shared across levels and actors. Level mesh descriptors and actor render caches remain per instance/level."}
     atomic_write(generated / "bundle_report.json", json.dumps(report, indent=2) + "\n")
     return report, units

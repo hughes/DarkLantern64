@@ -1,0 +1,384 @@
+{
+  "version": 1,
+  "id": "basic-guard",
+  "skeleton_id": "humanoid-v1",
+  "bones": 20,
+  "vertices": 997,
+  "triangles": 531,
+  "cross_joint_triangles": 48,
+  "clips": [
+    {
+      "id": "idle",
+      "fps": 30.0,
+      "duration": 2.0,
+      "sample_count": 61,
+      "dense_float_key_bytes": 34160,
+      "dense_int16_key_bytes": 17080,
+      "constant_stripped_key_bytes": 992,
+      "track_descriptor_bytes_n64": 32,
+      "event_bytes_n64": 0,
+      "clip_descriptor_bytes_n64": 36,
+      "omitted_rest_tracks": 36,
+      "constant_tracks": 2,
+      "animated_tracks": 2,
+      "quantization_error": {
+        "tested_pose_samples": 121,
+        "max_vertex_error_m": 2.168431734203979e-05,
+        "rms_vertex_error_m": 5.70867777844535e-06,
+        "max_socket_error_m": 1.3785254729075001e-05,
+        "bounds_min": [
+          -0.4550001282342639,
+          0.004000000189989698,
+          -0.16870667665061082
+        ],
+        "bounds_max": [
+          0.4550001282342639,
+          1.8455070229741388,
+          0.21600000560283678
+        ],
+        "error_scope": "All source keys and their midpoints; sampled evidence, not a continuous-time error bound."
+      },
+      "comparison_15hz": {
+        "fps": 15.0,
+        "sample_count": 31,
+        "dense_float_key_bytes": 17360,
+        "dense_int16_key_bytes": 8680,
+        "constant_stripped_key_bytes": 512,
+        "track_descriptor_bytes_n64": 32,
+        "event_bytes_n64": 0,
+        "clip_descriptor_bytes_n64": 36,
+        "omitted_rest_tracks": 36,
+        "constant_tracks": 2,
+        "animated_tracks": 2,
+        "error": {
+          "tested_pose_samples": 121,
+          "max_vertex_error_m": 9.802913754787621e-05,
+          "rms_vertex_error_m": 1.7118707842316975e-05,
+          "max_socket_error_m": 4.0702429293664776e-05,
+          "bounds_min": [
+            -0.4550001282342639,
+            0.004000000189989698,
+            -0.16870356749955603
+          ],
+          "bounds_max": [
+            0.4550001282342639,
+            1.8455069149711303,
+            0.21600000560283678
+          ],
+          "error_scope": "All source keys and their midpoints; sampled evidence, not a continuous-time error bound."
+        }
+      }
+    },
+    {
+      "id": "notice",
+      "fps": 30.0,
+      "duration": 1.4,
+      "sample_count": 43,
+      "dense_float_key_bytes": 24080,
+      "dense_int16_key_bytes": 12040,
+      "constant_stripped_key_bytes": 1376,
+      "track_descriptor_bytes_n64": 32,
+      "event_bytes_n64": 0,
+      "clip_descriptor_bytes_n64": 36,
+      "omitted_rest_tracks": 36,
+      "constant_tracks": 0,
+      "animated_tracks": 4,
+      "quantization_error": {
+        "tested_pose_samples": 85,
+        "max_vertex_error_m": 4.0980250258314225e-05,
+        "rms_vertex_error_m": 6.22573832717117e-06,
+        "max_socket_error_m": 2.858400415280749e-05,
+        "bounds_min": [
+          -0.4550152893977268,
+          0.004000000189989698,
+          -0.16098839082470257
+        ],
+        "bounds_max": [
+          0.45500013432192205,
+          1.8454484011920524,
+          0.47148428973119993
+        ],
+        "error_scope": "All source keys and their midpoints; sampled evidence, not a continuous-time error bound."
+      },
+      "comparison_15hz": {
+        "fps": 15.000000000000002,
+        "sample_count": 22,
+        "dense_float_key_bytes": 12320,
+        "dense_int16_key_bytes": 6160,
+        "constant_stripped_key_bytes": 704,
+        "track_descriptor_bytes_n64": 32,
+        "event_bytes_n64": 0,
+        "clip_descriptor_bytes_n64": 36,
+        "omitted_rest_tracks": 36,
+        "constant_tracks": 0,
+        "animated_tracks": 4,
+        "error": {
+          "tested_pose_samples": 85,
+          "max_vertex_error_m": 0.003019636308886621,
+          "rms_vertex_error_m": 0.0002654952586483339,
+          "max_socket_error_m": 0.002150813661236427,
+          "bounds_min": [
+            -0.4550152893977268,
+            0.004000000189989698,
+            -0.16097866719440895
+          ],
+          "bounds_max": [
+            0.45500013432192205,
+            1.8454482905803775,
+            0.47148428973119993
+          ],
+          "error_scope": "All source keys and their midpoints; sampled evidence, not a continuous-time error bound."
+        }
+      }
+    },
+    {
+      "id": "run",
+      "fps": 30.0,
+      "duration": 0.8,
+      "sample_count": 25,
+      "dense_float_key_bytes": 14000,
+      "dense_int16_key_bytes": 7000,
+      "constant_stripped_key_bytes": 2758,
+      "track_descriptor_bytes_n64": 120,
+      "event_bytes_n64": 8,
+      "clip_descriptor_bytes_n64": 36,
+      "omitted_rest_tracks": 25,
+      "constant_tracks": 1,
+      "animated_tracks": 14,
+      "quantization_error": {
+        "tested_pose_samples": 49,
+        "max_vertex_error_m": 0.00014366440712561458,
+        "rms_vertex_error_m": 6.667966058175771e-05,
+        "max_socket_error_m": 0.00012491168549330983,
+        "bounds_min": [
+          -0.4567542850034481,
+          0.0010693970048981562,
+          -0.4179814624315764
+        ],
+        "bounds_max": [
+          0.4567542850034481,
+          1.7492044353015361,
+          0.5659452872290964
+        ],
+        "error_scope": "All source keys and their midpoints; sampled evidence, not a continuous-time error bound."
+      },
+      "comparison_15hz": {
+        "fps": 15.0,
+        "sample_count": 13,
+        "dense_float_key_bytes": 7280,
+        "dense_int16_key_bytes": 3640,
+        "constant_stripped_key_bytes": 1438,
+        "track_descriptor_bytes_n64": 120,
+        "event_bytes_n64": 8,
+        "clip_descriptor_bytes_n64": 36,
+        "omitted_rest_tracks": 25,
+        "constant_tracks": 1,
+        "animated_tracks": 14,
+        "error": {
+          "tested_pose_samples": 49,
+          "max_vertex_error_m": 0.024015330031041227,
+          "rms_vertex_error_m": 0.003314693257115136,
+          "max_socket_error_m": 0.009462710977706143,
+          "bounds_min": [
+            -0.4567617803300672,
+            -0.004352309488891177,
+            -0.4179814624315764
+          ],
+          "bounds_max": [
+            0.4567617803300672,
+            1.7492044353015361,
+            0.5659452872290964
+          ],
+          "error_scope": "All source keys and their midpoints; sampled evidence, not a continuous-time error bound."
+        }
+      }
+    },
+    {
+      "id": "turn",
+      "fps": 30.0,
+      "duration": 1.6,
+      "sample_count": 49,
+      "dense_float_key_bytes": 27440,
+      "dense_int16_key_bytes": 13720,
+      "constant_stripped_key_bytes": 784,
+      "track_descriptor_bytes_n64": 16,
+      "event_bytes_n64": 0,
+      "clip_descriptor_bytes_n64": 36,
+      "omitted_rest_tracks": 38,
+      "constant_tracks": 0,
+      "animated_tracks": 2,
+      "quantization_error": {
+        "tested_pose_samples": 97,
+        "max_vertex_error_m": 1.3469402050414065e-05,
+        "rms_vertex_error_m": 3.507992951031176e-06,
+        "max_socket_error_m": 1.1416353079223176e-05,
+        "bounds_min": [
+          -0.45893209860695094,
+          0.004000000189989698,
+          -0.1599999964237213
+        ],
+        "bounds_max": [
+          0.45893209860695094,
+          1.845000267028809,
+          0.21600000560283678
+        ],
+        "error_scope": "All source keys and their midpoints; sampled evidence, not a continuous-time error bound."
+      },
+      "comparison_15hz": {
+        "fps": 15.0,
+        "sample_count": 25,
+        "dense_float_key_bytes": 14000,
+        "dense_int16_key_bytes": 7000,
+        "constant_stripped_key_bytes": 400,
+        "track_descriptor_bytes_n64": 16,
+        "event_bytes_n64": 0,
+        "clip_descriptor_bytes_n64": 36,
+        "omitted_rest_tracks": 38,
+        "constant_tracks": 0,
+        "animated_tracks": 2,
+        "error": {
+          "tested_pose_samples": 97,
+          "max_vertex_error_m": 0.0011218929420134956,
+          "rms_vertex_error_m": 0.00022533616388756796,
+          "max_socket_error_m": 0.0007794617752457498,
+          "bounds_min": [
+            -0.4589316174954788,
+            0.004000000189989698,
+            -0.1599999964237213
+          ],
+          "bounds_max": [
+            0.4589316174954788,
+            1.845000267028809,
+            0.21600000560283678
+          ],
+          "error_scope": "All source keys and their midpoints; sampled evidence, not a continuous-time error bound."
+        }
+      }
+    },
+    {
+      "id": "walk",
+      "fps": 30.0,
+      "duration": 1.2,
+      "sample_count": 37,
+      "dense_float_key_bytes": 20720,
+      "dense_int16_key_bytes": 10360,
+      "constant_stripped_key_bytes": 2910,
+      "track_descriptor_bytes_n64": 104,
+      "event_bytes_n64": 8,
+      "clip_descriptor_bytes_n64": 36,
+      "omitted_rest_tracks": 27,
+      "constant_tracks": 3,
+      "animated_tracks": 10,
+      "quantization_error": {
+        "tested_pose_samples": 73,
+        "max_vertex_error_m": 0.0001135704598286821,
+        "rms_vertex_error_m": 5.5136106934465835e-05,
+        "max_socket_error_m": 0.0001085108203169663,
+        "bounds_min": [
+          -0.45539828364317847,
+          0.003795218379711577,
+          -0.31798873098116437
+        ],
+        "bounds_max": [
+          0.45539828364317847,
+          1.7748496477178217,
+          0.46592439632611937
+        ],
+        "error_scope": "All source keys and their midpoints; sampled evidence, not a continuous-time error bound."
+      },
+      "comparison_15hz": {
+        "fps": 15.0,
+        "sample_count": 19,
+        "dense_float_key_bytes": 10640,
+        "dense_int16_key_bytes": 5320,
+        "constant_stripped_key_bytes": 1506,
+        "track_descriptor_bytes_n64": 104,
+        "event_bytes_n64": 8,
+        "clip_descriptor_bytes_n64": 36,
+        "omitted_rest_tracks": 27,
+        "constant_tracks": 3,
+        "animated_tracks": 10,
+        "error": {
+          "tested_pose_samples": 73,
+          "max_vertex_error_m": 0.0043671122363597974,
+          "rms_vertex_error_m": 0.0007897281631641034,
+          "max_socket_error_m": 0.0026974506026806832,
+          "bounds_min": [
+            -0.45539473823121385,
+            0.0029606442189180878,
+            -0.31798873098116437
+          ],
+          "bounds_max": [
+            0.45539473823121385,
+            1.7748496477178217,
+            0.46592439632611937
+          ],
+          "error_scope": "All source keys and their midpoints; sampled evidence, not a continuous-time error bound."
+        }
+      }
+    }
+  ],
+  "single_joint_triangles": 483,
+  "unique_bind_positions": 316,
+  "vertex_attribute_splits": {
+    "unique_positions": 316,
+    "with_joint_identity": 316,
+    "with_quantized_normals": 693,
+    "with_texture_coordinates": 997,
+    "note": "Cumulative distinct attribute tuples, before any target cache scheduling. A shared position may still require separate vertices for normals or UV seams."
+  },
+  "joint_connections": [
+    {
+      "bones": [
+        "upper_arm_l",
+        "forearm_l"
+      ],
+      "triangles": 12,
+      "referenced_vertices": 24
+    },
+    {
+      "bones": [
+        "thigh_l",
+        "shin_l"
+      ],
+      "triangles": 12,
+      "referenced_vertices": 24
+    },
+    {
+      "bones": [
+        "upper_arm_r",
+        "forearm_r"
+      ],
+      "triangles": 12,
+      "referenced_vertices": 24
+    },
+    {
+      "bones": [
+        "thigh_r",
+        "shin_r"
+      ],
+      "triangles": 12,
+      "referenced_vertices": 24
+    }
+  ],
+  "cross_joint_skinning_note": "Triangles may reference vertices owned by different bones. Every vertex still has exactly one influence; triangles join already-deformed vertices without multi-weight interpolation.",
+  "encoded_key_bytes": 8820,
+  "dense_float_key_bytes": 120400,
+  "dense_int16_key_bytes": 60200,
+  "geometry_bytes": 26117,
+  "joint_index_bytes": 997,
+  "skeleton_descriptor_bytes_n64": 1280,
+  "asset_descriptor_bytes_n64": 52,
+  "socket_descriptor_bytes_n64": 72,
+  "clip_and_track_descriptor_bytes_n64": 500,
+  "bounds_center": [
+    0,
+    0,
+    0
+  ],
+  "bounds_radius": 2.3337224945401993,
+  "bounds_policy": "Conservative hierarchy path-length sphere includes arbitrary rigid rotation, blending and head attention.",
+  "compression_policy": "Source sample rates preserved; int16 XYZW and XYZ, rest-channel removal and single-sample constants. 15 Hz is comparison only.",
+  "memory_note": "Immutable keys and geometry shared per asset. Target descriptor estimates exclude strings, final linker alignment, pose scratch, per-actor state and renderer caches; measure target sizeof separately.",
+  "source_sha256": "69d62710e4982a640ba515a1047bb67204fb451266c9b4e3fd4b7b7d7ff0997f"
+}

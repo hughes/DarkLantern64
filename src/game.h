@@ -12,6 +12,7 @@ extern "C" {
 typedef struct { float x, y, z; } DlVec3;
 typedef struct { float u, v; } DlVec2;
 typedef struct { int8_t x, y, z; } DlNormal; /* normalized XYZ quantized to -127..127 */
+struct DlAnimationAsset;
 typedef struct {
     DlVec3 position;
     float radius, intensity;
@@ -30,6 +31,7 @@ typedef struct {
     int index_count;
     const DlVec2 *uvs; /* optional; one UV per vertex, including duplicated seams */
     const DlNormal *normals; /* optional authored normals; NULL retains flat faces */
+    const struct DlAnimationAsset *animation; /* optional shared rigid skeleton/clips */
 } DlMesh;
 
 typedef enum { DL_MODEL_STATIC, DL_MODEL_GUARD, DL_MODEL_DOOR,
@@ -115,6 +117,7 @@ typedef struct {
     DlVec3 investigate_target;
     float search_timer;
     bool sees_player, heard_sound;
+    float animation_distance, animation_speed; /* actual horizontal travel; presentation only */
 } DlEnemy;
 typedef enum { DL_EVENT_NONE, DL_EVENT_STEP, DL_EVENT_NOISE, DL_EVENT_DOOR,
                DL_EVENT_DETECTED, DL_EVENT_OBJECTIVE } DlEvent;

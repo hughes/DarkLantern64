@@ -27,8 +27,15 @@ int dl_render_texture_upload_count(void);
 int dl_render_model_count(void);
 int dl_render_visible_model_count(void);
 int dl_render_transformed_vertex_count(void);
+/* Animation sub-costs belong to the transforms section. Flushes a window of
+ * CPU pose/skinning costs; these are emulator CPU ticks, not RSP/RDP timings.
+ * Window totals cover all visible models; maxima are per individual pose. */
+void dl_render_report_animation(void);
 #if defined(DL_CAPTURE) || defined(DL_MENU_TEST)
 void dl_render_request_capture(int id);
+#endif
+#ifdef DL_CAPTURE
+void dl_render_set_animation_preview(const char *clip,float time,float yaw,float pitch);
 #endif
 /* Legacy aggregate elapsed time excluding waiting for a free VI buffer.
  * This includes audio interrupts and any internal graphics queue stalls;

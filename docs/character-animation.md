@@ -1,6 +1,6 @@
 # Artist-authored character animation
 
-Status: **proposed architecture**, researched September 6, 2026. No skeletal animation, character exporter, or renderer migration is implemented by this document. The numbers below are experiment budgets, not verified hardware limits. This extends the [architecture](architecture.md), [Blender workflow](blender-assets.md), [audio design](audio-design.md), and [scale study](scaling-guide.md).
+Status: **architecture with an implemented CPU reference prototype**, updated September 6, 2026. The [guard animation study](guard-animation-prototype.md) now proves Blender export, connected one-influence geometry, simple compression, shared assets, editor playback and N64 integration. Five clips occupy 8,820 key bytes, but the measured two-guard workshop runs at roughly 10 fps; RSP acceleration and production performance remain future work. LightEngine's dynamic preview support is published in [PR #17](https://github.com/hughes/LightEngine/pull/17), pending review. Unless explicitly identified as measured, the numbers below are experiment budgets, not verified hardware limits. This extends the [architecture](architecture.md), [Blender workflow](blender-assets.md), [audio design](audio-design.md), and [scale study](scaling-guide.md).
 
 ## Recommended direction
 
@@ -12,24 +12,24 @@ The N64's RSP is programmable vector hardware, suitable for transforming and lig
 
 ## What exists today
 
-| Current seam | Required extension |
+| Current seam | Implemented prototype and remaining work |
 | --- | --- |
-| `tools/blender/darklantern64_export/__init__.py` exports an evaluated pose to OBJ. | Add a character export path carrying a bind mesh, deformation skeleton and clips. Preserve the static prop path. |
-| `tools/asset_pack.py` accepts version-1 OBJ assets and static prefabs. | Introduce a versioned character asset contract and stable skeleton/clip/socket identities. |
-| `tools/compile_level.py` emits static meshes and preview glTF. | Cook character data, motion bounds, events and memory reports; retain links to shared assets. |
-| LightEngine's glTF loader and vertex format have no skin/clip support. | Add a generic character preview component and pose rendering; do not turn every bone into a level entity. |
-| `src/render.c` moves each guard as one rigid mesh. | Evaluate a pose and draw an articulated character, with correct deformed normals and bounds. |
-| `src/game.c` owns movement and guard behavior. | Add presentation requests and a logical animation timeline without transferring collision authority to the renderer. |
+| Static Blender prop export remains available. | `tools/guard_assets.py` exports the saved guard's bind mesh, rig and Actions. A general character-export UI remains future work. |
+| Level/pack assets accept `type: "character"`. | Version-1 character JSON defines stable bone, clip and socket identities with one influence per vertex. Production glTF/GLB interchange remains proposed. |
+| `tools/character_assets.py` and the level/bundle compiler cook characters. | Quantized keys, constant/rest-channel removal, conservative bounds, events, error reports and shared bundle data are implemented. Variable-rate compression is not. |
+| LightEngine provides fixed-topology mesh updates. | The project editor runs the shared C sampler and CPU skinning for connected meshes, with rigid-part previews as a fallback. Desktop lighting remains separate. |
+| `src/animation.c` samples/blends poses; `src/render.c` deforms geometry and normals on the CPU. | Idle/walk gameplay blending and bounded head attention work. RSP transforms, animation LOD and production-speed rendering remain future work. |
+| `src/game.c` retains collision and movement authority. | Actual-distance gait and foot-contact playback are integrated; the broader animation controller and shared audio/AI event queue remain proposed. |
 
 The present renderer reserves caches for up to **128 models, 4,096 instanced vertices and 4,096 instanced triangles**. Its limits count every placed instance, even if the source mesh is shared. Eight 500-vertex guards would consume almost the entire vertex capacity before scenery. The 16-enemy authoring limit does not establish capacity for 16 animated guards.
 
-Bundled levels currently retain all their geometry, with separate geometry compilation per level; texture payloads have deduplication. A character library must therefore be shared across the bundle as well as across actors within a level. Simply copying a skeleton and clips into each generated level header would waste the memory we are trying to save.
+Bundled levels retain their static-world geometry with separate compilation per level; texture payloads have deduplication. Character geometry, skeletons, clips and sockets now use one generated C definition per source hash across the bundle. Actors share these immutable assets while retaining independent motion state and per-instance renderer caches.
 
 ## Artist and designer workflow
 
 1. **Create a character in Blender.** Artists can use control rigs, inverse kinematics and constraints for authoring. Export bakes their evaluated result onto a separate small deformation skeleton; control bones and Blender constraint solvers stay on the workstation.
 2. **Author named clips.** Begin with idle, walk, run, turn, notice/listen, investigate, attack and fall. Use explicit clip ranges, loop flags and semantic markers such as left-foot contact. A clip's stable identity must survive renaming its display label.
-3. **Export a character pack.** Use glTF/GLB as the interchange representation for skin, joint hierarchy and transform tracks, plus a project manifest for clip roles, event markers, sockets, root-motion policy and target settings. glTF already specifies skin attributes, inverse bind matrices, transform animation and joint attachments. It does not define our footstep or AI semantics. [glTF 2.0 specification](https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#skins)
+3. **Export a character pack.** The guard prototype uses an explicit versioned JSON bake. For a general interchange path, evaluate glTF/GLB for skin, joint hierarchy and transform tracks, plus a manifest for clip roles, event markers, sockets, root-motion policy and target settings. glTF specifies skin attributes, inverse bind matrices, transform animation and joint attachments, while our footstep/AI semantics need project metadata. [glTF 2.0 specification](https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#skins)
 4. **Cook and inspect the target result.** Reduce and quantize tracks, apply the target influence policy, validate materials, and calculate motion bounds. Show source-versus-cooked deformation and compression error before publishing. Extra weights must produce a visible diagnostic or explicit approved reduction, rather than quietly disappearing.
 5. **Use the character in LightEngine.** Designers choose an enemy type and compatible character/animation set, place actors, and author patrols as today. Character assets own motion; level files reference them. Reimport preserves actor placement and behavior overrides.
 6. **Play the level or a named test start.** The existing launch workflow remains the entry point. Animation inspection and stress fixtures belong inside the editor and developer tools, without adding another daily VS Code task.
@@ -51,7 +51,7 @@ Adopting Tiny3D would require an offline bridge from our materials to its suppor
 
 For the first art experiment, try a close guard around 300–500 triangles and a cheaper variant around 150–250. These are comparison targets, not acceptance limits. Report the **cooked** vertex count after UV, material, normal and joint boundaries split vertices. Materials, overdraw, attachments, lights and clipping can matter as much as the triangle count.
 
-One-influence meshes can still be continuous: vertices on either side of a joint follow different bones. They are not limited to visibly disconnected body parts. However, elbows, shoulders and hips will deform differently from a smoothly weighted desktop character. Spend geometry at these joints and inspect crouching, reaching and turning, not just an idle pose. Armor, belts and sleeve construction can make the restriction work with the character design. The Tiny3D author's current asset documentation explicitly describes selecting the strongest weight when several are supplied; our cooker should surface that conversion to the artist. [Author's skinning notes](https://hailtododongo.github.io/pyrite64/docs/manual/assets/model3d.html#skinning)
+One-influence meshes can be continuous: vertices on either side of a joint follow different bones, and triangles connect them. The guard demonstrates this with 48 elbow/knee triangles; its [study](guard-animation-prototype.md#connected-joints-and-the-n64-vertex-cache) records the Kaze, Nintendo and Fast64 references. Elbows, shoulders and hips still deform differently from smoothly weighted desktop characters. Inspect crouching, reaching and turning as well as idle poses. The Tiny3D author's asset documentation describes selecting the strongest weight when several are supplied; our current exporter rejects extra weights instead of reducing them silently. [Author's skinning notes](https://hailtododongo.github.io/pyrite64/docs/manual/assets/model3d.html#skinning)
 
 Rigid articulated parts are an especially cheap fit for armor and mechanical enemies. A few morph targets or vertex-animated regions may later help unusual creatures or expressions, but full per-frame vertex animation should not be the default guard format. Begin faces with a jaw/head bone and small eye or mouth texture changes if needed.
 
@@ -106,7 +106,7 @@ Reduced visual update rates are an optimization to measure, not permission to re
 
 ## Footsteps, voices and gameplay events
 
-This integration is essential for DarkLantern64. Currently, `src/main.c` synthesizes guard steps from traveled distance and sends them directly to playback. They are not generated by an artist's foot contact and do not traverse the player-sound AI-hearing path. The game also retains only one latest event, which is insufficient for simultaneous animated actors.
+This integration is essential for DarkLantern64. Animated guards now advance authored walk contacts from actual traveled distance, including while culled, and `src/main.c` sends them through the existing audible guard-step path. Static models retain the distance-threshold fallback. These sounds still do not traverse the player-sound AI-hearing path; terrain-specific contact positions and a shared event queue remain future work. The game's single latest event is insufficient for simultaneous actor stimuli.
 
 Introduce a bounded semantic event queue. A foot-contact event carries an actor ID, simulation timestamp, left/right foot, contact location and movement intensity. Resolve the surface material there, then feed the same event into player audio and AI acoustics. Listener rules can ignore self-generated steps or recognize routine friendly movement; audibility does not automatically mean alarm. Choosing or dropping a playback voice must not erase the corresponding gameplay stimulus. Define priority and overflow behavior explicitly; instrument missed deadlines or overflow.
 
@@ -118,7 +118,7 @@ Artists specify semantic contacts and gestures, not particular audio file paths.
 
 Store sockets such as `hand_r`, `hand_l`, `head` and `belt` in the character definition. A weapon, lantern or purse uses the socket transform plus an authored offset, while keeping its own gameplay identity where needed. A swinging lantern can attach an actual dynamic light, but its illumination and shadow-query costs must be budgeted separately from the animation.
 
-Transform normals consistently with the pose. The current nighttime actor path shares two body-light probes but applies one RGB result across all corners. For animated guards, retain cheap probes for environmental visibility and add directional or hemisphere response using the deformed normals. Otherwise a moving, smoothly modeled body can still look flat. Avoid per-vertex world shadow traces for every animated guard.
+Transform normals consistently with the pose. The prototype now deforms character normals and combines them with the existing environmental probes and directional lighting response. Its normal cache costs 11,964 bytes per 997-vertex guard, and lighting remains expensive. Preserve cheap environmental visibility probes when replacing the CPU geometry path; avoid per-vertex world shadow traces for every animated guard.
 
 Cook conservative bounds that cover full motion, attachments, transitions and allowed procedural offsets. Rest-pose bounds are insufficient. Sampled motion bounds need conservative padding or stronger bounds construction for interpolation between samples; verify extended weapons, falls and raised arms at frustum edges. A culled guard must still have valid logical state and sound events.
 
@@ -139,11 +139,13 @@ These libraries are not limited to emulator-only experiments. Cathode Quest 64 h
 
 ## First implementation milestone
 
+The initial source/export/cook/preview/runtime milestone is implemented and measured in the [guard animation study](guard-animation-prototype.md). Remaining work below focuses on backend comparison, a broader controller and scale. Idle/walk blending, manual transition preview and head attention are available; attachment rendering, skeleton/socket overlays, foot IK and the shared audio/AI event system are not yet implemented.
+
 Use one asymmetric, artist-editable humanoid with idle, walk, run, notice and turn clips, a hand socket, and two foot-contact markers. Include a planted-foot loop and a wide-reaching pose specifically to expose sliding, deformation and bounds errors.
 
 First establish export, cooking, target preview and one animated guard following its existing patrol. Then compare the CPU reference against an RSP path in the same room, with the same camera, mesh, lighting and ordinary audio. Include the existing material conversion and SDK compatibility work in this spike. Do not make full smooth skinning a prerequisite for evaluating the geometry backend.
 
-Next run 1, 2, 4 and 8 actor cases with visible and occluded groups, synchronized transitions, a moving attachment and audio-heavy moments. These are attempted workloads, not promised supported counts. Report simulation, sampling, blending, hierarchy, transforms/skinning, lighting, submission, queue waits, RSP activity and audio underruns separately. Record shared resident assets, per-actor allocations and transition high-water memory; existing guard studies exclude skeletal animation.
+Next run 1, 2, 4 and 8 actor cases with visible and occluded groups, synchronized transitions, a moving attachment and audio-heavy moments. These are attempted workloads, not promised supported counts. Report simulation, sampling, blending, hierarchy, transforms/skinning, lighting, submission, queue waits, RSP activity and audio underruns separately. Record shared resident assets, per-actor allocations and transition high-water memory; the earlier mission-scale guard studies exclude skeletal animation, and the new prototype provides only a short two-guard runtime measurement.
 
 The editor's first animation panel should provide clip selection, play/pause/scrub, transition preview, skeleton/socket display, contacts, source-versus-cooked comparison, and a target cost report. Its command interface should expose the same deterministic clip/time/transition controls for automated comparison captures. Ares proves runtime integration; original N64 and M64 establish final performance and presentation.
 

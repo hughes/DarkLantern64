@@ -1,0 +1,336 @@
+{
+  "passed": true,
+  "source_sha256": "f4781afec86b84f850b447f15adeb6a5b836ed8768a8407e958a8e42d843c1a0",
+  "run": {
+    "name": "guard-animation",
+    "passed": true,
+    "log": ".dev\\ares\\runs\\a217ac40d46a47059a9b092961e2519b\\guard-animation.log",
+    "tested_rom": ".dev\\ares\\runs\\a217ac40d46a47059a9b092961e2519b\\DarkLantern64-animation_workshop.z64",
+    "rom_sha256": "7daae7bb6cd947fb62d642840c54fbb87677a1e5638856dbdd4132006d708501",
+    "rom_bytes": 344064,
+    "settings": ".dev\\ares\\runs\\a217ac40d46a47059a9b092961e2519b\\settings.bml",
+    "settings_source_sha256": "f7bb747f78c0dc059ca1c5c003c2a1af282105752c483514d265c14b61c67e06",
+    "profile_report": null,
+    "elapsed_seconds": 10.563,
+    "peak_sampled_heap_bytes": 656192,
+    "max_reported_cpu_ms": 91.76,
+    "boot": "DL64 boot_ok memory=8388608 scene=\"DarkLantern64 - Guard Animation Workshop\" meshes=2 models=12 colliders=8 version=2 world=3d renderer=xyz-mesh-rdpq depth=hardware",
+    "terminal_event": "DL64 profile_end window=6"
+  },
+  "animation": {
+    "frames": 62,
+    "poses": 124,
+    "sample_ms_per_frame": 1.178281634408602,
+    "sample_ms_per_pose": 0.589140817204301,
+    "deform_normal_instance_ms_per_frame": 23.91272017204301,
+    "deform_normal_instance_ms_per_pose": 11.956360086021505,
+    "max_individual_pose_sample_ms": 0.854464,
+    "max_individual_pose_deform_ms": 12.109781333333332,
+    "scope": "CPU elapsed ticks excluding audio interrupts, nested within transforms; deformation includes normals and instance transforms."
+  },
+  "runtime_allocations": {
+    "models": "2",
+    "shared_matrix_bytes": "1536",
+    "pose_scratch_arrays_bytes": "1792",
+    "normal_cache_bytes": "23928",
+    "per_enemy_motion_bytes": "8",
+    "timeline": "actual-distance",
+    "head_yaw_max": "45",
+    "head_pitch_max": "25"
+  },
+  "profile": {
+    "schema_version": 1,
+    "measurement": "Emulated CPU-timer elapsed time; not CPU utilization or host CPU time",
+    "source_log": "C:\\Users\\hughe\\dev\\DarkLantern64\\.dev\\ares\\runs\\a217ac40d46a47059a9b092961e2519b\\guard-animation.log",
+    "source_log_sha256": "1315d62c8d2f3900a65f60559859cef21ab0a8d71fd098da4c525f1f21857f46",
+    "source_log_bytes": 13267,
+    "complete_windows": 6,
+    "frames": 62,
+    "ignored_trailing_partial_window": false,
+    "ticks_per_second": 46875000,
+    "target_fps": 30,
+    "frame_budget_ms": 33.333333333333336,
+    "debug_states": [
+      0
+    ],
+    "debug_frames": {
+      "0": 62
+    },
+    "audio_calls": 155,
+    "frame": {
+      "total_ticks": 289593050,
+      "max_ticks": 4894505,
+      "average_ms": 99.64492043010753,
+      "max_ms": 104.41610666666666,
+      "percent_of_30fps_budget": 298.9347612903226,
+      "percent_of_frame_elapsed": 100.0
+    },
+    "slots": {
+      "input": {
+        "total_ticks": 159418,
+        "max_ticks": 3916,
+        "average_ms": 0.054853505376344085,
+        "max_ms": 0.08354133333333333,
+        "percent_of_30fps_budget": 0.16456051612903227,
+        "percent_of_frame_elapsed": 0.055048973033019956
+      },
+      "gameplay": {
+        "total_ticks": 4224264,
+        "max_ticks": 74186,
+        "average_ms": 1.4535101935483872,
+        "max_ms": 1.5826346666666666,
+        "percent_of_30fps_budget": 4.360530580645162,
+        "percent_of_frame_elapsed": 1.458689702670696
+      },
+      "audio_events": {
+        "total_ticks": 138475,
+        "max_ticks": 6936,
+        "average_ms": 0.04764731182795699,
+        "max_ms": 0.147968,
+        "percent_of_30fps_budget": 0.14294193548387096,
+        "percent_of_frame_elapsed": 0.04781710058304231
+      },
+      "audio_mix": {
+        "total_ticks": 3641113,
+        "max_ticks": 218917,
+        "average_ms": 1.2528560860215052,
+        "max_ms": 4.670229333333333,
+        "percent_of_30fps_budget": 3.7585682580645154,
+        "percent_of_frame_elapsed": 1.2573205745096439
+      },
+      "cache": {
+        "total_ticks": 0,
+        "max_ticks": 0,
+        "average_ms": 0.0,
+        "max_ms": 0.0,
+        "percent_of_30fps_budget": 0.0,
+        "percent_of_frame_elapsed": 0.0
+      },
+      "transforms": {
+        "total_ticks": 99680086,
+        "max_ticks": 1623906,
+        "average_ms": 34.29852421505376,
+        "max_ms": 34.643328,
+        "percent_of_30fps_budget": 102.8955726451613,
+        "percent_of_frame_elapsed": 34.42074524923854
+      },
+      "lighting": {
+        "total_ticks": 56660430,
+        "max_ticks": 919193,
+        "average_ms": 19.496061935483873,
+        "max_ms": 19.609450666666667,
+        "percent_of_30fps_budget": 58.488185806451625,
+        "percent_of_frame_elapsed": 19.565535153554272
+      },
+      "triangles": {
+        "total_ticks": 94264106,
+        "max_ticks": 1603275,
+        "average_ms": 32.434961204301075,
+        "max_ms": 34.2032,
+        "percent_of_30fps_budget": 97.30488361290323,
+        "percent_of_frame_elapsed": 32.550541527153364
+      },
+      "hud": {
+        "total_ticks": 4744726,
+        "max_ticks": 81215,
+        "average_ms": 1.6325938924731183,
+        "max_ms": 1.7325866666666667,
+        "percent_of_30fps_budget": 4.8977816774193546,
+        "percent_of_frame_elapsed": 1.638411557183434
+      },
+      "debug_hud": {
+        "total_ticks": 0,
+        "max_ticks": 0,
+        "average_ms": 0.0,
+        "max_ms": 0.0,
+        "percent_of_30fps_budget": 0.0,
+        "percent_of_frame_elapsed": 0.0
+      },
+      "render_setup": {
+        "total_ticks": 342027,
+        "max_ticks": 7663,
+        "average_ms": 0.11768670967741936,
+        "max_ms": 0.16347733333333334,
+        "percent_of_30fps_budget": 0.35306012903225803,
+        "percent_of_frame_elapsed": 0.11810608023914938
+      },
+      "display_wait": {
+        "total_ticks": 24750616,
+        "max_ticks": 692420,
+        "average_ms": 8.516340989247313,
+        "max_ms": 14.771626666666666,
+        "percent_of_30fps_budget": 25.54902296774194,
+        "percent_of_frame_elapsed": 8.546688534134365
+      },
+      "other": {
+        "total_ticks": 987789,
+        "max_ticks": 142307,
+        "average_ms": 0.33988438709677415,
+        "max_ms": 3.0358826666666667,
+        "percent_of_30fps_budget": 1.0196531612903226,
+        "percent_of_frame_elapsed": 0.3410955477004714
+      }
+    },
+    "limitations": [
+      "Ares timing model; original N64 and M64 hardware validation remains pending.",
+      "Slot maxima are worst observed per-frame totals and must not be added together.",
+      "Submission scopes include internal queue stalls; this does not time RDP/GPU execution.",
+      "Audio callback time is attributed exclusively; other interrupts remain in the interrupted scope.",
+      "Profiling and enabled debug display add overhead. Incomplete trailing records are excluded."
+    ]
+  },
+  "actor_samples": {
+    "animated-patrol": [
+      {
+        "index": 0,
+        "position": [
+          -1.26,
+          0.0,
+          1.2
+        ],
+        "state": "PATROL",
+        "patrol_index": 0
+      },
+      {
+        "index": 0,
+        "position": [
+          -1.7,
+          0.0,
+          1.2
+        ],
+        "state": "PATROL",
+        "patrol_index": 0
+      },
+      {
+        "index": 0,
+        "position": [
+          -2.1,
+          0.0,
+          1.2
+        ],
+        "state": "PATROL",
+        "patrol_index": 0
+      },
+      {
+        "index": 0,
+        "position": [
+          -2.22,
+          0.0,
+          1.2
+        ],
+        "state": "PATROL",
+        "patrol_index": 1
+      },
+      {
+        "index": 0,
+        "position": [
+          -1.82,
+          0.0,
+          1.2
+        ],
+        "state": "PATROL",
+        "patrol_index": 1
+      },
+      {
+        "index": 0,
+        "position": [
+          -1.42,
+          0.0,
+          1.2
+        ],
+        "state": "PATROL",
+        "patrol_index": 1
+      },
+      {
+        "index": 0,
+        "position": [
+          -1.02,
+          0.0,
+          1.2
+        ],
+        "state": "PATROL",
+        "patrol_index": 1
+      }
+    ],
+    "animated-sentry": [
+      {
+        "index": 1,
+        "position": [
+          1.45,
+          0.0,
+          1.2
+        ],
+        "state": "PATROL",
+        "patrol_index": 0
+      },
+      {
+        "index": 1,
+        "position": [
+          1.45,
+          0.0,
+          1.2
+        ],
+        "state": "PATROL",
+        "patrol_index": 0
+      },
+      {
+        "index": 1,
+        "position": [
+          1.45,
+          0.0,
+          1.2
+        ],
+        "state": "PATROL",
+        "patrol_index": 0
+      },
+      {
+        "index": 1,
+        "position": [
+          1.45,
+          0.0,
+          1.2
+        ],
+        "state": "PATROL",
+        "patrol_index": 0
+      },
+      {
+        "index": 1,
+        "position": [
+          1.45,
+          0.0,
+          1.2
+        ],
+        "state": "PATROL",
+        "patrol_index": 0
+      },
+      {
+        "index": 1,
+        "position": [
+          1.45,
+          0.0,
+          1.2
+        ],
+        "state": "PATROL",
+        "patrol_index": 0
+      },
+      {
+        "index": 1,
+        "position": [
+          1.45,
+          0.0,
+          1.2
+        ],
+        "state": "PATROL",
+        "patrol_index": 0
+      }
+    ]
+  },
+  "checks": [
+    "Ordinary 8 MiB ROM runs two independently animated guards with audio",
+    "Patrol advances through its route while sentry holds its post",
+    "Pose and deformation timing records have valid clocks and nonzero work",
+    "Bounded pose scratch, shared matrices and actual normal cache bytes reported",
+    "Canonical level unchanged; owned Ares process closed by harness"
+  ],
+  "limitations": "Short stationary emulator workload; original N64/M64, crowded chases and worst-case audio remain unmeasured."
+}

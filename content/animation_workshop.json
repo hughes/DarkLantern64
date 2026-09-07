@@ -1,0 +1,696 @@
+{
+  "version": 2,
+  "title": "DarkLantern64 - Guard Animation Workshop",
+  "assets": [
+    {
+      "id": "mesh-block",
+      "uri": "models/block.obj"
+    },
+    {
+      "id": "mesh-guard",
+      "type": "character",
+      "uri": "assets/guard/guard.character.json"
+    }
+  ],
+  "materials": [
+    {
+      "id": "mat-stone",
+      "color": [
+        0.3,
+        0.35,
+        0.42,
+        1
+      ]
+    },
+    {
+      "id": "mat-wood",
+      "color": [
+        0.35,
+        0.2,
+        0.08,
+        1
+      ]
+    },
+    {
+      "id": "mat-switch",
+      "color": [
+        0.15,
+        0.7,
+        0.35,
+        1
+      ]
+    },
+    {
+      "id": "mat-gold",
+      "color": [
+        0.95,
+        0.66,
+        0.12,
+        1
+      ]
+    },
+    {
+      "id": "mat-guard",
+      "color": [
+        1,
+        1,
+        1,
+        1
+      ],
+      "double_sided": false,
+      "texture": {
+        "uri": "assets/guard/guard-atlas.png",
+        "width": 32,
+        "height": 32,
+        "format": "RGBA16"
+      }
+    }
+  ],
+  "entities": [
+    {
+      "id": "floor",
+      "kind": "static",
+      "transform": {
+        "position": [
+          0,
+          -0.1,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          8.4,
+          0.2,
+          8.4
+        ]
+      },
+      "model": "mesh-block",
+      "material": "mat-stone",
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          0.5,
+          0.5,
+          0.5
+        ]
+      }
+    },
+    {
+      "id": "west-wall",
+      "kind": "static",
+      "transform": {
+        "position": [
+          -4,
+          1.5,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          0.2,
+          3,
+          8.2
+        ]
+      },
+      "model": "mesh-block",
+      "material": "mat-stone",
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          0.5,
+          0.5,
+          0.5
+        ]
+      }
+    },
+    {
+      "id": "east-wall",
+      "kind": "static",
+      "transform": {
+        "position": [
+          4,
+          1.5,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          0.2,
+          3,
+          8.2
+        ]
+      },
+      "model": "mesh-block",
+      "material": "mat-stone",
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          0.5,
+          0.5,
+          0.5
+        ]
+      }
+    },
+    {
+      "id": "north-wall",
+      "kind": "static",
+      "transform": {
+        "position": [
+          0,
+          1.5,
+          -4
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          8.2,
+          3,
+          0.2
+        ]
+      },
+      "model": "mesh-block",
+      "material": "mat-stone",
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          0.5,
+          0.5,
+          0.5
+        ]
+      }
+    },
+    {
+      "id": "south-wall",
+      "kind": "static",
+      "transform": {
+        "position": [
+          0,
+          1.5,
+          4
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          8.2,
+          3,
+          0.2
+        ]
+      },
+      "model": "mesh-block",
+      "material": "mat-stone",
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          0.5,
+          0.5,
+          0.5
+        ]
+      }
+    },
+    {
+      "id": "divider-west",
+      "kind": "static",
+      "transform": {
+        "position": [
+          -2.425,
+          1.5,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          3.15,
+          3,
+          0.2
+        ]
+      },
+      "model": "mesh-block",
+      "material": "mat-stone",
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          0.5,
+          0.5,
+          0.5
+        ]
+      }
+    },
+    {
+      "id": "divider-east",
+      "kind": "static",
+      "transform": {
+        "position": [
+          2.425,
+          1.5,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          3.15,
+          3,
+          0.2
+        ]
+      },
+      "model": "mesh-block",
+      "material": "mat-stone",
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          0.5,
+          0.5,
+          0.5
+        ]
+      }
+    },
+    {
+      "id": "door",
+      "kind": "door",
+      "transform": {
+        "position": [
+          0,
+          1.5,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1.6,
+          3,
+          0.15
+        ]
+      },
+      "model": "mesh-block",
+      "material": "mat-wood",
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          0.5,
+          0.5,
+          0.5
+        ]
+      }
+    },
+    {
+      "id": "door-switch",
+      "kind": "control",
+      "transform": {
+        "position": [
+          -1.05,
+          0.9,
+          0.25
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          0.22,
+          0.3,
+          0.18
+        ]
+      },
+      "model": "mesh-block",
+      "material": "mat-switch",
+      "target": "door"
+    },
+    {
+      "id": "mission-relic",
+      "kind": "objective",
+      "transform": {
+        "position": [
+          0,
+          0.65,
+          -2.5
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          0.35,
+          0.65,
+          0.35
+        ]
+      },
+      "model": "mesh-block",
+      "material": "mat-gold"
+    },
+    {
+      "id": "player-start",
+      "kind": "spawn",
+      "transform": {
+        "position": [
+          0,
+          0,
+          3.4
+        ],
+        "rotation": [
+          0,
+          180,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "id": "entry-light",
+      "kind": "light",
+      "transform": {
+        "position": [
+          1.45,
+          2.6,
+          2.2
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "radius": 5,
+      "intensity": 2.5,
+      "color": [
+        1,
+        0.78,
+        0.5
+      ]
+    },
+    {
+      "id": "relic-light",
+      "kind": "light",
+      "transform": {
+        "position": [
+          0,
+          2.6,
+          -2
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "radius": 5,
+      "intensity": 1.0,
+      "color": [
+        1,
+        0.78,
+        0.5
+      ]
+    },
+    {
+      "id": "patrol-left",
+      "kind": "waypoint",
+      "transform": {
+        "position": [
+          -2.5,
+          0,
+          1.2
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "id": "patrol-right",
+      "kind": "waypoint",
+      "transform": {
+        "position": [
+          -0.8,
+          0,
+          1.2
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "id": "animated-patrol",
+      "kind": "guard",
+      "model": "mesh-guard",
+      "material": "mat-guard",
+      "transform": {
+        "position": [
+          -1.25,
+          0,
+          1.2
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "enemy_type": "watchman",
+      "behavior": "patrol",
+      "patrol": [
+        "patrol-left",
+        "patrol-right"
+      ],
+      "speed": 0.8,
+      "sight_range": 0.3,
+      "hearing_range": 0.2
+    },
+    {
+      "id": "animated-sentry",
+      "kind": "guard",
+      "model": "mesh-guard",
+      "material": "mat-guard",
+      "transform": {
+        "position": [
+          1.45,
+          0,
+          1.2
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "enemy_type": "watchman",
+      "behavior": "sentry",
+      "patrol": [],
+      "sight_range": 0.3,
+      "hearing_range": 0.2
+    }
+  ],
+  "test_starts": [
+    {
+      "id": "guard-front",
+      "label": "Guard animation close view",
+      "position": [
+        1.45,
+        0,
+        3.4
+      ],
+      "yaw": 180,
+      "pitch": -16,
+      "door_open": false
+    },
+    {
+      "id": "two-guards",
+      "label": "Patrol and sentry",
+      "position": [
+        0,
+        0,
+        3.4
+      ],
+      "yaw": 180,
+      "pitch": -12
+    }
+  ],
+  "views": [
+    {
+      "id": "guard-idle",
+      "position": [
+        1.45,
+        0,
+        3.4
+      ],
+      "yaw": 180,
+      "pitch": -16,
+      "animation_clip": "idle",
+      "animation_time": 0,
+      "head_yaw": 0,
+      "head_pitch": 0
+    },
+    {
+      "id": "guard-walk",
+      "position": [
+        1.45,
+        0,
+        3.4
+      ],
+      "yaw": 180,
+      "pitch": -16,
+      "animation_clip": "walk",
+      "animation_time": 0.3,
+      "head_yaw": 0,
+      "head_pitch": 0
+    },
+    {
+      "id": "guard-run",
+      "position": [
+        1.45,
+        0,
+        3.4
+      ],
+      "yaw": 180,
+      "pitch": -16,
+      "animation_clip": "run",
+      "animation_time": 0.2,
+      "head_yaw": 0,
+      "head_pitch": 0
+    },
+    {
+      "id": "guard-notice",
+      "position": [
+        1.45,
+        0,
+        3.4
+      ],
+      "yaw": 180,
+      "pitch": -16,
+      "animation_clip": "notice",
+      "animation_time": 0.7,
+      "head_yaw": 0,
+      "head_pitch": 0
+    },
+    {
+      "id": "guard-attention",
+      "position": [
+        1.45,
+        0,
+        3.4
+      ],
+      "yaw": 180,
+      "pitch": -16,
+      "animation_clip": "idle",
+      "animation_time": 0,
+      "head_yaw": 38,
+      "head_pitch": -12
+    },
+    {
+      "id": "guard-turn",
+      "position": [
+        1.45,
+        0,
+        3.4
+      ],
+      "yaw": 180,
+      "pitch": -16,
+      "animation_clip": "turn",
+      "animation_time": 0.6,
+      "head_yaw": 0,
+      "head_pitch": 0
+    }
+  ]
+}

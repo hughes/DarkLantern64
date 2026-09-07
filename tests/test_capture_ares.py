@@ -132,6 +132,15 @@ class CapturePreflightTests(unittest.TestCase):
             with self.subTest(value=value),self.assertRaisesRegex(ValueError,'animation_time'):
                 capture.validate_views({'views':[dict(self.view,animation_time=value)]})
 
+    def test_character_clip_and_attention_capture_fields(self):
+        view = dict(self.view, animation_clip="walk", head_yaw=45, head_pitch=-25)
+        self.assertEqual(capture.validate_views({"views": [view]}), [view])
+        for fields in ({"animation_clip": 'walk"'}, {"animation_clip": True},
+                       {"head_yaw": 46}, {"head_pitch": -26}, {"head_yaw": float("nan")},
+                       {"head_pitch": True}):
+            with self.subTest(fields=fields), self.assertRaises(ValueError):
+                capture.validate_views({"views": [dict(self.view, **fields)]})
+
     def test_scene_output_mapping_and_content_boundaries(self):
         with patch.object(sys, "path", [str(ROOT/"tools"),*sys.path]):
             builder=importlib.import_module("build")

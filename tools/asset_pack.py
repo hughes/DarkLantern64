@@ -73,9 +73,17 @@ def load_pack(uri, asset_root=ROOT / "content"):
             require(ident not in seen, f"Duplicate asset pack ID: {ident}")
             seen.add(ident)
     for item in pack["assets"]:
-        fields(item, {"id", "uri"}, set(), item["id"])
-        path = content_path(item["uri"], asset_root, {".obj"})
-        require(path.stat().st_size <= 8 * 1024 * 1024, f"{item['id']}: OBJ exceeds 8 MiB")
+        fields(item, {"id", "uri"}, {"type"}, item["id"])
+        require(item.get("type", "mesh") in ("mesh", "character"), "Unsupported asset type")
+        character = item.get("type") == "character"
+        path = content_path(item["uri"], asset_root, {".json"} if character else {".obj"})
+        require(path.stat().st_size <= (32 if character else 8) * 1024 * 1024, f"{item['id']}: asset source too large")
+        if character:
+            try:
+                from character_assets import load_character
+            except ModuleNotFoundError:
+                from tools.character_assets import load_character
+            load_character(path)
     for item in pack["materials"]:
         fields(item, {"id", "color"}, {"texture", "emissive", "double_sided"}, item["id"])
         vector(item["color"], "Material RGBA", 4, 0, 1)

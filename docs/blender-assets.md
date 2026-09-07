@@ -1,5 +1,7 @@
 # Blender props: edit, export, place, play
 
+For the rigged guard, five editable Actions and animation export, use the [guard animation workflow](guard-animation-prototype.md). This page covers static props and asset packs.
+
 The Blender asset pipeline turns saved mesh objects into reusable props for the LightEngine level editor and the N64 game. Start with `art/loot.blend`: coins, a goblet, a jewel, a purse and a scepter. These are static modeled props; collectible behavior is separate future work.
 
 ![The five exported meshes in Blender's authoring studio](images/loot-blender.png)

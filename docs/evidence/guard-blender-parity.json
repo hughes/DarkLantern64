@@ -1,0 +1,44 @@
+{
+  "passed": true,
+  "blender_version": "5.3.0 Alpha",
+  "clips": [
+    {
+      "id": "idle",
+      "tested_poses": 121,
+      "source_key_max_error_m": 6.248508218341318e-07,
+      "half_frame_bake_max_error_m": 5.623090941939713e-07,
+      "worst_half_frame_time": 1.05
+    },
+    {
+      "id": "notice",
+      "tested_poses": 85,
+      "source_key_max_error_m": 7.402743308767212e-07,
+      "half_frame_bake_max_error_m": 6.124361938611883e-07,
+      "worst_half_frame_time": 0.6166666666666667
+    },
+    {
+      "id": "run",
+      "tested_poses": 49,
+      "source_key_max_error_m": 7.795920979944745e-07,
+      "half_frame_bake_max_error_m": 7.463979593734857e-07,
+      "worst_half_frame_time": 0.2833333333333333
+    },
+    {
+      "id": "turn",
+      "tested_poses": 97,
+      "source_key_max_error_m": 6.034510353599962e-07,
+      "half_frame_bake_max_error_m": 5.448611169690556e-07,
+      "worst_half_frame_time": 0.6833333333333333
+    },
+    {
+      "id": "walk",
+      "tested_poses": 73,
+      "source_key_max_error_m": 6.573844478958581e-07,
+      "half_frame_bake_max_error_m": 6.542950391799256e-07,
+      "worst_half_frame_time": 0.4166666666666667
+    }
+  ],
+  "saved_source_roundtrip_identical": true,
+  "source_sha256": "69d62710e4982a640ba515a1047bb67204fb451266c9b4e3fd4b7b7d7ff0997f",
+  "scope": "Source keys and half-frame poses against Blender evaluated mesh; compression error measured separately."
+}

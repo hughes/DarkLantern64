@@ -143,12 +143,12 @@ def build_rom(sdk, autoplay=False, debug_overlay=False, level=None, capture=Fals
             if len(values) != 5 or any(type(v) not in (int, float) or not math.isfinite(v) for v in values):
                 raise ValueError("Capture view needs finite XYZ, yaw and pitch")
             position = ",".join(f"{float(v):.6f}f" for v in values[:3])
-            rows.append("{{" + position + "}," + f"{math.radians(values[3]):.6f}f,{math.radians(values[4]):.6f}f," + ("true" if door_open else "false") + f",{float(view.get('animation_time',0)):.6f}f" + "}")
+            rows.append("{{" + position + "}," + f"{math.radians(values[3]):.6f}f,{math.radians(values[4]):.6f}f," + ("true" if door_open else "false") + f",{float(view.get('animation_time',0)):.6f}f," + json.dumps(view.get("animation_clip", "")) + f",{math.radians(view.get('head_yaw',0)):.6f}f,{math.radians(view.get('head_pitch',0)):.6f}f" + "}")
         capture_header = work / "capture_views.h"
-        capture_header.write_text("static const struct { DlVec3 position; float yaw,pitch; bool door_open; float animation_time; } dl_capture_views[]={" +
+        capture_header.write_text("static const struct { DlVec3 position; float yaw,pitch; bool door_open; float animation_time; const char *animation_clip; float head_yaw,head_pitch; } dl_capture_views[]={" +
                                   ",".join(rows) + "};\n#define DL_CAPTURE_VIEW_COUNT " + str(len(rows)) + "\n")
         extra_headers.append(capture_header)
-    sources = [ROOT / "src" / f for f in ("game.c", "main.c", "dl_profile.c", "launch.c")]
+    sources = [ROOT / "src" / f for f in ("game.c", "main.c", "dl_profile.c", "launch.c", "animation.c")]
     sources += generated_sources
     if scale_bench:
         sources.append(ROOT / "src/scale_bench.c")
@@ -163,7 +163,7 @@ def build_rom(sdk, autoplay=False, debug_overlay=False, level=None, capture=Fals
     headers += [bundle_output / texture["sprite_path"] for texture in texture_report["textures"]]
     if bundle is not None:
         headers.append(bundle)
-    headers += [ROOT / "tools" / name for name in ("compile_bundle.py", "compile_level.py", "cook_textures.py")]
+    headers += [ROOT / "tools" / name for name in ("compile_bundle.py", "compile_level.py", "cook_textures.py", "character_assets.py")]
     sdk_inputs = [lib / n for n in ("libdragon.a", "libdragonsys.a", "n64.ld")]
     sdk_inputs += sorted((sdk / "mips64-elf/include").rglob("*.h"))
     compiler_version = run([tools["mips64-elf-gcc"], "--version"], env=env, capture=True).stdout.splitlines()[0]
@@ -257,17 +257,21 @@ def run_tests():
     for name in ("test_game", "test_first_room"):
         output = BUILD / (name + ".exe")
         run([compiler, "-std=c17", "-O2", "-Wall", "-Wextra", "-Werror", "-Isrc", "-Ibuild/generated",
-             "src/game.c", f"tests/{name}.c", "-lm", "-o", output])
+             "src/game.c", f"tests/{name}.c", "-lm", "-o", output], env=env)
         run([output], env=env)
+    output = BUILD / "test_animation.exe"
+    run([compiler, "-std=c17", "-O2", "-Wall", "-Wextra", "-Werror", "-Isrc",
+         "src/animation.c", "tests/test_animation.c", "-lm", "-o", output], env=env)
+    run([output], env=env)
     output = BUILD / "test_profile.exe"
     run([compiler, "-std=c17", "-O2", "-Wall", "-Wextra", "-Werror", "-DDL_PROFILE_TEST", "-Isrc",
-         "src/dl_profile.c", "tests/test_profile.c", "-lm", "-o", output])
+         "src/dl_profile.c", "tests/test_profile.c", "-lm", "-o", output], env=env)
     run([output], env=env)
 
     output = BUILD / "test_scale_bench.exe"
     run([compiler, "-std=c17", "-O2", "-Wall", "-Wextra", "-Werror", "-Isrc",
          "-DDL_SCALE_BENCH", "-DDL_SCALE_BENCH_TEST", "src/game.c", "src/scale_bench.c",
-         "tests/test_scale_bench.c", "-lm", "-o", output])
+         "tests/test_scale_bench.c", "-lm", "-o", output], env=env)
     result = run([output], env=env, capture=True)
     from scale_study import parse_microbench
     parsed = parse_microbench("DL64 scale_boot memory=8388608\n" + result.stdout)
@@ -276,17 +280,17 @@ def run_tests():
 
     output = BUILD / "test_render_visibility.exe"
     run([compiler, "-std=c17", "-O2", "-Wall", "-Wextra", "-Werror", "-Isrc",
-         "tests/test_render_visibility.c", "-lm", "-o", output])
+         "tests/test_render_visibility.c", "-lm", "-o", output], env=env)
     run([output], env=env)
 
     output = BUILD / "test_launch.exe"
     shading_output = BUILD / "test_render_shading.exe"
     run([compiler, "-std=c17", "-O2", "-Wall", "-Wextra", "-Werror", "-Isrc",
-         "tests/test_render_shading.c", "-lm", "-o", shading_output])
+         "tests/test_render_shading.c", "-lm", "-o", shading_output], env=env)
     run([shading_output], env=env)
 
     run([compiler, "-std=c17", "-O2", "-Wall", "-Wextra", "-Werror", "-Isrc",
-         "src/launch.c", "tests/test_launch.c", "-lm", "-o", output])
+         "src/launch.c", "tests/test_launch.c", "-lm", "-o", output], env=env)
     run([output], env=env)
 
 

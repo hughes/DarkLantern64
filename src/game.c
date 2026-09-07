@@ -311,6 +311,7 @@ static void init_enemy(DlEnemy *enemy, const DlEnemyDef *definition) {
 static void update_guard(DlGame *g, int index, float dt) {
     const DlEnemyDef *definition = &g->level->enemies[index];
     DlEnemy *enemy = &g->enemies[index];
+    DlVec3 previous_position = enemy->position;
     DlVec3 eye = guard_eye(enemy), target = dl_player_eye(g);
     float distance = distance_between(eye, target), range = fmaxf(0, definition->sight_range);
     float dx = target.x - eye.x, dz = target.z - eye.z;
@@ -360,6 +361,10 @@ static void update_guard(DlGame *g, int index, float dt) {
         break;
     }
     move_vertical(g, &enemy->position, &enemy->vertical_velocity, GUARD_RADIUS, STAND_HEIGHT, dt);
+    float travel = horizontal_distance(enemy->position, previous_position);
+    enemy->animation_distance += travel;
+    float target_speed = dt > 0 ? travel / dt : 0;
+    enemy->animation_speed += (target_speed - enemy->animation_speed) * fminf(1, dt * 12);
     /* A bad route must not repeatedly reset everyone else's progress. */
     if (enemy->position.y < -20) init_enemy(enemy, definition);
 }

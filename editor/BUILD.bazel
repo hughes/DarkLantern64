@@ -1,17 +1,37 @@
-load("@rules_cc//cc:defs.bzl", "cc_binary")
+load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
+
+cc_library(
+    name = "character_preview",
+    hdrs = ["character_preview.h"],
+    deps = ["@dl64_animation//:animation", "@nlohmann_json//:json"],
+)
+
+cc_test(
+    name = "character_preview_test",
+    srcs = ["test_character_preview.cpp"],
+    deps = [":character_preview"],
+)
+
+cc_test(
+    name = "character_preview_material_test",
+    srcs = ["test_character_preview_material.cpp"],
+    data = ["testdata/uv_probe.gltf"],
+    args = ["$(rootpath testdata/uv_probe.gltf)"],
+    deps = [":character_preview", "@lightengine//:lightengine", "@bazel_tools//tools/cpp/runfiles"],
+)
 
 cc_binary(
     name = "darklantern64_project_editor",
     srcs = ["main.cpp"],
     copts = select({"@platforms//os:windows": ["/wd4005"], "//conditions:default": []}),
-    deps = ["@lightengine//:lightengine"],
+    deps = [":character_preview", "@lightengine//:lightengine"],
 )
 
 cc_binary(
     name = "darklantern64_editor",
     srcs = ["main.cpp"],
     copts = select({"@platforms//os:windows": ["/wd4005"], "//conditions:default": []}),
-    deps = ["@lightengine//:lightengine"],
+    deps = [":character_preview", "@lightengine//:lightengine"],
 )
 
 # Separate executable lets a scene workshop build while the original workshop
@@ -20,5 +40,5 @@ cc_binary(
     name = "darklantern64_scene_editor",
     srcs = ["main.cpp"],
     copts = select({"@platforms//os:windows": ["/wd4005"], "//conditions:default": []}),
-    deps = ["@lightengine//:lightengine"],
+    deps = [":character_preview", "@lightengine//:lightengine"],
 )

@@ -12,6 +12,8 @@ Our development approach is to extend **LightEngine** into a productive content 
 
 **Creating models?** The [Blender asset guide](docs/blender-assets.md) covers the editable loot set, exporter, material budget, prefab placement, and a direct launch at the courtyard's loot counter.
 
+**Animating characters?** The [guard animation study](docs/guard-animation-prototype.md) covers the editable Blender guard, five Actions, connected joints, editor playback/head attention and measured N64 costs. Its clips compress to 8.61 KiB; the CPU reference renderer still needs substantial performance work.
+
 ## Build and play
 
 **Full 3D prototype:** the model compiler, desktop editor, and both ROM variants build. The editor's XYZ/rotation save round trip and Ares startup/mission replay have passed. Original N64 and M64 validation remains pending; this is still placeholder content and a prototype rendering/audio backend.
@@ -37,7 +39,7 @@ python tools/setup_editor.py # fetch the pinned LightEngine revision if missing
 .\build.ps1 -Editor -Run
 ```
 
-The engine revision is recorded in [dependencies.json](dependencies.json). Project layouts and the saved-tab startup fix merged through [PR #14](https://github.com/hughes/LightEngine/pull/14) and [PR #15](https://github.com/hughes/LightEngine/pull/15). Project level registration and guarded Open/Save/Close merged through [PR #16](https://github.com/hughes/LightEngine/pull/16); this project pins that tested revision. Setup checks an existing checkout without resetting it. See the [editor guide](editor/README.md) and [workflow](docs/workflow.md) for editing and automation.
+The engine revision is recorded in [dependencies.json](dependencies.json). Project layouts and the saved-tab startup fix merged through [PR #14](https://github.com/hughes/LightEngine/pull/14) and [PR #15](https://github.com/hughes/LightEngine/pull/15). Project level registration and guarded Open/Save/Close merged through [PR #16](https://github.com/hughes/LightEngine/pull/16). Fixed-topology character preview updates and orbit-focus synchronization are published in [PR #17](https://github.com/hughes/LightEngine/pull/17), pending review; this project pins its tested commit. Setup checks an existing checkout without resetting it. See the [editor guide](editor/README.md) and [workflow](docs/workflow.md) for editing and automation.
 
 ## Start here
 
@@ -48,7 +50,8 @@ The engine revision is recorded in [dependencies.json](dependencies.json). Proje
 | [Project workflow verification](docs/project-workflow-verification.md) | Tested level management, editor game launches, and the horizontal camera correction. |
 | [Level select and test starts](docs/level-select.md) | Bundle levels into one ROM, switch during testing, or launch directly into a named starting state. |
 | [Enemy authoring](docs/enemy-authoring.md) | Place multiple enemies, choose code-defined types, and author independent patrols or sentry posts. |
-| [Character animation proposal](docs/character-animation.md) | Artist-created rigs and clips, N64 deformation choices, audio events, memory and editor workflow. |
+| [Guard animation prototype](docs/guard-animation-prototype.md) | Edit/export the Blender guard, preview clips and head attention, and inspect measured compression and runtime costs. |
+| [Character animation architecture](docs/character-animation.md) | Implemented foundations and proposed N64 deformation, audio events, memory and editor extensions. |
 | [Vision](docs/vision.md) | Game pillars, collaboration, and scope. |
 | [Architecture](docs/architecture.md) | Editor/runtime boundary, content model, and existing foundations. |
 | [N64 hardware guide](docs/n64-hardware-guide.md) | Processors, memory/bandwidth, graphics features, lighting, and seamless spaces. |
@@ -70,4 +73,4 @@ The engine revision is recorded in [dependencies.json](dependencies.json). Proje
 
 Prototype implementation in progress, dated 2026-09-06. The repository now contains a portable gameplay module, N64 runtime, content compiler, LightEngine project editor, and build/debug tools. Placeholder mesh assets are authored in `content/`; generated outputs are kept in ignored `build/` and `.dev/` directories.
 
-The 3D renderer uses CPU transforms and RDP hardware triangles/depth, with flat-color or textured models. The courtyard adds colored vertex lighting, occlusion, emissive surfaces and fog; its source texture pixels are cooked into the ROM. Collision uses upright rotated boxes; sloped mesh collision, animated assets, richer navigation, and SDK provisioning remain future work. Original N64 and M64 validation is **pending**. See [First playable](docs/first-playable.md) for acceptance details.
+The 3D renderer uses CPU transforms and RDP hardware triangles/depth, with flat-color or textured models. The courtyard adds colored vertex lighting, occlusion, emissive surfaces and fog; its source texture pixels are cooked into the ROM. The guard workshop adds skeletal clips, connected one-influence geometry and bounded head attention through a measured CPU reference path. Collision uses upright rotated boxes; sloped mesh collision, RSP animation acceleration, richer navigation, and SDK provisioning remain future work. Original N64 and M64 validation is **pending**. See [First playable](docs/first-playable.md) for acceptance details.

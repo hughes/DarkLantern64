@@ -159,7 +159,13 @@ def _geometry(collection, material, bones):
         b.rings([(sign*.275,1.305,0,.096,.105),(sign*.25,1.415,0,.106,.108)],f'upper_arm_{suffix}',4,6)
         elbow_top=(sign*.341,1.17,0,.074,.078)
         elbow_bottom=(sign*.367,1.07,.004,.071,.075)
-        b.rings([elbow_top,(sign*.285,1.32,0,.08,.09)],f'upper_arm_{suffix}',0,6,caps=(False,True))
+        sleeve_top=(sign*.285,1.32,0,.08,.09)
+        sleeve=[elbow_top,sleeve_top]
+        if suffix=='r':
+            sleeve=[elbow_top,*[_sleeve_ring(y) for y in (1.188,1.244)],sleeve_top]
+        first_face=len(b.faces)
+        b.rings(sleeve,f'upper_arm_{suffix}',0,6,caps=(False,True))
+        if suffix=='r': b.tiles[first_face+6:first_face+12]=[13]*6
         b.rings([(sign*.39,.91,.015,.065,.071),elbow_bottom],f'forearm_{suffix}',6,6,caps=(True,False))
         b.bridge(elbow_bottom,elbow_top,f'forearm_{suffix}',f'upper_arm_{suffix}',0)
         b.box((sign*.39,.847,.028),(.060,.068,.065),f'hand_{suffix}',7)
@@ -169,10 +175,106 @@ def _geometry(collection, material, bones):
         b.rings([(sign*.115,.14,.0,.071,.075),knee_bottom],f'shin_{suffix}',6,6,caps=(True,False))
         b.bridge(knee_bottom,knee_top,f'shin_{suffix}',f'thigh_{suffix}',2)
         b.box((sign*.115,.069,.074),(.079,.065,.142),f'foot_{suffix}',6)
-    # One asymmetrical badge and red armband aid parity checks between targets.
+    # One asymmetrical badge and the integrated red sleeve strip aid parity checks.
     b.box((-.125,1.335,.131),(.027,.043,.018),'chest',11)
-    b.rings([(-.326,1.188,0,.079,.083),(-.309,1.244,0,.082,.086)],'upper_arm_r',13,6,False)
     return b.object(collection, material, bones)
+
+
+def _sleeve_ring(y):
+    """Exact authored sleeve profile; the cloth marking has no offset shell."""
+    lower=(-.341,1.17,0,.074,.078);upper=(-.285,1.32,0,.08,.09)
+    fraction=(y-lower[1])/(upper[1]-lower[1])
+    return tuple(a+(b-a)*fraction for a,b in zip(lower,upper))
+
+
+def integrate_armband(scene=None):
+    """Replace only the known overlapping band/sleeve faces in the open mesh.
+
+    Keeps the object, rig, Actions, modifiers, materials and unrelated geometry.
+    Refuses an artist-altered sleeve instead of rebuilding their whole guard.
+    Does not save or export; the caller can validate the staged result first.
+    """
+    import bmesh
+    scene=scene or bpy.context.scene
+    objects=[o for o in scene.objects if o.type=='MESH' and o.get('dl64_character_id')=='basic-guard']
+    if len(objects)!=1: raise ValueError('Expected one exported guard mesh')
+    obj=objects[0];original=obj.data
+    if obj.mode!='OBJECT' or original.shape_keys: raise ValueError('Exit mesh Edit Mode; this migration does not support shape keys')
+    if len(original.uv_layers)!=1: raise ValueError('Expected the guard single-atlas UV layer')
+    group=obj.vertex_groups.get('upper_arm_r')
+    if group is None: raise ValueError('Guard upper_arm_r group is missing')
+    working=original.copy();working.name='Guard | integrated cloth armband'
+    bm=bmesh.new()
+    try:
+        bm.from_mesh(working)
+        uv=bm.loops.layers.uv.active;deform=bm.verts.layers.deform.active
+        if uv is None or deform is None: raise ValueError('Expected UV and single-bone data')
+        def owned(face):
+            return all(len(v[deform])==1 and abs(v[deform].get(group.index,0)-1)<1e-6 for v in face.verts)
+        def tile(face):
+            colors={int(math.floor(loop[uv].uv.x*4))+4*int(math.floor(loop[uv].uv.y*4)) for loop in face.loops}
+            return next(iter(colors)) if len(colors)==1 else None
+        def position(vertex): return TO_GAME@vertex.co
+        band=[face for face in bm.faces if owned(face) and tile(face)==13]
+        side=[face for face in bm.faces if owned(face) and tile(face)==0 and len(face.verts)==4 and
+              all(min(abs(position(v).y-y) for y in (1.17,1.32))<2e-6 for v in face.verts) and
+              max(position(v).y for v in face.verts)-min(position(v).y for v in face.verts)>.14]
+        if len(side)!=6 or len(band)!=8: raise ValueError('Sleeve has been edited or is already integrated; expected six sleeve sides and eight band faces')
+        endpoints=set(v for face in side for v in face.verts)
+        def point(ring,index):
+            x,y,z,rx,rz=ring;angle=2*math.pi*index/6
+            return Vector((x+rx*math.cos(angle),y,z+rz*math.sin(angle)))
+        old_band=[(-.326,1.188,0,.079,.083),(-.309,1.244,0,.082,.086)]
+        for vertex in {v for face in band for v in face.verts}:
+            if min((position(vertex)-point(ring,index)).length for ring in old_band for index in range(6))>2e-6:
+                raise ValueError('Armband vertices differ from the known overlapping source; artist edits were preserved')
+        rings=[]
+        for y in (1.17,1.188,1.244,1.32):
+            ring=[]
+            for index in range(6):
+                target=point(_sleeve_ring(y),index)
+                if y in (1.17,1.32):
+                    matches=[v for v in endpoints if (position(v)-target).length<2e-6]
+                    if len(matches)!=1: raise ValueError('Sleeve endpoint vertices differ from the known source')
+                    vertex=matches[0]
+                else:
+                    vertex=bm.verts.new(TO_BLENDER@target);vertex[deform][group.index]=1.0
+                ring.append(vertex)
+            rings.append(ring)
+        material=side[0].material_index
+        if any(face.material_index!=material for face in side+band): raise ValueError('Sleeve material slots have been edited')
+        band_vertices={v for face in band for v in face.verts}
+        if any(any(face not in band for face in v.link_faces) for v in band_vertices):
+            raise ValueError('The old band is connected to artist geometry; migration refused')
+        side_edges={edge for face in side for edge in face.edges}
+        for face in side+band: bm.faces.remove(face)
+        for vertex in band_vertices: bm.verts.remove(vertex)
+        for segment in range(3):
+            color=13 if segment==1 else 0
+            for index in range(6):
+                following=(index+1)%6
+                face=bm.faces.new((rings[segment][index],rings[segment+1][index],
+                                   rings[segment+1][following],rings[segment][following]))
+                face.smooth=True;face.material_index=material
+                for corner,loop in enumerate(face.loops):
+                    angle=2*math.pi*corner/4
+                    loop[uv].uv=((color%4+.5+.30*math.cos(angle))/4,
+                                 (color//4+.5+.30*math.sin(angle))/4)
+        for edge in side_edges:
+            if edge.is_valid and not edge.link_faces: bm.edges.remove(edge)
+        bm.normal_update();bm.to_mesh(working);working.update()
+        obj.data=working
+        original.use_fake_user=True
+        original.name='BACKUP | prior overlapping armband'
+        obj['dl64_integrated_armband']=True
+        return {'object':obj.name,'removed_faces':14,'added_faces':18,
+                'preserved_backup_mesh':original.name,'saved':False,'exported':False}
+    except Exception:
+        if obj.data is working: obj.data=original
+        bpy.data.meshes.remove(working)
+        raise
+    finally:
+        bm.free()
 
 
 def upgrade_connected_joints(output=None):
@@ -350,7 +452,7 @@ def export(scene=None, output=None):
             if key not in lookup:
                 lookup[key]=len(verts);verts.append(list(pos));normals.append(list(normal));uvs.append(tex);joints.append(bone)
             indices.append(lookup[key])
-    previous_action=rig.animation_data.action;previous_frame=scene.frame_current
+    previous_action=rig.animation_data.action;previous_frame=scene.frame_current;previous_subframe=scene.frame_subframe
     clips=[]
     try:
         for action in sorted((a for a in bpy.data.actions if a.get('dl64_clip_id')),key=lambda a:a['dl64_clip_id']):
@@ -369,7 +471,7 @@ def export(scene=None, output=None):
                 'frames':frames,'events':[{'id':m.name,'time':(m.frame-start)/fps} for m in action.pose_markers],
                 'stride_length':float(action.get('dl64_stride_length',0))})
     finally:
-        rig.animation_data.action=previous_action;scene.frame_set(previous_frame)
+        rig.animation_data.action=previous_action;scene.frame_set(previous_frame,subframe=previous_subframe)
     data={'version':1,'id':'basic-guard','skeleton_id':rig.get('dl64_skeleton_id','humanoid-v1'),
         'coordinates':'RH_Y_UP_Z_FORWARD_METERS','bones':records,
         'mesh':{'vertices':verts,'normals':normals,'uvs':uvs,'indices':indices,'joints':joints},

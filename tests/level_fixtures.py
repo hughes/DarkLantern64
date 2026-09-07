@@ -14,6 +14,13 @@ def gameplay_baseline():
     Full source/dependency tests should load the authored document directly.
     """
     level = json.loads((ROOT / "content/first_room.json").read_text())
+    # Core gameplay tests intentionally keep their tiny, untextured legacy
+    # actor. Shared animated resources have separate integration coverage.
+    level.pop("asset_packs", None)
+    if not any(asset["id"] == "mesh-guard" for asset in level["assets"]):
+        level["assets"].append({"id": "mesh-guard", "uri": "models/guard.obj"})
+    if not any(material["id"] == "mat-guard" for material in level["materials"]):
+        level["materials"].append({"id": "mat-guard", "color": [.65, .18, .13, 1]})
     imported = {asset["id"] for asset in level["assets"] if asset["uri"].startswith("assets/")}
     level["entities"] = [entity for entity in level["entities"] if entity.get("model") not in imported]
     models = {entity["model"] for entity in level["entities"] if "model" in entity}
@@ -31,6 +38,14 @@ def copy_level_dependencies(level, destination, source_root=ROOT / "content"):
     source_root, destination = Path(source_root).resolve(), Path(destination).resolve()
     uris = {asset["uri"] for asset in level["assets"]}
     uris.update(material["texture"]["uri"] for material in level["materials"] if "texture" in material)
+    for uri in level.get("asset_packs", []):
+        path = (source_root / uri).resolve()
+        if not path.is_relative_to(source_root):
+            raise ValueError("Fixture pack escapes its content root")
+        pack = json.loads(path.read_text())
+        uris.add(uri)
+        uris.update(asset["uri"] for asset in pack["assets"])
+        uris.update(material["texture"]["uri"] for material in pack["materials"] if "texture" in material)
     for uri in uris:
         source, target = (source_root / uri).resolve(), (destination / uri).resolve()
         if Path(uri).is_absolute() or not source.is_relative_to(source_root) or not target.is_relative_to(destination):

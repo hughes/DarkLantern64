@@ -24,11 +24,11 @@ static rspq_syncpoint_t gpu_fences[GPU_FRAMES];
 static unsigned gpu_frame;
 /* C union representation access: N64 is big-endian, so RGBA bytes are the
  * RSP's 32-bit color word. Word alignment avoids unaligned byte reconstruction. */
-static union { DlLightingPair pairs[MAX_VERTICES];uint32_t words[MAX_VERTICES][2]; } gpu_colors;
+static union { DlLightingPair pairs[MAX_MESH_VERTICES];uint32_t words[MAX_MESH_VERTICES][2]; } gpu_colors;
 #define gpu_group_colors gpu_colors.pairs
 _Static_assert(sizeof(DlLightingColor)==4&&sizeof(DlLightingPair)==8,"RSP color word layout");
 static DlAnimMatrix gpu_world_palette[DL_ANIMATION_MAX_BONES];
-static float gpu_vertex_fog[MAX_VERTICES];
+static float gpu_vertex_fog[MAX_MESH_VERTICES];
 static uint64_t gpu_probe_ticks,gpu_normal_ticks,gpu_color_ticks;
 static uint32_t gpu_lighting_frames;
 static void gpu_report(void){

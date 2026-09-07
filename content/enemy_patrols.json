@@ -9,10 +9,6 @@
       "uri": "models/floor.obj"
     },
     {
-      "id": "mesh-guard",
-      "uri": "models/guard.obj"
-    },
-    {
       "id": "mesh-lantern",
       "uri": "models/lantern.obj"
     },
@@ -1069,15 +1065,6 @@
     },
     {
       "color": [
-        0.65,
-        0.18,
-        0.13,
-        1
-      ],
-      "id": "mat-guard"
-    },
-    {
-      "color": [
         0.92,
         0.64,
         0.14,
@@ -1190,5 +1177,8 @@
       "yaw": 180,
       "pitch": 0
     }
+  ],
+  "asset_packs": [
+    "assets/guard/pack.json"
   ]
 }

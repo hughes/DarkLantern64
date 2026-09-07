@@ -37,7 +37,7 @@ Keep stable bone names and the Action custom properties `dl64_clip_id`, `dl64_fr
 python tools/guard_assets.py
 ```
 
-This exports [guard.character.json](../content/assets/guard/guard.character.json) and [guard-atlas.png](../content/assets/guard/guard-atlas.png). Return to the project editor and use **Save + Cook** to refresh the preview, then **Play level** to test the ROM. The supplied workshop already references these assets, so no new prefab import is needed.
+This exports [guard.character.json](../content/assets/guard/guard.character.json) and [guard-atlas.png](../content/assets/guard/guard-atlas.png). Return to the project editor and use **Save + Cook** to refresh the preview, then **Play level** to test the ROM. Every supplied level references these assets through the [shared guard pack](shared-guard-resources.md), so no new prefab import is needed.
 
 The exporter is currently tailored to this guard's tagged mesh, rig, named hand/head sockets and first material. It requires applied mesh/armature object transforms, one full-strength bone assignment per vertex, UVs, and rigid bone transforms. Extra weights and animated scale are rejected. Constraints can help author motion, but the current exporter traverses all bones in this rig; it does not strip a separate control rig. Keep the exported rig within the 32-bone limit. General character import, retargeting, richer materials and a reusable animation-export UI remain future work.
 
@@ -47,19 +47,19 @@ The exporter is currently tailored to this guard's tagged mesh, rig, named hand/
 
 The version-1 character JSON uses metres, right-handed XYZ, +Y up and +Z forward. It contains parent-first local bone translations and XYZW quaternions, a model-space bind mesh, one bone index per vertex, endpoint-inclusive sampled clips, semantic events and sockets. The cooker derives inverse bind transforms. Source UV V grows upward; the cooker converts it once for the existing target texture path.
 
-Levels use a typed asset and the usual model reference:
+The shared guard pack declares a typed asset:
 
 ```json
 {"id":"mesh-guard","type":"character","uri":"assets/guard/guard.character.json"}
 ```
 
-An entity's `model` is `mesh-guard`; its `material` selects the atlas material. Placement, enemy type and patrol references stay in the level. Animation data stays in the shared character source. The [workshop source](../content/animation_workshop.json) is the complete example. Ordinary and bundled builds emit character geometry, skeletons, clips and sockets once per content hash; guards and levels share that immutable data.
+Levels link `assets/guard/pack.json`; an entity's `model` is `mesh-guard` and its `material` selects the atlas material. Placement, enemy type and patrol references stay in the level. Animation data stays in the shared character source. The [workshop source](../content/animation_workshop.json) is the complete example. Ordinary and bundled builds emit character geometry, skeletons, clips and sockets once per content hash; guards and levels share that immutable data.
 
 The cooker emits bind meshes, per-bone preview meshes, a complete connected preview mesh, compressed clip metadata and memory/error reports. The complete mesh is used when triangles span bones. Generated preview data lives in `build/project/editor-assets/characters/<level>/<asset-id>.json`; `build/` is disposable.
 
 ## Connected joints and the N64 vertex cache
 
-Each vertex follows one bone, while a triangle can join vertices following different bones. Our four elbow/knee connections use **48 mixed-bone triangles**, twelve per joint. This creates a continuous connection without adding blended vertex weights. The rest of the mesh contributes 483 triangles.
+Each vertex follows one bone, while a triangle can join vertices following different bones. Our four elbow/knee connections use **48 mixed-bone triangles**, twelve per joint. This creates a continuous connection without adding blended vertex weights. The rest of the current mesh contributes 487 triangles.
 
 Kaze describes the applicable N64 technique at approximately 13:38–14:05: transform one vertex group with one matrix, another group with another matrix, then connect the retained results. Nintendo's `gSPVertex` reference explicitly states that cached vertices retain their transformed positions when the matrix changes, and identifies joints as a use case. [Kaze's explanation](https://www.youtube.com/watch?v=xwls5SpNn1s&t=818s), [Nintendo `gSPVertex` reference](https://ultra64.ca/files/documentation/online-manuals/man/n64man/gsp/gSPVertex.html)
 
@@ -69,7 +69,11 @@ The initial CPU reference renderer performs this deformation on the CPU and send
 
 The saving is avoiding extra weighted deformation math at the connection. Matrix commands, vertex loads, cache management and triangle rasterization still have costs. Cache capacity and allowed load offsets depend on the selected microcode; an SM64 exporter's parent/child restrictions are not a universal N64 hardware rule.
 
-The guard has only **316 distinct bind positions**, but normals increase the distinct attribute combinations to **693**, and UV seams raise the final vertex count to **997**. Each elbow/knee connection references 24 such vertices. Those counts matter when designing matrix groups and cache batches: a visually shared point can occupy several target vertices. The connected revision adds 48 vertices and a net 16 triangles to the earlier model, costing **1,248 extra geometry/joint-index bytes** without increasing clip storage.
+The guard has only **316 distinct bind positions**, but normals increase the distinct attribute combinations to **669**, and UV seams raise the final vertex count to **1,009**. Each elbow/knee connection references 24 such vertices. Those counts matter when designing matrix groups and cache batches: a visually shared point can occupy several target vertices. The initial connected revision added 48 vertices and a net 16 triangles to the earlier model, costing **1,248 extra geometry/joint-index bytes** without increasing clip storage.
+
+The subsequent [sleeve correction](evidence/guard-armband-fix.json) replaces an intersecting armband shell with a red strip on one continuous sleeve surface. Smooth normals continue across the stripe, and there are no hidden olive faces beneath it. This adds 12 attribute vertices and four triangles (312 shared geometry/joint bytes), preserving the rig, all clips and all 48 joint triangles. Blender parity was rechecked at 425 poses, along with saved-source export, editor playback and N64 captures.
+
+![Integrated sleeve stripe in the N64 renderer](images/guard-armband-n64.png)
 
 ## Compression measurements
 
@@ -100,18 +104,18 @@ There are two separate correctness comparisons. [Blender parity](evidence/guard-
 
 | Cost | Bytes | Scope |
 | --- | ---: | --- |
-| Positions, normals, UVs and triangle indices | 26,117 | Once per unique character |
-| One-byte bone indices | 997 | Once per unique character |
+| Positions, normals, UVs and triangle indices | 26,417 | Once per unique character |
+| One-byte bone indices | 1,009 | Once per unique character |
 | Compressed keys | 8,820 | Once per unique character |
 | Skeleton descriptors | 1,280 | N64 ABI estimate, shared |
 | Clip/track/event, socket and asset descriptors | 624 | N64 ABI estimate, shared |
 | RGBA16 atlas pixels | 2,048 | Shared; sprite headers/allocation are additional |
 | Skin matrix array | 1,536 | One reusable 32-bone CPU array |
 | Pose scratch arrays | 1,792 | Temporary sampler stack arrays; excludes call-frame overhead |
-| Deformed normal cache | **11,964 per guard** | 997 float3 normals; 23,928 for this two-guard run |
+| Deformed normal cache | **12,108 per guard** | 1,009 float3 normals; 24,216 for two guards |
 | Added motion-distance/speed fields | 8 per enemy | Additional fields, not the full enemy state |
 
-The shared asset rows total **39,886 bytes including atlas pixels**, before string storage, linker alignment and sprite/allocator overhead. Do not multiply them by the guard count. Conversely, the normal cache and existing renderer instance buffers do grow with placed actors. The current 4,096-instanced-vertex limit leaves only 108 vertices for scenery after four copies of this guard; eight copies exceed it. This model is a deformation study, not a finished crowd asset.
+The shared asset rows total **40,198 bytes including atlas pixels**, before string storage, linker alignment and sprite/allocator overhead. Do not multiply them by the guard count. Conversely, the normal cache and existing renderer instance buffers do grow with placed actors. The current 6,144-instanced-vertex limit leaves 2,108 vertices for scenery after four copies of this guard; eight copies exceed it. This is an allocation budget, not a measured crowd frame rate.
 
 ## Initial CPU runtime measurement and next work
 

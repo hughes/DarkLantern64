@@ -70,10 +70,11 @@ def _exercise(executable, source, pack_uri, fixture, fixture_uri, queue):
                                    stdout=log, stderr=log, startupinfo=startup)
         try:
             initial = request(queue, "inspect")
-            assert not initial["dirty"] and initial["prefabs"] == []
+            linked_prefabs = initial["report"].get("resolved_catalog", {}).get("prefabs", [])
+            assert not initial["dirty"] and initial["prefabs"] == linked_prefabs
             request(queue, "import_asset_pack", {"uri": fixture_uri})
             imported = request(queue, "inspect")
-            assert len(imported["prefabs"]) == len(pack["prefabs"])
+            assert {item["id"] for item in imported["prefabs"]} == {item["id"] for item in pack["prefabs"]+linked_prefabs}
             again = request(queue, "import_asset_pack", {"uri": fixture_uri})
             assert not again["definitions_changed"]
             request(queue, "import_asset_pack", {"uri": "../pack.json"}, expect_ok=False)
@@ -129,7 +130,7 @@ def _exercise(executable, source, pack_uri, fixture, fixture_uri, queue):
             request(queue, "delete_entity", {"id": "asset-test-prop"})
             request(queue, "save")
             request(queue, "reload")
-            assert request(queue, "inspect")["prefabs"] == []
+            assert request(queue, "inspect")["prefabs"] == linked_prefabs
             restored = request(queue, "import_asset_pack", {"uri": fixture_uri})
             assert not restored["definitions_changed"] and not restored["dirty"]
             final = request(queue, "inspect")

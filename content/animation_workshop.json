@@ -5,11 +5,6 @@
     {
       "id": "mesh-block",
       "uri": "models/block.obj"
-    },
-    {
-      "id": "mesh-guard",
-      "type": "character",
-      "uri": "assets/guard/guard.character.json"
     }
   ],
   "materials": [
@@ -48,22 +43,6 @@
         0.12,
         1
       ]
-    },
-    {
-      "id": "mat-guard",
-      "color": [
-        1,
-        1,
-        1,
-        1
-      ],
-      "double_sided": false,
-      "texture": {
-        "uri": "assets/guard/guard-atlas.png",
-        "width": 32,
-        "height": 32,
-        "format": "RGBA16"
-      }
     }
   ],
   "entities": [
@@ -720,5 +699,8 @@
       "head_yaw": 0,
       "head_pitch": 0
     }
+  ],
+  "asset_packs": [
+    "assets/guard/pack.json"
   ]
 }

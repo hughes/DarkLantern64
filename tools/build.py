@@ -32,8 +32,11 @@ def run(args, *, cwd=ROOT, env=None, capture=False):
                           check=True, text=True, capture_output=capture)
 
 
-def fingerprint(paths, flags):
-    digest = hashlib.sha256(json.dumps(flags, sort_keys=True).encode())
+def fingerprint(paths, flags, *, content_hashes=()):
+    # Linked-resource metadata can change without changing generated C arrays.
+    # Its cook hash must still invalidate the build's provenance manifest.
+    metadata = {"flags": flags, "content_hashes": list(content_hashes)}
+    digest = hashlib.sha256(json.dumps(metadata, sort_keys=True).encode())
     for path in paths:
         digest.update(str(path).encode())
         digest.update(path.read_bytes())
@@ -184,14 +187,15 @@ def build_rom(sdk, autoplay=False, debug_overlay=False, level=None, capture=Fals
     headers += [bundle_output / texture["sprite_path"] for texture in texture_report["textures"]]
     if bundle is not None:
         headers.append(bundle)
-    headers += [ROOT / "tools" / name for name in ("compile_bundle.py", "compile_level.py", "cook_textures.py", "character_assets.py")]
+    headers += [ROOT / "tools" / name for name in ("compile_bundle.py", "compile_level.py", "cook_textures.py", "character_assets.py", "asset_pack.py")]
     sdk_inputs = [lib / n for n in ("libdragon.a", "libdragonsys.a", "n64.ld")]
     sdk_inputs += sorted((sdk / "mips64-elf/include").rglob("*.h"))
     compiler_version = run([tools["mips64-elf-gcc"], "--version"], env=env, capture=True).stdout.splitlines()[0]
     kernel_flags = {"render_lighting.c": ["-O3"], "render_transform.c": ["-O3"]}
     signature = fingerprint(sources + headers + sdk_inputs + renderer_inputs + [Path(__file__)],
                             {"flags": common, "kernel_flags": kernel_flags, "compiler": compiler_version, "renderer": renderer,
-                             "tools": {n: (p.stat().st_size, p.stat().st_mtime_ns) for n, p in tools.items()}})
+                             "tools": {n: (p.stat().st_size, p.stat().st_mtime_ns) for n, p in tools.items()}},
+                            content_hashes=[entry["content"]["source_sha256"] for entry in catalog["levels"]])
     manifest = work / "build.json"
     rom = BUILD / (name + ".z64")
     if manifest.exists() and rom.exists():

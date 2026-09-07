@@ -1,0 +1,18 @@
+{
+  "version": 1,
+  "assets": [
+    {"id": "mesh-guard", "type": "character", "uri": "assets/guard/guard.character.json"}
+  ],
+  "materials": [
+    {
+      "id": "mat-guard",
+      "color": [1, 1, 1, 1],
+      "double_sided": false,
+      "texture": {"uri": "assets/guard/guard-atlas.png", "width": 32, "height": 32, "format": "RGBA16"}
+    }
+  ],
+  "prefabs": [
+    {"id": "guard-watchman", "enemy_type": "watchman", "model": "mesh-guard", "material": "mat-guard", "scale": [1, 1, 1]},
+    {"id": "guard-scout", "enemy_type": "scout", "model": "mesh-guard", "material": "mat-guard", "scale": [1, 1, 1]}
+  ]
+}

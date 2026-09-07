@@ -4,9 +4,9 @@
   "profile": {
     "schema_version": 2,
     "measurement": "Emulated CPU-timer elapsed time; not CPU utilization or host CPU time",
-    "source_log": ".dev/ares/runs/8a3e1e94a98f4b8e99c4c24e1c4cc9cb/guard-performance.log",
-    "source_log_sha256": "4eda6c4bb63ae5650caf30611754a09f18daa15b163eb2970e8ad949123922aa",
-    "source_log_bytes": 109559,
+    "source_log": ".dev/ares/runs/9dfab25dc6864e668d8ead26cf57f811/guard-performance.log",
+    "source_log_sha256": "7e7f121de0e4288047b573861634cf3a5e29071b7824a2c5f368fc4961b57a7f",
+    "source_log_bytes": 109582,
     "complete_windows": 30,
     "selected_window_ids": [
       4,
@@ -53,52 +53,52 @@
     "debug_frames": {
       "0": 1800
     },
-    "audio_calls": 753,
+    "audio_calls": 754,
     "frame": {
-      "total_ticks": 1410311088,
-      "max_ticks": 862459,
-      "average_ms": 16.71479808,
-      "max_ms": 18.399125333333334,
-      "percent_of_frame_budget": 100.28878848000001,
-      "percent_of_30fps_budget": 50.144394240000004,
+      "total_ticks": 1410331327,
+      "max_ticks": 863569,
+      "average_ms": 16.71503794962963,
+      "max_ms": 18.422805333333333,
+      "percent_of_frame_budget": 100.29022769777778,
+      "percent_of_30fps_budget": 50.14511384888888,
       "percent_of_frame_elapsed": 100.0
     },
     "slots": {
       "input": {
-        "total_ticks": 3706200,
-        "max_ticks": 3878,
-        "average_ms": 0.04392533333333334,
-        "max_ms": 0.08273066666666666,
-        "percent_of_frame_budget": 0.263552,
-        "percent_of_30fps_budget": 0.131776,
-        "percent_of_frame_elapsed": 0.26279308384761135
+        "total_ticks": 3665701,
+        "max_ticks": 3435,
+        "average_ms": 0.04344534518518518,
+        "max_ms": 0.07328,
+        "percent_of_frame_budget": 0.2606720711111111,
+        "percent_of_30fps_budget": 0.13033603555555556,
+        "percent_of_frame_elapsed": 0.25991771790232665
       },
       "gameplay": {
-        "total_ticks": 88669248,
-        "max_ticks": 57981,
-        "average_ms": 1.050894791111111,
-        "max_ms": 1.236928,
-        "percent_of_frame_budget": 6.305368746666667,
-        "percent_of_30fps_budget": 3.152684373333333,
-        "percent_of_frame_elapsed": 6.287212002689722
+        "total_ticks": 94335261,
+        "max_ticks": 61250,
+        "average_ms": 1.1180475377777779,
+        "max_ms": 1.3066666666666666,
+        "percent_of_frame_budget": 6.708285226666668,
+        "percent_of_30fps_budget": 3.354142613333334,
+        "percent_of_frame_elapsed": 6.688872266679786
       },
       "audio_events": {
-        "total_ticks": 4125656,
-        "max_ticks": 12738,
-        "average_ms": 0.0488966637037037,
-        "max_ms": 0.271744,
-        "percent_of_frame_budget": 0.29337998222222217,
-        "percent_of_30fps_budget": 0.14668999111111108,
-        "percent_of_frame_elapsed": 0.2925351743387839
+        "total_ticks": 4129440,
+        "max_ticks": 12970,
+        "average_ms": 0.048941511111111106,
+        "max_ms": 0.27669333333333335,
+        "percent_of_frame_budget": 0.2936490666666666,
+        "percent_of_30fps_budget": 0.1468245333333333,
+        "percent_of_frame_elapsed": 0.29279928205125944
       },
       "audio_mix": {
-        "total_ticks": 22293036,
-        "max_ticks": 73080,
-        "average_ms": 0.26421376,
-        "max_ms": 1.55904,
-        "percent_of_frame_budget": 1.58528256,
-        "percent_of_30fps_budget": 0.79264128,
-        "percent_of_frame_elapsed": 1.5807176295844312
+        "total_ticks": 22314513,
+        "max_ticks": 73120,
+        "average_ms": 0.26446830222222223,
+        "max_ms": 1.5598933333333334,
+        "percent_of_frame_budget": 1.5868098133333333,
+        "percent_of_30fps_budget": 0.7934049066666666,
+        "percent_of_frame_elapsed": 1.582217779099223
       },
       "cache": {
         "total_ticks": 0,
@@ -110,40 +110,40 @@
         "percent_of_frame_elapsed": 0.0
       },
       "transforms": {
-        "total_ticks": 251739638,
-        "max_ticks": 145580,
-        "average_ms": 2.9835808948148146,
-        "max_ms": 3.105706666666667,
-        "percent_of_frame_budget": 17.90148536888889,
-        "percent_of_30fps_budget": 8.950742684444444,
-        "percent_of_frame_elapsed": 17.849936807700967
+        "total_ticks": 253250956,
+        "max_ticks": 145844,
+        "average_ms": 3.001492811851852,
+        "max_ms": 3.1113386666666667,
+        "percent_of_frame_budget": 18.00895687111111,
+        "percent_of_30fps_budget": 9.004478435555555,
+        "percent_of_frame_elapsed": 17.956841144463922
       },
       "lighting": {
-        "total_ticks": 519954958,
-        "max_ticks": 296204,
-        "average_ms": 6.162429131851852,
-        "max_ms": 6.319018666666667,
-        "percent_of_frame_budget": 36.97457479111111,
-        "percent_of_30fps_budget": 18.487287395555555,
-        "percent_of_frame_elapsed": 36.86810395409725
+        "total_ticks": 522905383,
+        "max_ticks": 297200,
+        "average_ms": 6.197397131851852,
+        "max_ms": 6.3402666666666665,
+        "percent_of_frame_budget": 37.184382791111105,
+        "percent_of_30fps_budget": 18.592191395555556,
+        "percent_of_frame_elapsed": 37.076775718532986
       },
       "triangles": {
-        "total_ticks": 32180482,
-        "max_ticks": 22459,
-        "average_ms": 0.38139830518518514,
-        "max_ms": 0.47912533333333335,
-        "percent_of_frame_budget": 2.2883898311111106,
-        "percent_of_30fps_budget": 1.1441949155555555,
-        "percent_of_frame_elapsed": 2.2818002548385268
+        "total_ticks": 31440834,
+        "max_ticks": 20896,
+        "average_ms": 0.3726321066666667,
+        "max_ms": 0.4457813333333333,
+        "percent_of_frame_budget": 2.23579264,
+        "percent_of_30fps_budget": 1.11789632,
+        "percent_of_frame_elapsed": 2.22932252854935
       },
       "hud": {
-        "total_ticks": 4750267,
-        "max_ticks": 4576,
-        "average_ms": 0.056299460740740735,
-        "max_ms": 0.09762133333333334,
-        "percent_of_frame_budget": 0.3377967644444444,
-        "percent_of_30fps_budget": 0.1688983822222222,
-        "percent_of_frame_elapsed": 0.3368240553746536
+        "total_ticks": 4810419,
+        "max_ticks": 4556,
+        "average_ms": 0.05701237333333333,
+        "max_ms": 0.09719466666666667,
+        "percent_of_frame_budget": 0.34207424,
+        "percent_of_30fps_budget": 0.17103712,
+        "percent_of_frame_elapsed": 0.34108431883396717
       },
       "debug_hud": {
         "total_ticks": 0,
@@ -155,31 +155,31 @@
         "percent_of_frame_elapsed": 0.0
       },
       "render_setup": {
-        "total_ticks": 17476592,
-        "max_ticks": 14376,
-        "average_ms": 0.20712997925925924,
-        "max_ms": 0.306688,
-        "percent_of_frame_budget": 1.2427798755555555,
-        "percent_of_30fps_budget": 0.6213899377777777,
-        "percent_of_frame_elapsed": 1.2392012052308277
+        "total_ticks": 16554311,
+        "max_ticks": 13213,
+        "average_ms": 0.1961992414814815,
+        "max_ms": 0.2818773333333333,
+        "percent_of_frame_budget": 1.177195448888889,
+        "percent_of_30fps_budget": 0.5885977244444445,
+        "percent_of_frame_elapsed": 1.1737887887106404
       },
       "display_wait": {
-        "total_ticks": 435492570,
-        "max_ticks": 272291,
-        "average_ms": 5.161393422222222,
-        "max_ms": 5.808874666666667,
-        "percent_of_frame_budget": 30.968360533333332,
-        "percent_of_30fps_budget": 15.484180266666666,
-        "percent_of_frame_elapsed": 30.87918500432296
+        "total_ticks": 426800783,
+        "max_ticks": 267733,
+        "average_ms": 5.05837965037037,
+        "max_ms": 5.711637333333333,
+        "percent_of_frame_budget": 30.350277902222224,
+        "percent_of_30fps_budget": 15.175138951111112,
+        "percent_of_frame_elapsed": 30.262447896401298
       },
       "other": {
-        "total_ticks": 29922441,
-        "max_ticks": 169158,
-        "average_ms": 0.3546363377777778,
-        "max_ms": 3.608704,
-        "percent_of_frame_budget": 2.127818026666667,
-        "percent_of_30fps_budget": 1.0639090133333333,
-        "percent_of_frame_elapsed": 2.1216908279742603
+        "total_ticks": 30123726,
+        "max_ticks": 169310,
+        "average_ms": 0.3570219377777778,
+        "max_ms": 3.611946666666667,
+        "percent_of_frame_budget": 2.142131626666667,
+        "percent_of_30fps_budget": 1.0710658133333335,
+        "percent_of_frame_elapsed": 2.1359325587752473
       }
     },
     "limitations": [
@@ -193,23 +193,23 @@
     "distributions": {
       "elapsed": {
         "samples": 1800,
-        "average_ms": 16.71479808,
-        "min_ms": 15.05792,
-        "max_ms": 18.399125333333334,
-        "p50_ms": 16.702741333333332,
-        "p95_ms": 17.467498666666668,
-        "p99_ms": 18.316821333333333,
-        "over_budget_frames": 1136,
+        "average_ms": 16.71503794962963,
+        "min_ms": 15.023658666666666,
+        "max_ms": 18.422805333333333,
+        "p50_ms": 16.703829333333335,
+        "p95_ms": 17.367018666666667,
+        "p99_ms": 18.329258666666668,
+        "over_budget_frames": 1151,
         "quantile_method": "nearest rank of every exact CP0-tick sample"
       },
       "work": {
         "samples": 1800,
-        "average_ms": 11.553404657777778,
-        "min_ms": 10.926592,
-        "max_ms": 16.275882666666668,
-        "p50_ms": 11.385792,
-        "p95_ms": 12.895317333333333,
-        "p99_ms": 14.634730666666666,
+        "average_ms": 11.65665829925926,
+        "min_ms": 11.008384,
+        "max_ms": 16.368981333333334,
+        "p50_ms": 11.490453333333333,
+        "p95_ms": 12.982058666666667,
+        "p99_ms": 14.779008,
         "over_budget_frames": 0,
         "quantile_method": "nearest rank of every exact CP0-tick sample"
       }
@@ -218,13 +218,13 @@
       "vis": 1800,
       "presents": 1800,
       "repeats": 0,
-      "ticks": 1410335785,
+      "ticks": 1410335133,
       "tracked": true,
       "max_gap_vis": 1,
-      "max_interval_ms": 18.25984,
-      "seconds": 30.087163413333332,
-      "native_refresh_hz": 59.826178203370205,
-      "presented_fps": 59.826178203370205
+      "max_interval_ms": 18.272085333333333,
+      "seconds": 30.087149504,
+      "native_refresh_hz": 59.82620586110011,
+      "presented_fps": 59.82620586110011
     },
     "workload": {
       "frames": 1800,
@@ -239,8 +239,8 @@
       "full_max": 0,
       "drawn_min": 2,
       "drawn_max": 2,
-      "triangles_min": 1182,
-      "triangles_max": 1182,
+      "triangles_min": 1190,
+      "triangles_max": 1190,
       "heads_min": 0,
       "heads_max": 0
     }
@@ -306,7 +306,7 @@
     "animated-patrol": [
       {
         "position": [
-          -1.1,
+          -1.08,
           0.0,
           1.2
         ],
@@ -315,7 +315,7 @@
       },
       {
         "position": [
-          -1.54,
+          -1.55,
           0.0,
           1.2
         ],
@@ -324,7 +324,7 @@
       },
       {
         "position": [
-          -2.34,
+          -2.36,
           0.0,
           1.2
         ],
@@ -333,7 +333,7 @@
       },
       {
         "position": [
-          -1.62,
+          -1.6,
           0.0,
           1.2
         ],
@@ -342,7 +342,7 @@
       },
       {
         "position": [
-          -1.02,
+          -1.03,
           0.0,
           1.2
         ],
@@ -351,7 +351,7 @@
       },
       {
         "position": [
-          -1.82,
+          -1.83,
           0.0,
           1.2
         ],
@@ -360,7 +360,7 @@
       },
       {
         "position": [
-          -2.14,
+          -2.13,
           0.0,
           1.2
         ],
@@ -369,7 +369,7 @@
       },
       {
         "position": [
-          -1.34,
+          -1.32,
           0.0,
           1.2
         ],
@@ -378,7 +378,7 @@
       },
       {
         "position": [
-          -1.3,
+          -1.32,
           0.0,
           1.2
         ],
@@ -387,7 +387,7 @@
       },
       {
         "position": [
-          -2.11,
+          -2.12,
           0.0,
           1.2
         ],
@@ -396,7 +396,7 @@
       },
       {
         "position": [
-          -1.85,
+          -1.84,
           0.0,
           1.2
         ],
@@ -405,7 +405,7 @@
       },
       {
         "position": [
-          -1.05,
+          -1.04,
           0.0,
           1.2
         ],
@@ -414,7 +414,7 @@
       },
       {
         "position": [
-          -1.59,
+          -1.6,
           0.0,
           1.2
         ],
@@ -423,7 +423,7 @@
       },
       {
         "position": [
-          -2.37,
+          -2.36,
           0.0,
           1.2
         ],
@@ -432,7 +432,7 @@
       },
       {
         "position": [
-          -1.57,
+          -1.56,
           0.0,
           1.2
         ],
@@ -441,7 +441,7 @@
       },
       {
         "position": [
-          -1.06,
+          -1.08,
           0.0,
           1.2
         ],
@@ -450,7 +450,7 @@
       },
       {
         "position": [
-          -1.87,
+          -1.88,
           0.0,
           1.2
         ],
@@ -495,7 +495,7 @@
       },
       {
         "position": [
-          -1.81,
+          -1.82,
           0.0,
           1.2
         ],
@@ -504,7 +504,7 @@
       },
       {
         "position": [
-          -1.01,
+          -1.02,
           0.0,
           1.2
         ],
@@ -549,7 +549,7 @@
       },
       {
         "position": [
-          -1.9,
+          -1.91,
           0.0,
           1.2
         ],
@@ -558,7 +558,7 @@
       },
       {
         "position": [
-          -2.07,
+          -2.06,
           0.0,
           1.2
         ],
@@ -567,7 +567,7 @@
       },
       {
         "position": [
-          -1.26,
+          -1.25,
           0.0,
           1.2
         ],
@@ -853,7 +853,7 @@
       "models": "2",
       "shared_matrix_bytes": "1536",
       "pose_scratch_arrays_bytes": "1792",
-      "normal_cache_bytes": "23928",
+      "normal_cache_bytes": "24216",
       "per_enemy_motion_bytes": "8",
       "timeline": "actual-distance",
       "head_yaw_max": "45",
@@ -865,9 +865,9 @@
       "frames": 1800,
       "windows": 30,
       "average_ms_per_frame": {
-        "probe": 1.06490912,
-        "normal": 2.2358393125925926,
-        "color_upload": 2.4883309866666665
+        "probe": 1.0554736118518517,
+        "normal": 2.2283649896296294,
+        "color_upload": 2.5288499792592596
       },
       "scope": "Nested CPU elapsed excluding audio; independent report windows selected inside steady interval. Do not add to parent slots."
     },
@@ -875,7 +875,7 @@
       "frames": 1800,
       "windows": 30,
       "average_ms_per_frame": {
-        "sample": 1.0591873422222222,
+        "sample": 1.06457248,
         "skin": 0.0
       },
       "scope": "Nested CPU elapsed excluding audio; independent report windows selected inside steady interval. Do not add to parent slots."
@@ -889,26 +889,26 @@
     "This verifies the authored two-guard camera/route, not crowded combat or worst-case audio.",
     "Active procedural head attention is counted; quiet patrol/sentry can report zero and does not benchmark alerted head tracking."
   ],
-  "source_sha256": "13c4f5cf124d8a8018400fef6d937ae49e850b6e5f8fc7b50b78f4ddd48ff462",
-  "asset_sha256": "69d62710e4982a640ba515a1047bb67204fb451266c9b4e3fd4b7b7d7ff0997f",
+  "source_sha256": "0480ac4b7343b82b1f5c709c93d3496f8fd89ea846315a6b68b96028cb9fb8fd",
+  "asset_sha256": "5a4b7b78522eb3e4f8986f9e37e0109441f64d3f62e0e2bbcdb90d31d4837ae2",
   "run": {
     "name": "guard-performance",
     "passed": true,
-    "log": ".dev\\ares\\runs\\8a3e1e94a98f4b8e99c4c24e1c4cc9cb\\guard-performance.log",
-    "tested_rom": ".dev\\ares\\runs\\8a3e1e94a98f4b8e99c4c24e1c4cc9cb\\DarkLantern64-animation_workshop-preset-two-guards-t3d.z64",
-    "rom_sha256": "57251bd8fce35edae0d83c35a11d18380613afbb9b5e48a43de3ed7cd9bf77fd",
+    "log": ".dev\\ares\\runs\\9dfab25dc6864e668d8ead26cf57f811\\guard-performance.log",
+    "tested_rom": ".dev\\ares\\runs\\9dfab25dc6864e668d8ead26cf57f811\\DarkLantern64-animation_workshop-preset-two-guards-t3d.z64",
+    "rom_sha256": "c3e5c3d297aeb818f5aa905b1e6cf3e4009e5c362caefc07d771416ae93263ff",
     "rom_bytes": 376832,
-    "settings": ".dev\\ares\\runs\\8a3e1e94a98f4b8e99c4c24e1c4cc9cb\\settings.bml",
-    "settings_source_sha256": "38509335b888565dce197812f23f450ebbb2d711090313d1786deae83d979f21",
+    "settings": ".dev\\ares\\runs\\9dfab25dc6864e668d8ead26cf57f811\\settings.bml",
+    "settings_source_sha256": "792881a14980e13000dbc3d59ea5439507e0379fb162fcdfaa7dd54067fa5047",
     "profile_report": null,
-    "elapsed_seconds": 36.813,
-    "peak_sampled_heap_bytes": 1006200,
-    "max_reported_cpu_ms": 12.53,
+    "elapsed_seconds": 37.047,
+    "peak_sampled_heap_bytes": 1007984,
+    "max_reported_cpu_ms": 12.63,
     "boot": "DL64 boot_ok memory=8388608 scene=\"DarkLantern64 - Guard Animation Workshop\" meshes=2 models=12 colliders=8 version=2 world=3d renderer=rsp-tiny3d depth=hardware",
     "terminal_event": "DL64 profile_end window=33"
   },
   "manifest": {
-    "signature": "c75130b639b815c7dc3efcd1213df0c727890e8eba8b0d782f3793980db3267d",
+    "signature": "8b7dd9a999a18b8a9198b1f1155894e2b866b4838d4aa20c38dc2f8e7868df9f",
     "compiler": "mips64-elf-gcc.exe (GCC) 16.2.0",
     "sdk": "C:\\n64-toolchain",
     "renderer": "t3d",
@@ -925,12 +925,12 @@
         "-O3"
       ]
     },
-    "source_sha256": "597221bcfde4f26dd2190ac028e5b9b7c4f2274772c0cb7cba73b9858aaa1ac5",
+    "source_sha256": "aedfc172e12a9364f00ec7198a4d801d6f7e48480f9d72056803fd0cadfbf459",
     "rom": "build\\DarkLantern64-animation_workshop-preset-two-guards-t3d.z64",
     "rom_bytes": 376832,
-    "rom_sha256": "57251bd8fce35edae0d83c35a11d18380613afbb9b5e48a43de3ed7cd9bf77fd",
-    "static_image_bytes": 653856,
-    "elapsed_seconds": 6.669,
+    "rom_sha256": "c3e5c3d297aeb818f5aa905b1e6cf3e4009e5c362caefc07d771416ae93263ff",
+    "static_image_bytes": 678800,
+    "elapsed_seconds": 7.509,
     "autoplay": false,
     "debug_overlay": false,
     "capture": false,
@@ -951,16 +951,123 @@
           "cooked_dir": "build/scenes/animation_workshop",
           "content": {
             "version": 2,
-            "source_sha256": "597221bcfde4f26dd2190ac028e5b9b7c4f2274772c0cb7cba73b9858aaa1ac5",
+            "source_sha256": "aedfc172e12a9364f00ec7198a4d801d6f7e48480f9d72056803fd0cadfbf459",
             "title": "DarkLantern64 - Guard Animation Workshop",
+            "resolved_catalog": {
+              "assets": [
+                {
+                  "id": "mesh-block",
+                  "uri": "models/block.obj"
+                },
+                {
+                  "id": "mesh-guard",
+                  "type": "character",
+                  "uri": "assets/guard/guard.character.json"
+                }
+              ],
+              "materials": [
+                {
+                  "id": "mat-stone",
+                  "color": [
+                    0.3,
+                    0.35,
+                    0.42,
+                    1
+                  ]
+                },
+                {
+                  "id": "mat-wood",
+                  "color": [
+                    0.35,
+                    0.2,
+                    0.08,
+                    1
+                  ]
+                },
+                {
+                  "id": "mat-switch",
+                  "color": [
+                    0.15,
+                    0.7,
+                    0.35,
+                    1
+                  ]
+                },
+                {
+                  "id": "mat-gold",
+                  "color": [
+                    0.95,
+                    0.66,
+                    0.12,
+                    1
+                  ]
+                },
+                {
+                  "id": "mat-guard",
+                  "color": [
+                    1,
+                    1,
+                    1,
+                    1
+                  ],
+                  "double_sided": false,
+                  "texture": {
+                    "uri": "assets/guard/guard-atlas.png",
+                    "width": 32,
+                    "height": 32,
+                    "format": "RGBA16"
+                  }
+                }
+              ],
+              "prefabs": [
+                {
+                  "id": "guard-watchman",
+                  "enemy_type": "watchman",
+                  "model": "mesh-guard",
+                  "material": "mat-guard",
+                  "scale": [
+                    1,
+                    1,
+                    1
+                  ]
+                },
+                {
+                  "id": "guard-scout",
+                  "enemy_type": "scout",
+                  "model": "mesh-guard",
+                  "material": "mat-guard",
+                  "scale": [
+                    1,
+                    1,
+                    1
+                  ]
+                }
+              ],
+              "origins": {
+                "mesh-guard": "assets/guard/pack.json",
+                "mat-guard": "assets/guard/pack.json",
+                "guard-watchman": "assets/guard/pack.json",
+                "guard-scout": "assets/guard/pack.json"
+              }
+            },
+            "limits": {
+              "mesh_vertices": 4096,
+              "scene_vertices": 6144,
+              "scene_triangles": 4096,
+              "models": 128
+            },
             "dependencies": [
+              {
+                "uri": "assets/guard/pack.json",
+                "sha256": "47d830d24b06da3e161b290710d4b0e8450298f9d7fb455ae44b6b423921fc4d"
+              },
               {
                 "uri": "models/block.obj",
                 "sha256": "75c2b7dee24119997301183cc75e75844ebb13f96ec95bc195ac1f9b066f82ed"
               },
               {
                 "uri": "assets/guard/guard.character.json",
-                "sha256": "69d62710e4982a640ba515a1047bb67204fb451266c9b4e3fd4b7b7d7ff0997f"
+                "sha256": "5a4b7b78522eb3e4f8986f9e37e0109441f64d3f62e0e2bbcdb90d31d4837ae2"
               },
               {
                 "uri": "assets/guard/guard-atlas.png",
@@ -969,6 +1076,10 @@
               {
                 "uri": "code:src/enemy_types.def",
                 "sha256": "c7dc61a6e285278279d633a0b4e41be904bc26897e78fb1f5c61b79ccffae1e4"
+              },
+              {
+                "uri": "code:src/content_limits.h",
+                "sha256": "ec4c37638a9ee2e7bc4fb415caa1071d20a1f5b64ee60f54d1f27bcf1183a591"
               }
             ],
             "counts": {
@@ -976,23 +1087,23 @@
               "meshes": 2,
               "models": 12,
               "colliders": 8,
-              "instanced_vertices": 2074,
-              "instanced_triangles": 1182,
+              "instanced_vertices": 2098,
+              "instanced_triangles": 1190,
               "lights": 2,
               "enemies": 2,
               "test_starts": 2,
               "patrol_points": 2
             },
-            "compiled_geometry_bytes": 26285,
-            "compiled_normal_bytes": 2991,
+            "compiled_geometry_bytes": 26585,
+            "compiled_normal_bytes": 3027,
             "characters": {
               "mesh-guard": {
                 "version": 1,
                 "id": "basic-guard",
                 "skeleton_id": "humanoid-v1",
                 "bones": 20,
-                "vertices": 997,
-                "triangles": 531,
+                "vertices": 1009,
+                "triangles": 535,
                 "cross_joint_triangles": 48,
                 "clips": [
                   {
@@ -1012,7 +1123,7 @@
                     "quantization_error": {
                       "tested_pose_samples": 121,
                       "max_vertex_error_m": 2.168431734203979e-05,
-                      "rms_vertex_error_m": 5.70867777844535e-06,
+                      "rms_vertex_error_m": 5.675948349776574e-06,
                       "max_socket_error_m": 1.3785254729075001e-05,
                       "bounds_min": [
                         -0.4550001282342639,
@@ -1041,7 +1152,7 @@
                       "error": {
                         "tested_pose_samples": 121,
                         "max_vertex_error_m": 9.802913754787621e-05,
-                        "rms_vertex_error_m": 1.7118707842316975e-05,
+                        "rms_vertex_error_m": 1.7020776270136587e-05,
                         "max_socket_error_m": 4.0702429293664776e-05,
                         "bounds_min": [
                           -0.4550001282342639,
@@ -1074,7 +1185,7 @@
                     "quantization_error": {
                       "tested_pose_samples": 85,
                       "max_vertex_error_m": 4.0980250258314225e-05,
-                      "rms_vertex_error_m": 6.22573832717117e-06,
+                      "rms_vertex_error_m": 6.211900359184041e-06,
                       "max_socket_error_m": 2.858400415280749e-05,
                       "bounds_min": [
                         -0.4550152893977268,
@@ -1103,7 +1214,7 @@
                       "error": {
                         "tested_pose_samples": 85,
                         "max_vertex_error_m": 0.003019636308886621,
-                        "rms_vertex_error_m": 0.0002654952586483339,
+                        "rms_vertex_error_m": 0.00026488453166920536,
                         "max_socket_error_m": 0.002150813661236427,
                         "bounds_min": [
                           -0.4550152893977268,
@@ -1136,7 +1247,7 @@
                     "quantization_error": {
                       "tested_pose_samples": 49,
                       "max_vertex_error_m": 0.00014366440712561458,
-                      "rms_vertex_error_m": 6.667966058175771e-05,
+                      "rms_vertex_error_m": 6.666857914711348e-05,
                       "max_socket_error_m": 0.00012491168549330983,
                       "bounds_min": [
                         -0.4567542850034481,
@@ -1165,7 +1276,7 @@
                       "error": {
                         "tested_pose_samples": 49,
                         "max_vertex_error_m": 0.024015330031041227,
-                        "rms_vertex_error_m": 0.003314693257115136,
+                        "rms_vertex_error_m": 0.0033009218146571153,
                         "max_socket_error_m": 0.009462710977706143,
                         "bounds_min": [
                           -0.4567617803300672,
@@ -1198,7 +1309,7 @@
                     "quantization_error": {
                       "tested_pose_samples": 97,
                       "max_vertex_error_m": 1.3469402050414065e-05,
-                      "rms_vertex_error_m": 3.507992951031176e-06,
+                      "rms_vertex_error_m": 3.5403035257062885e-06,
                       "max_socket_error_m": 1.1416353079223176e-05,
                       "bounds_min": [
                         -0.45893209860695094,
@@ -1227,7 +1338,7 @@
                       "error": {
                         "tested_pose_samples": 97,
                         "max_vertex_error_m": 0.0011218929420134956,
-                        "rms_vertex_error_m": 0.00022533616388756796,
+                        "rms_vertex_error_m": 0.00022622095275703552,
                         "max_socket_error_m": 0.0007794617752457498,
                         "bounds_min": [
                           -0.4589316174954788,
@@ -1260,7 +1371,7 @@
                     "quantization_error": {
                       "tested_pose_samples": 73,
                       "max_vertex_error_m": 0.0001135704598286821,
-                      "rms_vertex_error_m": 5.5136106934465835e-05,
+                      "rms_vertex_error_m": 5.5133390732502474e-05,
                       "max_socket_error_m": 0.0001085108203169663,
                       "bounds_min": [
                         -0.45539828364317847,
@@ -1289,7 +1400,7 @@
                       "error": {
                         "tested_pose_samples": 73,
                         "max_vertex_error_m": 0.0043671122363597974,
-                        "rms_vertex_error_m": 0.0007897281631641034,
+                        "rms_vertex_error_m": 0.0007871161768964217,
                         "max_socket_error_m": 0.0026974506026806832,
                         "bounds_min": [
                           -0.45539473823121385,
@@ -1306,13 +1417,13 @@
                     }
                   }
                 ],
-                "single_joint_triangles": 483,
+                "single_joint_triangles": 487,
                 "unique_bind_positions": 316,
                 "vertex_attribute_splits": {
                   "unique_positions": 316,
                   "with_joint_identity": 316,
-                  "with_quantized_normals": 693,
-                  "with_texture_coordinates": 997,
+                  "with_quantized_normals": 669,
+                  "with_texture_coordinates": 1009,
                   "note": "Cumulative distinct attribute tuples, before any target cache scheduling. A shared position may still require separate vertices for normals or UV seams."
                 },
                 "joint_connections": [
@@ -1353,8 +1464,8 @@
                 "encoded_key_bytes": 8820,
                 "dense_float_key_bytes": 120400,
                 "dense_int16_key_bytes": 60200,
-                "geometry_bytes": 26117,
-                "joint_index_bytes": 997,
+                "geometry_bytes": 26417,
+                "joint_index_bytes": 1009,
                 "skeleton_descriptor_bytes_n64": 1280,
                 "asset_descriptor_bytes_n64": 52,
                 "socket_descriptor_bytes_n64": 72,
@@ -1368,7 +1479,7 @@
                 "bounds_policy": "Conservative hierarchy path-length sphere includes arbitrary rigid rotation, blending and head attention.",
                 "compression_policy": "Source sample rates preserved; int16 XYZW and XYZ, rest-channel removal and single-sample constants. 15 Hz is comparison only.",
                 "memory_note": "Immutable keys and geometry shared per asset. Target descriptor estimates exclude strings, final linker alignment, pose scratch, per-actor state and renderer caches; measure target sizeof separately.",
-                "source_sha256": "69d62710e4982a640ba515a1047bb67204fb451266c9b4e3fd4b7b7d7ff0997f"
+                "source_sha256": "5a4b7b78522eb3e4f8986f9e37e0109441f64d3f62e0e2bbcdb90d31d4837ae2"
               }
             },
             "memory_note": "Geometry arrays only; runtime buffers, state and other data need separate RDRAM measurement. Baseline 8 MiB.",
@@ -1771,14 +1882,16 @@
                 "label": "Watchman",
                 "speed": 0.8,
                 "sight_range": 6.5,
-                "hearing_range": 7.0
+                "hearing_range": 7.0,
+                "visual_prefab": "guard-watchman"
               },
               {
                 "id": "scout",
                 "label": "Scout",
                 "speed": 1.1,
                 "sight_range": 8.0,
-                "hearing_range": 8.0
+                "hearing_range": 8.0,
+                "visual_prefab": "guard-scout"
               }
             ],
             "enemy_instances": {
@@ -1839,7 +1952,7 @@
               "patrol-right"
             ],
             "changed_artifacts": [],
-            "elapsed_ms": 29.5,
+            "elapsed_ms": 63.8,
             "textures": {
               "version": 1,
               "textures": [
@@ -1956,11 +2069,11 @@
         "maximum_level_decoded_bytes": 2048,
         "maximum_level_sprite_bytes": 2184
       },
-      "resident_geometry_bytes": 26285,
+      "resident_geometry_bytes": 26585,
       "memory_note": "All bundled geometry and descriptors are resident. Only the active level's sprites are loaded; maximum_level_sprite_bytes excludes allocator overhead. Renderer, game, audio and display buffers are additional.",
       "characters": {
         "unique_assets": 1,
-        "shared_geometry_bytes": 26117,
+        "shared_geometry_bytes": 26417,
         "geometry_duplication_avoided_bytes": 0,
         "shared_key_bytes": 8820,
         "assets": [
@@ -1969,8 +2082,8 @@
             "id": "basic-guard",
             "skeleton_id": "humanoid-v1",
             "bones": 20,
-            "vertices": 997,
-            "triangles": 531,
+            "vertices": 1009,
+            "triangles": 535,
             "cross_joint_triangles": 48,
             "clips": [
               {
@@ -1990,7 +2103,7 @@
                 "quantization_error": {
                   "tested_pose_samples": 121,
                   "max_vertex_error_m": 2.168431734203979e-05,
-                  "rms_vertex_error_m": 5.70867777844535e-06,
+                  "rms_vertex_error_m": 5.675948349776574e-06,
                   "max_socket_error_m": 1.3785254729075001e-05,
                   "bounds_min": [
                     -0.4550001282342639,
@@ -2019,7 +2132,7 @@
                   "error": {
                     "tested_pose_samples": 121,
                     "max_vertex_error_m": 9.802913754787621e-05,
-                    "rms_vertex_error_m": 1.7118707842316975e-05,
+                    "rms_vertex_error_m": 1.7020776270136587e-05,
                     "max_socket_error_m": 4.0702429293664776e-05,
                     "bounds_min": [
                       -0.4550001282342639,
@@ -2052,7 +2165,7 @@
                 "quantization_error": {
                   "tested_pose_samples": 85,
                   "max_vertex_error_m": 4.0980250258314225e-05,
-                  "rms_vertex_error_m": 6.22573832717117e-06,
+                  "rms_vertex_error_m": 6.211900359184041e-06,
                   "max_socket_error_m": 2.858400415280749e-05,
                   "bounds_min": [
                     -0.4550152893977268,
@@ -2081,7 +2194,7 @@
                   "error": {
                     "tested_pose_samples": 85,
                     "max_vertex_error_m": 0.003019636308886621,
-                    "rms_vertex_error_m": 0.0002654952586483339,
+                    "rms_vertex_error_m": 0.00026488453166920536,
                     "max_socket_error_m": 0.002150813661236427,
                     "bounds_min": [
                       -0.4550152893977268,
@@ -2114,7 +2227,7 @@
                 "quantization_error": {
                   "tested_pose_samples": 49,
                   "max_vertex_error_m": 0.00014366440712561458,
-                  "rms_vertex_error_m": 6.667966058175771e-05,
+                  "rms_vertex_error_m": 6.666857914711348e-05,
                   "max_socket_error_m": 0.00012491168549330983,
                   "bounds_min": [
                     -0.4567542850034481,
@@ -2143,7 +2256,7 @@
                   "error": {
                     "tested_pose_samples": 49,
                     "max_vertex_error_m": 0.024015330031041227,
-                    "rms_vertex_error_m": 0.003314693257115136,
+                    "rms_vertex_error_m": 0.0033009218146571153,
                     "max_socket_error_m": 0.009462710977706143,
                     "bounds_min": [
                       -0.4567617803300672,
@@ -2176,7 +2289,7 @@
                 "quantization_error": {
                   "tested_pose_samples": 97,
                   "max_vertex_error_m": 1.3469402050414065e-05,
-                  "rms_vertex_error_m": 3.507992951031176e-06,
+                  "rms_vertex_error_m": 3.5403035257062885e-06,
                   "max_socket_error_m": 1.1416353079223176e-05,
                   "bounds_min": [
                     -0.45893209860695094,
@@ -2205,7 +2318,7 @@
                   "error": {
                     "tested_pose_samples": 97,
                     "max_vertex_error_m": 0.0011218929420134956,
-                    "rms_vertex_error_m": 0.00022533616388756796,
+                    "rms_vertex_error_m": 0.00022622095275703552,
                     "max_socket_error_m": 0.0007794617752457498,
                     "bounds_min": [
                       -0.4589316174954788,
@@ -2238,7 +2351,7 @@
                 "quantization_error": {
                   "tested_pose_samples": 73,
                   "max_vertex_error_m": 0.0001135704598286821,
-                  "rms_vertex_error_m": 5.5136106934465835e-05,
+                  "rms_vertex_error_m": 5.5133390732502474e-05,
                   "max_socket_error_m": 0.0001085108203169663,
                   "bounds_min": [
                     -0.45539828364317847,
@@ -2267,7 +2380,7 @@
                   "error": {
                     "tested_pose_samples": 73,
                     "max_vertex_error_m": 0.0043671122363597974,
-                    "rms_vertex_error_m": 0.0007897281631641034,
+                    "rms_vertex_error_m": 0.0007871161768964217,
                     "max_socket_error_m": 0.0026974506026806832,
                     "bounds_min": [
                       -0.45539473823121385,
@@ -2284,13 +2397,13 @@
                 }
               }
             ],
-            "single_joint_triangles": 483,
+            "single_joint_triangles": 487,
             "unique_bind_positions": 316,
             "vertex_attribute_splits": {
               "unique_positions": 316,
               "with_joint_identity": 316,
-              "with_quantized_normals": 693,
-              "with_texture_coordinates": 997,
+              "with_quantized_normals": 669,
+              "with_texture_coordinates": 1009,
               "note": "Cumulative distinct attribute tuples, before any target cache scheduling. A shared position may still require separate vertices for normals or UV seams."
             },
             "joint_connections": [
@@ -2331,8 +2444,8 @@
             "encoded_key_bytes": 8820,
             "dense_float_key_bytes": 120400,
             "dense_int16_key_bytes": 60200,
-            "geometry_bytes": 26117,
-            "joint_index_bytes": 997,
+            "geometry_bytes": 26417,
+            "joint_index_bytes": 1009,
             "skeleton_descriptor_bytes_n64": 1280,
             "asset_descriptor_bytes_n64": 52,
             "socket_descriptor_bytes_n64": 72,
@@ -2346,7 +2459,7 @@
             "bounds_policy": "Conservative hierarchy path-length sphere includes arbitrary rigid rotation, blending and head attention.",
             "compression_policy": "Source sample rates preserved; int16 XYZW and XYZ, rest-channel removal and single-sample constants. 15 Hz is comparison only.",
             "memory_note": "Immutable keys and geometry shared per asset. Target descriptor estimates exclude strings, final linker alignment, pose scratch, per-actor state and renderer caches; measure target sizeof separately.",
-            "source_sha256": "69d62710e4982a640ba515a1047bb67204fb451266c9b4e3fd4b7b7d7ff0997f"
+            "source_sha256": "5a4b7b78522eb3e4f8986f9e37e0109441f64d3f62e0e2bbcdb90d31d4837ae2"
           }
         ],
         "memory_note": "Character geometry, skeletons, clips and sockets are emitted once per content hash in a dedicated C unit, shared across levels and actors. Level mesh descriptors and actor render caches remain per instance/level."
@@ -2395,35 +2508,33 @@
       "decoded_bytes": 2048,
       "sprite_bytes": 2184
     },
-    "size_output": "   text\t   data\t    bss\t    dec\t    hex\tfilename\n 362580\t  32672\t 258604\t 653856\t  9fa20\tC:/Users/hughe/dev/DarkLantern64/build/DarkLantern64-animation_workshop-preset-two-guards-t3d/DarkLantern64-animation_workshop-preset-two-guards-t3d.elf\n"
+    "size_output": "   text\t   data\t    bss\t    dec\t    hex\tfilename\n 362948\t  32672\t 283180\t 678800\t  a5b90\tC:/Users/hughe/dev/DarkLantern64/build/DarkLantern64-animation_workshop-preset-two-guards-t3d/DarkLantern64-animation_workshop-preset-two-guards-t3d.elf\n"
   },
   "baseline_report": "build/guard-60fps/baseline-two-guards.json",
   "visibility_evidence": {
     "path": "docs/evidence/guard-60fps-visibility.json",
-    "sha256": "26fb83cc3bea0a87e15f51e5a0b50430c1faac66644a4d0cc0a566d7548e76b2",
+    "sha256": "bd4a99d49e0c7f5e2cd01ad171e98cfa9618b65a9b7faa1d1596597187f4f8a1",
     "method": "separate-framebuffer-visual-review",
     "preset": "two-guards",
     "renderer": "t3d",
-    "source_sha256": "13c4f5cf124d8a8018400fef6d937ae49e850b6e5f8fc7b50b78f4ddd48ff462",
-    "asset_sha256": "69d62710e4982a640ba515a1047bb67204fb451266c9b4e3fd4b7b7d7ff0997f",
-    "capture_rom_sha256": "41a01227e4d7498dd194817d1c019b130034b3aaa4e23d63b2f575f2521c16a1",
+    "source_sha256": "0480ac4b7343b82b1f5c709c93d3496f8fd89ea846315a6b68b96028cb9fb8fd",
+    "asset_sha256": "5a4b7b78522eb3e4f8986f9e37e0109441f64d3f62e0e2bbcdb90d31d4837ae2",
+    "capture_rom_sha256": "ab13e6c6e765efe6933f2958bf511633ccbe8c4544a4d3881875f2a74eca2739",
     "images": [
       {
         "path": "../images/guard-rsp-two-idle.png",
-        "sha256": "f4afdfdf250abe63ee8583d4d5983d0442b051beee2d1126ae245be997666237"
+        "sha256": "db8949b54f93b3533539acce1754b130e761f22a45de7b722cb84e4750809c75"
       },
       {
         "path": "../images/guard-rsp-two-walk.png",
-        "sha256": "972e1b153f0a4d4990ab1fec02219583e9ca7b4b2f8807ecbcee3065d59185f8"
+        "sha256": "77c3ffa2cb77c529633894949e27ad9a37fcbe1f167bd7c902c5e37d23521b4f"
       }
     ],
     "visible_guards": [
       "animated-patrol",
       "animated-sentry"
     ],
-    "reviewer": "Codex: inspected both raw RDP framebuffer exports. Both guards, their articulated limbs, textured materials and HUD are visible. The right guard has extremities near the viewport edge; full-body coverage is not an acceptance claim.",
+    "reviewer": "Codex: inspected both raw RDP framebuffer exports after the shared-resource migration and integrated sleeve stripe fix. Both articulated, textured guards and the HUD are visible. The right guard has extremities near the viewport edge; full-body coverage is not an acceptance claim.",
     "limitations": "Separate frozen animation-phase captures prove visible geometry. The performance run independently uses live patrol movement, idle sentry, normal audio and gameplay; capture synchronization/logging is excluded from that run."
-  },
-  "archived_report_sha256": "3195b4d2cac4d0c4119849aefe23c50b866f3ed37db2441a6508ba26978048f1",
-  "archive_note": "Project-local absolute paths normalized to repository-relative paths; measurement values and content/ROM/log hashes preserved."
+  }
 }

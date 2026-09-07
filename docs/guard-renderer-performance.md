@@ -6,23 +6,23 @@ The two-guard workshop **passes the sustained 60 fps target in Ares**, presentin
 
 | Steady measurement | Result |
 | --- | ---: |
-| Average CPU work | 11.553 ms |
-| 95th / 99th percentile work | 12.895 / 14.635 ms |
-| Maximum CPU work | 16.276 ms |
+| Average CPU work | 11.657 ms |
+| 95th / 99th percentile work | 12.982 / 14.779 ms |
+| Maximum CPU work | 16.369 ms |
 | Work samples exceeding 16.667 ms | 0 / 1,800 |
 | Fresh framebuffers / VI scans | 1,800 / 1,800 |
-| Average transforms / lighting / triangle submission | 2.984 / 6.162 / 0.381 ms |
-| Average normal HUD | 0.056 ms |
+| Average transforms / lighting / triangle submission | 3.001 / 6.197 / 0.373 ms |
+| Average normal HUD | 0.057 ms |
 
-Work includes audio, reporting and queue stalls, and excludes display-buffer waiting. The debug overlay is off; profiling continues in the background. Two posed guards and 1,182 candidate scene triangles were submitted in every measured frame. The patrol moves along its route while the sentry holds position. This quiet scene has no active attention overlays and does not establish crowded combat, worst-case audio or original N64/M64 performance. The verified ROM SHA-256 is `57251bd8fce35edae0d83c35a11d18380613afbb9b5e48a43de3ed7cd9bf77fd`.
+Work includes audio, reporting and queue stalls, and excludes display-buffer waiting. The debug overlay is off; profiling continues in the background. Two posed guards and 1,190 candidate scene triangles were submitted in every measured frame. The patrol moves along its route while the sentry holds position. This quiet scene has no active attention overlays and does not establish crowded combat, worst-case audio or original N64/M64 performance. This recheck includes the shared-resource migration and integrated sleeve stripe. The verified ROM SHA-256 is `c3e5c3d297aeb818f5aa905b1e6cf3e4009e5c362caefc07d771416ae93263ff`.
 
 The earlier [animation prototype measurement](evidence/guard-runtime.json) averaged **99.64 ms per frame** with the CPU reference renderer. That is a historical workflow/correctness measurement, not a controlled speedup denominator: the final authored camera was adjusted to frame the two guards. Short diagnostic runs and reciprocal CPU work time do not establish presentation throughput; the final result checks actual scanout changes separately.
 
 ## Workload and division of work
 
-The current [guard asset report](evidence/guard-compression.json) records 20 bones, 531 triangles, 997 attribute vertices, five clips and 8,820 bytes of compressed keys. The 32 × 32 atlas and all 48 triangles spanning elbow/knee joints remain present. No mesh simplification or animation-rate reduction is part of this renderer change.
+The initial [guard asset report](evidence/guard-compression.json) records 20 bones, 531 triangles, 997 attribute vertices, five clips and 8,820 bytes of compressed keys. The 32 × 32 atlas and all 48 triangles spanning elbow/knee joints remain present. No mesh simplification or animation-rate reduction was part of the renderer change. The later [sleeve correction](evidence/guard-armband-fix.json) changes the mesh to 535 triangles and 1,009 vertices while retaining the rig and clips; the performance result above includes that correction. The integration measurements below retain their original asset revision.
 
-| Per guard | Current count | Meaning |
+| Per guard | Initial integration count | Meaning |
 | --- | ---: | --- |
 | Bone transforms | 20 | One sampled pose palette; vertices have one influence each |
 | Source triangles | 531 | Original connectivity and triangle order retained |

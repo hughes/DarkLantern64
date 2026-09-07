@@ -268,6 +268,7 @@ class DemoEditor
     Json prefabs_ = Json::array();
     char assetPackUri_[256] = "assets/loot/pack.json";
     std::string selectedPrefab_;
+    std::string newEnemyType_ = "watchman";
     bool highlightNewProp_ = false;
     Scene* scene_ = nullptr;
     std::unordered_map<EntityId, std::string> previewIds_;
@@ -621,12 +622,12 @@ class DemoEditor
     void BindCharacters(Scene& scene)
     {
         characters_.clear(); characterAssets_.clear(); characterDiagnostics_=Json::object();
+        const Json assets=ResolvedDefinitions("assets");
         for (const auto& [id,sourceId] : previewIds_)
         {
             const auto* entity=Entity(sourceId);
             if (!entity || !entity->contains("model")) continue;
             const auto model=entity->at("model").get<std::string>();
-            const auto& assets=document_.at("assets");
             const auto source=std::find_if(assets.begin(),assets.end(),[&](const Json& row) { return row.at("id")==model; });
             if (source==assets.end() || source->value("type",std::string())!="character") continue;
             try
@@ -892,6 +893,44 @@ class DemoEditor
         for (const auto& type : EnemyTypes()) if (type.at("id") == id) return type;
         throw std::runtime_error("Unknown enemy type: " + id + ". Rebuild the editor content catalog if code changed.");
     }
+    std::string DefinitionOrigin(const std::string& id) const
+    {
+        if (!report_.contains("resolved_catalog")) return {};
+        const auto& origins=report_.at("resolved_catalog").at("origins");
+        return origins.value(id,std::string());
+    }
+    Json ResolvedDefinitions(const char* group) const
+    {
+        // Live local edits stay authoritative. Linked definitions are a cooked
+        // read-only catalog and are never appended to the saved document.
+        Json result=document_.at(group);
+        if (report_.contains("resolved_catalog"))
+            for (const auto& item : report_.at("resolved_catalog").at(group))
+                if (!DefinitionOrigin(item.at("id").get<std::string>()).empty()) result.push_back(item);
+        return result;
+    }
+    Json PrefabCatalog() const
+    {
+        Json result=prefabs_;
+        if (report_.contains("resolved_catalog"))
+            for (const auto& item : report_.at("resolved_catalog").at("prefabs")) result.push_back(item);
+        return result;
+    }
+    Json EnemyPrefab(const std::string& typeId) const
+    {
+        const auto& type=EnemyType(typeId);
+        const auto prefabId=type.value("visual_prefab",std::string());
+        for (const auto& prefab : PrefabCatalog()) if (prefab.at("id")==prefabId) return prefab;
+        throw std::runtime_error("No shared visual prefab for enemy type " + typeId + ". Link its asset pack and Save + Cook.");
+    }
+    bool UsesTypeVisual(const Json& entity) const
+    {
+        const auto& type=EnemyType(entity.value("enemy_type",std::string("watchman")));
+        if (!type.contains("visual_prefab")) return false;
+        const auto prefab=EnemyPrefab(type.at("id"));
+        return entity.value("model",std::string())==prefab.at("model").get<std::string>() &&
+               entity.value("material",std::string())==prefab.at("material").get<std::string>();
+    }
     static bool ValidId(const std::string& id)
     {
         return !id.empty() && id.size() <= 64 &&
@@ -903,6 +942,8 @@ class DemoEditor
         std::set<std::string> used;
         for (const char* group : {"assets","materials","entities"})
             for (const auto& item : document_.at(group)) used.insert(item.at("id").get<std::string>());
+        for (const char* group : {"assets","materials"})
+            for (const auto& item : ResolvedDefinitions(group)) used.insert(item.at("id").get<std::string>());
         return used;
     }
     static std::string NewId(const Json& args, const char* key, const std::string& prefix, std::set<std::string>& used)
@@ -955,11 +996,13 @@ class DemoEditor
             throw std::runtime_error("import_asset_pack requires only a content-relative uri");
         const std::string uri = args.at("uri").get<std::string>();
         if (uri.empty() || uri.size() > 240) throw std::runtime_error("Pack URI must contain 1-240 characters");
+        for (const auto& linked : document_.value("asset_packs",Json::array()))
+            if (linked==uri) throw std::runtime_error("This asset pack is already linked. Save + Cook refreshes its shared definitions; importing a copy would break that link.");
         const auto stage = queue_/"staging/asset-pack-level.json";
         const auto catalog = queue_/"staging/asset-pack-catalog.json";
         const auto output = queue_/"staging/asset-pack-import.json";
         AtomicWrite(stage,document_.dump(2)+"\n");
-        AtomicWrite(catalog,prefabs_.dump(2)+"\n");
+        AtomicWrite(catalog,PrefabCatalog().dump(2)+"\n");
         const int code = Run(root_,{L"python",(root_/"tools/asset_pack.py").wstring(),
             L"--level",stage.wstring(),L"--pack",fs::path(uri).wstring(),
             L"--asset-root",(root_/"content").wstring(),L"--catalog",catalog.wstring(),
@@ -967,13 +1010,20 @@ class DemoEditor
         if (code) throw std::runtime_error(Tail(queue_/"asset-pack-import.log"));
         Json imported = ReadJson(output);
         Json document = imported.at("document"), prefabs = imported.at("prefabs");
+        for (const char* group : {"assets","materials"})
+            for (const auto& item : document.at(group))
+                if (!DefinitionOrigin(item.at("id").get<std::string>()).empty())
+                    throw std::runtime_error("Copied definitions conflict with a linked resource: " + item.at("id").get<std::string>());
         const bool changed = document != document_;
         document_ = std::move(document);
-        prefabs_ = std::move(prefabs);
-        if (selectedPrefab_.empty() && !prefabs_.empty()) selectedPrefab_ = prefabs_[0].at("id");
+        prefabs_=Json::array();
+        for (const auto& prefab : prefabs)
+            if (DefinitionOrigin(prefab.at("id").get<std::string>()).empty()) prefabs_.push_back(prefab);
+        if (selectedPrefab_.empty())
+            for (const auto& prefab : prefabs) if (!prefab.contains("enemy_type")) { selectedPrefab_=prefab.at("id"); break; }
         dirty_ = dirty_ || changed;
         status_ = "Asset pack imported. Choose a prefab, place it, and edit XYZ. Save + Cook validates the models and textures.";
-        return {{"uri",uri},{"prefabs",prefabs_},{"dirty",dirty_},{"definitions_changed",changed},{"validation","geometry and textures checked on Save + Cook"}};
+        return {{"uri",uri},{"prefabs",PrefabCatalog()},{"dirty",dirty_},{"definitions_changed",changed},{"validation","geometry and textures checked on Save + Cook"}};
     }
     Json AddProp(const Json& args)
     {
@@ -985,8 +1035,10 @@ class DemoEditor
             throw std::runtime_error("loot_highlight must be a boolean");
         if (!args.contains("prefab") || !args.at("prefab").is_string()) throw std::runtime_error("Choose an imported prefab ID");
         const std::string prefabId = args.at("prefab");
-        const auto prefab = std::find_if(prefabs_.begin(),prefabs_.end(),[&](const Json& item) { return item.at("id") == prefabId; });
-        if (prefab == prefabs_.end()) throw std::runtime_error("Unknown prefab: " + prefabId + "; import its pack first");
+        const auto catalog=PrefabCatalog();
+        const auto prefab = std::find_if(catalog.begin(),catalog.end(),[&](const Json& item) { return item.at("id") == prefabId; });
+        if (prefab == catalog.end()) throw std::runtime_error("Unknown prefab: " + prefabId + "; import its pack first");
+        if (prefab->contains("enemy_type")) throw std::runtime_error("Use Add enemy to place an enemy prefab with gameplay behavior");
         CheckCapacity(1,0);
         size_t models = 0;
         for (const auto& entity : document_.at("entities")) if (entity.contains("model")) ++models;
@@ -1018,23 +1070,19 @@ class DemoEditor
             if (!entity || entity->at("kind") != "guard") throw std::runtime_error("template_id must identify an existing enemy");
             source = *entity;
         }
-        else
-            for (const auto& entity : document_.at("entities"))
-                if (entity.at("kind") == "guard") { source = entity; break; }
-        if (source.is_null())
+        const std::string typeId=args.value("enemy_type",source.is_null()?newEnemyType_:source.value("enemy_type",std::string("watchman")));
+        EnemyType(typeId);
+        if (source.is_null() || args.contains("enemy_type"))
         {
-            bool mesh = false, material = false;
-            for (const auto& asset : document_.at("assets")) if (asset.at("id") == "mesh-guard") mesh = true;
-            for (const auto& item : document_.at("materials")) if (item.at("id") == "mat-guard") material = true;
-            if (!mesh || !material) throw std::runtime_error("Add mesh-guard and mat-guard assets to this level, or supply an existing enemy template");
-            source = {{"kind","guard"},{"model","mesh-guard"},{"material","mat-guard"},
-                {"transform",{{"position",{0,0,0}},{"rotation",{0,0,0}},{"scale",{1,1,1}}}}};
+            const Json prefab=EnemyPrefab(typeId);
+            if (source.is_null()) source={{"kind","guard"},
+                {"transform",{{"position",{0,0,0}},{"rotation",{0,0,0}},{"scale",prefab.at("scale")}}}};
+            source["model"]=prefab.at("model"); source["material"]=prefab.at("material");
         }
         auto used = UsedIds();
         const std::string id = NewId(args,"id","enemy",used);
         source["id"] = id;
-        source["enemy_type"] = args.value("enemy_type",std::string("watchman"));
-        EnemyType(source.at("enemy_type").get<std::string>());
+        source["enemy_type"] = typeId;
         source["behavior"] = args.value("behavior",std::string("sentry"));
         if (source.at("behavior") != "sentry") throw std::runtime_error("New enemies start as sentries; author at least two route points before switching to patrol");
         source["patrol"] = Json::array();
@@ -1171,7 +1219,14 @@ class DemoEditor
                 throw std::runtime_error("Light intensity must be between 0 and 16");
             candidate[key] = value;
         }
+        if (candidate.at("kind")=="guard" && patch.contains("enemy_type") && UsesTypeVisual(*entity))
+        {
+            const auto prefab=EnemyPrefab(candidate.at("enemy_type"));
+            candidate["model"]=prefab.at("model"); candidate["material"]=prefab.at("material");
+        }
         CheckEnemy(candidate);
+        if (candidate.value("model",std::string())!=entity->value("model",std::string()) ||
+            candidate.value("material",std::string())!=entity->value("material",std::string())) structureDirty_=true;
         *entity = candidate;
         selected_ = id;
         dirty_ = true;
@@ -1220,6 +1275,8 @@ class DemoEditor
     void SetMaterial(const Json& args)
     {
         const std::string id = args.at("id");
+        const auto origin=DefinitionOrigin(id);
+        if (!origin.empty()) throw std::runtime_error("Shared material is read-only here: " + origin + ". Edit the shared resource, then Save + Cook to refresh.");
         Json* material = Material(id);
         if (!material) throw std::runtime_error("Unknown material: " + id);
         const auto& patch = args.at("patch");
@@ -1361,7 +1418,7 @@ class DemoEditor
                 if (request.at("expires_at").get<double>() < now) throw std::runtime_error("Request expired without execution");
                 const std::string op = request.at("op");
                 const Json args = request.value("args",Json::object());
-                if (op == "inspect") { Respond(id,true,{{"document",document_},{"source",source_.string()},{"output",output_.string()},{"scene_path",scenePath_},{"catalog",catalog_},{"pending_action",pendingAction_},{"dirty",dirty_},{"busy",Busy()},{"status",status_},{"report",report_},{"enemy_types",EnemyTypes()},{"prefabs",prefabs_},{"preview_refresh_pending",structureDirty_},{"audio",AudioState()},{"animation",AnimationState()}}); continue; }
+                if (op == "inspect") { Respond(id,true,{{"document",document_},{"source",source_.string()},{"output",output_.string()},{"scene_path",scenePath_},{"catalog",catalog_},{"pending_action",pendingAction_},{"dirty",dirty_},{"busy",Busy()},{"status",status_},{"report",report_},{"enemy_types",EnemyTypes()},{"prefabs",PrefabCatalog()},{"preview_refresh_pending",structureDirty_},{"audio",AudioState()},{"animation",AnimationState()}}); continue; }
                 if (op == "get_audio_memory") { Respond(id,true,AudioState()); continue; }
                 if (op == "get_animation") { Respond(id,true,AnimationState()); continue; }
                 if (op == "get_layout") { Respond(id,true,Layout()); continue; }
@@ -1558,6 +1615,13 @@ class DemoEditor
         if (ImGui::Begin("Room Objects"))
         {
             ImGui::BeginDisabled(Busy());
+            if (ImGui::BeginCombo("New enemy type",EnemyType(newEnemyType_).at("label").get<std::string>().c_str()))
+            {
+                for (const auto& type : EnemyTypes())
+                    if (ImGui::Selectable(type.at("label").get<std::string>().c_str(),type.at("id")==newEnemyType_))
+                        newEnemyType_=type.at("id");
+                ImGui::EndCombo();
+            }
             if (ImGui::Button("Add enemy"))
                 try { AddEnemy(Json::object()); }
                 catch (const std::exception& error) { status_ = error.what(); }
@@ -1580,7 +1644,7 @@ class DemoEditor
             }
             ImGui::EndDisabled();
             if (structureDirty_) ImGui::TextWrapped("Viewport refresh pending: Save + Cook to show added or removed models and waypoint markers.");
-            ImGui::TextWrapped("New enemies start at an existing actor/waypoint position. Move their XYZ placement before playing. Duplicates get independent route points.");
+            ImGui::TextWrapped("New enemies use their type's shared visual resource and start at an actor/waypoint position. Move their XYZ placement before playing. Duplicates keep resource links and get independent route points.");
             if (ImGui::CollapsingHeader("Asset packs / props",ImGuiTreeNodeFlags_DefaultOpen))
             {
                 ImGui::BeginDisabled(Busy());
@@ -1590,8 +1654,9 @@ class DemoEditor
                     catch (const std::exception& error) { status_ = error.what(); }
                 if (ImGui::BeginCombo("Prefab",selectedPrefab_.empty() ? "Import a pack" : selectedPrefab_.c_str()))
                 {
-                    for (const auto& prefab : prefabs_)
+                    for (const auto& prefab : PrefabCatalog())
                     {
+                        if (prefab.contains("enemy_type")) continue;
                         const std::string id = prefab.at("id");
                         if (ImGui::Selectable(id.c_str(),selectedPrefab_ == id)) selectedPrefab_ = id;
                     }
@@ -1604,7 +1669,7 @@ class DemoEditor
                     catch (const std::exception& error) { status_ = error.what(); }
                 ImGui::EndDisabled();
                 ImGui::EndDisabled();
-                ImGui::TextWrapped("URIs start inside content/. Props are decorative models with no collision or pickup behavior. Highlight adds a gentle brightness pulse in the game for loot that should stand out. Set placement in Object Properties, then Save + Cook. Import the pack again after reopening to restore its prefab list; placed objects are saved with the level.");
+                ImGui::TextWrapped("Import copies prop definitions into this level. URIs start inside content/. Props have no collision or pickup behavior. Highlight adds a brightness pulse. Save + Cook after placement. Copy-imported prefab lists need importing again after reopening; linked resources refresh automatically when cooked.");
             }
             ImGui::Separator();
             for (const auto& e:document_["entities"])
@@ -1670,7 +1735,15 @@ class DemoEditor
             else { ImGui::SameLine(); ImGui::TextDisabled("type default"); }
             ImGui::PopID();
         }
-        ImGui::TextWrapped("Changing type keeps explicit per-enemy overrides. Use type default to inherit future code tuning. Both initial types share the placeholder guard model.");
+        const auto visualType=EnemyType(Entity(id)->value("enemy_type",std::string("watchman")));
+        if (visualType.contains("visual_prefab"))
+        {
+            const auto visual=EnemyPrefab(visualType.at("id"));
+            ImGui::TextWrapped("Type visual: %s (%s)",visual.at("id").get<std::string>().c_str(),
+                UsesTypeVisual(*Entity(id))?"using shared default":"explicit instance visual");
+            ImGui::TextWrapped("Resource: %s",DefinitionOrigin(visual.at("id").get<std::string>()).c_str());
+        }
+        ImGui::TextWrapped("Changing type updates a matching type visual and keeps authored scale, route and tuning overrides. Save + Cook refreshes shared model, material and animation edits. Use type default to inherit future code tuning.");
         ImGui::Separator();
         ImGui::Text("Patrol route (%zu / 32 points)",route.size());
         for (size_t index = 0; index < route.size(); ++index)
@@ -1905,9 +1978,14 @@ class DemoEditor
     void DrawMaterial(const std::string& id)
     {
         if (!ImGui::CollapsingHeader("Material")) return;
-        auto* material = Material(id);
+        const Json definitions=ResolvedDefinitions("materials");
+        const auto found=std::find_if(definitions.begin(),definitions.end(),[&](const Json& item) { return item.at("id")==id; });
+        const Json* material=found==definitions.end()?nullptr:&*found;
         if (!material) return;
-        ImGui::TextWrapped("%s (shared by objects using this material)",id.c_str());
+        const std::string origin=DefinitionOrigin(id);
+        ImGui::TextWrapped("%s (%s)",id.c_str(),origin.empty()?"level material":"linked shared material");
+        if (!origin.empty()) ImGui::TextWrapped("Source: %s. Edit this resource, then Save + Cook or reopen the level to refresh. The level retains its link.",origin.c_str());
+        ImGui::BeginDisabled(!origin.empty());
         const auto& color = material->at("color");
         float rgba[4] = {color[0],color[1],color[2],color[3]};
         if (ImGui::ColorEdit4("Surface RGBA",rgba))
@@ -1940,6 +2018,7 @@ class DemoEditor
             }
             ImGui::Text("RGBA16 tile: %d / 4096 bytes",material->at("texture").at("width").get<int>()*material->at("texture").at("height").get<int>()*2);
         }
+        ImGui::EndDisabled();
     }
     void DrawBuild()
     {

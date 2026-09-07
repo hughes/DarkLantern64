@@ -44,13 +44,15 @@ Use **Save + Cook**, **File → Save scene**, or **Ctrl+S** to save canonical le
 
 ### Place enemies and author patrols
 
-1. In **Room Objects**, click **Add enemy**. Choose **Enemy type** in Object Properties: **Watchman** or **Scout**. Both use the level's guard asset; the Scout has faster movement and longer perception ranges. Guard Animation Workshop supplies the animated model, while the earlier levels retain their blockout guard.
+1. In **Room Objects**, choose **New enemy type**, then click **Add enemy**. **Watchman** and **Scout** use the shared animated guard in every supplied level; the Scout has faster movement and longer perception ranges. Change an existing actor's **Enemy type** in Object Properties.
 2. Edit **position** to place its feet on a floor. New enemies start at an existing actor or waypoint, so move them apart. **Save + Cook** creates the viewport model; select it in **Entity List** to use the normal transform gizmo.
 3. Leave **Behavior** on **Sentry** for a stationary lookout. Set the middle **rotation** value to choose its facing: `0` faces +Z, `90` faces +X. It can investigate and chase, then returns to its post.
 4. For a patrol, click **Create + append waypoint** in the enemy's properties. Click the route entry to edit that waypoint's XYZ position. Reselect the enemy and repeat. With at least two points, choose **Patrol**. The ordered route loops, including the segment from the last point back to the first.
 5. Use **Up**, **Down**, **Remove from route**, or **Append existing waypoint** to edit the route. Save + Cook shows new waypoint markers in the viewport. Walk every segment in Ares; the current AI follows straight segments and does not find detours around walls.
 
 **Duplicate enemy** copies its settings and makes independent copies of its route points. Move the new enemy and its route to the intended location. **Delete enemy** removes the instance; route points remain available for reuse. **Delete waypoint** rejects points that any enemy still references. Shared waypoints move for every route that uses them.
+
+The guard's model, material and animations come from [one shared resource](shared-guard-resources.md). Updating its Blender asset changes every linked level after cooking. Placement, patrols and tuning remain specific to each enemy. Shared materials identify their source and are read-only in the level inspector.
 
 Speed, sight and hearing normally inherit the selected code-defined type. Editing a value makes an instance override; **Use type default** restores inheritance. Existing levels retain their previous explicit tuning. A level may contain zero through 16 enemies, subject to geometry and frame-time budgets. See the [enemy authoring reference](enemy-authoring.md) for the example workshop and current limits.
 

@@ -29,13 +29,20 @@ except ModuleNotFoundError:
 
 try:
     from cook_textures import prepare_texture, validate_texture
+    from asset_pack import resolve_asset_packs
 except ModuleNotFoundError:
     from tools.cook_textures import prepare_texture, validate_texture
+    from tools.asset_pack import resolve_asset_packs
 
 ROOT = Path(__file__).resolve().parents[1]
 KINDS = {"static", "spawn", "guard", "waypoint", "door", "control", "objective", "light"}
 ROLES = {"guard":"DL_MODEL_GUARD", "door":"DL_MODEL_DOOR", "control":"DL_MODEL_CONTROL", "objective":"DL_MODEL_OBJECTIVE"}
 ENEMY_TYPES_PATH = ROOT/"src/enemy_types.def"
+CONTENT_LIMITS_PATH = ROOT/"src/content_limits.h"
+LIMITS = {name: int(re.search(r"^#define " + macro + r" (\d+)$", CONTENT_LIMITS_PATH.read_text(), re.MULTILINE)[1])
+          for name, macro in (("mesh_vertices", "DL_MAX_MESH_VERTICES"),
+                              ("scene_vertices", "DL_MAX_SCENE_VERTICES"),
+                              ("scene_triangles", "DL_MAX_SCENE_TRIANGLES"), ("models", "DL_MAX_MODELS"))}
 MAX_ENEMIES = 16
 MAX_TEST_STARTS = 16
 
@@ -205,8 +212,8 @@ def read_obj(path, textured=False):
     else:
         # Keep legacy, untextured flat meshes' source vertex ordering exactly.
         indices = [corner[0] for corner in corners]
-    require(3 <= len(vertices) <= 4096, f"{path.name}: expected 3-4096 vertices")
-    require(indices and len(indices)//3 <= 4096, f"{path.name}: expected 1-4096 triangles")
+    require(3 <= len(vertices) <= LIMITS["mesh_vertices"], f"{path.name}: expected 3-{LIMITS['mesh_vertices']} vertices")
+    require(indices and len(indices)//3 <= LIMITS["scene_triangles"], f"{path.name}: expected 1-{LIMITS['scene_triangles']} triangles")
     result = {"vertices":vertices,"indices":indices}
     if textured: result["uvs"] = seam_uvs
     if source_normals: result["normals"] = seam_normals
@@ -278,13 +285,26 @@ def validate(data, source_dir=None):
     require(isinstance(data,dict) and type(data.get("version")) is int and data["version"]==2,
             "version: expected 2 (3D model scene)")
     require("grid" not in data, "grid: version 2 has no authoritative tile grid")
+    try:
+        data, resolved_catalog, pack_dependencies = resolve_asset_packs(data, source_dir)
+    except ValueError as error:
+        raise ContentError(str(error)) from error
+    defaults_by_type = {}
+    for prefab in resolved_catalog["prefabs"]:
+        if "enemy_type" not in prefab:
+            continue
+        enemy_type = prefab["enemy_type"]
+        require(enemy_type in enemy_type_map, f"{prefab['id']}: unknown prefab enemy_type {enemy_type}")
+        require(enemy_type not in defaults_by_type, f"Multiple visual prefabs define enemy_type {enemy_type}")
+        defaults_by_type[enemy_type] = prefab["id"]
+        enemy_type_map[enemy_type]["visual_prefab"] = prefab["id"]
     require(isinstance(data.get("title"),str) and 0<len(data["title"])<=120 and
             all(32<=ord(c)<127 for c in data["title"]), "title: expected 1-120 printable ASCII characters")
     assets, materials, entities = data.get("assets"),data.get("materials"),data.get("entities")
     require(isinstance(assets,list) and 1<=len(assets)<=64,"assets: expected 1-64 assets")
     require(isinstance(materials,list) and 1<=len(materials)<=64,"materials: expected 1-64 materials")
     require(isinstance(entities,list) and 1<=len(entities)<=256,"entities: expected 1-256 objects")
-    seen, meshes, dependencies, mesh_paths, characters = set(),{},[],{},{}
+    seen, meshes, dependencies, mesh_paths, characters = set(),{},list(pack_dependencies),{},{}
     textures, texture_artifacts, texture_indices = [], {}, {}
     environment = data.get("environment")
     if environment is not None:
@@ -321,6 +341,8 @@ def validate(data, source_dir=None):
             meshes[ident] = characters[ident]["mesh"]
         else:
             meshes[ident]=read_obj(path)
+        require(len(meshes[ident]["vertices"]) <= LIMITS["mesh_vertices"],
+                f"{ident}: maximum {LIMITS['mesh_vertices']} vertices per mesh")
         mesh_paths[ident]=path
         dependencies.append((uri,path))
     material_map={}
@@ -409,9 +431,11 @@ def validate(data, source_dir=None):
             meshes[model] = read_obj(mesh_paths[model], textured=True)
     boxes=[collider(e) for e in entities if "collider" in e]
     require(1<=len(boxes)<=256,"colliders: expected 1-256 boxes")
-    require(len(models)<=128,"models: maximum 128 instances")
-    require(sum(len(meshes[e["model"]]["vertices"]) for e in models)<=4096,"models: maximum 4096 instanced vertices")
-    require(sum(len(meshes[e["model"]]["indices"])//3 for e in models)<=4096,"models: maximum 4096 instanced triangles")
+    require(len(models)<=LIMITS["models"],f"models: maximum {LIMITS['models']} instances")
+    require(sum(len(meshes[e["model"]]["vertices"]) for e in models)<=LIMITS["scene_vertices"],
+            f"models: maximum {LIMITS['scene_vertices']} instanced vertices")
+    require(sum(len(meshes[e["model"]]["indices"])//3 for e in models)<=LIMITS["scene_triangles"],
+            f"models: maximum {LIMITS['scene_triangles']} instanced triangles")
     for e in kinds["spawn"]+kinds["guard"]+kinds["waypoint"]:
         validate_actor_placement(e["transform"]["position"], boxes, e["id"], radius=.18 if e["kind"]=="spawn" else .17)
     test_starts = validate_test_starts(data, boxes)
@@ -427,9 +451,11 @@ def validate(data, source_dir=None):
             texture_artifacts[texture["png_path"]] = png
         texture_indices[material["id"]] = existing
     dependencies.append(("code:src/enemy_types.def", ENEMY_TYPES_PATH))
+    dependencies.append(("code:src/content_limits.h", CONTENT_LIMITS_PATH))
     return {"by_id":by_id,"kinds":kinds,"meshes":meshes,"materials":material_map,"models":models,"colliders":boxes,"dependencies":dependencies,
             "textures":textures,"texture_artifacts":texture_artifacts,"texture_indices":texture_indices,
-            "enemy_types":enemy_types,"enemies":enemies,"test_starts":test_starts,"characters":characters}
+            "enemy_types":enemy_types,"enemies":enemies,"test_starts":test_starts,"characters":characters,
+            "resolved_document":data,"resolved_catalog":resolved_catalog}
 
 
 def atomic_write(path, data):
@@ -555,6 +581,7 @@ def mesh_gltf(mesh):
 
 
 def preview_scene(data,state):
+    data=state["resolved_document"]
     mats=list(state["materials"])
     materials=[{"id":i+1,"name":m["id"],"shadingModel":"PBR","baseColor":m["color"],"roughness":.85,"metallic":0,"ambient":.3,"displacementIntensity":0} for i,m in enumerate(data["materials"])]
     environment=data.get("environment")
@@ -583,13 +610,15 @@ def preview_scene(data,state):
         moon_rotation=[-math.degrees(math.asin(direction[1]/length)),math.degrees(math.atan2(direction[0],direction[2])),0]
         moon_color=environment["moon_color"]+[environment["moon_intensity"]]
     entities.append({"name":"Editor moon" if environment else "Editor fill","transform":{"position":[0,0,0],"rotation":quaternion(moon_rotation),"scale":[1,1,1]},"light":{"type":"directional","color":moon_color,"castShadows":bool(environment),"cascadeCount":1,"shadowDistance":30,"shadowDepth":50}})
-    return {"entities":entities,"materials":materials,"effects":[]}
+    return {"entities":entities,"materials":materials,"effects":[],
+            "metadata":{"darklantern":{"asset_packs":data.get("asset_packs",[]),"resolved_catalog":state["resolved_catalog"]}}}
 
 
 def compile_level(source=ROOT/"content/first_room.json",output=ROOT/"build",asset_root=None, *, shared_characters=None):
     started=time.perf_counter(); source,output=Path(source),Path(output)
     raw=source.read_bytes(); data=json.loads(raw)
     state=validate(data,asset_root or source.parent)
+    data=state["resolved_document"]
     state["shared_characters"] = shared_characters is not None
     if shared_characters is not None:
         for character in state["characters"].values():
@@ -644,6 +673,7 @@ def compile_level(source=ROOT/"content/first_room.json",output=ROOT/"build",asse
     arrays=sum(len(m["vertices"])*12+len(m["indices"])*2+len(m.get("uvs",[]))*8 for m in compiled_meshes)+normal_bytes
     report={
         "version":2, "source_sha256":digest.hexdigest(), "title":data["title"],
+        "resolved_catalog":state["resolved_catalog"], "limits":dict(LIMITS),
         "dependencies":[{"uri":uri,"sha256":hashlib.sha256(path.read_bytes()).hexdigest()} for uri,path in state["dependencies"]],
         "counts":{"entities":len(data["entities"]), "meshes":len(state["meshes"]), "models":len(state["models"]),
                   "colliders":len(state["colliders"]), "instanced_vertices":vertices, "instanced_triangles":triangles,

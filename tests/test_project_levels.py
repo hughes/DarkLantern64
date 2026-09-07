@@ -27,6 +27,14 @@ class ProjectLevelTests(unittest.TestCase):
         (self.content / "models").mkdir(parents=True)
         for filename in ("block.obj", "guard.obj"):
             shutil.copy2(ROOT / "content/models" / filename, self.content / "models" / filename)
+        # CRUD tests use a tiny shared resource with the production IDs. Actual
+        # character/atlas migration is covered by shared-resource integration.
+        (self.content / "assets/guard").mkdir(parents=True)
+        self.write("assets/guard/pack.json", {"version": 1,
+            "assets": [{"id": "mesh-guard", "uri": "models/guard.obj"}],
+            "materials": [{"id": "mat-guard", "color": [.65, .18, .13, 1]}],
+            "prefabs": [{"id": "guard-watchman", "enemy_type": "watchman", "model": "mesh-guard",
+                         "material": "mat-guard", "scale": [1, 1, 1]}]})
         self.one = project.starter_level("One")
         self.one["test_starts"] = [{"id": "entry", "label": "Entry", "position": [1, 0, 2.7], "yaw": 180, "pitch": 0}]
         self.write("first_room.json", self.one)
@@ -73,8 +81,8 @@ class ProjectLevelTests(unittest.TestCase):
         self.assertEqual(len(state["kinds"]["spawn"]), 1)
         self.assertEqual(len(state["kinds"]["door"]), 1)
         self.assertEqual(len(state["enemies"]), 0)
-        self.assertEqual(data["assets"], [{"id": "mesh-block", "uri": "models/block.obj"},
-                                          {"id": "mesh-guard", "uri": "models/guard.obj"}])
+        self.assertEqual(data["assets"], [{"id": "mesh-block", "uri": "models/block.obj"}])
+        self.assertEqual(data["asset_packs"], ["assets/guard/pack.json"])
         self.assertEqual((self.content / "models/block.obj").read_bytes(), before_models)
         self.assertEqual(len(list((self.content / "models").iterdir())), 2)
         self.project.cook(path, result["level"]["source_sha256"])
@@ -84,10 +92,13 @@ class ProjectLevelTests(unittest.TestCase):
         path = self.content / result["level"]["file"]
         data = json.loads(path.read_bytes())
         self.assertFalse(any(entity["kind"] == "guard" for entity in data["entities"]))
-        self.assertEqual(next(asset["uri"] for asset in data["assets"] if asset["id"] == "mesh-guard"), "models/guard.obj")
-        self.assertTrue(any(material["id"] == "mat-guard" for material in data["materials"]))
-        # These are the named model/material and default behavior used by the
-        # editor's AddEnemy path when the scene has no existing enemy template.
+        state = validate(data, self.content)
+        catalog = state["resolved_catalog"]
+        self.assertEqual(next(asset["uri"] for asset in catalog["assets"] if asset["id"] == "mesh-guard"), "models/guard.obj")
+        self.assertTrue(any(material["id"] == "mat-guard" for material in catalog["materials"]))
+        self.assertFalse(any(asset["id"] == "mesh-guard" for asset in data["assets"]))
+        self.assertEqual(state["enemy_types"][0]["visual_prefab"], "guard-watchman")
+        # New enemies reference the linked resource, even in a fresh empty level.
         data["entities"].append({"id": "first-enemy", "kind": "guard", "model": "mesh-guard",
             "material": "mat-guard", "enemy_type": "watchman", "behavior": "sentry", "patrol": [],
             "transform": {"position": [2, 0, 2], "rotation": [0, 0, 0], "scale": [1, 1, 1]}})

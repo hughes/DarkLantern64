@@ -1,0 +1,155 @@
+{
+  "version": 1,
+  "passed": true,
+  "change": "Replace the intersecting right-arm shell with six red quads in the continuous sleeve; preserve the original rig and Actions.",
+  "source": {
+    "path": "../../art/guard.blend",
+    "sha256": "1d3bd969d484842b352bbcec3ea2d4dc9a52c1be78179c82ef07a564a8c29804"
+  },
+  "export": {
+    "path": "../../content/assets/guard/guard.character.json",
+    "sha256": "5a4b7b78522eb3e4f8986f9e37e0109441f64d3f62e0e2bbcdb90d31d4837ae2"
+  },
+  "generator": {
+    "path": "../../tools/blender/guard_character.py",
+    "sha256": "3a1ab90c8fd12199da4734275c610e70b331cfd2e72fe93faa86708a2409ce0e"
+  },
+  "before": {
+    "vertices": 997,
+    "triangles": 531,
+    "unique_bind_positions": 316,
+    "encoded_key_bytes": 8820
+  },
+  "after": {
+    "bones": 20,
+    "vertices": 1009,
+    "triangles": 535,
+    "cross_joint_triangles": 48,
+    "unique_bind_positions": 316,
+    "encoded_key_bytes": 8820
+  },
+  "topology_sha256": "04ed95235f41e21f06d08813c2f8110844ec1281e7241e996eab27b29efff94a",
+  "geometry_and_joint_index_delta_bytes": 312,
+  "quantized_normal_attribute_tuples": {
+    "before": 693,
+    "after": 669
+  },
+  "source_rig_clips_sockets_identical": true,
+  "compressed_clips_identical": true,
+  "geometry_tests": {
+    "command": "python -m unittest discover -s tests -p test_guard_geometry.py",
+    "passed": 3,
+    "checks": [
+      "No underlying olive faces or red end caps",
+      "Band vertices lie on the sleeve edges and share smooth seam normals",
+      "Outward triangle winding; 48 original joint-bridge triangles retained"
+    ]
+  },
+  "blender_roundtrip": {
+    "report": {
+      "path": "../../build/guard-blender-verification/report.json",
+      "sha256": "2385a18a76dbb7ae9134055f9c0eac11b0c80166f64c0378ac473447f8dc2a8c"
+    },
+    "saved_source_export_byte_identical": true,
+    "tested_poses": 425,
+    "maximum_pose_error_m": 7.795920979944745e-07,
+    "clips": [
+      {
+        "id": "idle",
+        "tested_poses": 121,
+        "source_key_max_error_m": 6.248508218341318e-07,
+        "half_frame_bake_max_error_m": 5.623090941939713e-07,
+        "worst_half_frame_time": 1.05
+      },
+      {
+        "id": "notice",
+        "tested_poses": 85,
+        "source_key_max_error_m": 7.402743308767212e-07,
+        "half_frame_bake_max_error_m": 6.10083821294733e-07,
+        "worst_half_frame_time": 0.6166666666666667
+      },
+      {
+        "id": "run",
+        "tested_poses": 49,
+        "source_key_max_error_m": 7.795920979944745e-07,
+        "half_frame_bake_max_error_m": 7.463979593734857e-07,
+        "worst_half_frame_time": 0.2833333333333333
+      },
+      {
+        "id": "turn",
+        "tested_poses": 97,
+        "source_key_max_error_m": 6.034510353599962e-07,
+        "half_frame_bake_max_error_m": 5.448611169690556e-07,
+        "worst_half_frame_time": 0.6833333333333333
+      },
+      {
+        "id": "walk",
+        "tested_poses": 73,
+        "source_key_max_error_m": 6.573844478958581e-07,
+        "half_frame_bake_max_error_m": 6.542950391799256e-07,
+        "worst_half_frame_time": 0.4166666666666667
+      }
+    ]
+  },
+  "editor_verification": {
+    "report": {
+      "path": "../../build/character-editor-verification.json",
+      "sha256": "06ecb5b4c201bad21a788d840f59b7a5bb0e08e9fc29a0f18844856a254fa91a"
+    },
+    "passed": true,
+    "editor_sha256": "3369db1ea31b9b555f1d8133fd3f6d7b8328c71c97764f480d765054050a43ce",
+    "elapsed_seconds": 31.94,
+    "tested_source_sha256": "5a4b7b78522eb3e4f8986f9e37e0109441f64d3f62e0e2bbcdb90d31d4837ae2",
+    "checks": [
+      "Project level opens cooked character assets through the shared N64 sampler",
+      "Focus guard frames its current pose in a clear three-quarter view",
+      "Authored idle and walking poses visibly differ in the ordinary level viewport",
+      "Repeated paused clip/time produces identical skin matrices and viewport PNG",
+      "Bounded procedural head attention changes the image without moving the body root",
+      "Crossfade weight changes the sampled cooked pose",
+      "Guards share the asset while keeping independent preview playback state",
+      "Invalid clips and out-of-range preview settings are rejected atomically",
+      "Play advances the preview clock and Pause stops it",
+      "Connected-joint animation reuses one fixed-topology mesh per instance without arena growth",
+      "Artist animation re-export displays new motion while reusing the same per-instance meshes and arena storage",
+      "Clip, scrub, blend and attention controls preserve clean canonical content"
+    ],
+    "canonical_content_unchanged": true,
+    "owned_editor_closed": true
+  },
+  "n64_visual_review": {
+    "capture_report": {
+      "path": "../../build/scenes/animation_workshop/captures-t3d.json",
+      "sha256": "26a0dfa283f2b5697e00a4b5d98a3ff39b635a439704c15cb30cf08040f53335"
+    },
+    "capture_rom_sha256": "ab13e6c6e765efe6933f2958bf511633ccbe8c4544a4d3881875f2a74eca2739",
+    "renderer": "t3d",
+    "view": {
+      "id": "guard-walk",
+      "position": [
+        1.45,
+        0,
+        3.4
+      ],
+      "yaw": 180,
+      "pitch": -16,
+      "animation_clip": "walk",
+      "animation_time": 0.3,
+      "head_yaw": 0,
+      "head_pitch": 0
+    },
+    "image": {
+      "path": "../images/guard-armband-n64.png",
+      "sha256": "aa1c9bcfc88bc3a477c12086fcc96e2b38e58db94ff67bb02e1e3e6706b899ae"
+    },
+    "reviewer": "Codex",
+    "observed": "The red band is visible as a strip of the right sleeve in the idle and walking framebuffer captures.",
+    "scope": "Capture ROM provides appearance evidence; it is not a performance measurement."
+  },
+  "preserved": [
+    "20 bones and five authored clips",
+    "Unrelated Blender objects, Actions and current pose",
+    "919 unrelated exported geometry/UV/quantized-normal attribute tuples",
+    "Original mesh retained as a Blender backup datablock"
+  ]
+}

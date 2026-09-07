@@ -4,9 +4,9 @@ Designers place enemies, choose their type, and author their routes in the proje
 
 ## Try the workshop
 
-The separate [Enemy Patrol Workshop](../content/enemy_patrols.json) contains the original store patrol, a Scout following three points in the workroom, and a Watchman sentry in the store. It reuses the fully 3D placeholder models and does not change the original mission or courtyard.
+The separate [Enemy Patrol Workshop](../content/enemy_patrols.json) contains the original store patrol, a Scout following three points in the workroom, and a Watchman sentry in the store. Every supplied level now uses the [shared animated guard resource](shared-guard-resources.md), with independent placement and behavior per instance.
 
-![Three independently placed placeholder enemies in the LightEngine viewport](images/enemy-workshop-editor.png)
+![Historical placement preview with three placeholder enemies; the current shared resource supplies the animated guard](images/enemy-workshop-editor.png)
 
 Use **DarkLantern64: Launch editor**, then open **Enemy Patrol Workshop** through **Levels**. Edit enemies and routes, then use **Play level** to save, cook and launch the result. Equivalent command-line access remains available:
 
@@ -38,7 +38,7 @@ The shared catalog is [src/enemy_types.def](../src/enemy_types.def). Each row su
 | Watchman | 0.8 m/s | 6.5 m | 7 m |
 | Scout | 1.1 m/s | 8 m | 8 m |
 
-Both are initial tuning variants of the same humanoid AI and use the same placeholder model. The catalog is a starting point for additional code-defined abilities and enemy families. The existing explicit per-instance values in old levels still take precedence. In the editor, **Use type default** removes that override. Catalog changes are included in cook/build fingerprints; recook and reopen the editor after changing code defaults.
+Both are initial tuning variants of the same humanoid AI. Their visual defaults come from the shared guard pack, currently using the same animated model. The catalog is a starting point for additional code-defined abilities and enemy families. The existing explicit per-instance values in old levels still take precedence. In the editor, **Use type default** removes that override. Catalog changes are included in cook/build fingerprints; recook and reopen the editor after changing code defaults.
 
 Version-2 source remains compatible: `kind: "guard"` defaults to type `watchman` and behavior `patrol` when those fields are absent. The compiler validates every route reference and emits one definition and waypoint array per enemy. Every guard model receives an explicit enemy index; rendering reads that particular enemy's position, facing and lighting. `level_report.json` includes `enemy_types`, ID-keyed `enemy_instances`, and enemy/route counts.
 
@@ -46,7 +46,7 @@ The runtime stores a bounded array of enemy state alongside one shared player an
 
 ## Current limits
 
-- **16 enemies is a capacity limit, not a measured frame-rate guarantee.** Geometry still shares the 128-model/4096-instanced-vertex/4096-triangle limits. More visible guards cost both AI and rendering time; use the profiler on the actual encounter.
+- **16 enemies is a capacity limit, not a measured frame-rate guarantee.** Geometry shares the 128-model/6144-instanced-vertex/4096-triangle limits, with at most 4096 vertices in one mesh. More visible guards cost both AI and rendering time; use the profiler on the actual encounter.
 - Routes follow straight segments with existing upright-box collision and step/gravity handling. There is no navigation mesh, path search around obstructions, crowd avoidance, or guard-to-guard collision. Keep route segments and the closing loop clear, and separate starting positions.
 - There are no per-waypoint waits, scripted actions, route branches, squad communication or distinct animation sets yet. A Sentry supplies the first stationary assignment without needing scripting.
 - Perception and behavior remain active for offscreen enemies. Render culling does not silently disable simulation. The previous [scale study](scaling-guide.md) is historical evidence for workload cost, not a benchmark of a populated multi-enemy level.

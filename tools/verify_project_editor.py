@@ -210,7 +210,7 @@ def verify(executable, root=ROOT):
 
             added_enemy = client.request("add_enemy", {"id": "starter-enemy", "position": [2, 0, 2]})["entity"]
             require(added_enemy["model"] == "mesh-guard" and added_enemy["material"] == "mat-guard",
-                    "First enemy did not use the starter's reusable fallback definitions")
+                    "First enemy did not use the starter's shared type visual")
             client.request("save")
             enemy_state = identity(client, created.name)
             require(enemy_state["report"]["counts"]["enemies"] == 1, "Starter enemy did not cook into the runtime")

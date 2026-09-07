@@ -155,9 +155,11 @@ def verify(executable, root=ROOT, level="animation_workshop.json"):
             # mesh remains byte-for-byte identical: recooking must load the new
             # keys into the same instance allocation instead of retaining a new
             # full-source-hash mesh after every animation export.
-            document = client.request("inspect")["document"]
+            state = client.request("inspect")
+            document = state["document"]
             model = next(row["model"] for row in document["entities"] if row["id"] == entity_id)
-            uri = next(row["uri"] for row in document["assets"] if row["id"] == model)
+            assets = state["report"].get("resolved_catalog", {}).get("assets", document["assets"])
+            uri = next(row["uri"] for row in assets if row["id"] == model)
             artist_source = (private / "content" / uri).resolve()
             require(artist_source.is_relative_to(private / "content"), "Character source escaped the private project")
             original_asset = artist_source.read_bytes()

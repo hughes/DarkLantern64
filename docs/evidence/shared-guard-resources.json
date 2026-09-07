@@ -1,0 +1,466 @@
+{
+  "schema_version": 1,
+  "created_at_utc": "2026-09-07T04:13:44+00:00",
+  "passed": true,
+  "scope": "Shared guard resources in four authored levels, before the subsequent armband art revision. This validates resource sharing, authoring, mission behavior and level switching; it is not a frame-rate gate.",
+  "renderer": "rsp-tiny3d",
+  "verified_dependencies": [
+    {
+      "uri": "assets/guard/pack.json",
+      "sha256": "47d830d24b06da3e161b290710d4b0e8450298f9d7fb455ae44b6b423921fc4d"
+    },
+    {
+      "uri": "assets/guard/guard.character.json",
+      "sha256": "69d62710e4982a640ba515a1047bb67204fb451266c9b4e3fd4b7b7d7ff0997f"
+    },
+    {
+      "uri": "assets/guard/guard-atlas.png",
+      "sha256": "45f3e1f49a7363965e1b2b8f7f331f5b69e344b62119e43f3e7fb8b7e139985b"
+    },
+    {
+      "uri": "code:src/enemy_types.def",
+      "sha256": "c7dc61a6e285278279d633a0b4e41be904bc26897e78fb1f5c61b79ccffae1e4"
+    },
+    {
+      "uri": "code:src/content_limits.h",
+      "sha256": "ec4c37638a9ee2e7bc4fb415caa1071d20a1f5b64ee60f54d1f27bcf1183a591"
+    }
+  ],
+  "limits": {
+    "mesh_vertices": 4096,
+    "scene_vertices": 6144,
+    "scene_triangles": 4096,
+    "models": 128
+  },
+  "migration": [
+    {
+      "level": "content/first_room.json",
+      "source_before": "08bcf4e87db9c0473bc7453833eb596ea5e9d29cf37f13fb3b3eb91e013564be",
+      "source_after": "c1fb19e6b114fe9fa8459922dcacf55771ed86e2f9feb7ec25fe6aadf2009105",
+      "entities_unchanged": true,
+      "entities_sha256": "22ca7ee3b7d39d26c4752696e6875d3404249eaf75a00411b6c40454b43c8e47"
+    },
+    {
+      "level": "content/moonlit_courtyard.json",
+      "source_before": "d1e35537e00444e03fa71b593e3926090a2f1ddb0aa910cbabecf9a76f82bb92",
+      "source_after": "412ec992cefcfc7dc714aeabd0618cfc50e57b22e268fd30c3346bd86a03ff8e",
+      "entities_unchanged": true,
+      "entities_sha256": "e810d436a8e96ae9c74651a31508ce80479f3ea358ee50808e8c5fb8e89534be"
+    },
+    {
+      "level": "content/enemy_patrols.json",
+      "source_before": "f0aaa8ede40188e3ed320b203628b7d26f26c98ef48f13d1cea27034ec34ebdd",
+      "source_after": "26d61c6300b298a6b2d73de2f32030c9759536d490e611d7d7ee2200d89e450d",
+      "entities_unchanged": true,
+      "entities_sha256": "467bf30fb63f37e341cb0525add690fcace34712eb86869046a861d8cc8e4165"
+    },
+    {
+      "level": "content/animation_workshop.json",
+      "source_before": "13c4f5cf124d8a8018400fef6d937ae49e850b6e5f8fc7b50b78f4ddd48ff462",
+      "source_after": "0480ac4b7343b82b1f5c709c93d3496f8fd89ea846315a6b68b96028cb9fb8fd",
+      "entities_unchanged": true,
+      "entities_sha256": "19344e2e4ec9c766fdf503487601429d817e2861654a124e92d2f9c3fb2772c0"
+    }
+  ],
+  "levels": [
+    {
+      "id": "lantern-store",
+      "source": "content/first_room.json",
+      "cooked_content_sha256": "5b29e0b70fa0c23207d14e8c6cf05de270053c39771903a30f2588bcc2fd1b8c",
+      "counts": {
+        "entities": 30,
+        "meshes": 9,
+        "models": 25,
+        "colliders": 14,
+        "instanced_vertices": 2671,
+        "instanced_triangles": 1759,
+        "lights": 2,
+        "enemies": 1,
+        "test_starts": 1,
+        "patrol_points": 4
+      },
+      "shared_character": {
+        "id": "basic-guard",
+        "bones": 20,
+        "vertices": 997,
+        "triangles": 531,
+        "cross_joint_triangles": 48
+      }
+    },
+    {
+      "id": "moonlit-yard",
+      "source": "content/moonlit_courtyard.json",
+      "cooked_content_sha256": "d1555a955d6d409bfc085eb272a5eeb73c6f72b6fdf37e5e7876ffec84c912e1",
+      "counts": {
+        "entities": 54,
+        "meshes": 14,
+        "models": 49,
+        "colliders": 27,
+        "instanced_vertices": 4183,
+        "instanced_triangles": 2235,
+        "lights": 4,
+        "enemies": 1,
+        "test_starts": 1,
+        "patrol_points": 3
+      },
+      "shared_character": {
+        "id": "basic-guard",
+        "bones": 20,
+        "vertices": 997,
+        "triangles": 531,
+        "cross_joint_triangles": 48
+      }
+    },
+    {
+      "id": "enemy-workshop",
+      "source": "content/enemy_patrols.json",
+      "cooked_content_sha256": "ee2195a83a47caa633dd91542096415af4ae67826152347a6276d1b09a1818d3",
+      "counts": {
+        "entities": 35,
+        "meshes": 9,
+        "models": 27,
+        "colliders": 14,
+        "instanced_vertices": 4665,
+        "instanced_triangles": 2821,
+        "lights": 2,
+        "enemies": 3,
+        "test_starts": 3,
+        "patrol_points": 7
+      },
+      "shared_character": {
+        "id": "basic-guard",
+        "bones": 20,
+        "vertices": 997,
+        "triangles": 531,
+        "cross_joint_triangles": 48
+      }
+    },
+    {
+      "id": "animation_workshop",
+      "source": "content/animation_workshop.json",
+      "cooked_content_sha256": "5fb184ca8d17861d0d91a550ff07d78a904baf59ba0e1a4f78d1d3a83e2d3a36",
+      "counts": {
+        "entities": 17,
+        "meshes": 2,
+        "models": 12,
+        "colliders": 8,
+        "instanced_vertices": 2074,
+        "instanced_triangles": 1182,
+        "lights": 2,
+        "enemies": 2,
+        "test_starts": 2,
+        "patrol_points": 2
+      },
+      "shared_character": {
+        "id": "basic-guard",
+        "bones": 20,
+        "vertices": 997,
+        "triangles": 531,
+        "cross_joint_triangles": 48
+      }
+    }
+  ],
+  "bundle_sharing": {
+    "unique_assets": 1,
+    "shared_geometry_bytes": 26117,
+    "geometry_duplication_avoided_bytes": 78351,
+    "shared_key_bytes": 8820,
+    "memory_note": "Character geometry, skeletons, clips and sockets are emitted once per content hash in a dedicated C unit, shared across levels and actors. Level mesh descriptors and actor render caches remain per instance/level."
+  },
+  "host_tests": {
+    "passed": true,
+    "python_tests_run": 181,
+    "python_tests_skipped": 1,
+    "skip_reason": "Windows symlink permission unavailable",
+    "portable_c_checks": [
+      "Animation: hierarchy, inverse binds, quantized tracks, interpolation, crossfade, attention, normals, event intervals and invalid data passed; scratch=1792 matrix=1536",
+      "Profiler: wrap, interrupt subtraction, accounting, windows, maxima, resets, VI cadence and uint32 sample endpoints passed.",
+      "Scale benchmark: guard equivalence, immutable inputs, timer wrap and audio subtraction passed.",
+      "render visibility: six-plane boundary cases and 12000 visible-point containment cases passed",
+      "render shading: packed normal transforms, tangent orthogonality, bounded pulse and distance fade passed",
+      "render lighting: 160000 scalar/night normal pairs match original bytes; joint/seam grouping and transformed normals passed",
+      "render batches: exact triangle order/connectivity, 32-joint pair padding, flat face isolation, deterministic lifetimes and index limits passed",
+      "render transform: 38400 old-path comparisons passed; max point 4.26496126e-06 m, normal 8.11258417e-07, view 3.87384353e-06 m; packed/fixed max 0.00445770798 m",
+      "HUD cache: 400 frame replays preserve exact text/order/positions; terminal variants, title escaping/truncation and scene lifetimes passed",
+      "texture packing: large signed offsets, periodic interpolation across batches, unchanged atlas UVs, padding, s16 endpoints and transactional rejection passed",
+      "launch tests passed: invalid bundles, direct starts, navigation, presets, resume"
+    ],
+    "log": {
+      "path": "build/shared-resource-host-tests.log",
+      "sha256": "d41c994ba7bf74d6dd56fbab09fd1f837522fb820ea5e3992b0df0d1b261e379"
+    },
+    "targeted_checks": [
+      "test_all_authored_levels_resolve_one_character_and_fit_new_capacity",
+      "test_bundle_keeps_one_shared_character_definition",
+      "test_invalid_links_collisions_and_type_defaults_fail_atomically",
+      "test_prefab_only_edit_invalidates_build_manifest_with_identical_c_arrays",
+      "test_resolution_preserves_source_and_defines_shared_ownership",
+      "test_scene_budget_is_distinct_from_per_mesh_budget",
+      "test_shared_edit_changes_both_cooks_and_preview_without_rewriting_levels"
+    ],
+    "targeted_log": {
+      "path": "build/shared-resource-targeted-tests.log",
+      "sha256": "f41da8f435b00578ad85bd62316b491ee0292dc1f8924d7b1e8a59aee27622cb"
+    }
+  },
+  "editor": {
+    "passed": true,
+    "binary_sha256": "3369db1ea31b9b555f1d8133fd3f6d7b8328c71c97764f480d765054050a43ce",
+    "checks": [
+      "Existing First Room guards resolve the linked character animation",
+      "Empty starter creates selected enemy type; type changes and duplicate routes preserve shared references",
+      "Shared material edits visibly refresh through Save + Cook without flattening or changing the level",
+      "A second level inherits the edit and reopening preserves guard placement, routes and clean linked source",
+      "Explicit loot copy-import and placed props coexist with linked guard resources across save/reopen"
+    ],
+    "real_content_unchanged": true,
+    "captures": [
+      {
+        "label": "before-shared-material-edit",
+        "path": "docs/images/shared-guard-editor-before.png",
+        "sha256": "0a1afda8ff2900b954f8bd880b968d28c564c2438f62ab94dc9a547f2cf22fe5",
+        "size": [
+          783,
+          571
+        ]
+      },
+      {
+        "label": "after-shared-material-edit",
+        "path": "docs/images/shared-guard-editor-after.png",
+        "sha256": "047fba73a686675fbf1b835d24bfef875b078c9f7bee467edf7a7d27f3a8e22a",
+        "size": [
+          783,
+          571
+        ]
+      }
+    ],
+    "differences": [
+      {
+        "first": "before-shared-material-edit",
+        "second": "after-shared-material-edit",
+        "changed_pixels_over_8": 6096
+      }
+    ],
+    "original_report": {
+      "path": "build/shared-guard-editor-verification.json",
+      "sha256": "4ee15947cedf62de3577e9aefff7a51bf20b5759fca5e75c403599db31166afa"
+    }
+  },
+  "mission": {
+    "passed": true,
+    "checks": [
+      "4 MiB boot is rejected before gameplay",
+      "8 MiB full-3D replay completes the relic mission without capture",
+      "Audio callback runs during the mission replay"
+    ],
+    "runs": [
+      {
+        "name": "smoke-4mb",
+        "passed": true,
+        "rom_sha256": "282ac6abca1d28399e5ab48d73e5622c346751b8eb81cbc925816d99f9cdc799",
+        "rom_bytes": 393216,
+        "settings_source_sha256": "792881a14980e13000dbc3d59ea5439507e0379fb162fcdfaa7dd54067fa5047",
+        "elapsed_seconds": 3.516,
+        "peak_sampled_heap_bytes": null,
+        "terminal_event": "DL64 boot_failed reason=expansion_pak memory=4194304 required=8388608",
+        "log": {
+          "path": ".dev/ares/runs/94d38ef27fb34d4f9378ea66fc33f46f/smoke-4mb.log",
+          "sha256": "8ec6175b6d015e1b96eca1035162d7c6e3dc9e2fc21ec6a657de4d119301cf71"
+        },
+        "boot": null
+      },
+      {
+        "name": "smoke-8mb",
+        "passed": true,
+        "rom_sha256": "c55977104475065cbd16bd0e3d27085183331e678c4787b8530e654dce8f345d",
+        "rom_bytes": 393216,
+        "settings_source_sha256": "792881a14980e13000dbc3d59ea5439507e0379fb162fcdfaa7dd54067fa5047",
+        "elapsed_seconds": 26.0,
+        "peak_sampled_heap_bytes": 1175768,
+        "terminal_event": "DL64 profile_replay_done complete=1 caught=0",
+        "log": {
+          "path": ".dev/ares/runs/f4224b1aeab2432ca2e12b581b9edf63/smoke-8mb.log",
+          "sha256": "390c652e67087863a483eb965cb4b6920594d767e60f39c36052ea3e44df56fb"
+        },
+        "boot": "DL64 boot_ok memory=8388608 scene=\"DarkLantern64 - The Lantern Store\" meshes=9 models=25 colliders=14 version=2 world=3d renderer=rsp-tiny3d depth=hardware"
+      }
+    ],
+    "original_report": {
+      "path": "build/ares-smoke.json",
+      "sha256": "b663e5f6382eef329552cacec8f72d1390f9f14c458d08f411330fe04c41e589"
+    }
+  },
+  "bundle": {
+    "passed": true,
+    "checks": [
+      "Ordinary menu renders without starting a level; 4 MiB boot gate works",
+      "Every bundled default/test start launches and restarts three times",
+      "Position, view, stance, door and clean mission state match authored starts",
+      "Repeated textured/untextured switches reach a stable per-start heap",
+      "Menu resume preserves paused simulation time",
+      "Both bundle and standalone ROMs bypass the menu into a named start"
+    ],
+    "transitions": 66,
+    "launch_variants": 11,
+    "cycles": 3,
+    "stable_heap_bytes_by_variant": {
+      "lantern-store/default": {
+        "bytes": 1175792,
+        "samples": 6,
+        "minimum": 1175792,
+        "maximum": 1175792
+      },
+      "lantern-store/loot-crate": {
+        "bytes": 1175792,
+        "samples": 6,
+        "minimum": 1175792,
+        "maximum": 1175792
+      },
+      "moonlit-yard/default": {
+        "bytes": 1285952,
+        "samples": 6,
+        "minimum": 1285952,
+        "maximum": 1285952
+      },
+      "moonlit-yard/loot-counter": {
+        "bytes": 1285952,
+        "samples": 6,
+        "minimum": 1285952,
+        "maximum": 1285952
+      },
+      "enemy-workshop/default": {
+        "bytes": 1335624,
+        "samples": 6,
+        "minimum": 1335624,
+        "maximum": 1335624
+      },
+      "enemy-workshop/store-door-open": {
+        "bytes": 1335624,
+        "samples": 6,
+        "minimum": 1335624,
+        "maximum": 1335624
+      },
+      "enemy-workshop/scout-observation": {
+        "bytes": 1335624,
+        "samples": 6,
+        "minimum": 1335624,
+        "maximum": 1335624
+      },
+      "enemy-workshop/loot-crate": {
+        "bytes": 1335624,
+        "samples": 6,
+        "minimum": 1335624,
+        "maximum": 1335624
+      },
+      "animation_workshop/default": {
+        "bytes": 1006248,
+        "samples": 6,
+        "minimum": 1006248,
+        "maximum": 1006248
+      },
+      "animation_workshop/guard-front": {
+        "bytes": 1006248,
+        "samples": 6,
+        "minimum": 1006248,
+        "maximum": 1006248
+      },
+      "animation_workshop/two-guards": {
+        "bytes": 1006248,
+        "samples": 6,
+        "minimum": 1006248,
+        "maximum": 1006248
+      }
+    },
+    "runs": [
+      {
+        "name": "bundle-idle",
+        "passed": true,
+        "rom_sha256": "51b32c49ea49e279fbe45653f730af5c4eb624d6cd9a66365a3f3a59080a8797",
+        "rom_bytes": 425984,
+        "settings_source_sha256": "792881a14980e13000dbc3d59ea5439507e0379fb162fcdfaa7dd54067fa5047",
+        "elapsed_seconds": 4.782,
+        "peak_sampled_heap_bytes": null,
+        "terminal_event": "DL64 profile_end window=1",
+        "log": {
+          "path": ".dev/ares/runs/4c9b87e421014382a9b9dce47fa6f544/bundle-idle.log",
+          "sha256": "7899684d35566f972fa0285a2e3ccb29eb20f72a460b13ab608f0dcf1621a6a2"
+        },
+        "boot": null
+      },
+      {
+        "name": "bundle-4mb",
+        "passed": true,
+        "rom_sha256": "51b32c49ea49e279fbe45653f730af5c4eb624d6cd9a66365a3f3a59080a8797",
+        "rom_bytes": 425984,
+        "settings_source_sha256": "792881a14980e13000dbc3d59ea5439507e0379fb162fcdfaa7dd54067fa5047",
+        "elapsed_seconds": 4.016,
+        "peak_sampled_heap_bytes": null,
+        "terminal_event": "DL64 boot_failed reason=expansion_pak memory=4194304 required=8388608",
+        "log": {
+          "path": ".dev/ares/runs/5fc93179c08a43e490f0513dfcb4b78b/bundle-4mb.log",
+          "sha256": "6a003df14d099a8523ace15ca3db477a9b6ee35b159495a739d750e6557c0eab"
+        },
+        "boot": null
+      },
+      {
+        "name": "bundle-switching",
+        "passed": true,
+        "rom_sha256": "f441a471ea7374c5265ffa9196630eec63055a218c89a58b17e0403b644e954a",
+        "rom_bytes": 425984,
+        "settings_source_sha256": "792881a14980e13000dbc3d59ea5439507e0379fb162fcdfaa7dd54067fa5047",
+        "elapsed_seconds": 94.844,
+        "peak_sampled_heap_bytes": 1335624,
+        "terminal_event": "DL64 menu_test_complete transitions=66 variants=11 cycles=3",
+        "log": {
+          "path": ".dev/ares/runs/cbdd205a69d34e458b73b0c58265d3f4/bundle-switching.log",
+          "sha256": "6f2cbfbd05e999317e70e6f1459fae62bf9312ec792b9be3d83df4d93c0b505d"
+        },
+        "boot": "DL64 boot_ok memory=8388608 scene=\"DarkLantern64 - The Lantern Store\" meshes=9 models=25 colliders=14 version=2 world=3d renderer=rsp-tiny3d depth=hardware"
+      },
+      {
+        "name": "bundle-direct",
+        "passed": true,
+        "rom_sha256": "b78663c571bd0b74df8f5a60677ea0891c5e4ffe53e27e464976ce13b5a7a53b",
+        "rom_bytes": 425984,
+        "settings_source_sha256": "792881a14980e13000dbc3d59ea5439507e0379fb162fcdfaa7dd54067fa5047",
+        "elapsed_seconds": 4.546,
+        "peak_sampled_heap_bytes": 1335624,
+        "terminal_event": "DL64 frame n=0 t=0.02 ms=16.67 cpu_ms=0.00 heap=1335624/7513728 triangles=0 player=2.50,0.00,0.00 yaw=1.571 pitch=0.000 grounded=1 guard=3.01,0.00,-4.00 light=0.184 alert=0.000 state=PATROL door=1 complete=0 caught=0",
+        "log": {
+          "path": ".dev/ares/runs/a97939ce3f09431b9525a01af7f10d62/bundle-direct.log",
+          "sha256": "296d7f64d2d3ca67deda399216bb7d6271758929b3be19feffff04be494a4595"
+        },
+        "boot": "DL64 boot_ok memory=8388608 scene=\"Enemy Patrol Workshop\" meshes=9 models=27 colliders=14 version=2 world=3d renderer=rsp-tiny3d depth=hardware"
+      },
+      {
+        "name": "single-direct-preset",
+        "passed": true,
+        "rom_sha256": "b143cafdfb9ea2402e703350820af9f099527cbcf7971c09b506a1e2e2667657",
+        "rom_bytes": 393216,
+        "settings_source_sha256": "792881a14980e13000dbc3d59ea5439507e0379fb162fcdfaa7dd54067fa5047",
+        "elapsed_seconds": 4.781,
+        "peak_sampled_heap_bytes": 1335592,
+        "terminal_event": "DL64 frame n=0 t=0.02 ms=16.67 cpu_ms=0.00 heap=1335592/7606816 triangles=0 player=-6.00,0.00,2.70 yaw=3.142 pitch=-0.070 grounded=1 guard=3.01,0.00,-4.00 light=0.080 alert=0.000 state=PATROL door=0 complete=0 caught=0",
+        "log": {
+          "path": ".dev/ares/runs/08be209fe93146e7ad03abdb96af59d1/single-direct-preset.log",
+          "sha256": "188eef7bddb09eb8d6440a8ed3f0ade5e9b360d687a6031249b448c8e1ac2c1f"
+        },
+        "boot": "DL64 boot_ok memory=8388608 scene=\"Enemy Patrol Workshop\" meshes=9 models=27 colliders=14 version=2 world=3d renderer=rsp-tiny3d depth=hardware"
+      }
+    ],
+    "menu_capture": {
+      "path": "docs/images/shared-guard-level-select.png",
+      "sha256": "e0af6c41524cb27efac998900fc0f00615344ac14968d4f8cd9f3c9db8bf85b9"
+    },
+    "original_report": {
+      "path": "build/bundle-smoke.json",
+      "sha256": "54ac7b9d51165bc29d6ead62f11bc47f8fcd0af6f0579b9b1e6b71e792c57b53"
+    }
+  },
+  "limitations": [
+    "Ares emulator validation; original Nintendo 64 and ModRetro M64 hardware validation pending.",
+    "Heap values are sampled live allocations, not total platform memory use.",
+    "No performance claim is inferred from mission or menu-test timing; initialization and diagnostic work occur in these runs.",
+    "All source and ROM hashes identify the pre-armband revision tested here."
+  ]
+}

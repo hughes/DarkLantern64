@@ -4,6 +4,7 @@
 #include "render_shading.h"
 #include "render_camera.h"
 #include "animation.h"
+#include "content_limits.h"
 #ifdef DL_RENDER_T3D
 #include "render_batches.h"
 #include "render_lighting.h"
@@ -25,7 +26,8 @@ static void gpu_report(void);
 /* Full XYZ meshes: CPU affine/view transforms and frustum clipping, followed
  * by the RDP triangle rasterizer and hardware depth buffer. No grid dependency. */
 enum { SCREEN_W=320, SCREEN_H=240, VIEW_TOP=27, VIEW_BOTTOM=192,
-       MAX_MODELS=128, MAX_VERTICES=4096, MAX_TRIANGLES=4096, CLIP_CAPACITY=12 };
+       MAX_MODELS=DL_MAX_MODELS, MAX_VERTICES=DL_MAX_SCENE_VERTICES,
+       MAX_MESH_VERTICES=DL_MAX_MESH_VERTICES, MAX_TRIANGLES=DL_MAX_SCENE_TRIANGLES, CLIP_CAPACITY=12 };
 static const float focal=164.0f, horizon=(VIEW_TOP+VIEW_BOTTOM)*0.5f;
 static const float near_plane=0.12f, far_plane=64.0f;
 
@@ -369,7 +371,7 @@ static void build_cache(const DlGame *g){
         models[i].animation_normal_start=-1;
         models[i].idle_clip=models[i].walk_clip=models[i].run_clip=-1;
         if(!mesh->animation)continue;
-        assertf(mesh->vertex_count>0&&mesh->vertex_count<=MAX_VERTICES,"Invalid animated vertex count");
+        assertf(mesh->vertex_count>0&&mesh->vertex_count<=MAX_MESH_VERTICES,"Invalid animated vertex count");
         assertf(dl_animation_validate(mesh->animation,mesh->vertex_count),"Invalid animated mesh");
         ++animation_model_count;
         models[i].idle_clip=dl_animation_find_clip(mesh->animation,"idle");
@@ -402,7 +404,7 @@ static void build_cache(const DlGame *g){
         assertf(model->mesh<g->level->mesh_count,"Bad model mesh index");
         assertf(model->role!=DL_MODEL_GUARD||model_enemy(g,model),"Enemy model lacks a valid instance");
         const DlMesh *mesh=&g->level->meshes[model->mesh];
-        assertf(mesh->vertex_count>0&&mesh->index_count%3==0,"Invalid mesh geometry");
+        assertf(mesh->vertex_count>0&&mesh->vertex_count<=MAX_MESH_VERTICES&&mesh->index_count%3==0,"Invalid mesh geometry");
         assertf(vertex_count+mesh->vertex_count<=MAX_VERTICES,"Scene exceeds %d instanced vertices",MAX_VERTICES);
         assertf(triangle_count+mesh->index_count/3<=MAX_TRIANGLES,"Scene exceeds %d instanced triangles",MAX_TRIANGLES);
         models[i].vertex_start=vertex_count;models[i].triangle_start=triangle_count;

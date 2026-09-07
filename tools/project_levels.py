@@ -74,13 +74,11 @@ def starter_level(title):
     entities.append(spawn)
     for ident, z in (("entry-light", 2), ("relic-light", -2)):
         entities.append(dict(entity(ident, "light", (0, 2.6, z)), radius=5, intensity=.8, color=[1, .78, .5]))
-    return {"version": 2, "title": title,
-            "assets": [{"id": "mesh-block", "uri": "models/block.obj"},
-                       {"id": "mesh-guard", "uri": "models/guard.obj"}],
+    return {"version": 2, "title": title, "asset_packs": ["assets/guard/pack.json"],
+            "assets": [{"id": "mesh-block", "uri": "models/block.obj"}],
             "materials": [{"id": ident, "color": color} for ident, color in (
                 ("mat-stone", [.3, .35, .42, 1]), ("mat-wood", [.35, .2, .08, 1]),
-                ("mat-switch", [.15, .7, .35, 1]), ("mat-gold", [.95, .66, .12, 1]),
-                ("mat-guard", [.65, .18, .13, 1]))],
+                ("mat-switch", [.15, .7, .35, 1]), ("mat-gold", [.95, .66, .12, 1]))],
             "entities": entities, "test_starts": []}
 
 

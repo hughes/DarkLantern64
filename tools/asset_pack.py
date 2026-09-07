@@ -1,7 +1,7 @@
 """Validate a Blender asset pack and merge its reusable definitions into a level.
 
-Paths in packs are relative to content/, including OBJ and texture paths. Import
-does not rewrite or copy assets: Save + Cook validates their geometry and UVs.
+Paths in packs are relative to content/, including OBJ and texture paths. Linked
+asset_packs are resolved for cooking without flattening the authored level.
 """
 from __future__ import annotations
 
@@ -105,13 +105,70 @@ def load_pack(uri, asset_root=ROOT / "content"):
     models = {item["id"] for item in pack["assets"]}
     materials = {item["id"] for item in pack["materials"]}
     for item in pack["prefabs"]:
-        fields(item, {"id", "model", "material", "scale"}, set(), item["id"])
+        fields(item, {"id", "model", "material", "scale"}, {"enemy_type"}, item["id"])
         require(isinstance(item["model"], str) and item["model"] in models,
                 f"{item['id']}: unknown pack model")
         require(isinstance(item["material"], str) and item["material"] in materials,
                 f"{item['id']}: unknown pack material")
         vector(item["scale"], "Prefab scale", low=.001, high=1024)
+        if "enemy_type" in item:
+            valid_id(item["enemy_type"], "Prefab enemy_type")
     return pack
+
+
+def resolve_asset_packs(document, asset_root=ROOT / "content"):
+    """Return an expanded copy, catalog and manifest dependencies; never edit input.
+
+    Linked definitions have one owner. A local or second-pack duplicate is an
+    error even when equal, so an edit cannot accidentally shadow shared art.
+    Packs cannot link further packs, keeping resolution finite and predictable.
+    """
+    require(isinstance(document, dict), "Level must be an object")
+    uris = document.get("asset_packs", [])
+    require(isinstance(uris, list) and len(uris) <= 16, "asset_packs: expected at most 16 pack URIs")
+    result = copy.deepcopy(document)
+    origins, dependencies, prefabs, used, prefab_ids = {}, [], [], set(), set()
+    local_definitions = set()
+    for group in ("assets", "materials", "entities"):
+        values = result.get(group)
+        require(isinstance(values, list), f"Level {group} must be an array")
+        for item in values:
+            require(isinstance(item, dict), f"Level {group}: expected an object")
+            ident = valid_id(item.get("id"), f"Level {group}")
+            require(ident not in used, f"{ident}: duplicate ID")
+            used.add(ident)
+            if group != "entities":
+                local_definitions.add(ident)
+    seen_paths = set()
+    for uri in uris:
+        path = content_path(uri, asset_root, {".json"})
+        require(path not in seen_paths, f"Duplicate linked asset pack: {uri}")
+        seen_paths.add(path)
+        pack = load_pack(uri, asset_root)
+        dependencies.append((uri, path))
+        for group in ("assets", "materials"):
+            for item in pack[group]:
+                ident = item["id"]
+                require(ident not in used, f"Linked definition {ident} from {uri} conflicts with a local or linked ID; remove the duplicate definition")
+                used.add(ident)
+                origins[ident] = uri
+                result[group].append(copy.deepcopy(item))
+            require(len(result[group]) <= 64, f"Resolved level exceeds 64 {group}")
+        for item in pack["prefabs"]:
+            ident = item["id"]
+            require(ident not in prefab_ids, f"Duplicate linked prefab: {ident}")
+            require(ident not in local_definitions, f"Linked prefab {ident} conflicts with a local definition ID")
+            # Catalog IDs may match entities, but must not overwrite an asset's
+            # different ownership in the shared origins map.
+            require(ident not in origins or origins[ident] == uri, f"Conflicting linked prefab origin: {ident}")
+            prefab_ids.add(ident)
+            origins[ident] = uri
+            prefabs.append(copy.deepcopy(item))
+        require(len(prefabs) <= 128, "Resolved prefab catalog exceeds 128 entries")
+    catalog = {"assets": copy.deepcopy(result["assets"]),
+               "materials": copy.deepcopy(result["materials"]),
+               "prefabs": prefabs, "origins": origins}
+    return result, catalog, dependencies
 
 
 def merge_pack(document, uri, asset_root=ROOT / "content", prefabs=None):
@@ -123,10 +180,10 @@ def merge_pack(document, uri, asset_root=ROOT / "content", prefabs=None):
     pack = load_pack(uri, asset_root)
     result, catalog = copy.deepcopy(document), copy.deepcopy(prefabs or [])
     require(result.get("version") == 2, "Asset packs require a version-2 level")
+    resolved, _, _ = resolve_asset_packs(result, asset_root)
     existing = {}
     for group in ("assets", "materials", "entities"):
-        require(isinstance(result.get(group), list), f"Level {group} must be an array")
-        for item in result[group]:
+        for item in resolved[group]:
             ident = valid_id(item.get("id"), f"Level {group}")
             require(ident not in existing, f"Duplicate level ID: {ident}")
             existing[ident] = (group, item)

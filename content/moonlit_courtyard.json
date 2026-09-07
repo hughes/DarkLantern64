@@ -142,10 +142,6 @@
       "uri": "models/night_barrel.obj"
     },
     {
-      "id": "mesh-guard",
-      "uri": "models/guard.obj"
-    },
-    {
       "id": "mesh-objective",
       "uri": "models/lantern.obj"
     },
@@ -270,16 +266,6 @@
         0.95,
         0.45,
         0.095
-      ],
-      "double_sided": false
-    },
-    {
-      "id": "mat-guard",
-      "color": [
-        0.47,
-        0.27,
-        0.18,
-        1
       ],
       "double_sided": false
     },
@@ -1969,5 +1955,8 @@
       "yaw": 180,
       "pitch": -8
     }
+  ],
+  "asset_packs": [
+    "assets/guard/pack.json"
   ]
 }

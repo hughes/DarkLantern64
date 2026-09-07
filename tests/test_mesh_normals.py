@@ -105,12 +105,8 @@ class MeshNormalTests(unittest.TestCase):
         content = self.root / "content"
         content.mkdir(exist_ok=True)
         level = json.loads((ROOT / "content/first_room.json").read_text())
-        uris = [asset["uri"] for asset in level["assets"]]
-        uris += [material["texture"]["uri"] for material in level["materials"] if "texture" in material]
-        for uri in uris:
-            target = content / uri
-            target.parent.mkdir(parents=True, exist_ok=True)
-            shutil.copyfile(ROOT / "content" / uri, target)
+        from level_fixtures import copy_level_dependencies
+        copy_level_dependencies(level, content)
         (content / "models/normals.obj").write_text(mesh)
         level["assets"].append({"id": "mesh-normal-test", "uri": "models/normals.obj"})
         prop = next(entity for entity in level["entities"] if entity["id"] == "tilted-rafter")

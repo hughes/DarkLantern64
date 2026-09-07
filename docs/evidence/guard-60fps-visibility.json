@@ -2,23 +2,23 @@
   "method": "separate-framebuffer-visual-review",
   "preset": "two-guards",
   "renderer": "t3d",
-  "source_sha256": "13c4f5cf124d8a8018400fef6d937ae49e850b6e5f8fc7b50b78f4ddd48ff462",
-  "asset_sha256": "69d62710e4982a640ba515a1047bb67204fb451266c9b4e3fd4b7b7d7ff0997f",
-  "capture_rom_sha256": "41a01227e4d7498dd194817d1c019b130034b3aaa4e23d63b2f575f2521c16a1",
+  "source_sha256": "0480ac4b7343b82b1f5c709c93d3496f8fd89ea846315a6b68b96028cb9fb8fd",
+  "asset_sha256": "5a4b7b78522eb3e4f8986f9e37e0109441f64d3f62e0e2bbcdb90d31d4837ae2",
+  "capture_rom_sha256": "ab13e6c6e765efe6933f2958bf511633ccbe8c4544a4d3881875f2a74eca2739",
   "images": [
     {
       "path": "../images/guard-rsp-two-idle.png",
-      "sha256": "f4afdfdf250abe63ee8583d4d5983d0442b051beee2d1126ae245be997666237"
+      "sha256": "db8949b54f93b3533539acce1754b130e761f22a45de7b722cb84e4750809c75"
     },
     {
       "path": "../images/guard-rsp-two-walk.png",
-      "sha256": "972e1b153f0a4d4990ab1fec02219583e9ca7b4b2f8807ecbcee3065d59185f8"
+      "sha256": "77c3ffa2cb77c529633894949e27ad9a37fcbe1f167bd7c902c5e37d23521b4f"
     }
   ],
   "visible_guards": [
     "animated-patrol",
     "animated-sentry"
   ],
-  "reviewer": "Codex: inspected both raw RDP framebuffer exports. Both guards, their articulated limbs, textured materials and HUD are visible. The right guard has extremities near the viewport edge; full-body coverage is not an acceptance claim.",
+  "reviewer": "Codex: inspected both raw RDP framebuffer exports after the shared-resource migration and integrated sleeve stripe fix. Both articulated, textured guards and the HUD are visible. The right guard has extremities near the viewport edge; full-body coverage is not an acceptance claim.",
   "limitations": "Separate frozen animation-phase captures prove visible geometry. The performance run independently uses live patrol movement, idle sentry, normal audio and gameplay; capture synchronization/logging is excluded from that run."
 }

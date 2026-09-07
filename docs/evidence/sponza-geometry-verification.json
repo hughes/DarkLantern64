@@ -1,0 +1,206 @@
+{
+  "passed": true,
+  "scope": "Scenery authoring and private editor validation; ROM performance and gameplay evidence are separate",
+  "generator_sha256": "7b7a0a3f41ae2b5ad7ffd74d84b1b629af2b7191c1f2b03a2464f6a22f65f2fd",
+  "geometry_manifest_sha256": "c465e020ef5fd0624bfc24daf3676570cb93651c8a9881deb7fd1973f4662f22",
+  "scenery_counts": {
+    "vertices": 3240,
+    "triangles": 2496,
+    "models": 98,
+    "colliders": 116
+  },
+  "blender_roundtrip": {
+    "passed": true,
+    "instances": 98,
+    "shared_mesh_datablocks": 63,
+    "collision_proxies": 116,
+    "max_position_error_m": 4.1930952932034415e-07,
+    "max_uv_error": 3.8146972691777137e-07,
+    "max_normal_component_error": 5.395515075383439e-05,
+    "max_instance_matrix_error": 1.1920928955078125e-07,
+    "max_proxy_matrix_error": 0.0,
+    "blend_sha256": "3e3e5936dccc231a855a843e3b0e691285c4fdd21f56b6bc4b9726055288064c"
+  },
+  "host_geometry_tests": {
+    "command": "python -m unittest tests.test_sponza_geometry -v",
+    "passed": 6
+  },
+  "editor": {
+    "report": "build/sponza-editor-verification.json",
+    "passed": true,
+    "checks": [
+      "Registered Sponza opens both stacked floors and two shared character resources",
+      "Collision-only step proxy selects, moves through gizmo sync, cooks and survives reopen without render geometry",
+      "Both floor guards display the shared walking asset; upper attention changes visibly without changing the saved level",
+      "Registered switching returns to a clean Sponza level"
+    ],
+    "owned_editor_pid_closed": 25824,
+    "editor_sha256": "2810206381bfe10f4e887599214874ddf2de43bfb0be34da8e6648b9c2b64d37",
+    "fixture_level_sha256": "4dde3bfa6e9e89aed5ac144ff00ca7ec30f539f5ed391546e796115ee7e56300",
+    "canonical_source_unchanged": false,
+    "counts": {
+      "colliders": 118,
+      "enemies": 2,
+      "entities": 237,
+      "instanced_triangles": 3878,
+      "instanced_vertices": 5850,
+      "lights": 6,
+      "meshes": 70,
+      "models": 112,
+      "patrol_points": 8,
+      "test_starts": 5
+    },
+    "captures": [
+      {
+        "label": "courtyard-axis",
+        "path": ".dev/editor/sponza-verification/4531d86732274e2f8ed7e41f40e4e465/.dev/editor/project/captures/4c0364d5249c4cd7aeebcbae94d06656.png",
+        "sha256": "c1e769cab6bb83111211867d22893358657a5d05649399132afcdb9eac0684f6",
+        "size": [
+          783,
+          571
+        ]
+      },
+      {
+        "label": "ground-guard",
+        "path": ".dev/editor/sponza-verification/4531d86732274e2f8ed7e41f40e4e465/.dev/editor/project/captures/bcba4eaa54b4467194174855e4f2a772.png",
+        "sha256": "e84b447d3f0e4fb2b8b09fa8acb2d48b68eccd24655c43624891dbc2b54fb007",
+        "size": [
+          783,
+          571
+        ]
+      },
+      {
+        "label": "upper-guard",
+        "path": ".dev/editor/sponza-verification/4531d86732274e2f8ed7e41f40e4e465/.dev/editor/project/captures/435fe497df8b44d5a6b5dc39598d3688.png",
+        "sha256": "744d6cfbef721b808420f254099a4f7f382e41abb5b4ed29aef23f64d0594ea4",
+        "size": [
+          783,
+          571
+        ]
+      },
+      {
+        "label": "upper-attention",
+        "path": ".dev/editor/sponza-verification/4531d86732274e2f8ed7e41f40e4e465/.dev/editor/project/captures/b042bc4b52974ab1a182ed73eb88ccfe.png",
+        "sha256": "5a239fe7ef5aa5fbd36562d4a87c489186b9928564bfad45d4529a90683caf3a",
+        "size": [
+          783,
+          571
+        ]
+      }
+    ],
+    "attention_difference": {
+      "first": "upper-guard",
+      "second": "upper-attention",
+      "changed_pixels_over_8": 1302
+    },
+    "revision_note": "The isolated editor fixture contains final scenery geometry and six lamps. During its run, the parent revised only the canonical upper-gallery test-start position and added two lamps; the canonical change flag records this authorized concurrent update, not an editor write. Final canonical eight-lamp cook is recorded separately below."
+  },
+  "actual_source_reference_views": {
+    "source": "C:\\Users\\hughe\\dev\\LightEngine\\examples\\assets\\external\\sponza\\NewSponza_Main_glTF_003.gltf",
+    "source_sha256": "e04c4c540c74bdddcbd3f590a85c14119bfd5839702246a23b3a737c0cce2400",
+    "renderer": "Blender Workbench geometry only, neutral material categories, no textures",
+    "blender": "5.3.0 Alpha",
+    "counts": {
+      "mesh_nodes": 111,
+      "primitives": 374,
+      "vertices": 2041990,
+      "triangles": 3738824
+    },
+    "skipped_nodes": [
+      "decals_1st_floor",
+      "decals_2nd_floor",
+      "decals_3rd_floor",
+      "master_material"
+    ],
+    "views": [
+      {
+        "id": "courtyard-axis",
+        "position": [
+          10.5,
+          1.75,
+          0
+        ],
+        "target": [
+          -1.5,
+          6.3,
+          0
+        ],
+        "path": "build/sponza-reference-views/courtyard-axis.png",
+        "sha256": "0e1d9cbf73fd10f95584c8f0cbe0a1269f4e59b45c1146fa8b33f69bb387b19d"
+      },
+      {
+        "id": "upper-gallery",
+        "position": [
+          6.2,
+          6.95,
+          4.7
+        ],
+        "target": [
+          -3.2,
+          5.5,
+          -1.5
+        ],
+        "path": "build/sponza-reference-views/upper-gallery.png",
+        "sha256": "87c5b9a89da2787550988af330f2da4281fae3e2719016156ddc22c7bd11e7dc"
+      }
+    ],
+    "duration_seconds": 5.625190499999007,
+    "scope": "Separate factory-startup background process; no source or user scene saved/edited",
+    "license_context": "../sponza-reference-study.md"
+  },
+  "guard_blend_preserved_sha256": "1d3bd969d484842b352bbcec3ea2d4dc9a52c1be78179c82ef07a564a8c29804",
+  "authored_views": [
+    {
+      "path": "build/sponza-authored-views/courtyard-axis.png",
+      "sha256": "07792a238a0f3b1ef22b1747626bc81947382fb4e2ebc122b77593102b3b430d"
+    },
+    {
+      "path": "build/sponza-authored-views/courtyard-textured.png",
+      "sha256": "48ed6c5e5ffd1f6e15c38a8944eb87273d34bb60c891aaa9d6893172a8b7a5fb"
+    },
+    {
+      "path": "build/sponza-authored-views/east-stairs.png",
+      "sha256": "cfb23ee98160b09e5cd8eb825c389f9c89000669b5631fbf77071b1140c87829"
+    },
+    {
+      "path": "build/sponza-authored-views/upper-gallery.png",
+      "sha256": "429a861595ab6f8fca4973fb7fac1682b3375094265294b5241c19e3cef4bb13"
+    },
+    {
+      "path": "build/sponza-authored-views/upper-textured.png",
+      "sha256": "402f92081034aa606e2205747db25c56a1e5a01e315efd79667411defa6c8505"
+    }
+  ],
+  "final_canonical_cook": {
+    "report": "build/sponza-editor-final-cook/generated/level_report.json",
+    "level_file_sha256": "a75fb0e9415d405a1a004469048c2a7288bbcd49f34ea5db90a95c89f5a60164",
+    "source_sha256": "951850167ca81b5d7a152225fbafac6c8754f30be5d4b77eedf6955a530d846e",
+    "counts": {
+      "entities": 239,
+      "meshes": 70,
+      "models": 114,
+      "colliders": 118,
+      "instanced_vertices": 5898,
+      "instanced_triangles": 3902,
+      "lights": 8,
+      "enemies": 2,
+      "test_starts": 5,
+      "patrol_points": 8
+    },
+    "limits": {
+      "mesh_vertices": 4096,
+      "scene_vertices": 6144,
+      "scene_triangles": 4096,
+      "models": 128
+    }
+  },
+  "lighting_geometry_checks": {
+    "tread_center_samples": 44,
+    "wall_center_samples": 24,
+    "normal_offset_metres": 0.035,
+    "all_center_samples_outside_collision_proxies": true,
+    "roof_assets_with_downward_soffits": 6,
+    "collision_geometry_changed": false
+  },
+  "evidence_scope": "Source-matched saved Blender/editor verification. Export/editor fixtures predate only the last two stair-entry lamps and gallery test-start offset; final scene cook is recorded separately."
+}

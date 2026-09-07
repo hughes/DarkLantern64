@@ -1,0 +1,399 @@
+{
+  "version": 1,
+  "assets": [
+    {
+      "id": "mesh-sponza-ground-column",
+      "uri": "assets/sponza/models/ground-column.obj"
+    },
+    {
+      "id": "mesh-sponza-ground-arch",
+      "uri": "assets/sponza/models/ground-arch.obj"
+    },
+    {
+      "id": "mesh-sponza-ground-end-arch",
+      "uri": "assets/sponza/models/ground-end-arch.obj"
+    },
+    {
+      "id": "mesh-sponza-ground-floor-0",
+      "uri": "assets/sponza/models/ground-floor-0.obj"
+    },
+    {
+      "id": "mesh-sponza-ground-floor-1",
+      "uri": "assets/sponza/models/ground-floor-1.obj"
+    },
+    {
+      "id": "mesh-sponza-ground-floor-2",
+      "uri": "assets/sponza/models/ground-floor-2.obj"
+    },
+    {
+      "id": "mesh-sponza-ground-floor-3",
+      "uri": "assets/sponza/models/ground-floor-3.obj"
+    },
+    {
+      "id": "mesh-sponza-ground-floor-4",
+      "uri": "assets/sponza/models/ground-floor-4.obj"
+    },
+    {
+      "id": "mesh-sponza-ground-floor-5",
+      "uri": "assets/sponza/models/ground-floor-5.obj"
+    },
+    {
+      "id": "mesh-sponza-gallery-north-0",
+      "uri": "assets/sponza/models/gallery-north-0.obj"
+    },
+    {
+      "id": "mesh-sponza-gallery-north-1",
+      "uri": "assets/sponza/models/gallery-north-1.obj"
+    },
+    {
+      "id": "mesh-sponza-gallery-north-2",
+      "uri": "assets/sponza/models/gallery-north-2.obj"
+    },
+    {
+      "id": "mesh-sponza-gallery-north-3",
+      "uri": "assets/sponza/models/gallery-north-3.obj"
+    },
+    {
+      "id": "mesh-sponza-ceiling-north",
+      "uri": "assets/sponza/models/ceiling-north.obj"
+    },
+    {
+      "id": "mesh-sponza-upper-ceiling-north",
+      "uri": "assets/sponza/models/upper-ceiling-north.obj"
+    },
+    {
+      "id": "mesh-sponza-parapet-north",
+      "uri": "assets/sponza/models/parapet-north.obj"
+    },
+    {
+      "id": "mesh-sponza-gallery-south-0",
+      "uri": "assets/sponza/models/gallery-south-0.obj"
+    },
+    {
+      "id": "mesh-sponza-gallery-south-1",
+      "uri": "assets/sponza/models/gallery-south-1.obj"
+    },
+    {
+      "id": "mesh-sponza-gallery-south-2",
+      "uri": "assets/sponza/models/gallery-south-2.obj"
+    },
+    {
+      "id": "mesh-sponza-gallery-south-3",
+      "uri": "assets/sponza/models/gallery-south-3.obj"
+    },
+    {
+      "id": "mesh-sponza-ceiling-south",
+      "uri": "assets/sponza/models/ceiling-south.obj"
+    },
+    {
+      "id": "mesh-sponza-upper-ceiling-south",
+      "uri": "assets/sponza/models/upper-ceiling-south.obj"
+    },
+    {
+      "id": "mesh-sponza-parapet-south",
+      "uri": "assets/sponza/models/parapet-south.obj"
+    },
+    {
+      "id": "mesh-sponza-gallery-west",
+      "uri": "assets/sponza/models/gallery-west.obj"
+    },
+    {
+      "id": "mesh-sponza-ceiling-west",
+      "uri": "assets/sponza/models/ceiling-west.obj"
+    },
+    {
+      "id": "mesh-sponza-upper-ceiling-west",
+      "uri": "assets/sponza/models/upper-ceiling-west.obj"
+    },
+    {
+      "id": "mesh-sponza-parapet-west",
+      "uri": "assets/sponza/models/parapet-west.obj"
+    },
+    {
+      "id": "mesh-sponza-gallery-east",
+      "uri": "assets/sponza/models/gallery-east.obj"
+    },
+    {
+      "id": "mesh-sponza-ceiling-east",
+      "uri": "assets/sponza/models/ceiling-east.obj"
+    },
+    {
+      "id": "mesh-sponza-upper-ceiling-east",
+      "uri": "assets/sponza/models/upper-ceiling-east.obj"
+    },
+    {
+      "id": "mesh-sponza-parapet-east",
+      "uri": "assets/sponza/models/parapet-east.obj"
+    },
+    {
+      "id": "mesh-sponza-upper-post-pair",
+      "uri": "assets/sponza/models/upper-post-pair.obj"
+    },
+    {
+      "id": "mesh-sponza-upper-post-single",
+      "uri": "assets/sponza/models/upper-post-single.obj"
+    },
+    {
+      "id": "mesh-sponza-upper-arch-pair",
+      "uri": "assets/sponza/models/upper-arch-pair.obj"
+    },
+    {
+      "id": "mesh-sponza-upper-end-arch-pair",
+      "uri": "assets/sponza/models/upper-end-arch-pair.obj"
+    },
+    {
+      "id": "mesh-sponza-aisle-wall-north-0",
+      "uri": "assets/sponza/models/aisle-wall-north-0.obj"
+    },
+    {
+      "id": "mesh-sponza-aisle-wall-north-1",
+      "uri": "assets/sponza/models/aisle-wall-north-1.obj"
+    },
+    {
+      "id": "mesh-sponza-aisle-wall-north-2",
+      "uri": "assets/sponza/models/aisle-wall-north-2.obj"
+    },
+    {
+      "id": "mesh-sponza-aisle-wall-south-0",
+      "uri": "assets/sponza/models/aisle-wall-south-0.obj"
+    },
+    {
+      "id": "mesh-sponza-aisle-wall-south-1",
+      "uri": "assets/sponza/models/aisle-wall-south-1.obj"
+    },
+    {
+      "id": "mesh-sponza-aisle-wall-south-2",
+      "uri": "assets/sponza/models/aisle-wall-south-2.obj"
+    },
+    {
+      "id": "mesh-sponza-clerestory-north-0",
+      "uri": "assets/sponza/models/clerestory-north-0.obj"
+    },
+    {
+      "id": "mesh-sponza-roof-north-0",
+      "uri": "assets/sponza/models/roof-north-0.obj"
+    },
+    {
+      "id": "mesh-sponza-clerestory-north-1",
+      "uri": "assets/sponza/models/clerestory-north-1.obj"
+    },
+    {
+      "id": "mesh-sponza-roof-north-1",
+      "uri": "assets/sponza/models/roof-north-1.obj"
+    },
+    {
+      "id": "mesh-sponza-clerestory-south-0",
+      "uri": "assets/sponza/models/clerestory-south-0.obj"
+    },
+    {
+      "id": "mesh-sponza-roof-south-0",
+      "uri": "assets/sponza/models/roof-south-0.obj"
+    },
+    {
+      "id": "mesh-sponza-clerestory-south-1",
+      "uri": "assets/sponza/models/clerestory-south-1.obj"
+    },
+    {
+      "id": "mesh-sponza-roof-south-1",
+      "uri": "assets/sponza/models/roof-south-1.obj"
+    },
+    {
+      "id": "mesh-sponza-clerestory-west",
+      "uri": "assets/sponza/models/clerestory-west.obj"
+    },
+    {
+      "id": "mesh-sponza-roof-west",
+      "uri": "assets/sponza/models/roof-west.obj"
+    },
+    {
+      "id": "mesh-sponza-clerestory-east",
+      "uri": "assets/sponza/models/clerestory-east.obj"
+    },
+    {
+      "id": "mesh-sponza-roof-east",
+      "uri": "assets/sponza/models/roof-east.obj"
+    },
+    {
+      "id": "mesh-sponza-end-wall-east",
+      "uri": "assets/sponza/models/end-wall-east.obj"
+    },
+    {
+      "id": "mesh-sponza-end-wall-west",
+      "uri": "assets/sponza/models/end-wall-west.obj"
+    },
+    {
+      "id": "mesh-sponza-entry-floor",
+      "uri": "assets/sponza/models/entry-floor.obj"
+    },
+    {
+      "id": "mesh-sponza-entry-shell",
+      "uri": "assets/sponza/models/entry-shell.obj"
+    },
+    {
+      "id": "mesh-sponza-niche-floor",
+      "uri": "assets/sponza/models/niche-floor.obj"
+    },
+    {
+      "id": "mesh-sponza-niche-shell",
+      "uri": "assets/sponza/models/niche-shell.obj"
+    },
+    {
+      "id": "mesh-sponza-stairs-east",
+      "uri": "assets/sponza/models/stairs-east.obj"
+    },
+    {
+      "id": "mesh-sponza-stair-shell-east",
+      "uri": "assets/sponza/models/stair-shell-east.obj"
+    },
+    {
+      "id": "mesh-sponza-stairs-west",
+      "uri": "assets/sponza/models/stairs-west.obj"
+    },
+    {
+      "id": "mesh-sponza-stair-shell-west",
+      "uri": "assets/sponza/models/stair-shell-west.obj"
+    }
+  ],
+  "materials": [
+    {
+      "id": "mat-sponza-stone",
+      "color": [
+        1,
+        1,
+        1,
+        1
+      ],
+      "double_sided": false,
+      "texture": {
+        "uri": "assets/sponza/textures/sponza-stone.png",
+        "width": 64,
+        "height": 32,
+        "format": "RGBA16"
+      }
+    },
+    {
+      "id": "mat-sponza-trim",
+      "color": [
+        1,
+        1,
+        1,
+        1
+      ],
+      "double_sided": false,
+      "texture": {
+        "uri": "assets/sponza/textures/sponza-trim.png",
+        "width": 64,
+        "height": 32,
+        "format": "RGBA16"
+      }
+    },
+    {
+      "id": "mat-sponza-plaster",
+      "color": [
+        1,
+        1,
+        1,
+        1
+      ],
+      "double_sided": false,
+      "texture": {
+        "uri": "assets/sponza/textures/sponza-plaster.png",
+        "width": 32,
+        "height": 32,
+        "format": "RGBA16"
+      }
+    },
+    {
+      "id": "mat-sponza-brick",
+      "color": [
+        1,
+        1,
+        1,
+        1
+      ],
+      "double_sided": false,
+      "texture": {
+        "uri": "assets/sponza/textures/sponza-brick.png",
+        "width": 32,
+        "height": 32,
+        "format": "RGBA16"
+      }
+    },
+    {
+      "id": "mat-sponza-wood",
+      "color": [
+        1,
+        1,
+        1,
+        1
+      ],
+      "double_sided": false,
+      "texture": {
+        "uri": "assets/sponza/textures/sponza-wood.png",
+        "width": 32,
+        "height": 32,
+        "format": "RGBA16"
+      }
+    },
+    {
+      "id": "mat-sponza-floor",
+      "color": [
+        1,
+        1,
+        1,
+        1
+      ],
+      "double_sided": false,
+      "texture": {
+        "uri": "assets/sponza/textures/sponza-floor.png",
+        "width": 64,
+        "height": 32,
+        "format": "RGBA16"
+      }
+    },
+    {
+      "id": "mat-sponza-relief",
+      "color": [
+        1,
+        1,
+        1,
+        1
+      ],
+      "double_sided": false,
+      "texture": {
+        "uri": "assets/sponza/textures/sponza-relief.png",
+        "width": 32,
+        "height": 32,
+        "format": "RGBA16"
+      }
+    },
+    {
+      "id": "mat-sponza-roof",
+      "color": [
+        1,
+        1,
+        1,
+        1
+      ],
+      "double_sided": false,
+      "texture": {
+        "uri": "assets/sponza/textures/sponza-roof.png",
+        "width": 32,
+        "height": 32,
+        "format": "RGBA16"
+      }
+    }
+  ],
+  "prefabs": [
+    {
+      "id": "sponza-column",
+      "model": "mesh-sponza-ground-column",
+      "material": "mat-sponza-stone",
+      "scale": [
+        1,
+        1,
+        1
+      ]
+    }
+  ]
+}

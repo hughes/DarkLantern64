@@ -1,0 +1,89 @@
+{
+  "colliders": 118,
+  "input_sha256": {
+    "content/assets/sponza/geometry.json": "c465e020ef5fd0624bfc24daf3676570cb93651c8a9881deb7fd1973f4662f22",
+    "content/sponza_courtyard.json": "a75fb0e9415d405a1a004469048c2a7288bbcd49f34ea5db90a95c89f5a60164",
+    "src/game.c": "c49455b07c9210be8718376f2b36540ade3d77d688378fc5a393a1e674712274",
+    "tests/test_sponza_physics.c": "99b9c942fdd0f93f41a712c1d051a66b3fbd6b0e66b687478a280729d4b19bdf",
+    "src/game.h": "fc85c72ced23e3259964bb1b29207278db2b6c64635bf4982b117eaa38aaba47",
+    "src/enemy_types.def": "c7dc61a6e285278279d633a0b4e41be904bc26897e78fb1f5c61b79ccffae1e4",
+    "tools/verify_sponza_physics.py": "a41773ffb6f1d56eef9fc90c7f11791d22ef5b2e4a997d31ed46671825ae69f9"
+  },
+  "collision_and_routes_sha256": "40ac5d839f90a077d2936c1717c49f3285912c958484b69bcce74c9897537061",
+  "routes": {
+    "east": [
+      [
+        10.9,
+        0,
+        3.4
+      ],
+      [
+        15.25,
+        2.65,
+        3.4
+      ],
+      [
+        15.25,
+        2.65,
+        4.6
+      ],
+      [
+        10.9,
+        5.3,
+        4.6
+      ]
+    ],
+    "west": [
+      [
+        -10.9,
+        0,
+        -3.4
+      ],
+      [
+        -15.25,
+        2.65,
+        -3.4
+      ],
+      [
+        -15.25,
+        2.65,
+        -4.6
+      ],
+      [
+        -10.9,
+        5.3,
+        -4.6
+      ]
+    ]
+  },
+  "level_colliders_included": true,
+  "passed": true,
+  "traversals": 36,
+  "actor_samples": 16618,
+  "airborne_samples": 2334,
+  "minimum_feet_y": 0.0,
+  "maximum_feet_y": 5.3,
+  "los_checks": 12,
+  "clearance_checks": 6,
+  "actors": [
+    "standing player",
+    "crouched player",
+    "patrol guard"
+  ],
+  "update_rates_hz": [
+    60,
+    30,
+    10
+  ],
+  "steps_per_stair": 22,
+  "mission_ordinary_guards": true,
+  "mission_seconds": 85.818,
+  "compiler": "gcc.EXE (x86_64-posix-seh-rev0, Built by MinGW-Builds project) 13.2.0",
+  "scope": "Actual dl_game_update and public collision/LOS APIs; host behavior proof, not N64 performance.",
+  "command": "python tools/verify_sponza_physics.py",
+  "mission": {
+    "route": "ordinary spawn -> east stairs up -> upper gallery control/use -> west stairs down -> vault jewel/use",
+    "inputs": "Crouch, turn, forward and use through dl_game_update; no actor teleportation or AI suppression.",
+    "gameplay_data": "Full authored colliders, enemy types/routes/speed/sight/hearing, lights and environment; render meshes omitted from the host fixture."
+  }
+}

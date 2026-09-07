@@ -359,6 +359,7 @@ class CompileLevelTests(unittest.TestCase):
         guard["behavior"] = "patrol"
         with self.assertRaisesRegex(compiler.ContentError, "2-32 waypoint"):
             compiler.validate(self.level)
+
         self.level["entities"].remove(guard)
         with tempfile.TemporaryDirectory() as td:
             source, output = Path(td)/"source.json", Path(td)/"out"
@@ -370,6 +371,23 @@ class CompileLevelTests(unittest.TestCase):
             self.assertEqual(report["patrol_ids"], [])
             self.assertIn(".enemies=NULL, .enemy_count=0", (output/"generated/demo_level.h").read_text())
 
+    def test_collision_only_floor_keeps_physics_without_render_model(self):
+        before = compiler.validate(self.level)
+        floor = next(e for e in self.level["entities"] if e["kind"] == "static" and "collider" in e)
+        del floor["model"], floor["material"]
+        state = compiler.validate(self.level)
+        self.assertEqual(state["colliders"], before["colliders"])
+        self.assertEqual(len(state["models"]), len(before["models"]) - 1)
+        preview = compiler.preview_scene(self.level, state)
+        proxy = next(e for e in preview["entities"] if e["name"] == floor["id"])
+        self.assertNotIn("mesh", proxy)
+        self.assertEqual(proxy["transform"]["position"], floor["transform"]["position"])
+        floor["material"] = self.level["materials"][0]["id"]
+        with self.assertRaisesRegex(compiler.ContentError, "collision-only proxy has no material"):
+            compiler.validate(self.level)
+        del floor["material"], floor["collider"]
+        with self.assertRaisesRegex(compiler.ContentError, "requires a model or collision proxy"):
+            compiler.validate(self.level)
     def test_enemy_type_behavior_route_and_population_limits(self):
         for field, value, message in (("enemy_type", "wizard", "unknown enemy type"),
                                       ("enemy_type", {}, "unknown enemy type"),

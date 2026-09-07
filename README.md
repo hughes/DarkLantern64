@@ -12,6 +12,8 @@ Our development approach is to extend **LightEngine** into a productive content 
 
 **Creating models?** The [Blender asset guide](docs/blender-assets.md) covers the editable loot set, exporter, material budget, prefab placement, and a direct launch at the courtyard's loot counter.
 
+**Exploring larger interiors?** [Sponza After Hours](docs/sponza-study.md) adds a courtyard, two playable floors, connected stairways and a gallery-to-vault encounter. Choose it in the existing editor or game level menu.
+
 **Animating characters?** The [guard animation study](docs/guard-animation-prototype.md) covers the editable Blender guard, five Actions, connected joints, editor playback/head attention and measured N64 costs. Its clips compress to 8.61 KiB. The default renderer now uses Tiny3D on the RSP for model transforms and rigid skeletal deformation.
 
 The two-guard workshop [sustains every native refresh in Ares](docs/guard-renderer-performance.md): 1,800 fresh frames over 30 seconds, with no repeats and a 16.480 ms maximum CPU work sample after the shared-resource, sleeve and depth corrections. Original hardware validation remains pending.

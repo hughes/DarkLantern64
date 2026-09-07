@@ -1,0 +1,6691 @@
+{
+  "version": 1,
+  "assets": [
+    {
+      "id": "mesh-sponza-ground-column",
+      "uri": "assets/sponza/models/ground-column.obj"
+    },
+    {
+      "id": "mesh-sponza-ground-arch",
+      "uri": "assets/sponza/models/ground-arch.obj"
+    },
+    {
+      "id": "mesh-sponza-ground-end-arch",
+      "uri": "assets/sponza/models/ground-end-arch.obj"
+    },
+    {
+      "id": "mesh-sponza-ground-floor-0",
+      "uri": "assets/sponza/models/ground-floor-0.obj"
+    },
+    {
+      "id": "mesh-sponza-ground-floor-1",
+      "uri": "assets/sponza/models/ground-floor-1.obj"
+    },
+    {
+      "id": "mesh-sponza-ground-floor-2",
+      "uri": "assets/sponza/models/ground-floor-2.obj"
+    },
+    {
+      "id": "mesh-sponza-ground-floor-3",
+      "uri": "assets/sponza/models/ground-floor-3.obj"
+    },
+    {
+      "id": "mesh-sponza-ground-floor-4",
+      "uri": "assets/sponza/models/ground-floor-4.obj"
+    },
+    {
+      "id": "mesh-sponza-ground-floor-5",
+      "uri": "assets/sponza/models/ground-floor-5.obj"
+    },
+    {
+      "id": "mesh-sponza-gallery-north-0",
+      "uri": "assets/sponza/models/gallery-north-0.obj"
+    },
+    {
+      "id": "mesh-sponza-gallery-north-1",
+      "uri": "assets/sponza/models/gallery-north-1.obj"
+    },
+    {
+      "id": "mesh-sponza-gallery-north-2",
+      "uri": "assets/sponza/models/gallery-north-2.obj"
+    },
+    {
+      "id": "mesh-sponza-gallery-north-3",
+      "uri": "assets/sponza/models/gallery-north-3.obj"
+    },
+    {
+      "id": "mesh-sponza-ceiling-north",
+      "uri": "assets/sponza/models/ceiling-north.obj"
+    },
+    {
+      "id": "mesh-sponza-upper-ceiling-north",
+      "uri": "assets/sponza/models/upper-ceiling-north.obj"
+    },
+    {
+      "id": "mesh-sponza-parapet-north",
+      "uri": "assets/sponza/models/parapet-north.obj"
+    },
+    {
+      "id": "mesh-sponza-gallery-south-0",
+      "uri": "assets/sponza/models/gallery-south-0.obj"
+    },
+    {
+      "id": "mesh-sponza-gallery-south-1",
+      "uri": "assets/sponza/models/gallery-south-1.obj"
+    },
+    {
+      "id": "mesh-sponza-gallery-south-2",
+      "uri": "assets/sponza/models/gallery-south-2.obj"
+    },
+    {
+      "id": "mesh-sponza-gallery-south-3",
+      "uri": "assets/sponza/models/gallery-south-3.obj"
+    },
+    {
+      "id": "mesh-sponza-ceiling-south",
+      "uri": "assets/sponza/models/ceiling-south.obj"
+    },
+    {
+      "id": "mesh-sponza-upper-ceiling-south",
+      "uri": "assets/sponza/models/upper-ceiling-south.obj"
+    },
+    {
+      "id": "mesh-sponza-parapet-south",
+      "uri": "assets/sponza/models/parapet-south.obj"
+    },
+    {
+      "id": "mesh-sponza-gallery-west",
+      "uri": "assets/sponza/models/gallery-west.obj"
+    },
+    {
+      "id": "mesh-sponza-ceiling-west",
+      "uri": "assets/sponza/models/ceiling-west.obj"
+    },
+    {
+      "id": "mesh-sponza-upper-ceiling-west",
+      "uri": "assets/sponza/models/upper-ceiling-west.obj"
+    },
+    {
+      "id": "mesh-sponza-parapet-west",
+      "uri": "assets/sponza/models/parapet-west.obj"
+    },
+    {
+      "id": "mesh-sponza-gallery-east",
+      "uri": "assets/sponza/models/gallery-east.obj"
+    },
+    {
+      "id": "mesh-sponza-ceiling-east",
+      "uri": "assets/sponza/models/ceiling-east.obj"
+    },
+    {
+      "id": "mesh-sponza-upper-ceiling-east",
+      "uri": "assets/sponza/models/upper-ceiling-east.obj"
+    },
+    {
+      "id": "mesh-sponza-parapet-east",
+      "uri": "assets/sponza/models/parapet-east.obj"
+    },
+    {
+      "id": "mesh-sponza-upper-post-pair",
+      "uri": "assets/sponza/models/upper-post-pair.obj"
+    },
+    {
+      "id": "mesh-sponza-upper-post-single",
+      "uri": "assets/sponza/models/upper-post-single.obj"
+    },
+    {
+      "id": "mesh-sponza-upper-arch-pair",
+      "uri": "assets/sponza/models/upper-arch-pair.obj"
+    },
+    {
+      "id": "mesh-sponza-upper-end-arch-pair",
+      "uri": "assets/sponza/models/upper-end-arch-pair.obj"
+    },
+    {
+      "id": "mesh-sponza-aisle-wall-north-0",
+      "uri": "assets/sponza/models/aisle-wall-north-0.obj"
+    },
+    {
+      "id": "mesh-sponza-aisle-wall-north-1",
+      "uri": "assets/sponza/models/aisle-wall-north-1.obj"
+    },
+    {
+      "id": "mesh-sponza-aisle-wall-north-2",
+      "uri": "assets/sponza/models/aisle-wall-north-2.obj"
+    },
+    {
+      "id": "mesh-sponza-aisle-wall-south-0",
+      "uri": "assets/sponza/models/aisle-wall-south-0.obj"
+    },
+    {
+      "id": "mesh-sponza-aisle-wall-south-1",
+      "uri": "assets/sponza/models/aisle-wall-south-1.obj"
+    },
+    {
+      "id": "mesh-sponza-aisle-wall-south-2",
+      "uri": "assets/sponza/models/aisle-wall-south-2.obj"
+    },
+    {
+      "id": "mesh-sponza-clerestory-north-0",
+      "uri": "assets/sponza/models/clerestory-north-0.obj"
+    },
+    {
+      "id": "mesh-sponza-roof-north-0",
+      "uri": "assets/sponza/models/roof-north-0.obj"
+    },
+    {
+      "id": "mesh-sponza-clerestory-north-1",
+      "uri": "assets/sponza/models/clerestory-north-1.obj"
+    },
+    {
+      "id": "mesh-sponza-roof-north-1",
+      "uri": "assets/sponza/models/roof-north-1.obj"
+    },
+    {
+      "id": "mesh-sponza-clerestory-south-0",
+      "uri": "assets/sponza/models/clerestory-south-0.obj"
+    },
+    {
+      "id": "mesh-sponza-roof-south-0",
+      "uri": "assets/sponza/models/roof-south-0.obj"
+    },
+    {
+      "id": "mesh-sponza-clerestory-south-1",
+      "uri": "assets/sponza/models/clerestory-south-1.obj"
+    },
+    {
+      "id": "mesh-sponza-roof-south-1",
+      "uri": "assets/sponza/models/roof-south-1.obj"
+    },
+    {
+      "id": "mesh-sponza-clerestory-west",
+      "uri": "assets/sponza/models/clerestory-west.obj"
+    },
+    {
+      "id": "mesh-sponza-roof-west",
+      "uri": "assets/sponza/models/roof-west.obj"
+    },
+    {
+      "id": "mesh-sponza-clerestory-east",
+      "uri": "assets/sponza/models/clerestory-east.obj"
+    },
+    {
+      "id": "mesh-sponza-roof-east",
+      "uri": "assets/sponza/models/roof-east.obj"
+    },
+    {
+      "id": "mesh-sponza-end-wall-east",
+      "uri": "assets/sponza/models/end-wall-east.obj"
+    },
+    {
+      "id": "mesh-sponza-end-wall-west",
+      "uri": "assets/sponza/models/end-wall-west.obj"
+    },
+    {
+      "id": "mesh-sponza-entry-floor",
+      "uri": "assets/sponza/models/entry-floor.obj"
+    },
+    {
+      "id": "mesh-sponza-entry-shell",
+      "uri": "assets/sponza/models/entry-shell.obj"
+    },
+    {
+      "id": "mesh-sponza-niche-floor",
+      "uri": "assets/sponza/models/niche-floor.obj"
+    },
+    {
+      "id": "mesh-sponza-niche-shell",
+      "uri": "assets/sponza/models/niche-shell.obj"
+    },
+    {
+      "id": "mesh-sponza-stairs-east",
+      "uri": "assets/sponza/models/stairs-east.obj"
+    },
+    {
+      "id": "mesh-sponza-stair-shell-east",
+      "uri": "assets/sponza/models/stair-shell-east.obj"
+    },
+    {
+      "id": "mesh-sponza-stairs-west",
+      "uri": "assets/sponza/models/stairs-west.obj"
+    },
+    {
+      "id": "mesh-sponza-stair-shell-west",
+      "uri": "assets/sponza/models/stair-shell-west.obj"
+    }
+  ],
+  "instances": [
+    {
+      "id": "sponza-column-north-0",
+      "model": "mesh-sponza-ground-column",
+      "material": "mat-sponza-trim",
+      "transform": {
+        "position": [
+          -8,
+          0,
+          -3.1
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "id": "sponza-column-north-1",
+      "model": "mesh-sponza-ground-column",
+      "material": "mat-sponza-trim",
+      "transform": {
+        "position": [
+          -4,
+          0,
+          -3.1
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "id": "sponza-column-north-2",
+      "model": "mesh-sponza-ground-column",
+      "material": "mat-sponza-trim",
+      "transform": {
+        "position": [
+          0,
+          0,
+          -3.1
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "id": "sponza-column-north-3",
+      "model": "mesh-sponza-ground-column",
+      "material": "mat-sponza-trim",
+      "transform": {
+        "position": [
+          4,
+          0,
+          -3.1
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "id": "sponza-column-north-4",
+      "model": "mesh-sponza-ground-column",
+      "material": "mat-sponza-trim",
+      "transform": {
+        "position": [
+          8,
+          0,
+          -3.1
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "id": "sponza-column-south-0",
+      "model": "mesh-sponza-ground-column",
+      "material": "mat-sponza-trim",
+      "transform": {
+        "position": [
+          -8,
+          0,
+          3.1
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "id": "sponza-column-south-1",
+      "model": "mesh-sponza-ground-column",
+      "material": "mat-sponza-trim",
+      "transform": {
+        "position": [
+          -4,
+          0,
+          3.1
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "id": "sponza-column-south-2",
+      "model": "mesh-sponza-ground-column",
+      "material": "mat-sponza-trim",
+      "transform": {
+        "position": [
+          0,
+          0,
+          3.1
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "id": "sponza-column-south-3",
+      "model": "mesh-sponza-ground-column",
+      "material": "mat-sponza-trim",
+      "transform": {
+        "position": [
+          4,
+          0,
+          3.1
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "id": "sponza-column-south-4",
+      "model": "mesh-sponza-ground-column",
+      "material": "mat-sponza-trim",
+      "transform": {
+        "position": [
+          8,
+          0,
+          3.1
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "id": "sponza-arch-north-0",
+      "model": "mesh-sponza-ground-arch",
+      "material": "mat-sponza-stone",
+      "transform": {
+        "position": [
+          -6,
+          0,
+          -3.1
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "id": "sponza-arch-north-1",
+      "model": "mesh-sponza-ground-arch",
+      "material": "mat-sponza-stone",
+      "transform": {
+        "position": [
+          -2,
+          0,
+          -3.1
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "id": "sponza-arch-north-2",
+      "model": "mesh-sponza-ground-arch",
+      "material": "mat-sponza-stone",
+      "transform": {
+        "position": [
+          2,
+          0,
+          -3.1
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "id": "sponza-arch-north-3",
+      "model": "mesh-sponza-ground-arch",
+      "material": "mat-sponza-stone",
+      "transform": {
+        "position": [
+          6,
+          0,
+          -3.1
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "id": "sponza-arch-south-0",
+      "model": "mesh-sponza-ground-arch",
+      "material": "mat-sponza-stone",
+      "transform": {
+        "position": [
+          -6,
+          0,
+          3.1
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "id": "sponza-arch-south-1",
+      "model": "mesh-sponza-ground-arch",
+      "material": "mat-sponza-stone",
+      "transform": {
+        "position": [
+          -2,
+          0,
+          3.1
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "id": "sponza-arch-south-2",
+      "model": "mesh-sponza-ground-arch",
+      "material": "mat-sponza-stone",
+      "transform": {
+        "position": [
+          2,
+          0,
+          3.1
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "id": "sponza-arch-south-3",
+      "model": "mesh-sponza-ground-arch",
+      "material": "mat-sponza-stone",
+      "transform": {
+        "position": [
+          6,
+          0,
+          3.1
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "id": "sponza-arch-west",
+      "model": "mesh-sponza-ground-end-arch",
+      "material": "mat-sponza-stone",
+      "transform": {
+        "position": [
+          -8,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          90,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "id": "sponza-arch-east",
+      "model": "mesh-sponza-ground-end-arch",
+      "material": "mat-sponza-stone",
+      "transform": {
+        "position": [
+          8,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          90,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "id": "sponza-ground-floor-0",
+      "model": "mesh-sponza-ground-floor-0",
+      "material": "mat-sponza-floor",
+      "transform": {
+        "position": [
+          -9.7,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "id": "sponza-ground-floor-1",
+      "model": "mesh-sponza-ground-floor-1",
+      "material": "mat-sponza-floor",
+      "transform": {
+        "position": [
+          -6.0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "id": "sponza-ground-floor-2",
+      "model": "mesh-sponza-ground-floor-2",
+      "material": "mat-sponza-floor",
+      "transform": {
+        "position": [
+          -2.0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "id": "sponza-ground-floor-3",
+      "model": "mesh-sponza-ground-floor-3",
+      "material": "mat-sponza-floor",
+      "transform": {
+        "position": [
+          2.0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "id": "sponza-ground-floor-4",
+      "model": "mesh-sponza-ground-floor-4",
+      "material": "mat-sponza-floor",
+      "transform": {
+        "position": [
+          6.0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "id": "sponza-ground-floor-5",
+      "model": "mesh-sponza-ground-floor-5",
+      "material": "mat-sponza-floor",
+      "transform": {
+        "position": [
+          9.7,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "id": "sponza-gallery-north-0",
+      "model": "mesh-sponza-gallery-north-0",
+      "material": "mat-sponza-floor",
+      "transform": {
+        "position": [
+          -6.0,
+          5.3,
+          -4.39
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "id": "sponza-gallery-north-1",
+      "model": "mesh-sponza-gallery-north-1",
+      "material": "mat-sponza-floor",
+      "transform": {
+        "position": [
+          -2.0,
+          5.3,
+          -4.39
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "id": "sponza-gallery-north-2",
+      "model": "mesh-sponza-gallery-north-2",
+      "material": "mat-sponza-floor",
+      "transform": {
+        "position": [
+          2.0,
+          5.3,
+          -4.39
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "id": "sponza-gallery-north-3",
+      "model": "mesh-sponza-gallery-north-3",
+      "material": "mat-sponza-floor",
+      "transform": {
+        "position": [
+          6.0,
+          5.3,
+          -4.39
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "id": "sponza-ceiling-north",
+      "model": "mesh-sponza-ceiling-north",
+      "material": "mat-sponza-plaster",
+      "transform": {
+        "position": [
+          0,
+          5.1,
+          -4.39
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "id": "sponza-upper-ceiling-north",
+      "model": "mesh-sponza-upper-ceiling-north",
+      "material": "mat-sponza-plaster",
+      "transform": {
+        "position": [
+          0,
+          10.5,
+          -4.39
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "id": "sponza-parapet-north",
+      "model": "mesh-sponza-parapet-north",
+      "material": "mat-sponza-trim",
+      "transform": {
+        "position": [
+          0,
+          5.7,
+          -2.91
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "id": "sponza-gallery-south-0",
+      "model": "mesh-sponza-gallery-south-0",
+      "material": "mat-sponza-floor",
+      "transform": {
+        "position": [
+          -6.0,
+          5.3,
+          4.39
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "id": "sponza-gallery-south-1",
+      "model": "mesh-sponza-gallery-south-1",
+      "material": "mat-sponza-floor",
+      "transform": {
+        "position": [
+          -2.0,
+          5.3,
+          4.39
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "id": "sponza-gallery-south-2",
+      "model": "mesh-sponza-gallery-south-2",
+      "material": "mat-sponza-floor",
+      "transform": {
+        "position": [
+          2.0,
+          5.3,
+          4.39
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "id": "sponza-gallery-south-3",
+      "model": "mesh-sponza-gallery-south-3",
+      "material": "mat-sponza-floor",
+      "transform": {
+        "position": [
+          6.0,
+          5.3,
+          4.39
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "id": "sponza-ceiling-south",
+      "model": "mesh-sponza-ceiling-south",
+      "material": "mat-sponza-plaster",
+      "transform": {
+        "position": [
+          0,
+          5.1,
+          4.39
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "id": "sponza-upper-ceiling-south",
+      "model": "mesh-sponza-upper-ceiling-south",
+      "material": "mat-sponza-plaster",
+      "transform": {
+        "position": [
+          0,
+          10.5,
+          4.39
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "id": "sponza-parapet-south",
+      "model": "mesh-sponza-parapet-south",
+      "material": "mat-sponza-trim",
+      "transform": {
+        "position": [
+          0,
+          5.7,
+          2.91
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "id": "sponza-gallery-west",
+      "model": "mesh-sponza-gallery-west",
+      "material": "mat-sponza-floor",
+      "transform": {
+        "position": [
+          -9.7,
+          5.3,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "id": "sponza-ceiling-west",
+      "model": "mesh-sponza-ceiling-west",
+      "material": "mat-sponza-plaster",
+      "transform": {
+        "position": [
+          -9.7,
+          5.1,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "id": "sponza-upper-ceiling-west",
+      "model": "mesh-sponza-upper-ceiling-west",
+      "material": "mat-sponza-plaster",
+      "transform": {
+        "position": [
+          -9.7,
+          10.5,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "id": "sponza-parapet-west",
+      "model": "mesh-sponza-parapet-west",
+      "material": "mat-sponza-trim",
+      "transform": {
+        "position": [
+          -7.9,
+          5.7,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "id": "sponza-gallery-east",
+      "model": "mesh-sponza-gallery-east",
+      "material": "mat-sponza-floor",
+      "transform": {
+        "position": [
+          9.7,
+          5.3,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "id": "sponza-ceiling-east",
+      "model": "mesh-sponza-ceiling-east",
+      "material": "mat-sponza-plaster",
+      "transform": {
+        "position": [
+          9.7,
+          5.1,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "id": "sponza-upper-ceiling-east",
+      "model": "mesh-sponza-upper-ceiling-east",
+      "material": "mat-sponza-plaster",
+      "transform": {
+        "position": [
+          9.7,
+          10.5,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "id": "sponza-parapet-east",
+      "model": "mesh-sponza-parapet-east",
+      "material": "mat-sponza-trim",
+      "transform": {
+        "position": [
+          7.9,
+          5.7,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "id": "sponza-upper-posts-north-0",
+      "model": "mesh-sponza-upper-post-pair",
+      "material": "mat-sponza-trim",
+      "transform": {
+        "position": [
+          -6,
+          6.1,
+          -3.1
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "id": "sponza-upper-posts-north-1",
+      "model": "mesh-sponza-upper-post-pair",
+      "material": "mat-sponza-trim",
+      "transform": {
+        "position": [
+          -2,
+          6.1,
+          -3.1
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "id": "sponza-upper-posts-north-2",
+      "model": "mesh-sponza-upper-post-pair",
+      "material": "mat-sponza-trim",
+      "transform": {
+        "position": [
+          2,
+          6.1,
+          -3.1
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "id": "sponza-upper-posts-north-3",
+      "model": "mesh-sponza-upper-post-pair",
+      "material": "mat-sponza-trim",
+      "transform": {
+        "position": [
+          6,
+          6.1,
+          -3.1
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "id": "sponza-upper-posts-south-0",
+      "model": "mesh-sponza-upper-post-pair",
+      "material": "mat-sponza-trim",
+      "transform": {
+        "position": [
+          -6,
+          6.1,
+          3.1
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "id": "sponza-upper-posts-south-1",
+      "model": "mesh-sponza-upper-post-pair",
+      "material": "mat-sponza-trim",
+      "transform": {
+        "position": [
+          -2,
+          6.1,
+          3.1
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "id": "sponza-upper-posts-south-2",
+      "model": "mesh-sponza-upper-post-pair",
+      "material": "mat-sponza-trim",
+      "transform": {
+        "position": [
+          2,
+          6.1,
+          3.1
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "id": "sponza-upper-posts-south-3",
+      "model": "mesh-sponza-upper-post-pair",
+      "material": "mat-sponza-trim",
+      "transform": {
+        "position": [
+          6,
+          6.1,
+          3.1
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "id": "sponza-upper-post-end-0",
+      "model": "mesh-sponza-upper-post-single",
+      "material": "mat-sponza-trim",
+      "transform": {
+        "position": [
+          8,
+          6.1,
+          -3.1
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "id": "sponza-upper-post-end-1",
+      "model": "mesh-sponza-upper-post-single",
+      "material": "mat-sponza-trim",
+      "transform": {
+        "position": [
+          8,
+          6.1,
+          3.1
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "id": "sponza-upper-post-end-2",
+      "model": "mesh-sponza-upper-post-single",
+      "material": "mat-sponza-trim",
+      "transform": {
+        "position": [
+          -8,
+          6.1,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "id": "sponza-upper-post-end-3",
+      "model": "mesh-sponza-upper-post-single",
+      "material": "mat-sponza-trim",
+      "transform": {
+        "position": [
+          8,
+          6.1,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "id": "sponza-upper-arches-north-0",
+      "model": "mesh-sponza-upper-arch-pair",
+      "material": "mat-sponza-stone",
+      "transform": {
+        "position": [
+          -6,
+          0,
+          -3.1
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "id": "sponza-upper-arches-north-1",
+      "model": "mesh-sponza-upper-arch-pair",
+      "material": "mat-sponza-stone",
+      "transform": {
+        "position": [
+          -2,
+          0,
+          -3.1
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "id": "sponza-upper-arches-north-2",
+      "model": "mesh-sponza-upper-arch-pair",
+      "material": "mat-sponza-stone",
+      "transform": {
+        "position": [
+          2,
+          0,
+          -3.1
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "id": "sponza-upper-arches-north-3",
+      "model": "mesh-sponza-upper-arch-pair",
+      "material": "mat-sponza-stone",
+      "transform": {
+        "position": [
+          6,
+          0,
+          -3.1
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "id": "sponza-upper-arches-south-0",
+      "model": "mesh-sponza-upper-arch-pair",
+      "material": "mat-sponza-stone",
+      "transform": {
+        "position": [
+          -6,
+          0,
+          3.1
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "id": "sponza-upper-arches-south-1",
+      "model": "mesh-sponza-upper-arch-pair",
+      "material": "mat-sponza-stone",
+      "transform": {
+        "position": [
+          -2,
+          0,
+          3.1
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "id": "sponza-upper-arches-south-2",
+      "model": "mesh-sponza-upper-arch-pair",
+      "material": "mat-sponza-stone",
+      "transform": {
+        "position": [
+          2,
+          0,
+          3.1
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "id": "sponza-upper-arches-south-3",
+      "model": "mesh-sponza-upper-arch-pair",
+      "material": "mat-sponza-stone",
+      "transform": {
+        "position": [
+          6,
+          0,
+          3.1
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "id": "sponza-upper-arches-west",
+      "model": "mesh-sponza-upper-end-arch-pair",
+      "material": "mat-sponza-stone",
+      "transform": {
+        "position": [
+          -8,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          90,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "id": "sponza-upper-arches-east",
+      "model": "mesh-sponza-upper-end-arch-pair",
+      "material": "mat-sponza-stone",
+      "transform": {
+        "position": [
+          8,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          90,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "id": "sponza-aisle-wall-north-0",
+      "model": "mesh-sponza-aisle-wall-north-0",
+      "material": "mat-sponza-plaster",
+      "transform": {
+        "position": [
+          -7.7,
+          5.25,
+          -6
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "id": "sponza-aisle-wall-north-1",
+      "model": "mesh-sponza-aisle-wall-north-1",
+      "material": "mat-sponza-plaster",
+      "transform": {
+        "position": [
+          0.0,
+          5.25,
+          -6
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "id": "sponza-aisle-wall-north-2",
+      "model": "mesh-sponza-aisle-wall-north-2",
+      "material": "mat-sponza-plaster",
+      "transform": {
+        "position": [
+          7.7,
+          5.25,
+          -6
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "id": "sponza-aisle-wall-south-0",
+      "model": "mesh-sponza-aisle-wall-south-0",
+      "material": "mat-sponza-plaster",
+      "transform": {
+        "position": [
+          -7.7,
+          5.25,
+          6
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "id": "sponza-aisle-wall-south-1",
+      "model": "mesh-sponza-aisle-wall-south-1",
+      "material": "mat-sponza-plaster",
+      "transform": {
+        "position": [
+          0.0,
+          5.25,
+          6
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "id": "sponza-aisle-wall-south-2",
+      "model": "mesh-sponza-aisle-wall-south-2",
+      "material": "mat-sponza-plaster",
+      "transform": {
+        "position": [
+          7.7,
+          5.25,
+          6
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "id": "sponza-clerestory-north-0",
+      "model": "mesh-sponza-clerestory-north-0",
+      "material": "mat-sponza-plaster",
+      "transform": {
+        "position": [
+          -4.0,
+          13.45,
+          -3.1
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "id": "sponza-roof-north-0",
+      "model": "mesh-sponza-roof-north-0",
+      "material": "mat-sponza-roof",
+      "transform": {
+        "position": [
+          -4.0,
+          16.5,
+          -3.1
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "id": "sponza-clerestory-north-1",
+      "model": "mesh-sponza-clerestory-north-1",
+      "material": "mat-sponza-plaster",
+      "transform": {
+        "position": [
+          4.0,
+          13.45,
+          -3.1
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "id": "sponza-roof-north-1",
+      "model": "mesh-sponza-roof-north-1",
+      "material": "mat-sponza-roof",
+      "transform": {
+        "position": [
+          4.0,
+          16.5,
+          -3.1
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "id": "sponza-clerestory-south-0",
+      "model": "mesh-sponza-clerestory-south-0",
+      "material": "mat-sponza-plaster",
+      "transform": {
+        "position": [
+          -4.0,
+          13.45,
+          3.1
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "id": "sponza-roof-south-0",
+      "model": "mesh-sponza-roof-south-0",
+      "material": "mat-sponza-roof",
+      "transform": {
+        "position": [
+          -4.0,
+          16.5,
+          3.1
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "id": "sponza-clerestory-south-1",
+      "model": "mesh-sponza-clerestory-south-1",
+      "material": "mat-sponza-plaster",
+      "transform": {
+        "position": [
+          4.0,
+          13.45,
+          3.1
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "id": "sponza-roof-south-1",
+      "model": "mesh-sponza-roof-south-1",
+      "material": "mat-sponza-roof",
+      "transform": {
+        "position": [
+          4.0,
+          16.5,
+          3.1
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "id": "sponza-clerestory-west",
+      "model": "mesh-sponza-clerestory-west",
+      "material": "mat-sponza-plaster",
+      "transform": {
+        "position": [
+          -8,
+          13.45,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "id": "sponza-roof-west",
+      "model": "mesh-sponza-roof-west",
+      "material": "mat-sponza-roof",
+      "transform": {
+        "position": [
+          -8,
+          16.5,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "id": "sponza-clerestory-east",
+      "model": "mesh-sponza-clerestory-east",
+      "material": "mat-sponza-plaster",
+      "transform": {
+        "position": [
+          8,
+          13.45,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "id": "sponza-roof-east",
+      "model": "mesh-sponza-roof-east",
+      "material": "mat-sponza-roof",
+      "transform": {
+        "position": [
+          8,
+          16.5,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "id": "sponza-end-wall-east",
+      "model": "mesh-sponza-end-wall-east",
+      "material": "mat-sponza-brick",
+      "transform": {
+        "position": [
+          11.4,
+          5.25,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "id": "sponza-end-wall-west",
+      "model": "mesh-sponza-end-wall-west",
+      "material": "mat-sponza-brick",
+      "transform": {
+        "position": [
+          -11.4,
+          5.25,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "id": "sponza-entry-floor",
+      "model": "mesh-sponza-entry-floor",
+      "material": "mat-sponza-floor",
+      "transform": {
+        "position": [
+          15.45,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "id": "sponza-entry-shell",
+      "model": "mesh-sponza-entry-shell",
+      "material": "mat-sponza-brick",
+      "transform": {
+        "position": [
+          15.45,
+          1.9,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "id": "sponza-niche-floor",
+      "model": "mesh-sponza-niche-floor",
+      "material": "mat-sponza-floor",
+      "transform": {
+        "position": [
+          -13.45,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "id": "sponza-niche-shell",
+      "model": "mesh-sponza-niche-shell",
+      "material": "mat-sponza-brick",
+      "transform": {
+        "position": [
+          -13.45,
+          2.45,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "id": "sponza-stairs-east",
+      "model": "mesh-sponza-stairs-east",
+      "material": "mat-sponza-stone",
+      "transform": {
+        "position": [
+          13.65,
+          2.65,
+          4.0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "id": "sponza-stair-shell-east",
+      "model": "mesh-sponza-stair-shell-east",
+      "material": "mat-sponza-brick",
+      "transform": {
+        "position": [
+          13.65,
+          3.8,
+          4.0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "id": "sponza-stairs-west",
+      "model": "mesh-sponza-stairs-west",
+      "material": "mat-sponza-stone",
+      "transform": {
+        "position": [
+          -13.65,
+          2.65,
+          -4.0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "id": "sponza-stair-shell-west",
+      "model": "mesh-sponza-stair-shell-west",
+      "material": "mat-sponza-brick",
+      "transform": {
+        "position": [
+          -13.65,
+          3.8,
+          -4.0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      }
+    }
+  ],
+  "colliders": [
+    {
+      "id": "sponza-collision-column-north-0",
+      "transform": {
+        "position": [
+          -8.0,
+          1.525,
+          -3.1
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          0.33999999999999986,
+          1.525,
+          0.33999999999999986
+        ]
+      }
+    },
+    {
+      "id": "sponza-collision-column-north-1",
+      "transform": {
+        "position": [
+          -4.0,
+          1.525,
+          -3.1
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          0.33999999999999986,
+          1.525,
+          0.33999999999999986
+        ]
+      }
+    },
+    {
+      "id": "sponza-collision-column-north-2",
+      "transform": {
+        "position": [
+          0.0,
+          1.525,
+          -3.1
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          0.34,
+          1.525,
+          0.33999999999999986
+        ]
+      }
+    },
+    {
+      "id": "sponza-collision-column-north-3",
+      "transform": {
+        "position": [
+          4.0,
+          1.525,
+          -3.1
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          0.33999999999999986,
+          1.525,
+          0.33999999999999986
+        ]
+      }
+    },
+    {
+      "id": "sponza-collision-column-north-4",
+      "transform": {
+        "position": [
+          8.0,
+          1.525,
+          -3.1
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          0.33999999999999986,
+          1.525,
+          0.33999999999999986
+        ]
+      }
+    },
+    {
+      "id": "sponza-collision-column-south-0",
+      "transform": {
+        "position": [
+          -8.0,
+          1.525,
+          3.1
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          0.33999999999999986,
+          1.525,
+          0.33999999999999986
+        ]
+      }
+    },
+    {
+      "id": "sponza-collision-column-south-1",
+      "transform": {
+        "position": [
+          -4.0,
+          1.525,
+          3.1
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          0.33999999999999986,
+          1.525,
+          0.33999999999999986
+        ]
+      }
+    },
+    {
+      "id": "sponza-collision-column-south-2",
+      "transform": {
+        "position": [
+          0.0,
+          1.525,
+          3.1
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          0.34,
+          1.525,
+          0.33999999999999986
+        ]
+      }
+    },
+    {
+      "id": "sponza-collision-column-south-3",
+      "transform": {
+        "position": [
+          4.0,
+          1.525,
+          3.1
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          0.33999999999999986,
+          1.525,
+          0.33999999999999986
+        ]
+      }
+    },
+    {
+      "id": "sponza-collision-column-south-4",
+      "transform": {
+        "position": [
+          8.0,
+          1.525,
+          3.1
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          0.33999999999999986,
+          1.525,
+          0.33999999999999986
+        ]
+      }
+    },
+    {
+      "id": "sponza-collision-ground-floor-0",
+      "transform": {
+        "position": [
+          -9.7,
+          -0.1,
+          0.0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          1.7000000000000002,
+          0.1,
+          6.0
+        ]
+      }
+    },
+    {
+      "id": "sponza-collision-ground-floor-1",
+      "transform": {
+        "position": [
+          -6.0,
+          -0.1,
+          0.0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          2.0,
+          0.1,
+          6.0
+        ]
+      }
+    },
+    {
+      "id": "sponza-collision-ground-floor-2",
+      "transform": {
+        "position": [
+          -2.0,
+          -0.1,
+          0.0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          2.0,
+          0.1,
+          6.0
+        ]
+      }
+    },
+    {
+      "id": "sponza-collision-ground-floor-3",
+      "transform": {
+        "position": [
+          2.0,
+          -0.1,
+          0.0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          2.0,
+          0.1,
+          6.0
+        ]
+      }
+    },
+    {
+      "id": "sponza-collision-ground-floor-4",
+      "transform": {
+        "position": [
+          6.0,
+          -0.1,
+          0.0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          2.0,
+          0.1,
+          6.0
+        ]
+      }
+    },
+    {
+      "id": "sponza-collision-ground-floor-5",
+      "transform": {
+        "position": [
+          9.7,
+          -0.1,
+          0.0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          1.7000000000000002,
+          0.1,
+          6.0
+        ]
+      }
+    },
+    {
+      "id": "sponza-collision-gallery-north-0",
+      "transform": {
+        "position": [
+          -6.0,
+          5.199999999999999,
+          -4.39
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          2.0,
+          0.10000000000000009,
+          1.61
+        ]
+      }
+    },
+    {
+      "id": "sponza-collision-gallery-north-1",
+      "transform": {
+        "position": [
+          -2.0,
+          5.199999999999999,
+          -4.39
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          2.0,
+          0.10000000000000009,
+          1.61
+        ]
+      }
+    },
+    {
+      "id": "sponza-collision-gallery-north-2",
+      "transform": {
+        "position": [
+          2.0,
+          5.199999999999999,
+          -4.39
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          2.0,
+          0.10000000000000009,
+          1.61
+        ]
+      }
+    },
+    {
+      "id": "sponza-collision-gallery-north-3",
+      "transform": {
+        "position": [
+          6.0,
+          5.199999999999999,
+          -4.39
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          2.0,
+          0.10000000000000009,
+          1.61
+        ]
+      }
+    },
+    {
+      "id": "sponza-collision-upper-ceiling-north",
+      "transform": {
+        "position": [
+          0.0,
+          10.6,
+          -4.39
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          8.0,
+          0.09999999999999964,
+          1.61
+        ]
+      }
+    },
+    {
+      "id": "sponza-collision-parapet-north",
+      "transform": {
+        "position": [
+          0.0,
+          5.699999999999999,
+          -2.91
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          8.0,
+          0.3999999999999999,
+          0.1299999999999999
+        ]
+      }
+    },
+    {
+      "id": "sponza-collision-gallery-south-0",
+      "transform": {
+        "position": [
+          -6.0,
+          5.199999999999999,
+          4.39
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          2.0,
+          0.10000000000000009,
+          1.61
+        ]
+      }
+    },
+    {
+      "id": "sponza-collision-gallery-south-1",
+      "transform": {
+        "position": [
+          -2.0,
+          5.199999999999999,
+          4.39
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          2.0,
+          0.10000000000000009,
+          1.61
+        ]
+      }
+    },
+    {
+      "id": "sponza-collision-gallery-south-2",
+      "transform": {
+        "position": [
+          2.0,
+          5.199999999999999,
+          4.39
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          2.0,
+          0.10000000000000009,
+          1.61
+        ]
+      }
+    },
+    {
+      "id": "sponza-collision-gallery-south-3",
+      "transform": {
+        "position": [
+          6.0,
+          5.199999999999999,
+          4.39
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          2.0,
+          0.10000000000000009,
+          1.61
+        ]
+      }
+    },
+    {
+      "id": "sponza-collision-upper-ceiling-south",
+      "transform": {
+        "position": [
+          0.0,
+          10.6,
+          4.39
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          8.0,
+          0.09999999999999964,
+          1.61
+        ]
+      }
+    },
+    {
+      "id": "sponza-collision-parapet-south",
+      "transform": {
+        "position": [
+          0.0,
+          5.699999999999999,
+          2.91
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          8.0,
+          0.3999999999999999,
+          0.1299999999999999
+        ]
+      }
+    },
+    {
+      "id": "sponza-collision-gallery-west",
+      "transform": {
+        "position": [
+          -9.7,
+          5.199999999999999,
+          0.0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          1.7000000000000002,
+          0.10000000000000009,
+          6.0
+        ]
+      }
+    },
+    {
+      "id": "sponza-collision-upper-ceiling-west",
+      "transform": {
+        "position": [
+          -9.7,
+          10.6,
+          0.0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          1.7000000000000002,
+          0.09999999999999964,
+          6.0
+        ]
+      }
+    },
+    {
+      "id": "sponza-collision-parapet-west",
+      "transform": {
+        "position": [
+          -7.9,
+          5.699999999999999,
+          0.0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          0.13000000000000034,
+          0.3999999999999999,
+          2.78
+        ]
+      }
+    },
+    {
+      "id": "sponza-collision-gallery-east",
+      "transform": {
+        "position": [
+          9.7,
+          5.199999999999999,
+          0.0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          1.7000000000000002,
+          0.10000000000000009,
+          6.0
+        ]
+      }
+    },
+    {
+      "id": "sponza-collision-upper-ceiling-east",
+      "transform": {
+        "position": [
+          9.7,
+          10.6,
+          0.0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          1.7000000000000002,
+          0.09999999999999964,
+          6.0
+        ]
+      }
+    },
+    {
+      "id": "sponza-collision-parapet-east",
+      "transform": {
+        "position": [
+          7.9,
+          5.699999999999999,
+          0.0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          0.13000000000000034,
+          0.3999999999999999,
+          2.78
+        ]
+      }
+    },
+    {
+      "id": "sponza-collision-aisle-wall-north-0",
+      "transform": {
+        "position": [
+          -7.7,
+          5.25,
+          -6.0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          3.7,
+          5.25,
+          0.09999999999999964
+        ]
+      }
+    },
+    {
+      "id": "sponza-collision-aisle-wall-north-1",
+      "transform": {
+        "position": [
+          0.0,
+          5.25,
+          -6.0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          4.0,
+          5.25,
+          0.09999999999999964
+        ]
+      }
+    },
+    {
+      "id": "sponza-collision-aisle-wall-north-2",
+      "transform": {
+        "position": [
+          7.7,
+          5.25,
+          -6.0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          3.7,
+          5.25,
+          0.09999999999999964
+        ]
+      }
+    },
+    {
+      "id": "sponza-collision-aisle-wall-south-0",
+      "transform": {
+        "position": [
+          -7.7,
+          5.25,
+          6.0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          3.7,
+          5.25,
+          0.09999999999999964
+        ]
+      }
+    },
+    {
+      "id": "sponza-collision-aisle-wall-south-1",
+      "transform": {
+        "position": [
+          0.0,
+          5.25,
+          6.0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          4.0,
+          5.25,
+          0.09999999999999964
+        ]
+      }
+    },
+    {
+      "id": "sponza-collision-aisle-wall-south-2",
+      "transform": {
+        "position": [
+          7.7,
+          5.25,
+          6.0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          3.7,
+          5.25,
+          0.09999999999999964
+        ]
+      }
+    },
+    {
+      "id": "sponza-collision-end-wall-east-0",
+      "transform": {
+        "position": [
+          11.4,
+          5.25,
+          -3.625
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          0.09999999999999964,
+          5.25,
+          2.375
+        ]
+      }
+    },
+    {
+      "id": "sponza-collision-end-wall-east-1",
+      "transform": {
+        "position": [
+          11.4,
+          5.25,
+          2.025
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          0.09999999999999964,
+          5.25,
+          0.7749999999999999
+        ]
+      }
+    },
+    {
+      "id": "sponza-collision-end-wall-east-2",
+      "transform": {
+        "position": [
+          11.4,
+          5.25,
+          5.6
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          0.09999999999999964,
+          5.25,
+          0.3999999999999999
+        ]
+      }
+    },
+    {
+      "id": "sponza-collision-end-wall-east-3",
+      "transform": {
+        "position": [
+          11.4,
+          6.8,
+          0.0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          0.09999999999999964,
+          3.7,
+          1.25
+        ]
+      }
+    },
+    {
+      "id": "sponza-collision-end-wall-east-4",
+      "transform": {
+        "position": [
+          11.4,
+          8.95,
+          4.0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          0.09999999999999964,
+          1.5499999999999998,
+          1.2000000000000002
+        ]
+      }
+    },
+    {
+      "id": "sponza-collision-end-wall-west-0",
+      "transform": {
+        "position": [
+          -11.4,
+          5.25,
+          -5.6
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          0.09999999999999964,
+          5.25,
+          0.3999999999999999
+        ]
+      }
+    },
+    {
+      "id": "sponza-collision-end-wall-west-1",
+      "transform": {
+        "position": [
+          -11.4,
+          5.25,
+          -2.65
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          0.09999999999999964,
+          5.25,
+          0.1499999999999999
+        ]
+      }
+    },
+    {
+      "id": "sponza-collision-end-wall-west-2",
+      "transform": {
+        "position": [
+          -11.4,
+          5.25,
+          4.25
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          0.09999999999999964,
+          5.25,
+          1.75
+        ]
+      }
+    },
+    {
+      "id": "sponza-collision-end-wall-west-3",
+      "transform": {
+        "position": [
+          -11.4,
+          7.55,
+          0.0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          0.09999999999999964,
+          2.95,
+          2.5
+        ]
+      }
+    },
+    {
+      "id": "sponza-collision-end-wall-west-4",
+      "transform": {
+        "position": [
+          -11.4,
+          8.95,
+          -4.0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          0.09999999999999964,
+          1.5499999999999998,
+          1.2000000000000002
+        ]
+      }
+    },
+    {
+      "id": "sponza-collision-entry-floor",
+      "transform": {
+        "position": [
+          15.45,
+          -0.1,
+          0.0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          4.05,
+          0.1,
+          1.25
+        ]
+      }
+    },
+    {
+      "id": "sponza-collision-entry-wall--1p25",
+      "transform": {
+        "position": [
+          15.45,
+          1.9,
+          -1.25
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          4.05,
+          1.9,
+          0.10000000000000009
+        ]
+      }
+    },
+    {
+      "id": "sponza-collision-entry-wall-1p25",
+      "transform": {
+        "position": [
+          15.45,
+          1.9,
+          1.25
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          4.05,
+          1.9,
+          0.10000000000000009
+        ]
+      }
+    },
+    {
+      "id": "sponza-collision-entry-back",
+      "transform": {
+        "position": [
+          19.5,
+          1.9,
+          0.0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          0.10000000000000142,
+          1.9,
+          1.25
+        ]
+      }
+    },
+    {
+      "id": "sponza-collision-entry-ceiling",
+      "transform": {
+        "position": [
+          15.45,
+          3.9,
+          0.0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          4.05,
+          0.10000000000000009,
+          1.25
+        ]
+      }
+    },
+    {
+      "id": "sponza-collision-niche-floor",
+      "transform": {
+        "position": [
+          -13.45,
+          -0.1,
+          0.0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          2.05,
+          0.1,
+          2.5
+        ]
+      }
+    },
+    {
+      "id": "sponza-collision-niche-wall--2p5",
+      "transform": {
+        "position": [
+          -13.45,
+          2.45,
+          -2.5
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          2.05,
+          2.45,
+          0.10000000000000009
+        ]
+      }
+    },
+    {
+      "id": "sponza-collision-niche-wall-2p5",
+      "transform": {
+        "position": [
+          -13.45,
+          2.45,
+          2.5
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          2.05,
+          2.45,
+          0.10000000000000009
+        ]
+      }
+    },
+    {
+      "id": "sponza-collision-niche-back",
+      "transform": {
+        "position": [
+          -15.5,
+          2.45,
+          0.0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          0.09999999999999964,
+          2.45,
+          2.5
+        ]
+      }
+    },
+    {
+      "id": "sponza-collision-niche-ceiling",
+      "transform": {
+        "position": [
+          -13.45,
+          5.0,
+          0.0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          2.05,
+          0.10000000000000009,
+          2.5
+        ]
+      }
+    },
+    {
+      "id": "sponza-collision-east-step-0-0",
+      "transform": {
+        "position": [
+          11.55,
+          0.07045454545454545,
+          3.4
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          0.15000000000000036,
+          0.17045454545454547,
+          0.5
+        ]
+      }
+    },
+    {
+      "id": "sponza-collision-east-step-0-1",
+      "transform": {
+        "position": [
+          11.850000000000001,
+          0.19090909090909092,
+          3.4
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          0.14999999999999947,
+          0.2909090909090909,
+          0.5
+        ]
+      }
+    },
+    {
+      "id": "sponza-collision-east-step-0-2",
+      "transform": {
+        "position": [
+          12.15,
+          0.31136363636363634,
+          3.4
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          0.15000000000000036,
+          0.4113636363636363,
+          0.5
+        ]
+      }
+    },
+    {
+      "id": "sponza-collision-east-step-0-3",
+      "transform": {
+        "position": [
+          12.45,
+          0.4318181818181818,
+          3.4
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          0.14999999999999947,
+          0.5318181818181819,
+          0.5
+        ]
+      }
+    },
+    {
+      "id": "sponza-collision-east-step-0-4",
+      "transform": {
+        "position": [
+          12.75,
+          0.5522727272727272,
+          3.4
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          0.15000000000000036,
+          0.6522727272727273,
+          0.5
+        ]
+      }
+    },
+    {
+      "id": "sponza-collision-east-step-0-5",
+      "transform": {
+        "position": [
+          13.05,
+          0.6727272727272726,
+          3.4
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          0.14999999999999947,
+          0.7727272727272727,
+          0.5
+        ]
+      }
+    },
+    {
+      "id": "sponza-collision-east-step-0-6",
+      "transform": {
+        "position": [
+          13.35,
+          0.7931818181818181,
+          3.4
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          0.15000000000000036,
+          0.8931818181818182,
+          0.5
+        ]
+      }
+    },
+    {
+      "id": "sponza-collision-east-step-0-7",
+      "transform": {
+        "position": [
+          13.65,
+          0.9136363636363636,
+          3.4
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          0.15000000000000036,
+          1.0136363636363637,
+          0.5
+        ]
+      }
+    },
+    {
+      "id": "sponza-collision-east-step-0-8",
+      "transform": {
+        "position": [
+          13.95,
+          1.034090909090909,
+          3.4
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          0.14999999999999947,
+          1.134090909090909,
+          0.5
+        ]
+      }
+    },
+    {
+      "id": "sponza-collision-east-step-0-9",
+      "transform": {
+        "position": [
+          14.25,
+          1.1545454545454545,
+          3.4
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          0.15000000000000036,
+          1.2545454545454546,
+          0.5
+        ]
+      }
+    },
+    {
+      "id": "sponza-collision-east-step-0-10",
+      "transform": {
+        "position": [
+          14.55,
+          1.275,
+          3.4
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          0.14999999999999947,
+          1.375,
+          0.5
+        ]
+      }
+    },
+    {
+      "id": "sponza-collision-east-step-1-0",
+      "transform": {
+        "position": [
+          14.549999999999999,
+          1.3954545454545453,
+          4.6
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          0.15000000000000036,
+          1.4954545454545454,
+          0.5
+        ]
+      }
+    },
+    {
+      "id": "sponza-collision-east-step-1-1",
+      "transform": {
+        "position": [
+          14.25,
+          1.5159090909090909,
+          4.6
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          0.14999999999999947,
+          1.615909090909091,
+          0.5
+        ]
+      }
+    },
+    {
+      "id": "sponza-collision-east-step-1-2",
+      "transform": {
+        "position": [
+          13.95,
+          1.6363636363636362,
+          4.6
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          0.15000000000000036,
+          1.7363636363636363,
+          0.5
+        ]
+      }
+    },
+    {
+      "id": "sponza-collision-east-step-1-3",
+      "transform": {
+        "position": [
+          13.649999999999999,
+          1.7568181818181818,
+          4.6
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          0.14999999999999947,
+          1.856818181818182,
+          0.5
+        ]
+      }
+    },
+    {
+      "id": "sponza-collision-east-step-1-4",
+      "transform": {
+        "position": [
+          13.35,
+          1.8772727272727272,
+          4.6
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          0.15000000000000036,
+          1.9772727272727273,
+          0.5
+        ]
+      }
+    },
+    {
+      "id": "sponza-collision-east-step-1-5",
+      "transform": {
+        "position": [
+          13.049999999999999,
+          1.9977272727272728,
+          4.6
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          0.15000000000000036,
+          2.0977272727272727,
+          0.5
+        ]
+      }
+    },
+    {
+      "id": "sponza-collision-east-step-1-6",
+      "transform": {
+        "position": [
+          12.75,
+          2.118181818181818,
+          4.6
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          0.14999999999999947,
+          2.218181818181818,
+          0.5
+        ]
+      }
+    },
+    {
+      "id": "sponza-collision-east-step-1-7",
+      "transform": {
+        "position": [
+          12.45,
+          2.2386363636363638,
+          4.6
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          0.15000000000000036,
+          2.3386363636363634,
+          0.5
+        ]
+      }
+    },
+    {
+      "id": "sponza-collision-east-step-1-8",
+      "transform": {
+        "position": [
+          12.149999999999999,
+          2.3590909090909093,
+          4.6
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          0.14999999999999947,
+          2.459090909090909,
+          0.5
+        ]
+      }
+    },
+    {
+      "id": "sponza-collision-east-step-1-9",
+      "transform": {
+        "position": [
+          11.85,
+          2.4795454545454545,
+          4.6
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          0.15000000000000036,
+          2.579545454545454,
+          0.5
+        ]
+      }
+    },
+    {
+      "id": "sponza-collision-east-step-1-10",
+      "transform": {
+        "position": [
+          11.549999999999999,
+          2.6,
+          4.6
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          0.15000000000000036,
+          2.6999999999999997,
+          0.5
+        ]
+      }
+    },
+    {
+      "id": "sponza-collision-east-mid-landing",
+      "transform": {
+        "position": [
+          15.3,
+          1.275,
+          4.0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          0.6000000000000005,
+          1.375,
+          1.0999999999999999
+        ]
+      }
+    },
+    {
+      "id": "sponza-collision-east-outer-wall-2p8",
+      "transform": {
+        "position": [
+          13.65,
+          3.8,
+          2.8
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          2.25,
+          3.8,
+          0.10000000000000009
+        ]
+      }
+    },
+    {
+      "id": "sponza-collision-east-outer-wall-5p2",
+      "transform": {
+        "position": [
+          13.65,
+          3.8,
+          5.2
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          2.25,
+          3.8,
+          0.09999999999999964
+        ]
+      }
+    },
+    {
+      "id": "sponza-collision-east-back-wall",
+      "transform": {
+        "position": [
+          16.0,
+          3.8,
+          4.0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          0.10000000000000053,
+          3.8,
+          1.2000000000000002
+        ]
+      }
+    },
+    {
+      "id": "sponza-collision-east-divider",
+      "transform": {
+        "position": [
+          13.05,
+          3.2,
+          4.0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          1.6499999999999995,
+          3.2,
+          0.09999999999999987
+        ]
+      }
+    },
+    {
+      "id": "sponza-collision-east-ceiling",
+      "transform": {
+        "position": [
+          13.65,
+          7.699999999999999,
+          4.0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          2.25,
+          0.10000000000000009,
+          1.2000000000000002
+        ]
+      }
+    },
+    {
+      "id": "sponza-collision-west-step-0-0",
+      "transform": {
+        "position": [
+          -11.55,
+          0.07045454545454545,
+          -3.4
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          0.15000000000000036,
+          0.17045454545454547,
+          0.5
+        ]
+      }
+    },
+    {
+      "id": "sponza-collision-west-step-0-1",
+      "transform": {
+        "position": [
+          -11.850000000000001,
+          0.19090909090909092,
+          -3.4
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          0.14999999999999947,
+          0.2909090909090909,
+          0.5
+        ]
+      }
+    },
+    {
+      "id": "sponza-collision-west-step-0-2",
+      "transform": {
+        "position": [
+          -12.15,
+          0.31136363636363634,
+          -3.4
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          0.15000000000000036,
+          0.4113636363636363,
+          0.5
+        ]
+      }
+    },
+    {
+      "id": "sponza-collision-west-step-0-3",
+      "transform": {
+        "position": [
+          -12.45,
+          0.4318181818181818,
+          -3.4
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          0.14999999999999947,
+          0.5318181818181819,
+          0.5
+        ]
+      }
+    },
+    {
+      "id": "sponza-collision-west-step-0-4",
+      "transform": {
+        "position": [
+          -12.75,
+          0.5522727272727272,
+          -3.4
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          0.15000000000000036,
+          0.6522727272727273,
+          0.5
+        ]
+      }
+    },
+    {
+      "id": "sponza-collision-west-step-0-5",
+      "transform": {
+        "position": [
+          -13.05,
+          0.6727272727272726,
+          -3.4
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          0.14999999999999947,
+          0.7727272727272727,
+          0.5
+        ]
+      }
+    },
+    {
+      "id": "sponza-collision-west-step-0-6",
+      "transform": {
+        "position": [
+          -13.35,
+          0.7931818181818181,
+          -3.4
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          0.15000000000000036,
+          0.8931818181818182,
+          0.5
+        ]
+      }
+    },
+    {
+      "id": "sponza-collision-west-step-0-7",
+      "transform": {
+        "position": [
+          -13.65,
+          0.9136363636363636,
+          -3.4
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          0.15000000000000036,
+          1.0136363636363637,
+          0.5
+        ]
+      }
+    },
+    {
+      "id": "sponza-collision-west-step-0-8",
+      "transform": {
+        "position": [
+          -13.95,
+          1.034090909090909,
+          -3.4
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          0.14999999999999947,
+          1.134090909090909,
+          0.5
+        ]
+      }
+    },
+    {
+      "id": "sponza-collision-west-step-0-9",
+      "transform": {
+        "position": [
+          -14.25,
+          1.1545454545454545,
+          -3.4
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          0.15000000000000036,
+          1.2545454545454546,
+          0.5
+        ]
+      }
+    },
+    {
+      "id": "sponza-collision-west-step-0-10",
+      "transform": {
+        "position": [
+          -14.55,
+          1.275,
+          -3.4
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          0.14999999999999947,
+          1.375,
+          0.5
+        ]
+      }
+    },
+    {
+      "id": "sponza-collision-west-step-1-0",
+      "transform": {
+        "position": [
+          -14.549999999999999,
+          1.3954545454545453,
+          -4.6
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          0.15000000000000036,
+          1.4954545454545454,
+          0.5
+        ]
+      }
+    },
+    {
+      "id": "sponza-collision-west-step-1-1",
+      "transform": {
+        "position": [
+          -14.25,
+          1.5159090909090909,
+          -4.6
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          0.14999999999999947,
+          1.615909090909091,
+          0.5
+        ]
+      }
+    },
+    {
+      "id": "sponza-collision-west-step-1-2",
+      "transform": {
+        "position": [
+          -13.95,
+          1.6363636363636362,
+          -4.6
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          0.15000000000000036,
+          1.7363636363636363,
+          0.5
+        ]
+      }
+    },
+    {
+      "id": "sponza-collision-west-step-1-3",
+      "transform": {
+        "position": [
+          -13.649999999999999,
+          1.7568181818181818,
+          -4.6
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          0.14999999999999947,
+          1.856818181818182,
+          0.5
+        ]
+      }
+    },
+    {
+      "id": "sponza-collision-west-step-1-4",
+      "transform": {
+        "position": [
+          -13.35,
+          1.8772727272727272,
+          -4.6
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          0.15000000000000036,
+          1.9772727272727273,
+          0.5
+        ]
+      }
+    },
+    {
+      "id": "sponza-collision-west-step-1-5",
+      "transform": {
+        "position": [
+          -13.049999999999999,
+          1.9977272727272728,
+          -4.6
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          0.15000000000000036,
+          2.0977272727272727,
+          0.5
+        ]
+      }
+    },
+    {
+      "id": "sponza-collision-west-step-1-6",
+      "transform": {
+        "position": [
+          -12.75,
+          2.118181818181818,
+          -4.6
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          0.14999999999999947,
+          2.218181818181818,
+          0.5
+        ]
+      }
+    },
+    {
+      "id": "sponza-collision-west-step-1-7",
+      "transform": {
+        "position": [
+          -12.45,
+          2.2386363636363638,
+          -4.6
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          0.15000000000000036,
+          2.3386363636363634,
+          0.5
+        ]
+      }
+    },
+    {
+      "id": "sponza-collision-west-step-1-8",
+      "transform": {
+        "position": [
+          -12.149999999999999,
+          2.3590909090909093,
+          -4.6
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          0.14999999999999947,
+          2.459090909090909,
+          0.5
+        ]
+      }
+    },
+    {
+      "id": "sponza-collision-west-step-1-9",
+      "transform": {
+        "position": [
+          -11.85,
+          2.4795454545454545,
+          -4.6
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          0.15000000000000036,
+          2.579545454545454,
+          0.5
+        ]
+      }
+    },
+    {
+      "id": "sponza-collision-west-step-1-10",
+      "transform": {
+        "position": [
+          -11.549999999999999,
+          2.6,
+          -4.6
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          0.15000000000000036,
+          2.6999999999999997,
+          0.5
+        ]
+      }
+    },
+    {
+      "id": "sponza-collision-west-mid-landing",
+      "transform": {
+        "position": [
+          -15.3,
+          1.275,
+          -4.0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          0.6000000000000005,
+          1.375,
+          1.0999999999999999
+        ]
+      }
+    },
+    {
+      "id": "sponza-collision-west-outer-wall-2p8",
+      "transform": {
+        "position": [
+          -13.65,
+          3.8,
+          -2.8
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          2.25,
+          3.8,
+          0.10000000000000009
+        ]
+      }
+    },
+    {
+      "id": "sponza-collision-west-outer-wall-5p2",
+      "transform": {
+        "position": [
+          -13.65,
+          3.8,
+          -5.2
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          2.25,
+          3.8,
+          0.09999999999999964
+        ]
+      }
+    },
+    {
+      "id": "sponza-collision-west-back-wall",
+      "transform": {
+        "position": [
+          -16.0,
+          3.8,
+          -4.0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          0.10000000000000053,
+          3.8,
+          1.2000000000000002
+        ]
+      }
+    },
+    {
+      "id": "sponza-collision-west-divider",
+      "transform": {
+        "position": [
+          -13.05,
+          3.2,
+          -4.0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          1.6499999999999995,
+          3.2,
+          0.09999999999999987
+        ]
+      }
+    },
+    {
+      "id": "sponza-collision-west-ceiling",
+      "transform": {
+        "position": [
+          -13.65,
+          7.699999999999999,
+          -4.0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          2.25,
+          0.10000000000000009,
+          1.2000000000000002
+        ]
+      }
+    }
+  ],
+  "stair_routes": {
+    "east": [
+      [
+        10.9,
+        0,
+        3.4
+      ],
+      [
+        15.25,
+        2.65,
+        3.4
+      ],
+      [
+        15.25,
+        2.65,
+        4.6
+      ],
+      [
+        10.9,
+        5.3,
+        4.6
+      ]
+    ],
+    "west": [
+      [
+        -10.9,
+        0,
+        -3.4
+      ],
+      [
+        -15.25,
+        2.65,
+        -3.4
+      ],
+      [
+        -15.25,
+        2.65,
+        -4.6
+      ],
+      [
+        -10.9,
+        5.3,
+        -4.6
+      ]
+    ]
+  },
+  "landmarks": {
+    "entry": [
+      18.2,
+      0,
+      0
+    ],
+    "upper_control": [
+      -5.8,
+      6.3,
+      -5.5
+    ],
+    "lower_objective": [
+      -14.7,
+      0.9,
+      0
+    ],
+    "gallery_y": 5.3,
+    "ground_loop": [
+      [
+        10.2,
+        0,
+        4.7
+      ],
+      [
+        -10.2,
+        0,
+        4.7
+      ],
+      [
+        -10.2,
+        0,
+        -4.7
+      ],
+      [
+        10.2,
+        0,
+        -4.7
+      ]
+    ],
+    "upper_loop": [
+      [
+        10.2,
+        5.3,
+        4.7
+      ],
+      [
+        -10.2,
+        5.3,
+        4.7
+      ],
+      [
+        -10.2,
+        5.3,
+        -4.7
+      ],
+      [
+        10.2,
+        5.3,
+        -4.7
+      ]
+    ],
+    "reference_bounds": {
+      "atrium_x": [
+        -8,
+        8
+      ],
+      "atrium_z": [
+        -3.1,
+        3.1
+      ],
+      "roof_y": 17.8
+    }
+  },
+  "source_reference": "NewSponza_Main_glTF_003.gltf; measured and rebuilt silhouettes; see content credits",
+  "geometry_report": {
+    "instanced": {
+      "vertices": 3240,
+      "triangles": 2496,
+      "models": 98,
+      "colliders": 116
+    },
+    "meshes": {
+      "mesh-sponza-ground-column": {
+        "vertices": 40,
+        "triangles": 44,
+        "sha256": "1f2dd54c47c4bd70f2ff78ddc3741521e6bf388ccfcb3c35c3187f9ed4014b52"
+      },
+      "mesh-sponza-ground-arch": {
+        "vertices": 52,
+        "triangles": 36,
+        "sha256": "2486227b57f5a50c6207188213c64846c756be3a92e78252ca26f6dc301900d7"
+      },
+      "mesh-sponza-ground-end-arch": {
+        "vertices": 52,
+        "triangles": 36,
+        "sha256": "9731277f18fab06efd0932563550c5fadcdb4ffda3e3b34b2763285800aab639"
+      },
+      "mesh-sponza-ground-floor-0": {
+        "vertices": 15,
+        "triangles": 16,
+        "sha256": "ecf175bffeb4f1afe4b0925c3fbae6b1a500ebf3113f05f97b3bb2f01f175bf8"
+      },
+      "mesh-sponza-ground-floor-1": {
+        "vertices": 15,
+        "triangles": 16,
+        "sha256": "e6a36e192d001807c323ddea29cf3b0c0bccdfdbfc1b4e5c8c0901fb104fe40f"
+      },
+      "mesh-sponza-ground-floor-2": {
+        "vertices": 15,
+        "triangles": 16,
+        "sha256": "d380e63c707913bc7792573b177aecb4a7982714cf07852fce7f831331c51b28"
+      },
+      "mesh-sponza-ground-floor-3": {
+        "vertices": 15,
+        "triangles": 16,
+        "sha256": "782c018e10e49cc0fcc55142927987c5aa4cc5d8ea8215eab45139933bdc2afa"
+      },
+      "mesh-sponza-ground-floor-4": {
+        "vertices": 15,
+        "triangles": 16,
+        "sha256": "0bd8e161be124506280448c9e357bedd4c251069ef330e25309ed469c41e1f3f"
+      },
+      "mesh-sponza-ground-floor-5": {
+        "vertices": 15,
+        "triangles": 16,
+        "sha256": "5197c88a5aaefe8d0f20bf81709323b9588e230a5e12df5b298d106112c27233"
+      },
+      "mesh-sponza-gallery-north-0": {
+        "vertices": 9,
+        "triangles": 8,
+        "sha256": "a151646417c40cdac6a7966d6ff1c59746b3d938222505fd0dd3f7b8fbf8c67b"
+      },
+      "mesh-sponza-gallery-north-1": {
+        "vertices": 9,
+        "triangles": 8,
+        "sha256": "07364e99132773e83872232888a7e1c45fe2c154839953c141353b55199cd7f4"
+      },
+      "mesh-sponza-gallery-north-2": {
+        "vertices": 9,
+        "triangles": 8,
+        "sha256": "fd276bb14c27496bdb304c9f39dc86a3f6207bda78652d884a7385c81b06a8ed"
+      },
+      "mesh-sponza-gallery-north-3": {
+        "vertices": 9,
+        "triangles": 8,
+        "sha256": "a28062355f9568cc5b3b45bfe15b00a6b4e64f7f314688d06cdbd21bd39195b6"
+      },
+      "mesh-sponza-ceiling-north": {
+        "vertices": 18,
+        "triangles": 16,
+        "sha256": "e1bdee8b5de284f810191b0c1f354f9383b5791b3cdbc1127bf31fef99493639"
+      },
+      "mesh-sponza-upper-ceiling-north": {
+        "vertices": 10,
+        "triangles": 8,
+        "sha256": "ea247a97643469b37c38c116c61d35ffab2c19bd0e98187801572bb2fdcee347"
+      },
+      "mesh-sponza-parapet-north": {
+        "vertices": 20,
+        "triangles": 10,
+        "sha256": "f7a1318c66ed7d7667156af60468cdcf1df0042fd26293dc4449e6303b063d7a"
+      },
+      "mesh-sponza-gallery-south-0": {
+        "vertices": 9,
+        "triangles": 8,
+        "sha256": "d1202a5a549a94f90944cf7a76389edb162fa9ad022019378fbed875d8637bd8"
+      },
+      "mesh-sponza-gallery-south-1": {
+        "vertices": 9,
+        "triangles": 8,
+        "sha256": "0363cac78828615d28d21408569cf3144ccf8e9c79544cfcbd4517acc70972c4"
+      },
+      "mesh-sponza-gallery-south-2": {
+        "vertices": 9,
+        "triangles": 8,
+        "sha256": "ee7aa9c0a2ece1f369432c258c81f6b9f94833b4090acefdd89ce94da10aed34"
+      },
+      "mesh-sponza-gallery-south-3": {
+        "vertices": 9,
+        "triangles": 8,
+        "sha256": "dc1d8026c5f6c958d748f15504bdea8b550a301f34995a3b8079fe1242c2be9c"
+      },
+      "mesh-sponza-ceiling-south": {
+        "vertices": 18,
+        "triangles": 16,
+        "sha256": "d7610093a05948e79ed160b05a99b3e45a6723d3ca3ca29c1ce980090deb1ef0"
+      },
+      "mesh-sponza-upper-ceiling-south": {
+        "vertices": 10,
+        "triangles": 8,
+        "sha256": "a3251830977cebace2a5d1037bdaaffe1c3d976f2f14911e24a1c16b4b8b824d"
+      },
+      "mesh-sponza-parapet-south": {
+        "vertices": 20,
+        "triangles": 10,
+        "sha256": "ba602ba9c05310414ab62c69eb5e4843a05878210c6280c24fc8a2f5a73a6e00"
+      },
+      "mesh-sponza-gallery-west": {
+        "vertices": 15,
+        "triangles": 16,
+        "sha256": "eb9e1b35ff4a93ce2f58415ef14fe4f0ec4e935ca8396c29d766367c5a23ea3b"
+      },
+      "mesh-sponza-ceiling-west": {
+        "vertices": 9,
+        "triangles": 8,
+        "sha256": "c3c1d44da65cac997084ea088f28c0eb8b8bc672b7837474668c48cb98af4459"
+      },
+      "mesh-sponza-upper-ceiling-west": {
+        "vertices": 6,
+        "triangles": 4,
+        "sha256": "2ac22c5483ff1f1bc5b9cd24cc9c46924bb94ea9268806dfd91a43c737e69600"
+      },
+      "mesh-sponza-parapet-west": {
+        "vertices": 20,
+        "triangles": 10,
+        "sha256": "73b0d0d03e1b73e71feca78cb8d3391cda72a668e3456c545f194686403f0ef1"
+      },
+      "mesh-sponza-gallery-east": {
+        "vertices": 15,
+        "triangles": 16,
+        "sha256": "b947b8a2cc1c9b426e7db0ae9d88db247781eb33de3b80e0313abce5f9d11539"
+      },
+      "mesh-sponza-ceiling-east": {
+        "vertices": 9,
+        "triangles": 8,
+        "sha256": "bd91d9dc03a3e6916847f3f9bfe656f5be53f7f628b816fc99e006f6f32f4975"
+      },
+      "mesh-sponza-upper-ceiling-east": {
+        "vertices": 6,
+        "triangles": 4,
+        "sha256": "a019b82e6a685bca09b6d4ca8da85c14f600a6f5aeab7b8602571021876b1eda"
+      },
+      "mesh-sponza-parapet-east": {
+        "vertices": 20,
+        "triangles": 10,
+        "sha256": "351cce8f3b9347381615f63dffe08d720012cb4bb8df2af4a09bfc33ae46c067"
+      },
+      "mesh-sponza-upper-post-pair": {
+        "vertices": 52,
+        "triangles": 40,
+        "sha256": "d6b294f0862bfc491fca997332905be4061942a6570a2d685ed08040d1372de3"
+      },
+      "mesh-sponza-upper-post-single": {
+        "vertices": 26,
+        "triangles": 20,
+        "sha256": "1df6632b347dd33d579ac52abfc9afb8a04d33bfdf4d2b1c53c56cb519e9f3e3"
+      },
+      "mesh-sponza-upper-arch-pair": {
+        "vertices": 68,
+        "triangles": 48,
+        "sha256": "f29b84f2886f29822243099b66e3988cb4af3267726992e8c9776ce3fa5c08a5"
+      },
+      "mesh-sponza-upper-end-arch-pair": {
+        "vertices": 68,
+        "triangles": 48,
+        "sha256": "53c4a32afeeeac175048fd36ae025f6a9da8910f6821a26f01d7b8bca159372a"
+      },
+      "mesh-sponza-aisle-wall-north-0": {
+        "vertices": 16,
+        "triangles": 16,
+        "sha256": "b06aeb80c7f48953243fdb4ac02a9cff239797b15aea115aa5193ee3a919dedd"
+      },
+      "mesh-sponza-aisle-wall-north-1": {
+        "vertices": 16,
+        "triangles": 16,
+        "sha256": "414f3abf0effc905389507d46cd7e3840913fafe38366ad697b2b6d69a5687de"
+      },
+      "mesh-sponza-aisle-wall-north-2": {
+        "vertices": 16,
+        "triangles": 16,
+        "sha256": "10f6b5a684980dd1fa5db3ff69ed5e4fc230f668222264ec344a194b96de7853"
+      },
+      "mesh-sponza-aisle-wall-south-0": {
+        "vertices": 16,
+        "triangles": 16,
+        "sha256": "0957a1b6cc5ad36f26802555cf51dec3e3fdc85af0dd147bd5b2a2fe14d37135"
+      },
+      "mesh-sponza-aisle-wall-south-1": {
+        "vertices": 16,
+        "triangles": 16,
+        "sha256": "5c457605458946fee94f803e961d760976482b5229bb77443f98c86d9d0930e5"
+      },
+      "mesh-sponza-aisle-wall-south-2": {
+        "vertices": 16,
+        "triangles": 16,
+        "sha256": "f65b69dc85cc3c26091592b059f4a4f76fcf8338c1ba76086208939327a53320"
+      },
+      "mesh-sponza-clerestory-north-0": {
+        "vertices": 4,
+        "triangles": 2,
+        "sha256": "dc05888aeaddc0a7dcebbbd6dc8c3d61ccd48ef2d58f9f4f8483e3e47eeb9f53"
+      },
+      "mesh-sponza-roof-north-0": {
+        "vertices": 16,
+        "triangles": 8,
+        "sha256": "6e5a4a937ce5c8c87a070b52c40eb5b2ce1a49ce70a5d0c60ab795ff488d3eec"
+      },
+      "mesh-sponza-clerestory-north-1": {
+        "vertices": 4,
+        "triangles": 2,
+        "sha256": "af1043c826337f05d271501eecb5712db1c49ac075436a97a22d5b7189d4cdf6"
+      },
+      "mesh-sponza-roof-north-1": {
+        "vertices": 16,
+        "triangles": 8,
+        "sha256": "c3178e8eb011f1697b9a97cd1c3bb9d89429ca3bb13e9ec4835dbd19c734f9f4"
+      },
+      "mesh-sponza-clerestory-south-0": {
+        "vertices": 4,
+        "triangles": 2,
+        "sha256": "b07be6f84f63c696b50e2dbf26da5df450cbc35ba42e5c4a34cad9a7ff639599"
+      },
+      "mesh-sponza-roof-south-0": {
+        "vertices": 16,
+        "triangles": 8,
+        "sha256": "ed1fa95750cdf50026c2cf2fe41bf93958d70606f8ea93ea71341fdeeac5a8a0"
+      },
+      "mesh-sponza-clerestory-south-1": {
+        "vertices": 4,
+        "triangles": 2,
+        "sha256": "e968457fd64d24e621ff2a3a797f0ff7bc7659ae46d36095581cf70ec5793eae"
+      },
+      "mesh-sponza-roof-south-1": {
+        "vertices": 16,
+        "triangles": 8,
+        "sha256": "2a7cf06167d17f7324fb3c95d8ded7fd020ec0e02da876f835b9ccfa18e97504"
+      },
+      "mesh-sponza-clerestory-west": {
+        "vertices": 4,
+        "triangles": 2,
+        "sha256": "dad35034e5cbbd2dda4806fe0edb3051a229def51463702d68cadc791dfa584d"
+      },
+      "mesh-sponza-roof-west": {
+        "vertices": 12,
+        "triangles": 6,
+        "sha256": "7d3e908f0871c47bc33080937a5e260713e6b38cf62e227399951ad575d05c01"
+      },
+      "mesh-sponza-clerestory-east": {
+        "vertices": 4,
+        "triangles": 2,
+        "sha256": "6d375aa2e0d9d4e9cae3afb6a04ad63fc9d3485902431835702efe1fd666fa6d"
+      },
+      "mesh-sponza-roof-east": {
+        "vertices": 12,
+        "triangles": 6,
+        "sha256": "ffb7c2d48a0366a54eddd8b20f726b841488850df278415cae724585249a44e2"
+      },
+      "mesh-sponza-end-wall-east": {
+        "vertices": 16,
+        "triangles": 10,
+        "sha256": "a13ea609e3010fd1edd20c9cfe6ad5a36522d44598d07d8fdd757f2e8c5a02f5"
+      },
+      "mesh-sponza-end-wall-west": {
+        "vertices": 16,
+        "triangles": 10,
+        "sha256": "6970f2ed80810f89c9f5ed91c51bff995aaba4266511838f2f322fbc174101d1"
+      },
+      "mesh-sponza-entry-floor": {
+        "vertices": 12,
+        "triangles": 12,
+        "sha256": "a52186b6db21777d5c695fc68e867dab1883d93ee6b85a4e295f98abe9115e41"
+      },
+      "mesh-sponza-entry-shell": {
+        "vertices": 16,
+        "triangles": 8,
+        "sha256": "8f77fe31d27f3bc04ea892c25fb78c4894b24d41e88d98eba7a69cc1425f7d46"
+      },
+      "mesh-sponza-niche-floor": {
+        "vertices": 12,
+        "triangles": 12,
+        "sha256": "4c2af340627445088493b13da2c8f555d5725911f001eb3afc1f6f8d3c4764e8"
+      },
+      "mesh-sponza-niche-shell": {
+        "vertices": 16,
+        "triangles": 8,
+        "sha256": "00e2d773d73cdcd23b9bb649ae0f2618387f6bbda30b342a1bd71e5cf863b3a6"
+      },
+      "mesh-sponza-stairs-east": {
+        "vertices": 201,
+        "triangles": 134,
+        "sha256": "a03218a9e01a1752c198501ad3e837fd8e56a88986126b70cdff891e4fe7b5ff"
+      },
+      "mesh-sponza-stair-shell-east": {
+        "vertices": 32,
+        "triangles": 16,
+        "sha256": "cfd94b8c729c39ca1e70863ee598941a209fdfa497a51914a36b9da6be050a32"
+      },
+      "mesh-sponza-stairs-west": {
+        "vertices": 201,
+        "triangles": 134,
+        "sha256": "ff8dbbf9967d3adf7547f1e587d952a9242a8fee75042a502e9fd7ed6934d9c6"
+      },
+      "mesh-sponza-stair-shell-west": {
+        "vertices": 32,
+        "triangles": 16,
+        "sha256": "5de0abe40c7643b09e661b2cc5861b4b522afb1e2316a507baa9642ff0019208"
+      }
+    },
+    "source_sha256": "7b7a0a3f41ae2b5ad7ffd74d84b1b629af2b7191c1f2b03a2464f6a22f65f2fd"
+  }
+}

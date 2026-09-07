@@ -1879,6 +1879,8 @@ class DemoEditor
                     }
                 }
                 if (entity->contains("model")) ImGui::TextDisabled("Model: %s",(*entity)["model"].get<std::string>().c_str());
+                else if (entity->at("kind")=="static" && entity->contains("collider"))
+                    ImGui::TextWrapped("Collision-only proxy. Its position, yaw and scale affect movement and sight/light blocking without adding rendered geometry.");
                 if (DeletableProp(*entity))
                 {
                     bool highlighted = entity->value("loot_highlight",false);

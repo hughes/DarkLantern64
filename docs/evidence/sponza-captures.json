@@ -1,0 +1,147 @@
+{
+  "name": "capture-sponza_courtyard",
+  "passed": true,
+  "log": ".dev/ares/runs/872e5eb7532b40e7af56aaaab4945d1f/capture-sponza_courtyard.log",
+  "tested_rom": ".dev/ares/runs/872e5eb7532b40e7af56aaaab4945d1f/DarkLantern64-sponza_courtyard-capture-t3d.z64",
+  "rom_sha256": "edae7dc8ad638bc3a4286532299c832bdfd0d024137aeaed4bfa1e2c461e4bfd",
+  "rom_bytes": 425984,
+  "settings": ".dev/ares/runs/872e5eb7532b40e7af56aaaab4945d1f/settings.bml",
+  "settings_source_sha256": "010e6ec4df82b1750292c4a1e50b1e513f9e2d4b7c604d345be0c1d28b6b140a",
+  "profile_report": null,
+  "elapsed_seconds": 34.313,
+  "peak_sampled_heap_bytes": 1474800,
+  "max_reported_cpu_ms": 220.76,
+  "boot": "DL64 boot_ok memory=8388608 scene=\"DarkLantern64 - Sponza After Hours\" meshes=70 models=114 colliders=118 version=2 world=3d renderer=rsp-tiny3d depth=hardware",
+  "terminal_event": "DL64 capture_complete views=8",
+  "renderer": "t3d",
+  "captures": [
+    {
+      "view": {
+        "id": "entrance-axis",
+        "position": [
+          10.1,
+          0,
+          0
+        ],
+        "yaw": 270,
+        "pitch": 18
+      },
+      "image": "docs/images/sponza-entrance-axis.png",
+      "sha256": "d2ad9c4b686a35f08ad17aecc682849890e18ed6df76debf490e0c9539fa6d0d"
+    },
+    {
+      "view": {
+        "id": "courtyard-arcades",
+        "position": [
+          5.8,
+          0,
+          -1.9
+        ],
+        "yaw": 288,
+        "pitch": 22
+      },
+      "image": "docs/images/sponza-courtyard-arcades.png",
+      "sha256": "477bdc269b2a7900fa9f955fc185376a8c9d5be75831d0ab1155f7d7561cbc67"
+    },
+    {
+      "view": {
+        "id": "lower-gallery",
+        "position": [
+          7,
+          0,
+          4.7
+        ],
+        "yaw": 270,
+        "pitch": 5
+      },
+      "image": "docs/images/sponza-lower-gallery.png",
+      "sha256": "fcbc48e821bbcce82cd6662e07a7c11e6d9b2157dd9d855901adfbcae0157b58"
+    },
+    {
+      "view": {
+        "id": "upper-lookdown",
+        "position": [
+          7.3,
+          5.3,
+          -4.7
+        ],
+        "yaw": 300,
+        "pitch": -14
+      },
+      "image": "docs/images/sponza-upper-lookdown.png",
+      "sha256": "9b62f80c96db39fdc932ea6d218a4a25cf8ec5b809333a10a68869704f8b94c0"
+    },
+    {
+      "view": {
+        "id": "gallery-control",
+        "position": [
+          -4.7,
+          5.3,
+          -4.5
+        ],
+        "yaw": 225,
+        "pitch": -12
+      },
+      "image": "docs/images/sponza-gallery-control.png",
+      "sha256": "ca12c01569d93fef9c545adc05c266f563bd68437ed1a3d19743e30de29a97a2"
+    },
+    {
+      "view": {
+        "id": "east-stair",
+        "position": [
+          11,
+          0,
+          3.4
+        ],
+        "yaw": 90,
+        "pitch": 22
+      },
+      "image": "docs/images/sponza-east-stair.png",
+      "sha256": "fdeafa580c34b22d2ef5e8de1737773d7f842da51c0f01009bc5c9bc34d8df92"
+    },
+    {
+      "view": {
+        "id": "west-stair",
+        "position": [
+          -10.7,
+          5.3,
+          -4.6
+        ],
+        "yaw": 270,
+        "pitch": -25
+      },
+      "image": "docs/images/sponza-west-stair.png",
+      "sha256": "bf66f6f72c0bb01e71913017876d9f2208852beeedfdb6239ef475f389ece27d"
+    },
+    {
+      "view": {
+        "id": "vault-jewel",
+        "position": [
+          -13.2,
+          0,
+          0
+        ],
+        "yaw": 270,
+        "pitch": -16,
+        "door_open": true
+      },
+      "image": "docs/images/sponza-vault-jewel.png",
+      "sha256": "04cf7dda84e32daea16dd25ecb7e1adb193a7cb3cc83ca9bc01374182fe25408"
+    }
+  ],
+  "measurement": "Raw RDP framebuffer before VI filtering; capture timings are diagnostic only",
+  "visual_review": {
+    "accepted": true,
+    "views": 8,
+    "method": "All final images inspected, or byte-identical to the inspected third-pass image; changed stair/courtyard images individually reviewed.",
+    "findings": [
+      "Both gallery storeys and real arch apertures visible",
+      "Warm stair-entry pools reveal tread/riser steps",
+      "Wall pools survive self-occlusion correction",
+      "Upper control and west jewel readable",
+      "No observed courtyard/window-style depth tearing"
+    ],
+    "limitation": "Raw 320x240 pre-VI diagnostic captures, not timing or original-hardware evidence."
+  },
+  "canonical_level_sha256": "a75fb0e9415d405a1a004469048c2a7288bbcd49f34ea5db90a95c89f5a60164"
+}

@@ -153,7 +153,8 @@ def resolve_asset_packs(document, asset_root=ROOT / "content"):
                 used.add(ident)
                 origins[ident] = uri
                 result[group].append(copy.deepcopy(item))
-            require(len(result[group]) <= 64, f"Resolved level exceeds 64 {group}")
+            limit = 128 if group == "assets" else 64
+            require(len(result[group]) <= limit, f"Resolved level exceeds {limit} {group}")
         for item in pack["prefabs"]:
             ident = item["id"]
             require(ident not in prefab_ids, f"Duplicate linked prefab: {ident}")
@@ -195,7 +196,8 @@ def merge_pack(document, uri, asset_root=ROOT / "content", prefabs=None):
             else:
                 result[group].append(copy.deepcopy(item))
                 existing[ident] = (group, item)
-        require(len(result[group]) <= 64, f"Level exceeds 64 {group}")
+        limit = 128 if group == "assets" else 64
+        require(len(result[group]) <= limit, f"Level exceeds {limit} {group}")
     require(isinstance(catalog, list), "Prefab catalog must be an array")
     by_id = {item["id"]: item for item in catalog}
     require(len(by_id) == len(catalog), "Duplicate prefab catalog ID")

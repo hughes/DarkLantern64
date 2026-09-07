@@ -17,6 +17,10 @@
     {
       "id": "animation_workshop",
       "source": "animation_workshop.json"
+    },
+    {
+      "id": "sponza",
+      "source": "sponza_courtyard.json"
     }
   ]
 }

@@ -301,7 +301,10 @@ def validate(data, source_dir=None):
     require(isinstance(data.get("title"),str) and 0<len(data["title"])<=120 and
             all(32<=ord(c)<127 for c in data["title"]), "title: expected 1-120 printable ASCII characters")
     assets, materials, entities = data.get("assets"),data.get("materials"),data.get("entities")
-    require(isinstance(assets,list) and 1<=len(assets)<=64,"assets: expected 1-64 assets")
+    # Several linked packs can supply one mesh per placed model. The render
+    # instance and vertex limits below still bound actual scene memory/work.
+    require(isinstance(assets,list) and 1<=len(assets)<=LIMITS["models"],
+            f"assets: expected 1-{LIMITS['models']} assets")
     require(isinstance(materials,list) and 1<=len(materials)<=64,"materials: expected 1-64 materials")
     require(isinstance(entities,list) and 1<=len(entities)<=256,"entities: expected 1-256 objects")
     seen, meshes, dependencies, mesh_paths, characters = set(),{},list(pack_dependencies),{},{}
@@ -373,8 +376,13 @@ def validate(data, source_dir=None):
             require(e.get("material") in material_map,f"{eid}.material: unknown material reference")
             for v in meshes[e["model"]]["vertices"]:
                 vector(transform_point(v,t),eid+".world_vertex")
-        if kind in ("static","guard","door","control","objective"):
+        if kind in ("guard","door","control","objective"):
             require("model" in e,f"{eid}: rendered {kind} requires a model")
+        if kind == "static":
+            require("model" in e or "collider" in e,
+                    f"{eid}: static object requires a model or collision proxy")
+            require("model" in e or "material" not in e,
+                    f"{eid}: a collision-only proxy has no material")
         if "loot_highlight" in e:
             require(type(e["loot_highlight"]) is bool, f"{eid}.loot_highlight: expected a boolean")
             require(kind == "static" and "model" in e,

@@ -1,0 +1,542 @@
+{
+  "version": 1,
+  "materials": [
+    {
+      "id": "mat-sponza-stone",
+      "color": [
+        1,
+        1,
+        1,
+        1
+      ],
+      "double_sided": false,
+      "texture": {
+        "uri": "assets/sponza/textures/sponza-stone.png",
+        "width": 64,
+        "height": 32,
+        "format": "RGBA16"
+      }
+    },
+    {
+      "id": "mat-sponza-trim",
+      "color": [
+        1,
+        1,
+        1,
+        1
+      ],
+      "double_sided": false,
+      "texture": {
+        "uri": "assets/sponza/textures/sponza-trim.png",
+        "width": 64,
+        "height": 32,
+        "format": "RGBA16"
+      }
+    },
+    {
+      "id": "mat-sponza-plaster",
+      "color": [
+        1,
+        1,
+        1,
+        1
+      ],
+      "double_sided": false,
+      "texture": {
+        "uri": "assets/sponza/textures/sponza-plaster.png",
+        "width": 32,
+        "height": 32,
+        "format": "RGBA16"
+      }
+    },
+    {
+      "id": "mat-sponza-brick",
+      "color": [
+        1,
+        1,
+        1,
+        1
+      ],
+      "double_sided": false,
+      "texture": {
+        "uri": "assets/sponza/textures/sponza-brick.png",
+        "width": 32,
+        "height": 32,
+        "format": "RGBA16"
+      }
+    },
+    {
+      "id": "mat-sponza-wood",
+      "color": [
+        1,
+        1,
+        1,
+        1
+      ],
+      "double_sided": false,
+      "texture": {
+        "uri": "assets/sponza/textures/sponza-wood.png",
+        "width": 32,
+        "height": 32,
+        "format": "RGBA16"
+      }
+    },
+    {
+      "id": "mat-sponza-floor",
+      "color": [
+        1,
+        1,
+        1,
+        1
+      ],
+      "double_sided": false,
+      "texture": {
+        "uri": "assets/sponza/textures/sponza-floor.png",
+        "width": 64,
+        "height": 32,
+        "format": "RGBA16"
+      }
+    },
+    {
+      "id": "mat-sponza-relief",
+      "color": [
+        1,
+        1,
+        1,
+        1
+      ],
+      "double_sided": false,
+      "texture": {
+        "uri": "assets/sponza/textures/sponza-relief.png",
+        "width": 32,
+        "height": 32,
+        "format": "RGBA16"
+      }
+    },
+    {
+      "id": "mat-sponza-roof",
+      "color": [
+        1,
+        1,
+        1,
+        1
+      ],
+      "double_sided": false,
+      "texture": {
+        "uri": "assets/sponza/textures/sponza-roof.png",
+        "width": 32,
+        "height": 32,
+        "format": "RGBA16"
+      }
+    }
+  ],
+  "textures": [
+    {
+      "id": "sponza-stone",
+      "material": "mat-sponza-stone",
+      "source_path": "textures/arch_stone_wall_01_BaseColor.png",
+      "source_sha256": "61a34f79b8485262fc8253f9965d042a3f0a1437bddf97de854777981d19ac61",
+      "source_bytes": 35737734,
+      "source_dimensions": [
+        4096,
+        4096
+      ],
+      "derivative_uri": "assets/sponza/textures/sponza-stone.png",
+      "derivative_sha256": "b8964a8c796ad7fb02a2ae76869ed78a75a9fb314ed6f965bae2f04164b2d4e7",
+      "derivative_bytes": 4370,
+      "recipe": {
+        "crop_ltrb": [
+          0,
+          0,
+          4096,
+          4096
+        ],
+        "rotate_counterclockwise_degrees": 90,
+        "resize": "BOX",
+        "dimensions": [
+          64,
+          32
+        ],
+        "chroma_numerator_over_256": 224,
+        "contrast": "5/4 around integer mean luminance",
+        "brightness_gain": [
+          1,
+          1
+        ],
+        "edge_matching": "opposite border texels averaged, one texel wide",
+        "repeat_axes": "uv",
+        "pillow": "11.2.1"
+      },
+      "recommended_repeat_metres": [
+        4,
+        4
+      ],
+      "usage": "Pale dressed masonry; rotate the long source joints into horizontal courses.",
+      "target": {
+        "format": "RGBA16",
+        "decoded_bytes": 4096,
+        "png_sha256": "95d23627f257fcc48de7d0b05c4a5ceeac173b4c497b7a1ec4d96a1afc55831d",
+        "recipe_sha256": "2c51fc16ded205c8f29df2ea830f582d80b3cb9b4af4e3c637b8ae8d85380173"
+      }
+    },
+    {
+      "id": "sponza-trim",
+      "material": "mat-sponza-trim",
+      "source_path": "textures/stone_trims_02_BaseColor.png",
+      "source_sha256": "d2275ed38589952af8972da830a3f66eaf6214677d2e4d3ff7bd9b0c580bd864",
+      "source_bytes": 36495875,
+      "source_dimensions": [
+        4096,
+        4096
+      ],
+      "derivative_uri": "assets/sponza/textures/sponza-trim.png",
+      "derivative_sha256": "5c00eb1816ee6a9d0fcc84ecccbd64c7f3d1d13302303fa43df9acd4f27f9e48",
+      "derivative_bytes": 4274,
+      "recipe": {
+        "crop_ltrb": [
+          0,
+          896,
+          4096,
+          2432
+        ],
+        "rotate_counterclockwise_degrees": 0,
+        "resize": "BOX",
+        "dimensions": [
+          64,
+          32
+        ],
+        "chroma_numerator_over_256": 224,
+        "contrast": "5/4 around integer mean luminance",
+        "brightness_gain": [
+          1,
+          1
+        ],
+        "edge_matching": "opposite border texels averaged, one texel wide",
+        "repeat_axes": "u",
+        "pillow": "11.2.1"
+      },
+      "recommended_repeat_metres": [
+        4,
+        0.5
+      ],
+      "usage": "Continuous moulding bands only; repeat along U and map V once across trim height.",
+      "target": {
+        "format": "RGBA16",
+        "decoded_bytes": 4096,
+        "png_sha256": "4aa74726c91fa3d0099b4d80a897957abf39d00d3ffc95f2a274cf21005d6bd4",
+        "recipe_sha256": "5c4cefeb7f2d6328633bf95ff29b9f1f3febc80f26e579635c9830c4f760e4f4"
+      }
+    },
+    {
+      "id": "sponza-plaster",
+      "material": "mat-sponza-plaster",
+      "source_path": "textures/ceiling_plaster_02_BaseColor.png",
+      "source_sha256": "1002691be7f95b374120860b5e17cf5cac37fd909b96d27fd701b0dbb69a0e03",
+      "source_bytes": 19215255,
+      "source_dimensions": [
+        4096,
+        4096
+      ],
+      "derivative_uri": "assets/sponza/textures/sponza-plaster.png",
+      "derivative_sha256": "b6c7db4da130abc3cb069f12b02cd3c419652a448c04fcd43fa708394b15bb93",
+      "derivative_bytes": 1647,
+      "recipe": {
+        "crop_ltrb": [
+          1024,
+          1024,
+          3072,
+          3072
+        ],
+        "rotate_counterclockwise_degrees": 0,
+        "resize": "BOX",
+        "dimensions": [
+          32,
+          32
+        ],
+        "chroma_numerator_over_256": 192,
+        "contrast": "5/4 around integer mean luminance",
+        "brightness_gain": [
+          1,
+          1
+        ],
+        "edge_matching": "opposite border texels averaged, one texel wide",
+        "repeat_axes": "uv",
+        "pillow": "11.2.1"
+      },
+      "recommended_repeat_metres": [
+        3,
+        3
+      ],
+      "usage": "Neutral pale plaster; retain broad mottling for moonlit walls and ceilings.",
+      "target": {
+        "format": "RGBA16",
+        "decoded_bytes": 2048,
+        "png_sha256": "8193f077a649d65a02b89fd0c8967cdbfd7d840a76b86b8af3867ea51d526e50",
+        "recipe_sha256": "76cea859f3bf75cf8b88f0a44b46279bd3d2a89c8256c937cf3c282ac56e1d96"
+      }
+    },
+    {
+      "id": "sponza-brick",
+      "material": "mat-sponza-brick",
+      "source_path": "textures/brickwall_01_BaseColor.png",
+      "source_sha256": "45b77509983b55fb20884cdd9535dfe7655b4bcd9ef6889486164bbc48078373",
+      "source_bytes": 38692304,
+      "source_dimensions": [
+        4096,
+        4096
+      ],
+      "derivative_uri": "assets/sponza/textures/sponza-brick.png",
+      "derivative_sha256": "3bdc7e8ba1ec1517bd73f6a98046f3ad3fb05f6ebdbc9101530032fdc62a0900",
+      "derivative_bytes": 2406,
+      "recipe": {
+        "crop_ltrb": [
+          0,
+          0,
+          2048,
+          2048
+        ],
+        "rotate_counterclockwise_degrees": 0,
+        "resize": "BOX",
+        "dimensions": [
+          32,
+          32
+        ],
+        "chroma_numerator_over_256": 224,
+        "contrast": "5/4 around integer mean luminance",
+        "brightness_gain": [
+          1,
+          1
+        ],
+        "edge_matching": "opposite border texels averaged, one texel wide",
+        "repeat_axes": "uv",
+        "pillow": "11.2.1"
+      },
+      "recommended_repeat_metres": [
+        2,
+        2
+      ],
+      "usage": "Four readable masonry courses, retaining joints instead of averaging the whole sheet.",
+      "target": {
+        "format": "RGBA16",
+        "decoded_bytes": 2048,
+        "png_sha256": "e831300f4ec8ffa88520de12f0da2dd869e1ce3e8ec466d35a155a322daa48e2",
+        "recipe_sha256": "3fc82cf01226fa2e8d5241c2c2200272f54fcddfc42bf6704d32663172b9bb99"
+      }
+    },
+    {
+      "id": "sponza-wood",
+      "material": "mat-sponza-wood",
+      "source_path": "textures/wood_door_01_BaseColor.png",
+      "source_sha256": "fcbc484ebf6e707701ee1fec35c4840f8c00f400270210150d2a05dda8a8a22c",
+      "source_bytes": 15731270,
+      "source_dimensions": [
+        4096,
+        4096
+      ],
+      "derivative_uri": "assets/sponza/textures/sponza-wood.png",
+      "derivative_sha256": "197cdaf32e8b06fa183671f05ca3b6fd9d5238ab1f1afcbfd38d4dc095e29687",
+      "derivative_bytes": 1758,
+      "recipe": {
+        "crop_ltrb": [
+          448,
+          256,
+          1472,
+          1024
+        ],
+        "rotate_counterclockwise_degrees": 0,
+        "resize": "BOX",
+        "dimensions": [
+          32,
+          32
+        ],
+        "chroma_numerator_over_256": 160,
+        "contrast": "5/4 around integer mean luminance",
+        "brightness_gain": [
+          3,
+          2
+        ],
+        "edge_matching": "opposite border texels averaged, one texel wide",
+        "repeat_axes": "uv",
+        "pillow": "11.2.1"
+      },
+      "recommended_repeat_metres": [
+        1,
+        1
+      ],
+      "usage": "Timber from the central front-door island, excluding atlas dilation and metal hardware.",
+      "target": {
+        "format": "RGBA16",
+        "decoded_bytes": 2048,
+        "png_sha256": "b94c35666aae4f58dd8207babc9ad4db7559366792526fe202e25362d1cba454",
+        "recipe_sha256": "a8b09959123d9c8c36f1554c3f3d3e1d03abae059feb7dad4b47c597800b6101"
+      }
+    },
+    {
+      "id": "sponza-floor",
+      "material": "mat-sponza-floor",
+      "source_path": "textures/floor_tiles_01_BaseColor.png",
+      "source_sha256": "803484416f5db14596e2e9d8ae5405cf983ee0e4a5c13203c2bf2b8febddaaa4",
+      "source_bytes": 28032361,
+      "source_dimensions": [
+        4096,
+        4096
+      ],
+      "derivative_uri": "assets/sponza/textures/sponza-floor.png",
+      "derivative_sha256": "2696f4f99d8dbc5e24d17b21dcd65ea074cbbcde0c394c0e6f09805708094c2d",
+      "derivative_bytes": 3745,
+      "recipe": {
+        "crop_ltrb": [
+          256,
+          384,
+          2304,
+          2432
+        ],
+        "rotate_counterclockwise_degrees": 90,
+        "resize": "BOX",
+        "dimensions": [
+          64,
+          32
+        ],
+        "chroma_numerator_over_256": 192,
+        "contrast": "5/4 around integer mean luminance",
+        "brightness_gain": [
+          1,
+          1
+        ],
+        "edge_matching": "opposite border texels averaged, one texel wide",
+        "repeat_axes": "uv",
+        "pillow": "11.2.1"
+      },
+      "recommended_repeat_metres": [
+        2.5,
+        2.5
+      ],
+      "usage": "A few large floor slabs with readable joints; exclude the dark padded edge of the source atlas.",
+      "target": {
+        "format": "RGBA16",
+        "decoded_bytes": 4096,
+        "png_sha256": "67087e91831c3ef7a0ffb1991659f153d6908d21a4e9a391fb7b5dbcf5253aa8",
+        "recipe_sha256": "df0b810c0830af3dc380ec9d98fc73cf1011e27682e45fbce5c0ebcac8d94d43"
+      }
+    },
+    {
+      "id": "sponza-relief",
+      "material": "mat-sponza-relief",
+      "source_path": "textures/lionhead_01_BaseColor.png",
+      "source_sha256": "b2297d1e079dfdf449aaebccf144b6077966093474c9be3b62512d72cd30f86b",
+      "source_bytes": 21273971,
+      "source_dimensions": [
+        4096,
+        4096
+      ],
+      "derivative_uri": "assets/sponza/textures/sponza-relief.png",
+      "derivative_sha256": "b3ff8af3e610d83661cbeea212c9e754d2185643ba4e51aeefafa118b85ec710",
+      "derivative_bytes": 2156,
+      "recipe": {
+        "crop_ltrb": [
+          384,
+          2816,
+          1792,
+          3840
+        ],
+        "rotate_counterclockwise_degrees": 0,
+        "resize": "BOX",
+        "dimensions": [
+          32,
+          32
+        ],
+        "chroma_numerator_over_256": 192,
+        "contrast": "5/4 around integer mean luminance",
+        "brightness_gain": [
+          1,
+          1
+        ],
+        "edge_matching": "opposite border texels averaged, one texel wide",
+        "repeat_axes": "",
+        "pillow": "11.2.1"
+      },
+      "recommended_repeat_metres": [
+        1,
+        1
+      ],
+      "usage": "Carved rectangular ornament from the lower atlas island; not a flattened lion-face bake. Map once.",
+      "target": {
+        "format": "RGBA16",
+        "decoded_bytes": 2048,
+        "png_sha256": "745e3fab5a71d15f046afdfebf8cfed3c49ce840acef4caccbe89e065a03fd1c",
+        "recipe_sha256": "d0816d51cda2d80686891cf9f7ec4ac89b07d3bc1be275476534627902c6770a"
+      }
+    },
+    {
+      "id": "sponza-roof",
+      "material": "mat-sponza-roof",
+      "source_path": "textures/roof_tiles_01_BaseColor.png",
+      "source_sha256": "3310a7cd14ed82f56bc00cf88d36289a73d743e4594a0e72d4e21f68c2110cf8",
+      "source_bytes": 29975234,
+      "source_dimensions": [
+        4096,
+        4096
+      ],
+      "derivative_uri": "assets/sponza/textures/sponza-roof.png",
+      "derivative_sha256": "1f6c70c89ccf9b201531cc062867341356745dc3f041eca060a24003abd50909",
+      "derivative_bytes": 2003,
+      "recipe": {
+        "crop_ltrb": [
+          768,
+          768,
+          2816,
+          2816
+        ],
+        "rotate_counterclockwise_degrees": 0,
+        "resize": "BOX",
+        "dimensions": [
+          32,
+          32
+        ],
+        "chroma_numerator_over_256": 96,
+        "contrast": "5/4 around integer mean luminance",
+        "brightness_gain": [
+          1,
+          1
+        ],
+        "edge_matching": "opposite border texels averaged, one texel wide",
+        "repeat_axes": "uv",
+        "pillow": "11.2.1"
+      },
+      "recommended_repeat_metres": [
+        2,
+        2
+      ],
+      "usage": "Central roof-tile patch, excluding dilation; reduce orange chroma so scene lighting remains legible.",
+      "target": {
+        "format": "RGBA16",
+        "decoded_bytes": 2048,
+        "png_sha256": "b8cf9ec88ef9c1dd37212fb60f753384da25d125c298b7e6fa304d028ceffb2e",
+        "recipe_sha256": "51141f129dd2d00b6912c86b89a60bf4a9f7d5be305f7cef44844d3b99e93b3c"
+      }
+    }
+  ],
+  "decoded_bytes": 22528,
+  "maximum_texture_bytes": 4096,
+  "source_credit": {
+    "credit": "Sponza base-color derivatives from the user-supplied Intel New Sponza reference (origin inferred from the local asset).",
+    "reference_root_hint": "LightEngine/examples/assets/external/sponza",
+    "reference_gltf": "NewSponza_Main_glTF_003.gltf",
+    "reference_gltf_sha256": "e04c4c540c74bdddcbd3f590a85c14119bfd5839702246a23b3a737c0cce2400",
+    "source_links": [
+      "https://www.intel.com/content/www/us/en/developer/topic-technology/graphics-research/samples.html",
+      "https://www.intel.com/content/www/us/en/developer/topic-technology/graphics-research/overview.html"
+    ],
+    "terms_observed_on": "2026-09-06",
+    "terms_observed": "Intel Samples Library says Creative Commons Attribution; its Overview page says Academy Software Foundation.",
+    "unresolved": "The exact local download version, license version and original artist attribution were not supplied or recovered. These are not asserted to match another Sponza archive.",
+    "modifications": "Selected crops, optional90degree rotation, BOX reduction, muted chroma, modest contrast, timber brightening, matching repeat edges, and ordinary RGBA16 cooking.",
+    "full_reference_retained_externally": true
+  },
+  "generator": {
+    "path": "tools/sponza_textures.py",
+    "sha256": "1f707f98ac9d6a1330368e02185fab91d67bae92b70159cf11f9e329401aaa01",
+    "target_cooker": "tools/cook_textures.py",
+    "cooker_sha256": "297b21f7c787f4b9285ed7b113099a01e45c3f5e5056535f4fa76c195bf516cf"
+  }
+}

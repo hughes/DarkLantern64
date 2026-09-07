@@ -1,6 +1,6 @@
 # Creator quickstart
 
-For artists and level/game designers with the Windows environment already set up. One project editor manages all levels, including **The Lantern Store**, **Moonlit Delivery Yard**, **Enemy Patrol Workshop**, and **Guard Animation Workshop**.
+For artists and level/game designers with the Windows environment already set up. One project editor manages all levels, including **The Lantern Store**, **Moonlit Delivery Yard**, **Enemy Patrol Workshop**, **Guard Animation Workshop**, and **Sponza After Hours**.
 
 ## 1. Open the editor
 
@@ -37,6 +37,8 @@ Open **The Lantern Store**, then start with a small experiment:
 In **Viewport**, **middle-drag** orbits, **Shift + middle-drag** pans, and the **wheel** zooms. Left-click a mesh or choose it in **Entity List** to select its gizmo. Choose **Options → Transform mode → Translate / Rotate / Scale**; **Ctrl+T** cycles modes. Gizmo edits save with the level. **Room Objects** selection controls only the property inspector.
 
 Positions use metres; **Y is up**. Rotations use degrees; scale values must stay positive. Collision boxes currently support Y rotation only: tilting an object with collision around X or Z fails cooking.
+
+**Sponza After Hours** demonstrates two connected floors. Select it in **Levels**, then use **Play level**; its start presets jump directly to the upper gallery, either stairway, the courtyard or the unlocked vault. The upper gallery is at Y `5.3`. Its floors and stairs have separate collision-only entities in **Room Objects**, so move both the visible model and its proxies when changing architecture. Put guard feet and patrol waypoints at the walking-surface height. See the [Sponza guide](sponza-study.md) for the encounter route and current navigation limits.
 
 Lights expose radius, intensity (0–16), and color; the control exposes **Linked door**. In the courtyard, **Night environment** controls ambient, moon, sky, fog and exposure. **Material** controls color, emission and existing texture dimensions; changes affect every object using that material. Assign a new source image through the saved JSON or API as described in the [texture guide](texture-pipeline.md). Save + Cook refreshes these changes. Check final lighting in Ares; the desktop preview displays cooked textures but uses LightEngine's renderer.
 

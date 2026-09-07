@@ -5,7 +5,7 @@ from pathlib import Path
 import tempfile
 import unittest
 
-from tools.asset_pack import load_pack, merge_pack, place_prop
+from tools.asset_pack import load_pack, merge_pack, place_prop, resolve_asset_packs
 
 
 class AssetPackTests(unittest.TestCase):
@@ -120,6 +120,23 @@ class AssetPackTests(unittest.TestCase):
         imported, catalog = merge_pack(document, "pack.json", self.root, prefabs)
         self.assertEqual(imported, document)
         self.assertEqual(catalog, prefabs)
+
+    def test_combined_packs_allow_128_mesh_assets_but_keep_material_limit(self):
+        self.level["assets"] = [{"id": f"local-{i}", "uri": "loot.obj"} for i in range(127)]
+        linked = dict(self.level, asset_packs=["pack.json"])
+        expanded, _, _ = resolve_asset_packs(linked, self.root)
+        self.assertEqual(len(expanded["assets"]), 128)
+        merged, _ = merge_pack(self.level, "pack.json", self.root)
+        self.assertEqual(len(merged["assets"]), 128)
+        self.level["assets"].append({"id": "overflow", "uri": "loot.obj"})
+        with self.assertRaisesRegex(ValueError, "exceeds 128 assets"):
+            resolve_asset_packs(dict(self.level, asset_packs=["pack.json"]), self.root)
+        with self.assertRaisesRegex(ValueError, "exceeds 128 assets"):
+            merge_pack(self.level, "pack.json", self.root)
+        self.level["assets"] = []
+        self.level["materials"] = [{"id": f"local-{i}", "color": [1, 1, 1, 1]} for i in range(64)]
+        with self.assertRaisesRegex(ValueError, "exceeds 64 materials"):
+            resolve_asset_packs(dict(self.level, asset_packs=["pack.json"]), self.root)
 
 
 if __name__ == "__main__":

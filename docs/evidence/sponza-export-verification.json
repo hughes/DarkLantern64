@@ -1,0 +1,888 @@
+{
+  "passed": true,
+  "source_sha256": "3e3e5936dccc231a855a843e3b0e691285c4fdd21f56b6bc4b9726055288064c",
+  "unchanged_source": {
+    "published": false,
+    "changed_meshes": 63,
+    "validated_levels": {
+      "animation_workshop.json": {
+        "models": 12,
+        "instanced_vertices": 2098,
+        "instanced_triangles": 1190
+      },
+      "enemy_patrols.json": {
+        "models": 27,
+        "instanced_vertices": 4701,
+        "instanced_triangles": 2833
+      },
+      "first_room.json": {
+        "models": 25,
+        "instanced_vertices": 2683,
+        "instanced_triangles": 1763
+      },
+      "moonlit_courtyard.json": {
+        "models": 49,
+        "instanced_vertices": 4195,
+        "instanced_triangles": 2239
+      },
+      "sponza_courtyard.json": {
+        "models": 112,
+        "instanced_vertices": 5850,
+        "instanced_triangles": 3878
+      }
+    },
+    "passed": true,
+    "source": "art/sponza.blend",
+    "source_sha256": "3e3e5936dccc231a855a843e3b0e691285c4fdd21f56b6bc4b9726055288064c",
+    "assets": 63,
+    "instances": 98,
+    "comparisons": {
+      "mesh-sponza-ground-column": {
+        "same_topology": true,
+        "vertices": 40,
+        "triangles": 44,
+        "max_position_error_m": 7.999999995789153e-08,
+        "max_uv_error": 5.699999994224214e-08,
+        "max_normal_error": 5.392356963802858e-05
+      },
+      "mesh-sponza-ground-arch": {
+        "same_topology": true,
+        "vertices": 52,
+        "triangles": 36,
+        "max_position_error_m": 9.99999993922529e-08,
+        "max_uv_error": 4.999999969612645e-08,
+        "max_normal_error": 5.496353253642283e-07
+      },
+      "mesh-sponza-ground-end-arch": {
+        "same_topology": true,
+        "vertices": 52,
+        "triangles": 36,
+        "max_position_error_m": 1.200000001588819e-07,
+        "max_uv_error": 6.000000007944095e-08,
+        "max_normal_error": 2.5476236403809693e-07
+      },
+      "mesh-sponza-ground-floor-0": {
+        "same_topology": true,
+        "vertices": 15,
+        "triangles": 16,
+        "max_position_error_m": 5.000000014021566e-08,
+        "max_uv_error": 1.9000000062163735e-07,
+        "max_normal_error": 0.0
+      },
+      "mesh-sponza-ground-floor-1": {
+        "same_topology": true,
+        "vertices": 15,
+        "triangles": 16,
+        "max_position_error_m": 0.0,
+        "max_uv_error": 0.0,
+        "max_normal_error": 0.0
+      },
+      "mesh-sponza-ground-floor-2": {
+        "same_topology": true,
+        "vertices": 15,
+        "triangles": 16,
+        "max_position_error_m": 0.0,
+        "max_uv_error": 0.0,
+        "max_normal_error": 0.0
+      },
+      "mesh-sponza-ground-floor-3": {
+        "same_topology": true,
+        "vertices": 15,
+        "triangles": 16,
+        "max_position_error_m": 0.0,
+        "max_uv_error": 0.0,
+        "max_normal_error": 0.0
+      },
+      "mesh-sponza-ground-floor-4": {
+        "same_topology": true,
+        "vertices": 15,
+        "triangles": 16,
+        "max_position_error_m": 0.0,
+        "max_uv_error": 0.0,
+        "max_normal_error": 0.0
+      },
+      "mesh-sponza-ground-floor-5": {
+        "same_topology": true,
+        "vertices": 15,
+        "triangles": 16,
+        "max_position_error_m": 5.000000014021566e-08,
+        "max_uv_error": 1.9000000062163735e-07,
+        "max_normal_error": 0.0
+      },
+      "mesh-sponza-gallery-north-0": {
+        "same_topology": true,
+        "vertices": 9,
+        "triangles": 8,
+        "max_position_error_m": 9.99999993922529e-09,
+        "max_uv_error": 7.000000001866624e-08,
+        "max_normal_error": 0.0
+      },
+      "mesh-sponza-gallery-north-1": {
+        "same_topology": true,
+        "vertices": 9,
+        "triangles": 8,
+        "max_position_error_m": 9.99999993922529e-09,
+        "max_uv_error": 7.000000001866624e-08,
+        "max_normal_error": 0.0
+      },
+      "mesh-sponza-gallery-north-2": {
+        "same_topology": true,
+        "vertices": 9,
+        "triangles": 8,
+        "max_position_error_m": 9.99999993922529e-09,
+        "max_uv_error": 7.000000001866624e-08,
+        "max_normal_error": 0.0
+      },
+      "mesh-sponza-gallery-north-3": {
+        "same_topology": true,
+        "vertices": 9,
+        "triangles": 8,
+        "max_position_error_m": 9.99999993922529e-09,
+        "max_uv_error": 7.000000001866624e-08,
+        "max_normal_error": 0.0
+      },
+      "mesh-sponza-ceiling-north": {
+        "same_topology": true,
+        "vertices": 18,
+        "triangles": 16,
+        "max_position_error_m": 9.99999993922529e-09,
+        "max_uv_error": 9.99999993922529e-09,
+        "max_normal_error": 0.0
+      },
+      "mesh-sponza-upper-ceiling-north": {
+        "same_topology": true,
+        "vertices": 10,
+        "triangles": 8,
+        "max_position_error_m": 9.99999993922529e-09,
+        "max_uv_error": 9.99999993922529e-09,
+        "max_normal_error": 0.0
+      },
+      "mesh-sponza-parapet-north": {
+        "same_topology": true,
+        "vertices": 20,
+        "triangles": 10,
+        "max_position_error_m": 5.999999996841865e-09,
+        "max_uv_error": 2.0000000100495186e-08,
+        "max_normal_error": 0.0
+      },
+      "mesh-sponza-gallery-south-0": {
+        "same_topology": true,
+        "vertices": 9,
+        "triangles": 8,
+        "max_position_error_m": 9.99999993922529e-09,
+        "max_uv_error": 7.000000001866624e-08,
+        "max_normal_error": 0.0
+      },
+      "mesh-sponza-gallery-south-1": {
+        "same_topology": true,
+        "vertices": 9,
+        "triangles": 8,
+        "max_position_error_m": 9.99999993922529e-09,
+        "max_uv_error": 7.000000001866624e-08,
+        "max_normal_error": 0.0
+      },
+      "mesh-sponza-gallery-south-2": {
+        "same_topology": true,
+        "vertices": 9,
+        "triangles": 8,
+        "max_position_error_m": 9.99999993922529e-09,
+        "max_uv_error": 7.000000001866624e-08,
+        "max_normal_error": 0.0
+      },
+      "mesh-sponza-gallery-south-3": {
+        "same_topology": true,
+        "vertices": 9,
+        "triangles": 8,
+        "max_position_error_m": 9.99999993922529e-09,
+        "max_uv_error": 7.000000001866624e-08,
+        "max_normal_error": 0.0
+      },
+      "mesh-sponza-ceiling-south": {
+        "same_topology": true,
+        "vertices": 18,
+        "triangles": 16,
+        "max_position_error_m": 9.99999993922529e-09,
+        "max_uv_error": 9.99999993922529e-09,
+        "max_normal_error": 0.0
+      },
+      "mesh-sponza-upper-ceiling-south": {
+        "same_topology": true,
+        "vertices": 10,
+        "triangles": 8,
+        "max_position_error_m": 9.99999993922529e-09,
+        "max_uv_error": 9.99999993922529e-09,
+        "max_normal_error": 0.0
+      },
+      "mesh-sponza-parapet-south": {
+        "same_topology": true,
+        "vertices": 20,
+        "triangles": 10,
+        "max_position_error_m": 5.999999996841865e-09,
+        "max_uv_error": 2.0000000100495186e-08,
+        "max_normal_error": 0.0
+      },
+      "mesh-sponza-gallery-west": {
+        "same_topology": true,
+        "vertices": 15,
+        "triangles": 16,
+        "max_position_error_m": 5.000000014021566e-08,
+        "max_uv_error": 1.9000000062163735e-07,
+        "max_normal_error": 0.0
+      },
+      "mesh-sponza-ceiling-west": {
+        "same_topology": true,
+        "vertices": 9,
+        "triangles": 8,
+        "max_position_error_m": 5.000000014021566e-08,
+        "max_uv_error": 1.9000000062163735e-07,
+        "max_normal_error": 0.0
+      },
+      "mesh-sponza-upper-ceiling-west": {
+        "same_topology": true,
+        "vertices": 6,
+        "triangles": 4,
+        "max_position_error_m": 5.000000014021566e-08,
+        "max_uv_error": 1.9000000062163735e-07,
+        "max_normal_error": 0.0
+      },
+      "mesh-sponza-parapet-west": {
+        "same_topology": true,
+        "vertices": 20,
+        "triangles": 10,
+        "max_position_error_m": 2.999999981767587e-08,
+        "max_uv_error": 1.300000000981072e-07,
+        "max_normal_error": 0.0
+      },
+      "mesh-sponza-gallery-east": {
+        "same_topology": true,
+        "vertices": 15,
+        "triangles": 16,
+        "max_position_error_m": 5.000000014021566e-08,
+        "max_uv_error": 1.9000000062163735e-07,
+        "max_normal_error": 0.0
+      },
+      "mesh-sponza-ceiling-east": {
+        "same_topology": true,
+        "vertices": 9,
+        "triangles": 8,
+        "max_position_error_m": 5.000000014021566e-08,
+        "max_uv_error": 1.9000000062163735e-07,
+        "max_normal_error": 0.0
+      },
+      "mesh-sponza-upper-ceiling-east": {
+        "same_topology": true,
+        "vertices": 6,
+        "triangles": 4,
+        "max_position_error_m": 5.000000014021566e-08,
+        "max_uv_error": 1.9000000062163735e-07,
+        "max_normal_error": 0.0
+      },
+      "mesh-sponza-parapet-east": {
+        "same_topology": true,
+        "vertices": 20,
+        "triangles": 10,
+        "max_position_error_m": 2.999999981767587e-08,
+        "max_uv_error": 1.300000000981072e-07,
+        "max_normal_error": 0.0
+      },
+      "mesh-sponza-upper-post-pair": {
+        "same_topology": true,
+        "vertices": 52,
+        "triangles": 40,
+        "max_position_error_m": 1.1000000021965661e-07,
+        "max_uv_error": 5.000000014021566e-08,
+        "max_normal_error": 2.3998152790039206e-05
+      },
+      "mesh-sponza-upper-post-single": {
+        "same_topology": true,
+        "vertices": 26,
+        "triangles": 20,
+        "max_position_error_m": 1.1000000021965661e-07,
+        "max_uv_error": 4.3000000005122274e-08,
+        "max_normal_error": 2.3998152790039206e-05
+      },
+      "mesh-sponza-upper-arch-pair": {
+        "same_topology": true,
+        "vertices": 68,
+        "triangles": 48,
+        "max_position_error_m": 4.499999999296733e-07,
+        "max_uv_error": 1.6999999985500835e-07,
+        "max_normal_error": 1.510629491607851e-06
+      },
+      "mesh-sponza-upper-end-arch-pair": {
+        "same_topology": true,
+        "vertices": 68,
+        "triangles": 48,
+        "max_position_error_m": 4.499999999296733e-07,
+        "max_uv_error": 1.6999999985500835e-07,
+        "max_normal_error": 1.3363226258888972e-06
+      },
+      "mesh-sponza-aisle-wall-north-0": {
+        "same_topology": true,
+        "vertices": 16,
+        "triangles": 16,
+        "max_position_error_m": 1.9000000062163735e-07,
+        "max_uv_error": 1.9000000062163735e-07,
+        "max_normal_error": 0.0
+      },
+      "mesh-sponza-aisle-wall-north-1": {
+        "same_topology": true,
+        "vertices": 16,
+        "triangles": 16,
+        "max_position_error_m": 1.9000000062163735e-07,
+        "max_uv_error": 1.9000000062163735e-07,
+        "max_normal_error": 0.0
+      },
+      "mesh-sponza-aisle-wall-north-2": {
+        "same_topology": true,
+        "vertices": 16,
+        "triangles": 16,
+        "max_position_error_m": 1.9000000062163735e-07,
+        "max_uv_error": 1.9000000062163735e-07,
+        "max_normal_error": 0.0
+      },
+      "mesh-sponza-aisle-wall-south-0": {
+        "same_topology": true,
+        "vertices": 16,
+        "triangles": 16,
+        "max_position_error_m": 1.9000000062163735e-07,
+        "max_uv_error": 1.9000000062163735e-07,
+        "max_normal_error": 0.0
+      },
+      "mesh-sponza-aisle-wall-south-1": {
+        "same_topology": true,
+        "vertices": 16,
+        "triangles": 16,
+        "max_position_error_m": 1.9000000062163735e-07,
+        "max_uv_error": 1.9000000062163735e-07,
+        "max_normal_error": 0.0
+      },
+      "mesh-sponza-aisle-wall-south-2": {
+        "same_topology": true,
+        "vertices": 16,
+        "triangles": 16,
+        "max_position_error_m": 1.9000000062163735e-07,
+        "max_uv_error": 1.9000000062163735e-07,
+        "max_normal_error": 0.0
+      },
+      "mesh-sponza-clerestory-north-0": {
+        "same_topology": true,
+        "vertices": 4,
+        "triangles": 2,
+        "max_position_error_m": 0.0,
+        "max_uv_error": 9.99999993922529e-08,
+        "max_normal_error": 0.0
+      },
+      "mesh-sponza-roof-north-0": {
+        "same_topology": true,
+        "vertices": 16,
+        "triangles": 8,
+        "max_position_error_m": 5.000000014021566e-08,
+        "max_uv_error": 3.800000012432747e-07,
+        "max_normal_error": 1.442555795927447e-07
+      },
+      "mesh-sponza-clerestory-north-1": {
+        "same_topology": true,
+        "vertices": 4,
+        "triangles": 2,
+        "max_position_error_m": 0.0,
+        "max_uv_error": 9.99999993922529e-08,
+        "max_normal_error": 0.0
+      },
+      "mesh-sponza-roof-north-1": {
+        "same_topology": true,
+        "vertices": 16,
+        "triangles": 8,
+        "max_position_error_m": 5.000000014021566e-08,
+        "max_uv_error": 3.800000012432747e-07,
+        "max_normal_error": 1.442555795927447e-07
+      },
+      "mesh-sponza-clerestory-south-0": {
+        "same_topology": true,
+        "vertices": 4,
+        "triangles": 2,
+        "max_position_error_m": 0.0,
+        "max_uv_error": 9.99999993922529e-08,
+        "max_normal_error": 0.0
+      },
+      "mesh-sponza-roof-south-0": {
+        "same_topology": true,
+        "vertices": 16,
+        "triangles": 8,
+        "max_position_error_m": 5.000000014021566e-08,
+        "max_uv_error": 3.800000012432747e-07,
+        "max_normal_error": 1.442555795927447e-07
+      },
+      "mesh-sponza-clerestory-south-1": {
+        "same_topology": true,
+        "vertices": 4,
+        "triangles": 2,
+        "max_position_error_m": 0.0,
+        "max_uv_error": 9.99999993922529e-08,
+        "max_normal_error": 0.0
+      },
+      "mesh-sponza-roof-south-1": {
+        "same_topology": true,
+        "vertices": 16,
+        "triangles": 8,
+        "max_position_error_m": 5.000000014021566e-08,
+        "max_uv_error": 3.800000012432747e-07,
+        "max_normal_error": 1.442555795927447e-07
+      },
+      "mesh-sponza-clerestory-west": {
+        "same_topology": true,
+        "vertices": 4,
+        "triangles": 2,
+        "max_position_error_m": 1.0000000028043132e-07,
+        "max_uv_error": 9.99999993922529e-08,
+        "max_normal_error": 0.0
+      },
+      "mesh-sponza-roof-west": {
+        "same_topology": true,
+        "vertices": 12,
+        "triangles": 6,
+        "max_position_error_m": 1.0000000028043132e-07,
+        "max_uv_error": 1.9000000062163735e-07,
+        "max_normal_error": 2.6835624000742797e-08
+      },
+      "mesh-sponza-clerestory-east": {
+        "same_topology": true,
+        "vertices": 4,
+        "triangles": 2,
+        "max_position_error_m": 1.0000000028043132e-07,
+        "max_uv_error": 9.99999993922529e-08,
+        "max_normal_error": 0.0
+      },
+      "mesh-sponza-roof-east": {
+        "same_topology": true,
+        "vertices": 12,
+        "triangles": 6,
+        "max_position_error_m": 1.0000000028043132e-07,
+        "max_uv_error": 1.9000000062163735e-07,
+        "max_normal_error": 2.6835624000742797e-08
+      },
+      "mesh-sponza-end-wall-east": {
+        "same_topology": true,
+        "vertices": 16,
+        "triangles": 10,
+        "max_position_error_m": 1.9000000062163735e-07,
+        "max_uv_error": 1.0000000028043132e-07,
+        "max_normal_error": 0.0
+      },
+      "mesh-sponza-end-wall-west": {
+        "same_topology": true,
+        "vertices": 16,
+        "triangles": 10,
+        "max_position_error_m": 1.9000000062163735e-07,
+        "max_uv_error": 1.0000000028043132e-07,
+        "max_normal_error": 0.0
+      },
+      "mesh-sponza-entry-floor": {
+        "same_topology": true,
+        "vertices": 12,
+        "triangles": 12,
+        "max_position_error_m": 1.9000000062163735e-07,
+        "max_uv_error": 3.800000012432747e-07,
+        "max_normal_error": 0.0
+      },
+      "mesh-sponza-entry-shell": {
+        "same_topology": true,
+        "vertices": 16,
+        "triangles": 8,
+        "max_position_error_m": 1.9000000062163735e-07,
+        "max_uv_error": 1.9000000062163735e-07,
+        "max_normal_error": 0.0
+      },
+      "mesh-sponza-niche-floor": {
+        "same_topology": true,
+        "vertices": 12,
+        "triangles": 12,
+        "max_position_error_m": 4.999999969612645e-08,
+        "max_uv_error": 1.9000000062163735e-07,
+        "max_normal_error": 0.0
+      },
+      "mesh-sponza-niche-shell": {
+        "same_topology": true,
+        "vertices": 16,
+        "triangles": 8,
+        "max_position_error_m": 1.0000000028043132e-07,
+        "max_uv_error": 1.9000000062163735e-07,
+        "max_normal_error": 0.0
+      },
+      "mesh-sponza-stairs-east": {
+        "same_topology": true,
+        "vertices": 201,
+        "triangles": 134,
+        "max_position_error_m": 1.0000000028043132e-07,
+        "max_uv_error": 1.9000000062163735e-07,
+        "max_normal_error": 0.0
+      },
+      "mesh-sponza-stair-shell-east": {
+        "same_topology": true,
+        "vertices": 32,
+        "triangles": 16,
+        "max_position_error_m": 1.0000000028043132e-07,
+        "max_uv_error": 1.9000000062163735e-07,
+        "max_normal_error": 0.0
+      },
+      "mesh-sponza-stairs-west": {
+        "same_topology": true,
+        "vertices": 201,
+        "triangles": 134,
+        "max_position_error_m": 1.0000000028043132e-07,
+        "max_uv_error": 1.9000000062163735e-07,
+        "max_normal_error": 0.0
+      },
+      "mesh-sponza-stair-shell-west": {
+        "same_topology": true,
+        "vertices": 32,
+        "triangles": 16,
+        "max_position_error_m": 1.0000000028043132e-07,
+        "max_uv_error": 1.9000000062163735e-07,
+        "max_normal_error": 0.0
+      }
+    },
+    "worker": {
+      "assets": {
+        "mesh-sponza-ground-column": {
+          "sha256": "04cdee445cb0e5d232c705fbe825f16e3dc916ff359e5cc21f05537586349d5b",
+          "source_object": "sponza-column-south-4"
+        },
+        "mesh-sponza-ground-arch": {
+          "sha256": "d6534a9244d9182ca0481eb62e79fc20ad9dedaf06502027992bc39a2b41e5ce",
+          "source_object": "sponza-arch-south-3"
+        },
+        "mesh-sponza-ground-end-arch": {
+          "sha256": "23e6ff3f90008e5419f86a400c10e4a0e2715d5df440b43d2434b4fa111ee649",
+          "source_object": "sponza-arch-east"
+        },
+        "mesh-sponza-ground-floor-0": {
+          "sha256": "b291247827dc8d54892bf4b1f705d723ee425c1b07a014881ed4cf2080f29525",
+          "source_object": "sponza-ground-floor-0"
+        },
+        "mesh-sponza-ground-floor-1": {
+          "sha256": "389d0eb3b5a7cb32ae4572bef56a3359338b961b1d85a749c03fbf9bc05d5a81",
+          "source_object": "sponza-ground-floor-1"
+        },
+        "mesh-sponza-ground-floor-2": {
+          "sha256": "173ad85f89e2888cb75bbb89aee3d34b056f1f8826aa0743f9d42046b472508c",
+          "source_object": "sponza-ground-floor-2"
+        },
+        "mesh-sponza-ground-floor-3": {
+          "sha256": "6b0a09a56857ff3b12707030109aa31a1648b4e9f60606c81e4605146086b90f",
+          "source_object": "sponza-ground-floor-3"
+        },
+        "mesh-sponza-ground-floor-4": {
+          "sha256": "29df479209ac5c74474113c8f02938b3c46aace5ae4602a86cc38c7a39925d09",
+          "source_object": "sponza-ground-floor-4"
+        },
+        "mesh-sponza-ground-floor-5": {
+          "sha256": "d88f4ee796d6d6d1708f396225978541cfd5c3f042bf9016638e8e1ced2255d2",
+          "source_object": "sponza-ground-floor-5"
+        },
+        "mesh-sponza-gallery-north-0": {
+          "sha256": "51314c6f5b1f9846444715c13e02eba210b796e12d6bfa720ae4c0b1e6abad56",
+          "source_object": "sponza-gallery-north-0"
+        },
+        "mesh-sponza-gallery-north-1": {
+          "sha256": "8537ad1a1985223f182b06591752b99d83f2d745837e7d9a730c211402cb1f27",
+          "source_object": "sponza-gallery-north-1"
+        },
+        "mesh-sponza-gallery-north-2": {
+          "sha256": "5565fb10422f120fbe4daf9591317f2d8287fba9f63f02be523d0e8c28010389",
+          "source_object": "sponza-gallery-north-2"
+        },
+        "mesh-sponza-gallery-north-3": {
+          "sha256": "99f3515b347fb84d70e7978a28aa07fc933aaa72e165f3060d4a968cdd26d439",
+          "source_object": "sponza-gallery-north-3"
+        },
+        "mesh-sponza-ceiling-north": {
+          "sha256": "3219d64e98a192b2baed0814c1ab162ea01910eacf866e9441ee7532777dd75e",
+          "source_object": "sponza-ceiling-north"
+        },
+        "mesh-sponza-upper-ceiling-north": {
+          "sha256": "efa41864101cfea735e3497c5e09a9c0fe73d635deac25a7dffcd9145643e7e5",
+          "source_object": "sponza-upper-ceiling-north"
+        },
+        "mesh-sponza-parapet-north": {
+          "sha256": "f6739224764d076f121519771187a0e16ee7aad5cee6492c7d867e6764dab633",
+          "source_object": "sponza-parapet-north"
+        },
+        "mesh-sponza-gallery-south-0": {
+          "sha256": "4d1477d43342fc598453ef607c1d0800f59b03d84c965ade8e3af8edc8aec58e",
+          "source_object": "sponza-gallery-south-0"
+        },
+        "mesh-sponza-gallery-south-1": {
+          "sha256": "e8f52d18fd44bdeab0ba69248dc533782203f227f0c3cb25160ce0e8abf50ad5",
+          "source_object": "sponza-gallery-south-1"
+        },
+        "mesh-sponza-gallery-south-2": {
+          "sha256": "58e30eb947e493df391fbc44cd835d477f4a7866a0f53e64e1276d29c8e070d7",
+          "source_object": "sponza-gallery-south-2"
+        },
+        "mesh-sponza-gallery-south-3": {
+          "sha256": "5e10d8a4069f6a3c106be14b08099576fee850845ba0c9c6ff81e6fa4d7c82b7",
+          "source_object": "sponza-gallery-south-3"
+        },
+        "mesh-sponza-ceiling-south": {
+          "sha256": "152c4b0fee004d5f88e642484e1051d98ada631efafcf546d46982ba54d664b3",
+          "source_object": "sponza-ceiling-south"
+        },
+        "mesh-sponza-upper-ceiling-south": {
+          "sha256": "23becd81d4e410bbb68b9f97f87aefe7caa5ab35807c413136b90d04aa15af60",
+          "source_object": "sponza-upper-ceiling-south"
+        },
+        "mesh-sponza-parapet-south": {
+          "sha256": "458e5122d27478820d369efb619c030fe8ade69cc29b78a96b05e5eaf71635cf",
+          "source_object": "sponza-parapet-south"
+        },
+        "mesh-sponza-gallery-west": {
+          "sha256": "b291247827dc8d54892bf4b1f705d723ee425c1b07a014881ed4cf2080f29525",
+          "source_object": "sponza-gallery-west"
+        },
+        "mesh-sponza-ceiling-west": {
+          "sha256": "b3ab3f8ba6ec5c39ea30f0bdedc324b555af3b04a7a1a9a09c3133fa4bca1a8b",
+          "source_object": "sponza-ceiling-west"
+        },
+        "mesh-sponza-upper-ceiling-west": {
+          "sha256": "5e8c97304da3436622104afa7bec6fd1aadf2050aeeb260c96462332949ed55e",
+          "source_object": "sponza-upper-ceiling-west"
+        },
+        "mesh-sponza-parapet-west": {
+          "sha256": "9bc423e32393e25c812474ee60194e94288084d830326787c4b4cfd778594d6a",
+          "source_object": "sponza-parapet-west"
+        },
+        "mesh-sponza-gallery-east": {
+          "sha256": "d88f4ee796d6d6d1708f396225978541cfd5c3f042bf9016638e8e1ced2255d2",
+          "source_object": "sponza-gallery-east"
+        },
+        "mesh-sponza-ceiling-east": {
+          "sha256": "8c5a5594d376e0f95940c75a100b58c32747b18b87aa954d1d263dc57b3814bb",
+          "source_object": "sponza-ceiling-east"
+        },
+        "mesh-sponza-upper-ceiling-east": {
+          "sha256": "7581451a4b8041f802afd383892b677749b0feaabbbeb66d1676d75a6cd82186",
+          "source_object": "sponza-upper-ceiling-east"
+        },
+        "mesh-sponza-parapet-east": {
+          "sha256": "5da5414bce33c762855fe0ce95a3e2a5f610a0d08086ef9e79fdbb4d26fbe494",
+          "source_object": "sponza-parapet-east"
+        },
+        "mesh-sponza-upper-post-pair": {
+          "sha256": "ded873bf6660dab3abd715ea1981d3fba4995e0a0d6cf04c2c454ed36d98dbd0",
+          "source_object": "sponza-upper-posts-south-3"
+        },
+        "mesh-sponza-upper-post-single": {
+          "sha256": "e12627443af8e334de1a293eb532aa2e52a987f043476bc930a81652962670d3",
+          "source_object": "sponza-upper-post-end-3"
+        },
+        "mesh-sponza-upper-arch-pair": {
+          "sha256": "6f6578b2cd35c00760ff23b4a3c9704b6ce537e722f9d14e5be0caed39cf70dc",
+          "source_object": "sponza-upper-arches-south-3"
+        },
+        "mesh-sponza-upper-end-arch-pair": {
+          "sha256": "6e905413755928c8b986eae061ee411e9adb49d1a396161f5e4da10f0e439493",
+          "source_object": "sponza-upper-arches-east"
+        },
+        "mesh-sponza-aisle-wall-north-0": {
+          "sha256": "167e2e324e2122358fb6d387fd560f0ad3ce5f27f16e666e5bc731f8f87d8ca4",
+          "source_object": "sponza-aisle-wall-north-0"
+        },
+        "mesh-sponza-aisle-wall-north-1": {
+          "sha256": "a67840987bce6f62ee167e6006bcb652b36c1dbf541b44e2ad3ce8e7fcba2944",
+          "source_object": "sponza-aisle-wall-north-1"
+        },
+        "mesh-sponza-aisle-wall-north-2": {
+          "sha256": "a6bfac2e89ab4f273d3067b61a8eceadd75955d619d09a9291ce6d326739defd",
+          "source_object": "sponza-aisle-wall-north-2"
+        },
+        "mesh-sponza-aisle-wall-south-0": {
+          "sha256": "5387bade7d5f6cbed5387381ba7be26f1fdcf689fb21c2faa5edae71c6e7f986",
+          "source_object": "sponza-aisle-wall-south-0"
+        },
+        "mesh-sponza-aisle-wall-south-1": {
+          "sha256": "4c1d03abb4b30179690561f563d26fba8573367abf46eac490146cc7ab622743",
+          "source_object": "sponza-aisle-wall-south-1"
+        },
+        "mesh-sponza-aisle-wall-south-2": {
+          "sha256": "93aa20bdcf762394a864bf373a567263d7914a29f6e6eb7011781779ea45e1ac",
+          "source_object": "sponza-aisle-wall-south-2"
+        },
+        "mesh-sponza-clerestory-north-0": {
+          "sha256": "f24a5961ce6daebf070a179b13f688681e70d8c8809d3e839e97b19f3c780a5b",
+          "source_object": "sponza-clerestory-north-0"
+        },
+        "mesh-sponza-roof-north-0": {
+          "sha256": "2e6eb19c780d5c3ffd9fb80183a392e9dd48b5223fbb7b6a64a7630ced021a92",
+          "source_object": "sponza-roof-north-0"
+        },
+        "mesh-sponza-clerestory-north-1": {
+          "sha256": "63fc52a62055d95ca6d6339dd002cf0a854aab24fd83c6a916f3913df0f18eac",
+          "source_object": "sponza-clerestory-north-1"
+        },
+        "mesh-sponza-roof-north-1": {
+          "sha256": "efe580195dd0a2ff113465179af61fae1ae9052459783f51d1fd6666ac822dd5",
+          "source_object": "sponza-roof-north-1"
+        },
+        "mesh-sponza-clerestory-south-0": {
+          "sha256": "106b69957bd0e8e9149b0744729baeb15df5342a0b5d80f856378f6268e34ef5",
+          "source_object": "sponza-clerestory-south-0"
+        },
+        "mesh-sponza-roof-south-0": {
+          "sha256": "4dd0b3e8caccd53e276a20a6a6fa463fa013cab553847618da6f0fd938e23607",
+          "source_object": "sponza-roof-south-0"
+        },
+        "mesh-sponza-clerestory-south-1": {
+          "sha256": "4daf713ecf0bb80df883482dad5635ec9bb049020ea81796f7465c97bbbecc72",
+          "source_object": "sponza-clerestory-south-1"
+        },
+        "mesh-sponza-roof-south-1": {
+          "sha256": "d0d9f944ffc193e8f28911f5d691d0252849bff8a207b0d060d2aa1c8a352cdb",
+          "source_object": "sponza-roof-south-1"
+        },
+        "mesh-sponza-clerestory-west": {
+          "sha256": "de0b9f5d57340adff5196041f292b3e380b7f0e39fad2bf87a5a4124c325966f",
+          "source_object": "sponza-clerestory-west"
+        },
+        "mesh-sponza-roof-west": {
+          "sha256": "fee4ea4f56ac53400f9e7196015e43bd584e2dbafd93f815d65acdf0197516cf",
+          "source_object": "sponza-roof-west"
+        },
+        "mesh-sponza-clerestory-east": {
+          "sha256": "f124aa8fc9e2135f4cc1bcd2918e341833cde01d61342448f127bacfadd9bf70",
+          "source_object": "sponza-clerestory-east"
+        },
+        "mesh-sponza-roof-east": {
+          "sha256": "cd51623d2612abafda89b20f013d767946df72f4c0e9c2ed348db1d20c6732a7",
+          "source_object": "sponza-roof-east"
+        },
+        "mesh-sponza-end-wall-east": {
+          "sha256": "a6fe8a38bc1a0eb52e44db73f7b82e8a13387770fc89fd5ab917bbf8132268d4",
+          "source_object": "sponza-end-wall-east"
+        },
+        "mesh-sponza-end-wall-west": {
+          "sha256": "bb597c0f5dfdd2b054df9ae4fc83bb3bf938b6a5ed21f58891ce2fa2d77ae672",
+          "source_object": "sponza-end-wall-west"
+        },
+        "mesh-sponza-entry-floor": {
+          "sha256": "a7996f5541b83b810383748b74143ea940d9072c80482b47f8fced01496cd965",
+          "source_object": "sponza-entry-floor"
+        },
+        "mesh-sponza-entry-shell": {
+          "sha256": "dbb7ffa7ca3a8111e5220bae685f0194ba898b798441f0375ba99448f58ad9a0",
+          "source_object": "sponza-entry-shell"
+        },
+        "mesh-sponza-niche-floor": {
+          "sha256": "28f65ecb453ff205389782a46d14ef93e933f1df9c8f33155fe9716152c880e0",
+          "source_object": "sponza-niche-floor"
+        },
+        "mesh-sponza-niche-shell": {
+          "sha256": "21a64693c226d983a81f6caa4c2b7550c5386c2b825f704418c85f83a2cbc80e",
+          "source_object": "sponza-niche-shell"
+        },
+        "mesh-sponza-stairs-east": {
+          "sha256": "ea28ec39c2d3a7e314b0036aeff561ea4b8b47d820c5d0bc537af05520786b6e",
+          "source_object": "sponza-stairs-east"
+        },
+        "mesh-sponza-stair-shell-east": {
+          "sha256": "787175b6338cb60c0a874e68f716d6577aff55ee57faf4f92946d8e0854ac1fc",
+          "source_object": "sponza-stair-shell-east"
+        },
+        "mesh-sponza-stairs-west": {
+          "sha256": "40a0ccafb6c7e1978799cd074712e1247fcd9a7ba9ddfd9399f7af005052e2f7",
+          "source_object": "sponza-stairs-west"
+        },
+        "mesh-sponza-stair-shell-west": {
+          "sha256": "cb0d662dcaa8759821800d316432dbff7a79277c8a2976f3d2fa1ff535b197bc",
+          "source_object": "sponza-stair-shell-west"
+        }
+      },
+      "instances_checked": 98,
+      "collision_proxies_checked": 116,
+      "blender_version": "5.3.0 Alpha",
+      "placement_baked": false
+    },
+    "geometry_only": true,
+    "pack_level_and_proxies_unchanged": true,
+    "notes": [
+      "Only OBJ geometry is exported; materials, level placements and collision proxies remain editor-owned.",
+      "Mesh-local origins are preserved. Moving an origin in Blender normally changes its instance transform and is rejected.",
+      "Save + Cook in the editor after exporting to refresh shared assets."
+    ]
+  },
+  "edited_mesh": {
+    "same_topology": true,
+    "vertices": 40,
+    "triangles": 44,
+    "max_position_error_m": 0.009999995999999955,
+    "max_uv_error": 5.699999994224214e-08,
+    "max_normal_error": 0.04393214428517292
+  },
+  "edit": {
+    "asset": "mesh-sponza-ground-column",
+    "instances": [
+      "sponza-column-north-0",
+      "sponza-column-north-1",
+      "sponza-column-north-2",
+      "sponza-column-north-3",
+      "sponza-column-north-4",
+      "sponza-column-south-0",
+      "sponza-column-south-1",
+      "sponza-column-south-2",
+      "sponza-column-south-3",
+      "sponza-column-south-4"
+    ],
+    "local_vertex": 0,
+    "blender_before": [
+      0.4000000059604645,
+      -0.0,
+      0.20000000298023224
+    ],
+    "delta_x_m": 0.01,
+    "rejections": [
+      {
+        "name": "instance_placement",
+        "rejected": true,
+        "message": "sponza-column-north-0: object placement/origin changed. Export edits in mesh Edit Mode; edit instance placement and collision proxies in the level editor"
+      },
+      {
+        "name": "unlinked_shared_variant",
+        "rejected": true,
+        "message": "mesh-sponza-ground-column: repeated instances use unlinked mesh variants; link their mesh data or create a separately authored asset"
+      },
+      {
+        "name": "collision_proxy_edit",
+        "rejected": true,
+        "message": "sponza-collision-column-north-0: object placement/origin changed. Export edits in mesh Edit Mode; edit instance placement and collision proxies in the level editor"
+      }
+    ]
+  },
+  "shared_cooked_instances": [
+    "sponza-column-north-0",
+    "sponza-column-north-1",
+    "sponza-column-north-2",
+    "sponza-column-north-3",
+    "sponza-column-north-4",
+    "sponza-column-south-0",
+    "sponza-column-south-1",
+    "sponza-column-south-2",
+    "sponza-column-south-3",
+    "sponza-column-south-4"
+  ],
+  "cooked_level_source_sha256": "ed466805af1a44c8b8c1a77cec4dff6c542a79369886d98f98dee230256da73e",
+  "cooked_counts": {
+    "entities": 237,
+    "meshes": 70,
+    "models": 112,
+    "colliders": 118,
+    "instanced_vertices": 5850,
+    "instanced_triangles": 3878,
+    "lights": 6,
+    "enemies": 2,
+    "test_starts": 5,
+    "patrol_points": 8
+  },
+  "canonical_content_unchanged": true,
+  "open_blender_untouched": true,
+  "evidence_scope": "Source-matched saved Blender/editor verification. Export/editor fixtures predate only the last two stair-entry lamps and gallery test-start offset; final scene cook is recorded separately."
+}

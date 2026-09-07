@@ -237,7 +237,7 @@ static void start_level(DlGame *game, const DlLauncher *launcher, DlRenderStats 
         launcher->bundle->levels[launcher->active_level].id,preset,heap.used,heap.total,
         game->player.x,game->player.y,game->player.z,game->yaw,game->pitch,
         game->door_open,game->crouched,game->enemy_count,game->elapsed,game->complete,game->caught);
-    debugf("DL64 boot_ok memory=%d scene=\"%s\" meshes=%d models=%d colliders=%d version=%lu world=3d renderer=xyz-mesh-rdpq depth=hardware\n",
+    debugf("DL64 boot_ok memory=%d scene=\"%s\" meshes=%d models=%d colliders=%d version=%lu world=3d renderer=" DL_RENDER_BACKEND " depth=hardware\n",
         stats->memory_bytes,level->title,level->mesh_count,level->model_count,
         level->collider_count,(unsigned long)level->version);
     debugf("DL64 enemies count=%d capacity=%d state_bytes=%u\n",game->enemy_count,DL_MAX_ENEMIES,(unsigned)sizeof(game->enemies));
@@ -295,7 +295,14 @@ int main(void) {
     debug_init_emulog();
     int memory = get_memory_size();
     require_expansion_pak(memory);
+#ifdef DL_RENDER_T3D
+    /* One scanning, one queued, one being prepared. This lets the CPU prepare
+     * poses while RSP/RDP finish the preceding frame (153,600 extra bytes). */
+    display_init(RESOLUTION_320x240, DEPTH_16_BPP, 3, GAMMA_NONE, FILTERS_RESAMPLE);
+#else
     display_init(RESOLUTION_320x240, DEPTH_16_BPP, 2, GAMMA_NONE, FILTERS_RESAMPLE);
+#endif
+    dl_profile_init_display();
     rdpq_init();
     joypad_init();
     audio_init(SAMPLE_RATE, 4);

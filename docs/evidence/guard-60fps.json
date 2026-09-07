@@ -1,0 +1,2429 @@
+{
+  "schema_version": 1,
+  "passed": true,
+  "profile": {
+    "schema_version": 2,
+    "measurement": "Emulated CPU-timer elapsed time; not CPU utilization or host CPU time",
+    "source_log": ".dev/ares/runs/8a3e1e94a98f4b8e99c4c24e1c4cc9cb/guard-performance.log",
+    "source_log_sha256": "4eda6c4bb63ae5650caf30611754a09f18daa15b163eb2970e8ad949123922aa",
+    "source_log_bytes": 109559,
+    "complete_windows": 30,
+    "selected_window_ids": [
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22,
+      23,
+      24,
+      25,
+      26,
+      27,
+      28,
+      29,
+      30,
+      31,
+      32,
+      33
+    ],
+    "skipped_warmup_windows": 3,
+    "frames": 1800,
+    "ignored_trailing_partial_window": false,
+    "ticks_per_second": 46875000,
+    "target_fps": 60,
+    "configured_target_fps": 60,
+    "frame_budget_ms": 16.666666666666668,
+    "debug_states": [
+      0
+    ],
+    "debug_frames": {
+      "0": 1800
+    },
+    "audio_calls": 753,
+    "frame": {
+      "total_ticks": 1410311088,
+      "max_ticks": 862459,
+      "average_ms": 16.71479808,
+      "max_ms": 18.399125333333334,
+      "percent_of_frame_budget": 100.28878848000001,
+      "percent_of_30fps_budget": 50.144394240000004,
+      "percent_of_frame_elapsed": 100.0
+    },
+    "slots": {
+      "input": {
+        "total_ticks": 3706200,
+        "max_ticks": 3878,
+        "average_ms": 0.04392533333333334,
+        "max_ms": 0.08273066666666666,
+        "percent_of_frame_budget": 0.263552,
+        "percent_of_30fps_budget": 0.131776,
+        "percent_of_frame_elapsed": 0.26279308384761135
+      },
+      "gameplay": {
+        "total_ticks": 88669248,
+        "max_ticks": 57981,
+        "average_ms": 1.050894791111111,
+        "max_ms": 1.236928,
+        "percent_of_frame_budget": 6.305368746666667,
+        "percent_of_30fps_budget": 3.152684373333333,
+        "percent_of_frame_elapsed": 6.287212002689722
+      },
+      "audio_events": {
+        "total_ticks": 4125656,
+        "max_ticks": 12738,
+        "average_ms": 0.0488966637037037,
+        "max_ms": 0.271744,
+        "percent_of_frame_budget": 0.29337998222222217,
+        "percent_of_30fps_budget": 0.14668999111111108,
+        "percent_of_frame_elapsed": 0.2925351743387839
+      },
+      "audio_mix": {
+        "total_ticks": 22293036,
+        "max_ticks": 73080,
+        "average_ms": 0.26421376,
+        "max_ms": 1.55904,
+        "percent_of_frame_budget": 1.58528256,
+        "percent_of_30fps_budget": 0.79264128,
+        "percent_of_frame_elapsed": 1.5807176295844312
+      },
+      "cache": {
+        "total_ticks": 0,
+        "max_ticks": 0,
+        "average_ms": 0.0,
+        "max_ms": 0.0,
+        "percent_of_frame_budget": 0.0,
+        "percent_of_30fps_budget": 0.0,
+        "percent_of_frame_elapsed": 0.0
+      },
+      "transforms": {
+        "total_ticks": 251739638,
+        "max_ticks": 145580,
+        "average_ms": 2.9835808948148146,
+        "max_ms": 3.105706666666667,
+        "percent_of_frame_budget": 17.90148536888889,
+        "percent_of_30fps_budget": 8.950742684444444,
+        "percent_of_frame_elapsed": 17.849936807700967
+      },
+      "lighting": {
+        "total_ticks": 519954958,
+        "max_ticks": 296204,
+        "average_ms": 6.162429131851852,
+        "max_ms": 6.319018666666667,
+        "percent_of_frame_budget": 36.97457479111111,
+        "percent_of_30fps_budget": 18.487287395555555,
+        "percent_of_frame_elapsed": 36.86810395409725
+      },
+      "triangles": {
+        "total_ticks": 32180482,
+        "max_ticks": 22459,
+        "average_ms": 0.38139830518518514,
+        "max_ms": 0.47912533333333335,
+        "percent_of_frame_budget": 2.2883898311111106,
+        "percent_of_30fps_budget": 1.1441949155555555,
+        "percent_of_frame_elapsed": 2.2818002548385268
+      },
+      "hud": {
+        "total_ticks": 4750267,
+        "max_ticks": 4576,
+        "average_ms": 0.056299460740740735,
+        "max_ms": 0.09762133333333334,
+        "percent_of_frame_budget": 0.3377967644444444,
+        "percent_of_30fps_budget": 0.1688983822222222,
+        "percent_of_frame_elapsed": 0.3368240553746536
+      },
+      "debug_hud": {
+        "total_ticks": 0,
+        "max_ticks": 0,
+        "average_ms": 0.0,
+        "max_ms": 0.0,
+        "percent_of_frame_budget": 0.0,
+        "percent_of_30fps_budget": 0.0,
+        "percent_of_frame_elapsed": 0.0
+      },
+      "render_setup": {
+        "total_ticks": 17476592,
+        "max_ticks": 14376,
+        "average_ms": 0.20712997925925924,
+        "max_ms": 0.306688,
+        "percent_of_frame_budget": 1.2427798755555555,
+        "percent_of_30fps_budget": 0.6213899377777777,
+        "percent_of_frame_elapsed": 1.2392012052308277
+      },
+      "display_wait": {
+        "total_ticks": 435492570,
+        "max_ticks": 272291,
+        "average_ms": 5.161393422222222,
+        "max_ms": 5.808874666666667,
+        "percent_of_frame_budget": 30.968360533333332,
+        "percent_of_30fps_budget": 15.484180266666666,
+        "percent_of_frame_elapsed": 30.87918500432296
+      },
+      "other": {
+        "total_ticks": 29922441,
+        "max_ticks": 169158,
+        "average_ms": 0.3546363377777778,
+        "max_ms": 3.608704,
+        "percent_of_frame_budget": 2.127818026666667,
+        "percent_of_30fps_budget": 1.0639090133333333,
+        "percent_of_frame_elapsed": 2.1216908279742603
+      }
+    },
+    "limitations": [
+      "Ares timing model; original N64 and M64 hardware validation remains pending.",
+      "Slot maxima are worst observed per-frame totals and must not be added together.",
+      "Submission scopes include internal queue stalls; this does not time RDP/GPU execution.",
+      "Audio callback time is attributed exclusively; other interrupts remain in the interrupted scope.",
+      "Profiling and enabled debug display add overhead. Incomplete trailing records are excluded."
+    ],
+    "exact_frame_samples_available": true,
+    "distributions": {
+      "elapsed": {
+        "samples": 1800,
+        "average_ms": 16.71479808,
+        "min_ms": 15.05792,
+        "max_ms": 18.399125333333334,
+        "p50_ms": 16.702741333333332,
+        "p95_ms": 17.467498666666668,
+        "p99_ms": 18.316821333333333,
+        "over_budget_frames": 1136,
+        "quantile_method": "nearest rank of every exact CP0-tick sample"
+      },
+      "work": {
+        "samples": 1800,
+        "average_ms": 11.553404657777778,
+        "min_ms": 10.926592,
+        "max_ms": 16.275882666666668,
+        "p50_ms": 11.385792,
+        "p95_ms": 12.895317333333333,
+        "p99_ms": 14.634730666666666,
+        "over_budget_frames": 0,
+        "quantile_method": "nearest rank of every exact CP0-tick sample"
+      }
+    },
+    "video": {
+      "vis": 1800,
+      "presents": 1800,
+      "repeats": 0,
+      "ticks": 1410335785,
+      "tracked": true,
+      "max_gap_vis": 1,
+      "max_interval_ms": 18.25984,
+      "seconds": 30.087163413333332,
+      "native_refresh_hz": 59.826178203370205,
+      "presented_fps": 59.826178203370205
+    },
+    "workload": {
+      "frames": 1800,
+      "geometry_modes": [
+        1
+      ],
+      "full_body_coverage_measured": false,
+      "geometry_evidence": "RSP model bounds candidates and pre-clip triangle submission; full-body coverage unavailable",
+      "animated_min": 2,
+      "animated_max": 2,
+      "full_min": 0,
+      "full_max": 0,
+      "drawn_min": 2,
+      "drawn_max": 2,
+      "triangles_min": 1182,
+      "triangles_max": 1182,
+      "heads_min": 0,
+      "heads_max": 0
+    }
+  },
+  "checks": [
+    {
+      "name": "steady_window",
+      "passed": true,
+      "detail": "3 warmup windows excluded; 30 complete windows, 30.087s measured; minimum 30s"
+    },
+    {
+      "name": "complete_frame_distributions",
+      "passed": true,
+      "detail": "Every elapsed/work sample must be present; bounded-buffer overflow cannot pass"
+    },
+    {
+      "name": "16.667ms_work_budget",
+      "passed": true,
+      "detail": "All measured frames <=1000/60ms excluding display-buffer wait; includes normal audio, logging and queue stalls"
+    },
+    {
+      "name": "native_vi_presentation",
+      "passed": true,
+      "detail": "One new framebuffer per native NTSC VI, zero repeated scans, no callback gap >1.5 VI periods; native refresh is reported precisely"
+    },
+    {
+      "name": "both_guards_drawn_every_frame",
+      "passed": true,
+      "detail": "Every frame: two posed guard submissions; active attention head overlays are reported in 0..2 (quiet patrol may be zero); RSP model bounds candidates and pre-clip triangle submission; full-body coverage unavailable; image review separately proves appearance"
+    },
+    {
+      "name": "ordinary_live_workload",
+      "passed": true,
+      "detail": "Normal gameplay and audio remain active; no capture/replay/terminal/error state"
+    },
+    {
+      "name": "authored_camera",
+      "passed": true,
+      "detail": "One ordinary launch at authored two-guards preset"
+    },
+    {
+      "name": "independent_live_actors",
+      "passed": true,
+      "detail": "Patrol advances along authored route while sentry holds its post during measured interval"
+    },
+    {
+      "name": "two_character_allocations",
+      "passed": true,
+      "detail": "Two independently animated model instances"
+    },
+    {
+      "name": "actual_visible_guard_images",
+      "passed": true,
+      "detail": "Separately reviewed source-matched framebuffer images; geometry counters alone cannot satisfy this gate"
+    },
+    {
+      "name": "ordinary_rom_provenance",
+      "passed": true,
+      "detail": "Existing-log analysis alone is diagnostic; a measured ROM must match its ordinary build manifest"
+    }
+  ],
+  "actor_samples": {
+    "animated-patrol": [
+      {
+        "position": [
+          -1.1,
+          0.0,
+          1.2
+        ],
+        "patrol_index": 1,
+        "state": "PATROL"
+      },
+      {
+        "position": [
+          -1.54,
+          0.0,
+          1.2
+        ],
+        "patrol_index": 0,
+        "state": "PATROL"
+      },
+      {
+        "position": [
+          -2.34,
+          0.0,
+          1.2
+        ],
+        "patrol_index": 0,
+        "state": "PATROL"
+      },
+      {
+        "position": [
+          -1.62,
+          0.0,
+          1.2
+        ],
+        "patrol_index": 1,
+        "state": "PATROL"
+      },
+      {
+        "position": [
+          -1.02,
+          0.0,
+          1.2
+        ],
+        "patrol_index": 0,
+        "state": "PATROL"
+      },
+      {
+        "position": [
+          -1.82,
+          0.0,
+          1.2
+        ],
+        "patrol_index": 0,
+        "state": "PATROL"
+      },
+      {
+        "position": [
+          -2.14,
+          0.0,
+          1.2
+        ],
+        "patrol_index": 1,
+        "state": "PATROL"
+      },
+      {
+        "position": [
+          -1.34,
+          0.0,
+          1.2
+        ],
+        "patrol_index": 1,
+        "state": "PATROL"
+      },
+      {
+        "position": [
+          -1.3,
+          0.0,
+          1.2
+        ],
+        "patrol_index": 0,
+        "state": "PATROL"
+      },
+      {
+        "position": [
+          -2.11,
+          0.0,
+          1.2
+        ],
+        "patrol_index": 0,
+        "state": "PATROL"
+      },
+      {
+        "position": [
+          -1.85,
+          0.0,
+          1.2
+        ],
+        "patrol_index": 1,
+        "state": "PATROL"
+      },
+      {
+        "position": [
+          -1.05,
+          0.0,
+          1.2
+        ],
+        "patrol_index": 1,
+        "state": "PATROL"
+      },
+      {
+        "position": [
+          -1.59,
+          0.0,
+          1.2
+        ],
+        "patrol_index": 0,
+        "state": "PATROL"
+      },
+      {
+        "position": [
+          -2.37,
+          0.0,
+          1.2
+        ],
+        "patrol_index": 1,
+        "state": "PATROL"
+      },
+      {
+        "position": [
+          -1.57,
+          0.0,
+          1.2
+        ],
+        "patrol_index": 1,
+        "state": "PATROL"
+      },
+      {
+        "position": [
+          -1.06,
+          0.0,
+          1.2
+        ],
+        "patrol_index": 0,
+        "state": "PATROL"
+      },
+      {
+        "position": [
+          -1.87,
+          0.0,
+          1.2
+        ],
+        "patrol_index": 0,
+        "state": "PATROL"
+      },
+      {
+        "position": [
+          -2.09,
+          0.0,
+          1.2
+        ],
+        "patrol_index": 1,
+        "state": "PATROL"
+      },
+      {
+        "position": [
+          -1.29,
+          0.0,
+          1.2
+        ],
+        "patrol_index": 1,
+        "state": "PATROL"
+      },
+      {
+        "position": [
+          -1.34,
+          0.0,
+          1.2
+        ],
+        "patrol_index": 0,
+        "state": "PATROL"
+      },
+      {
+        "position": [
+          -2.15,
+          0.0,
+          1.2
+        ],
+        "patrol_index": 0,
+        "state": "PATROL"
+      },
+      {
+        "position": [
+          -1.81,
+          0.0,
+          1.2
+        ],
+        "patrol_index": 1,
+        "state": "PATROL"
+      },
+      {
+        "position": [
+          -1.01,
+          0.0,
+          1.2
+        ],
+        "patrol_index": 1,
+        "state": "PATROL"
+      },
+      {
+        "position": [
+          -1.62,
+          0.0,
+          1.2
+        ],
+        "patrol_index": 0,
+        "state": "PATROL"
+      },
+      {
+        "position": [
+          -2.34,
+          0.0,
+          1.2
+        ],
+        "patrol_index": 1,
+        "state": "PATROL"
+      },
+      {
+        "position": [
+          -1.54,
+          0.0,
+          1.2
+        ],
+        "patrol_index": 1,
+        "state": "PATROL"
+      },
+      {
+        "position": [
+          -1.1,
+          0.0,
+          1.2
+        ],
+        "patrol_index": 0,
+        "state": "PATROL"
+      },
+      {
+        "position": [
+          -1.9,
+          0.0,
+          1.2
+        ],
+        "patrol_index": 0,
+        "state": "PATROL"
+      },
+      {
+        "position": [
+          -2.07,
+          0.0,
+          1.2
+        ],
+        "patrol_index": 1,
+        "state": "PATROL"
+      },
+      {
+        "position": [
+          -1.26,
+          0.0,
+          1.2
+        ],
+        "patrol_index": 1,
+        "state": "PATROL"
+      }
+    ],
+    "animated-sentry": [
+      {
+        "position": [
+          1.45,
+          0.0,
+          1.2
+        ],
+        "patrol_index": 0,
+        "state": "PATROL"
+      },
+      {
+        "position": [
+          1.45,
+          0.0,
+          1.2
+        ],
+        "patrol_index": 0,
+        "state": "PATROL"
+      },
+      {
+        "position": [
+          1.45,
+          0.0,
+          1.2
+        ],
+        "patrol_index": 0,
+        "state": "PATROL"
+      },
+      {
+        "position": [
+          1.45,
+          0.0,
+          1.2
+        ],
+        "patrol_index": 0,
+        "state": "PATROL"
+      },
+      {
+        "position": [
+          1.45,
+          0.0,
+          1.2
+        ],
+        "patrol_index": 0,
+        "state": "PATROL"
+      },
+      {
+        "position": [
+          1.45,
+          0.0,
+          1.2
+        ],
+        "patrol_index": 0,
+        "state": "PATROL"
+      },
+      {
+        "position": [
+          1.45,
+          0.0,
+          1.2
+        ],
+        "patrol_index": 0,
+        "state": "PATROL"
+      },
+      {
+        "position": [
+          1.45,
+          0.0,
+          1.2
+        ],
+        "patrol_index": 0,
+        "state": "PATROL"
+      },
+      {
+        "position": [
+          1.45,
+          0.0,
+          1.2
+        ],
+        "patrol_index": 0,
+        "state": "PATROL"
+      },
+      {
+        "position": [
+          1.45,
+          0.0,
+          1.2
+        ],
+        "patrol_index": 0,
+        "state": "PATROL"
+      },
+      {
+        "position": [
+          1.45,
+          0.0,
+          1.2
+        ],
+        "patrol_index": 0,
+        "state": "PATROL"
+      },
+      {
+        "position": [
+          1.45,
+          0.0,
+          1.2
+        ],
+        "patrol_index": 0,
+        "state": "PATROL"
+      },
+      {
+        "position": [
+          1.45,
+          0.0,
+          1.2
+        ],
+        "patrol_index": 0,
+        "state": "PATROL"
+      },
+      {
+        "position": [
+          1.45,
+          0.0,
+          1.2
+        ],
+        "patrol_index": 0,
+        "state": "PATROL"
+      },
+      {
+        "position": [
+          1.45,
+          0.0,
+          1.2
+        ],
+        "patrol_index": 0,
+        "state": "PATROL"
+      },
+      {
+        "position": [
+          1.45,
+          0.0,
+          1.2
+        ],
+        "patrol_index": 0,
+        "state": "PATROL"
+      },
+      {
+        "position": [
+          1.45,
+          0.0,
+          1.2
+        ],
+        "patrol_index": 0,
+        "state": "PATROL"
+      },
+      {
+        "position": [
+          1.45,
+          0.0,
+          1.2
+        ],
+        "patrol_index": 0,
+        "state": "PATROL"
+      },
+      {
+        "position": [
+          1.45,
+          0.0,
+          1.2
+        ],
+        "patrol_index": 0,
+        "state": "PATROL"
+      },
+      {
+        "position": [
+          1.45,
+          0.0,
+          1.2
+        ],
+        "patrol_index": 0,
+        "state": "PATROL"
+      },
+      {
+        "position": [
+          1.45,
+          0.0,
+          1.2
+        ],
+        "patrol_index": 0,
+        "state": "PATROL"
+      },
+      {
+        "position": [
+          1.45,
+          0.0,
+          1.2
+        ],
+        "patrol_index": 0,
+        "state": "PATROL"
+      },
+      {
+        "position": [
+          1.45,
+          0.0,
+          1.2
+        ],
+        "patrol_index": 0,
+        "state": "PATROL"
+      },
+      {
+        "position": [
+          1.45,
+          0.0,
+          1.2
+        ],
+        "patrol_index": 0,
+        "state": "PATROL"
+      },
+      {
+        "position": [
+          1.45,
+          0.0,
+          1.2
+        ],
+        "patrol_index": 0,
+        "state": "PATROL"
+      },
+      {
+        "position": [
+          1.45,
+          0.0,
+          1.2
+        ],
+        "patrol_index": 0,
+        "state": "PATROL"
+      },
+      {
+        "position": [
+          1.45,
+          0.0,
+          1.2
+        ],
+        "patrol_index": 0,
+        "state": "PATROL"
+      },
+      {
+        "position": [
+          1.45,
+          0.0,
+          1.2
+        ],
+        "patrol_index": 0,
+        "state": "PATROL"
+      },
+      {
+        "position": [
+          1.45,
+          0.0,
+          1.2
+        ],
+        "patrol_index": 0,
+        "state": "PATROL"
+      },
+      {
+        "position": [
+          1.45,
+          0.0,
+          1.2
+        ],
+        "patrol_index": 0,
+        "state": "PATROL"
+      }
+    ]
+  },
+  "runtime_allocations": [
+    {
+      "models": "2",
+      "shared_matrix_bytes": "1536",
+      "pose_scratch_arrays_bytes": "1792",
+      "normal_cache_bytes": "23928",
+      "per_enemy_motion_bytes": "8",
+      "timeline": "actual-distance",
+      "head_yaw_max": "45",
+      "head_pitch_max": "25"
+    }
+  ],
+  "nested_timings": {
+    "rsp_lighting": {
+      "frames": 1800,
+      "windows": 30,
+      "average_ms_per_frame": {
+        "probe": 1.06490912,
+        "normal": 2.2358393125925926,
+        "color_upload": 2.4883309866666665
+      },
+      "scope": "Nested CPU elapsed excluding audio; independent report windows selected inside steady interval. Do not add to parent slots."
+    },
+    "animation_profile": {
+      "frames": 1800,
+      "windows": 30,
+      "average_ms_per_frame": {
+        "sample": 1.0591873422222222,
+        "skin": 0.0
+      },
+      "scope": "Nested CPU elapsed excluding audio; independent report windows selected inside steady interval. Do not add to parent slots."
+    }
+  },
+  "limitations": [
+    "Ares CP0/VI timing model, not original N64/M64 hardware validation or host monitor presentation.",
+    "VI_ORIGIN is observed once per VI before libdragon updates it, so evidence has one-field latency.",
+    "Work excludes waiting for a free display buffer; actual VI-origin changes separately gate graphics throughput.",
+    "Exact timing samples and logging add overhead; there are no capture dumps or forced graphics waits in the measured loop.",
+    "This verifies the authored two-guard camera/route, not crowded combat or worst-case audio.",
+    "Active procedural head attention is counted; quiet patrol/sentry can report zero and does not benchmark alerted head tracking."
+  ],
+  "source_sha256": "13c4f5cf124d8a8018400fef6d937ae49e850b6e5f8fc7b50b78f4ddd48ff462",
+  "asset_sha256": "69d62710e4982a640ba515a1047bb67204fb451266c9b4e3fd4b7b7d7ff0997f",
+  "run": {
+    "name": "guard-performance",
+    "passed": true,
+    "log": ".dev\\ares\\runs\\8a3e1e94a98f4b8e99c4c24e1c4cc9cb\\guard-performance.log",
+    "tested_rom": ".dev\\ares\\runs\\8a3e1e94a98f4b8e99c4c24e1c4cc9cb\\DarkLantern64-animation_workshop-preset-two-guards-t3d.z64",
+    "rom_sha256": "57251bd8fce35edae0d83c35a11d18380613afbb9b5e48a43de3ed7cd9bf77fd",
+    "rom_bytes": 376832,
+    "settings": ".dev\\ares\\runs\\8a3e1e94a98f4b8e99c4c24e1c4cc9cb\\settings.bml",
+    "settings_source_sha256": "38509335b888565dce197812f23f450ebbb2d711090313d1786deae83d979f21",
+    "profile_report": null,
+    "elapsed_seconds": 36.813,
+    "peak_sampled_heap_bytes": 1006200,
+    "max_reported_cpu_ms": 12.53,
+    "boot": "DL64 boot_ok memory=8388608 scene=\"DarkLantern64 - Guard Animation Workshop\" meshes=2 models=12 colliders=8 version=2 world=3d renderer=rsp-tiny3d depth=hardware",
+    "terminal_event": "DL64 profile_end window=33"
+  },
+  "manifest": {
+    "signature": "c75130b639b815c7dc3efcd1213df0c727890e8eba8b0d782f3793980db3267d",
+    "compiler": "mips64-elf-gcc.exe (GCC) 16.2.0",
+    "sdk": "C:\\n64-toolchain",
+    "renderer": "t3d",
+    "renderer_dependency": {
+      "revision": "ec557373e986b5e041cc102a7ff787eb07921937",
+      "library": "external/tiny3d/build_sdk_main/libt3d.a",
+      "library_sha256": "f4ac41f4d9ada8e80bdca3d68a7484e57ca02cdf8b6b01fb43024f940327d819"
+    },
+    "kernel_flags": {
+      "render_lighting.c": [
+        "-O3"
+      ],
+      "render_transform.c": [
+        "-O3"
+      ]
+    },
+    "source_sha256": "597221bcfde4f26dd2190ac028e5b9b7c4f2274772c0cb7cba73b9858aaa1ac5",
+    "rom": "build\\DarkLantern64-animation_workshop-preset-two-guards-t3d.z64",
+    "rom_bytes": 376832,
+    "rom_sha256": "57251bd8fce35edae0d83c35a11d18380613afbb9b5e48a43de3ed7cd9bf77fd",
+    "static_image_bytes": 653856,
+    "elapsed_seconds": 6.669,
+    "autoplay": false,
+    "debug_overlay": false,
+    "capture": false,
+    "scale_bench": false,
+    "model_culling": true,
+    "level": "content\\animation_workshop.json",
+    "bundle": null,
+    "start_level": null,
+    "start_preset": "two-guards",
+    "menu_test": false,
+    "level_catalog": {
+      "version": 1,
+      "title": "DarkLantern64",
+      "levels": [
+        {
+          "id": "animation_workshop",
+          "source": "content/animation_workshop.json",
+          "cooked_dir": "build/scenes/animation_workshop",
+          "content": {
+            "version": 2,
+            "source_sha256": "597221bcfde4f26dd2190ac028e5b9b7c4f2274772c0cb7cba73b9858aaa1ac5",
+            "title": "DarkLantern64 - Guard Animation Workshop",
+            "dependencies": [
+              {
+                "uri": "models/block.obj",
+                "sha256": "75c2b7dee24119997301183cc75e75844ebb13f96ec95bc195ac1f9b066f82ed"
+              },
+              {
+                "uri": "assets/guard/guard.character.json",
+                "sha256": "69d62710e4982a640ba515a1047bb67204fb451266c9b4e3fd4b7b7d7ff0997f"
+              },
+              {
+                "uri": "assets/guard/guard-atlas.png",
+                "sha256": "45f3e1f49a7363965e1b2b8f7f331f5b69e344b62119e43f3e7fb8b7e139985b"
+              },
+              {
+                "uri": "code:src/enemy_types.def",
+                "sha256": "c7dc61a6e285278279d633a0b4e41be904bc26897e78fb1f5c61b79ccffae1e4"
+              }
+            ],
+            "counts": {
+              "entities": 17,
+              "meshes": 2,
+              "models": 12,
+              "colliders": 8,
+              "instanced_vertices": 2074,
+              "instanced_triangles": 1182,
+              "lights": 2,
+              "enemies": 2,
+              "test_starts": 2,
+              "patrol_points": 2
+            },
+            "compiled_geometry_bytes": 26285,
+            "compiled_normal_bytes": 2991,
+            "characters": {
+              "mesh-guard": {
+                "version": 1,
+                "id": "basic-guard",
+                "skeleton_id": "humanoid-v1",
+                "bones": 20,
+                "vertices": 997,
+                "triangles": 531,
+                "cross_joint_triangles": 48,
+                "clips": [
+                  {
+                    "id": "idle",
+                    "fps": 30.0,
+                    "duration": 2.0,
+                    "sample_count": 61,
+                    "dense_float_key_bytes": 34160,
+                    "dense_int16_key_bytes": 17080,
+                    "constant_stripped_key_bytes": 992,
+                    "track_descriptor_bytes_n64": 32,
+                    "event_bytes_n64": 0,
+                    "clip_descriptor_bytes_n64": 36,
+                    "omitted_rest_tracks": 36,
+                    "constant_tracks": 2,
+                    "animated_tracks": 2,
+                    "quantization_error": {
+                      "tested_pose_samples": 121,
+                      "max_vertex_error_m": 2.168431734203979e-05,
+                      "rms_vertex_error_m": 5.70867777844535e-06,
+                      "max_socket_error_m": 1.3785254729075001e-05,
+                      "bounds_min": [
+                        -0.4550001282342639,
+                        0.004000000189989698,
+                        -0.16870667665061082
+                      ],
+                      "bounds_max": [
+                        0.4550001282342639,
+                        1.8455070229741388,
+                        0.21600000560283678
+                      ],
+                      "error_scope": "All source keys and their midpoints; sampled evidence, not a continuous-time error bound."
+                    },
+                    "comparison_15hz": {
+                      "fps": 15.0,
+                      "sample_count": 31,
+                      "dense_float_key_bytes": 17360,
+                      "dense_int16_key_bytes": 8680,
+                      "constant_stripped_key_bytes": 512,
+                      "track_descriptor_bytes_n64": 32,
+                      "event_bytes_n64": 0,
+                      "clip_descriptor_bytes_n64": 36,
+                      "omitted_rest_tracks": 36,
+                      "constant_tracks": 2,
+                      "animated_tracks": 2,
+                      "error": {
+                        "tested_pose_samples": 121,
+                        "max_vertex_error_m": 9.802913754787621e-05,
+                        "rms_vertex_error_m": 1.7118707842316975e-05,
+                        "max_socket_error_m": 4.0702429293664776e-05,
+                        "bounds_min": [
+                          -0.4550001282342639,
+                          0.004000000189989698,
+                          -0.16870356749955603
+                        ],
+                        "bounds_max": [
+                          0.4550001282342639,
+                          1.8455069149711303,
+                          0.21600000560283678
+                        ],
+                        "error_scope": "All source keys and their midpoints; sampled evidence, not a continuous-time error bound."
+                      }
+                    }
+                  },
+                  {
+                    "id": "notice",
+                    "fps": 30.0,
+                    "duration": 1.4,
+                    "sample_count": 43,
+                    "dense_float_key_bytes": 24080,
+                    "dense_int16_key_bytes": 12040,
+                    "constant_stripped_key_bytes": 1376,
+                    "track_descriptor_bytes_n64": 32,
+                    "event_bytes_n64": 0,
+                    "clip_descriptor_bytes_n64": 36,
+                    "omitted_rest_tracks": 36,
+                    "constant_tracks": 0,
+                    "animated_tracks": 4,
+                    "quantization_error": {
+                      "tested_pose_samples": 85,
+                      "max_vertex_error_m": 4.0980250258314225e-05,
+                      "rms_vertex_error_m": 6.22573832717117e-06,
+                      "max_socket_error_m": 2.858400415280749e-05,
+                      "bounds_min": [
+                        -0.4550152893977268,
+                        0.004000000189989698,
+                        -0.16098839082470257
+                      ],
+                      "bounds_max": [
+                        0.45500013432192205,
+                        1.8454484011920524,
+                        0.47148428973119993
+                      ],
+                      "error_scope": "All source keys and their midpoints; sampled evidence, not a continuous-time error bound."
+                    },
+                    "comparison_15hz": {
+                      "fps": 15.000000000000002,
+                      "sample_count": 22,
+                      "dense_float_key_bytes": 12320,
+                      "dense_int16_key_bytes": 6160,
+                      "constant_stripped_key_bytes": 704,
+                      "track_descriptor_bytes_n64": 32,
+                      "event_bytes_n64": 0,
+                      "clip_descriptor_bytes_n64": 36,
+                      "omitted_rest_tracks": 36,
+                      "constant_tracks": 0,
+                      "animated_tracks": 4,
+                      "error": {
+                        "tested_pose_samples": 85,
+                        "max_vertex_error_m": 0.003019636308886621,
+                        "rms_vertex_error_m": 0.0002654952586483339,
+                        "max_socket_error_m": 0.002150813661236427,
+                        "bounds_min": [
+                          -0.4550152893977268,
+                          0.004000000189989698,
+                          -0.16097866719440895
+                        ],
+                        "bounds_max": [
+                          0.45500013432192205,
+                          1.8454482905803775,
+                          0.47148428973119993
+                        ],
+                        "error_scope": "All source keys and their midpoints; sampled evidence, not a continuous-time error bound."
+                      }
+                    }
+                  },
+                  {
+                    "id": "run",
+                    "fps": 30.0,
+                    "duration": 0.8,
+                    "sample_count": 25,
+                    "dense_float_key_bytes": 14000,
+                    "dense_int16_key_bytes": 7000,
+                    "constant_stripped_key_bytes": 2758,
+                    "track_descriptor_bytes_n64": 120,
+                    "event_bytes_n64": 8,
+                    "clip_descriptor_bytes_n64": 36,
+                    "omitted_rest_tracks": 25,
+                    "constant_tracks": 1,
+                    "animated_tracks": 14,
+                    "quantization_error": {
+                      "tested_pose_samples": 49,
+                      "max_vertex_error_m": 0.00014366440712561458,
+                      "rms_vertex_error_m": 6.667966058175771e-05,
+                      "max_socket_error_m": 0.00012491168549330983,
+                      "bounds_min": [
+                        -0.4567542850034481,
+                        0.0010693970048981562,
+                        -0.4179814624315764
+                      ],
+                      "bounds_max": [
+                        0.4567542850034481,
+                        1.7492044353015361,
+                        0.5659452872290964
+                      ],
+                      "error_scope": "All source keys and their midpoints; sampled evidence, not a continuous-time error bound."
+                    },
+                    "comparison_15hz": {
+                      "fps": 15.0,
+                      "sample_count": 13,
+                      "dense_float_key_bytes": 7280,
+                      "dense_int16_key_bytes": 3640,
+                      "constant_stripped_key_bytes": 1438,
+                      "track_descriptor_bytes_n64": 120,
+                      "event_bytes_n64": 8,
+                      "clip_descriptor_bytes_n64": 36,
+                      "omitted_rest_tracks": 25,
+                      "constant_tracks": 1,
+                      "animated_tracks": 14,
+                      "error": {
+                        "tested_pose_samples": 49,
+                        "max_vertex_error_m": 0.024015330031041227,
+                        "rms_vertex_error_m": 0.003314693257115136,
+                        "max_socket_error_m": 0.009462710977706143,
+                        "bounds_min": [
+                          -0.4567617803300672,
+                          -0.004352309488891177,
+                          -0.4179814624315764
+                        ],
+                        "bounds_max": [
+                          0.4567617803300672,
+                          1.7492044353015361,
+                          0.5659452872290964
+                        ],
+                        "error_scope": "All source keys and their midpoints; sampled evidence, not a continuous-time error bound."
+                      }
+                    }
+                  },
+                  {
+                    "id": "turn",
+                    "fps": 30.0,
+                    "duration": 1.6,
+                    "sample_count": 49,
+                    "dense_float_key_bytes": 27440,
+                    "dense_int16_key_bytes": 13720,
+                    "constant_stripped_key_bytes": 784,
+                    "track_descriptor_bytes_n64": 16,
+                    "event_bytes_n64": 0,
+                    "clip_descriptor_bytes_n64": 36,
+                    "omitted_rest_tracks": 38,
+                    "constant_tracks": 0,
+                    "animated_tracks": 2,
+                    "quantization_error": {
+                      "tested_pose_samples": 97,
+                      "max_vertex_error_m": 1.3469402050414065e-05,
+                      "rms_vertex_error_m": 3.507992951031176e-06,
+                      "max_socket_error_m": 1.1416353079223176e-05,
+                      "bounds_min": [
+                        -0.45893209860695094,
+                        0.004000000189989698,
+                        -0.1599999964237213
+                      ],
+                      "bounds_max": [
+                        0.45893209860695094,
+                        1.845000267028809,
+                        0.21600000560283678
+                      ],
+                      "error_scope": "All source keys and their midpoints; sampled evidence, not a continuous-time error bound."
+                    },
+                    "comparison_15hz": {
+                      "fps": 15.0,
+                      "sample_count": 25,
+                      "dense_float_key_bytes": 14000,
+                      "dense_int16_key_bytes": 7000,
+                      "constant_stripped_key_bytes": 400,
+                      "track_descriptor_bytes_n64": 16,
+                      "event_bytes_n64": 0,
+                      "clip_descriptor_bytes_n64": 36,
+                      "omitted_rest_tracks": 38,
+                      "constant_tracks": 0,
+                      "animated_tracks": 2,
+                      "error": {
+                        "tested_pose_samples": 97,
+                        "max_vertex_error_m": 0.0011218929420134956,
+                        "rms_vertex_error_m": 0.00022533616388756796,
+                        "max_socket_error_m": 0.0007794617752457498,
+                        "bounds_min": [
+                          -0.4589316174954788,
+                          0.004000000189989698,
+                          -0.1599999964237213
+                        ],
+                        "bounds_max": [
+                          0.4589316174954788,
+                          1.845000267028809,
+                          0.21600000560283678
+                        ],
+                        "error_scope": "All source keys and their midpoints; sampled evidence, not a continuous-time error bound."
+                      }
+                    }
+                  },
+                  {
+                    "id": "walk",
+                    "fps": 30.0,
+                    "duration": 1.2,
+                    "sample_count": 37,
+                    "dense_float_key_bytes": 20720,
+                    "dense_int16_key_bytes": 10360,
+                    "constant_stripped_key_bytes": 2910,
+                    "track_descriptor_bytes_n64": 104,
+                    "event_bytes_n64": 8,
+                    "clip_descriptor_bytes_n64": 36,
+                    "omitted_rest_tracks": 27,
+                    "constant_tracks": 3,
+                    "animated_tracks": 10,
+                    "quantization_error": {
+                      "tested_pose_samples": 73,
+                      "max_vertex_error_m": 0.0001135704598286821,
+                      "rms_vertex_error_m": 5.5136106934465835e-05,
+                      "max_socket_error_m": 0.0001085108203169663,
+                      "bounds_min": [
+                        -0.45539828364317847,
+                        0.003795218379711577,
+                        -0.31798873098116437
+                      ],
+                      "bounds_max": [
+                        0.45539828364317847,
+                        1.7748496477178217,
+                        0.46592439632611937
+                      ],
+                      "error_scope": "All source keys and their midpoints; sampled evidence, not a continuous-time error bound."
+                    },
+                    "comparison_15hz": {
+                      "fps": 15.0,
+                      "sample_count": 19,
+                      "dense_float_key_bytes": 10640,
+                      "dense_int16_key_bytes": 5320,
+                      "constant_stripped_key_bytes": 1506,
+                      "track_descriptor_bytes_n64": 104,
+                      "event_bytes_n64": 8,
+                      "clip_descriptor_bytes_n64": 36,
+                      "omitted_rest_tracks": 27,
+                      "constant_tracks": 3,
+                      "animated_tracks": 10,
+                      "error": {
+                        "tested_pose_samples": 73,
+                        "max_vertex_error_m": 0.0043671122363597974,
+                        "rms_vertex_error_m": 0.0007897281631641034,
+                        "max_socket_error_m": 0.0026974506026806832,
+                        "bounds_min": [
+                          -0.45539473823121385,
+                          0.0029606442189180878,
+                          -0.31798873098116437
+                        ],
+                        "bounds_max": [
+                          0.45539473823121385,
+                          1.7748496477178217,
+                          0.46592439632611937
+                        ],
+                        "error_scope": "All source keys and their midpoints; sampled evidence, not a continuous-time error bound."
+                      }
+                    }
+                  }
+                ],
+                "single_joint_triangles": 483,
+                "unique_bind_positions": 316,
+                "vertex_attribute_splits": {
+                  "unique_positions": 316,
+                  "with_joint_identity": 316,
+                  "with_quantized_normals": 693,
+                  "with_texture_coordinates": 997,
+                  "note": "Cumulative distinct attribute tuples, before any target cache scheduling. A shared position may still require separate vertices for normals or UV seams."
+                },
+                "joint_connections": [
+                  {
+                    "bones": [
+                      "upper_arm_l",
+                      "forearm_l"
+                    ],
+                    "triangles": 12,
+                    "referenced_vertices": 24
+                  },
+                  {
+                    "bones": [
+                      "thigh_l",
+                      "shin_l"
+                    ],
+                    "triangles": 12,
+                    "referenced_vertices": 24
+                  },
+                  {
+                    "bones": [
+                      "upper_arm_r",
+                      "forearm_r"
+                    ],
+                    "triangles": 12,
+                    "referenced_vertices": 24
+                  },
+                  {
+                    "bones": [
+                      "thigh_r",
+                      "shin_r"
+                    ],
+                    "triangles": 12,
+                    "referenced_vertices": 24
+                  }
+                ],
+                "cross_joint_skinning_note": "Triangles may reference vertices owned by different bones. Every vertex still has exactly one influence; triangles join already-deformed vertices without multi-weight interpolation.",
+                "encoded_key_bytes": 8820,
+                "dense_float_key_bytes": 120400,
+                "dense_int16_key_bytes": 60200,
+                "geometry_bytes": 26117,
+                "joint_index_bytes": 997,
+                "skeleton_descriptor_bytes_n64": 1280,
+                "asset_descriptor_bytes_n64": 52,
+                "socket_descriptor_bytes_n64": 72,
+                "clip_and_track_descriptor_bytes_n64": 500,
+                "bounds_center": [
+                  0,
+                  0,
+                  0
+                ],
+                "bounds_radius": 2.3337224945401993,
+                "bounds_policy": "Conservative hierarchy path-length sphere includes arbitrary rigid rotation, blending and head attention.",
+                "compression_policy": "Source sample rates preserved; int16 XYZW and XYZ, rest-channel removal and single-sample constants. 15 Hz is comparison only.",
+                "memory_note": "Immutable keys and geometry shared per asset. Target descriptor estimates exclude strings, final linker alignment, pose scratch, per-actor state and renderer caches; measure target sizeof separately.",
+                "source_sha256": "69d62710e4982a640ba515a1047bb67204fb451266c9b4e3fd4b7b7d7ff0997f"
+              }
+            },
+            "memory_note": "Geometry arrays only; runtime buffers, state and other data need separate RDRAM measurement. Baseline 8 MiB.",
+            "ids": {
+              "floor": {
+                "kind": "static",
+                "source_index": 0,
+                "transform": {
+                  "position": [
+                    0,
+                    -0.1,
+                    0
+                  ],
+                  "rotation": [
+                    0,
+                    0,
+                    0
+                  ],
+                  "scale": [
+                    8.4,
+                    0.2,
+                    8.4
+                  ]
+                },
+                "loot_highlight": false,
+                "model_index": 0
+              },
+              "west-wall": {
+                "kind": "static",
+                "source_index": 1,
+                "transform": {
+                  "position": [
+                    -4,
+                    1.5,
+                    0
+                  ],
+                  "rotation": [
+                    0,
+                    0,
+                    0
+                  ],
+                  "scale": [
+                    0.2,
+                    3,
+                    8.2
+                  ]
+                },
+                "loot_highlight": false,
+                "model_index": 1
+              },
+              "east-wall": {
+                "kind": "static",
+                "source_index": 2,
+                "transform": {
+                  "position": [
+                    4,
+                    1.5,
+                    0
+                  ],
+                  "rotation": [
+                    0,
+                    0,
+                    0
+                  ],
+                  "scale": [
+                    0.2,
+                    3,
+                    8.2
+                  ]
+                },
+                "loot_highlight": false,
+                "model_index": 2
+              },
+              "north-wall": {
+                "kind": "static",
+                "source_index": 3,
+                "transform": {
+                  "position": [
+                    0,
+                    1.5,
+                    -4
+                  ],
+                  "rotation": [
+                    0,
+                    0,
+                    0
+                  ],
+                  "scale": [
+                    8.2,
+                    3,
+                    0.2
+                  ]
+                },
+                "loot_highlight": false,
+                "model_index": 3
+              },
+              "south-wall": {
+                "kind": "static",
+                "source_index": 4,
+                "transform": {
+                  "position": [
+                    0,
+                    1.5,
+                    4
+                  ],
+                  "rotation": [
+                    0,
+                    0,
+                    0
+                  ],
+                  "scale": [
+                    8.2,
+                    3,
+                    0.2
+                  ]
+                },
+                "loot_highlight": false,
+                "model_index": 4
+              },
+              "divider-west": {
+                "kind": "static",
+                "source_index": 5,
+                "transform": {
+                  "position": [
+                    -2.425,
+                    1.5,
+                    0
+                  ],
+                  "rotation": [
+                    0,
+                    0,
+                    0
+                  ],
+                  "scale": [
+                    3.15,
+                    3,
+                    0.2
+                  ]
+                },
+                "loot_highlight": false,
+                "model_index": 5
+              },
+              "divider-east": {
+                "kind": "static",
+                "source_index": 6,
+                "transform": {
+                  "position": [
+                    2.425,
+                    1.5,
+                    0
+                  ],
+                  "rotation": [
+                    0,
+                    0,
+                    0
+                  ],
+                  "scale": [
+                    3.15,
+                    3,
+                    0.2
+                  ]
+                },
+                "loot_highlight": false,
+                "model_index": 6
+              },
+              "door": {
+                "kind": "door",
+                "source_index": 7,
+                "transform": {
+                  "position": [
+                    0,
+                    1.5,
+                    0
+                  ],
+                  "rotation": [
+                    0,
+                    0,
+                    0
+                  ],
+                  "scale": [
+                    1.6,
+                    3,
+                    0.15
+                  ]
+                },
+                "loot_highlight": false,
+                "model_index": 7
+              },
+              "door-switch": {
+                "kind": "control",
+                "source_index": 8,
+                "transform": {
+                  "position": [
+                    -1.05,
+                    0.9,
+                    0.25
+                  ],
+                  "rotation": [
+                    0,
+                    0,
+                    0
+                  ],
+                  "scale": [
+                    0.22,
+                    0.3,
+                    0.18
+                  ]
+                },
+                "loot_highlight": false,
+                "model_index": 8
+              },
+              "mission-relic": {
+                "kind": "objective",
+                "source_index": 9,
+                "transform": {
+                  "position": [
+                    0,
+                    0.65,
+                    -2.5
+                  ],
+                  "rotation": [
+                    0,
+                    0,
+                    0
+                  ],
+                  "scale": [
+                    0.35,
+                    0.65,
+                    0.35
+                  ]
+                },
+                "loot_highlight": false,
+                "model_index": 9
+              },
+              "player-start": {
+                "kind": "spawn",
+                "source_index": 10,
+                "transform": {
+                  "position": [
+                    0,
+                    0,
+                    3.4
+                  ],
+                  "rotation": [
+                    0,
+                    180,
+                    0
+                  ],
+                  "scale": [
+                    1,
+                    1,
+                    1
+                  ]
+                },
+                "loot_highlight": false,
+                "model_index": null
+              },
+              "entry-light": {
+                "kind": "light",
+                "source_index": 11,
+                "transform": {
+                  "position": [
+                    1.45,
+                    2.6,
+                    2.2
+                  ],
+                  "rotation": [
+                    0,
+                    0,
+                    0
+                  ],
+                  "scale": [
+                    1,
+                    1,
+                    1
+                  ]
+                },
+                "loot_highlight": false,
+                "model_index": null
+              },
+              "relic-light": {
+                "kind": "light",
+                "source_index": 12,
+                "transform": {
+                  "position": [
+                    0,
+                    2.6,
+                    -2
+                  ],
+                  "rotation": [
+                    0,
+                    0,
+                    0
+                  ],
+                  "scale": [
+                    1,
+                    1,
+                    1
+                  ]
+                },
+                "loot_highlight": false,
+                "model_index": null
+              },
+              "patrol-left": {
+                "kind": "waypoint",
+                "source_index": 13,
+                "transform": {
+                  "position": [
+                    -2.5,
+                    0,
+                    1.2
+                  ],
+                  "rotation": [
+                    0,
+                    0,
+                    0
+                  ],
+                  "scale": [
+                    1,
+                    1,
+                    1
+                  ]
+                },
+                "loot_highlight": false,
+                "model_index": null
+              },
+              "patrol-right": {
+                "kind": "waypoint",
+                "source_index": 14,
+                "transform": {
+                  "position": [
+                    -0.8,
+                    0,
+                    1.2
+                  ],
+                  "rotation": [
+                    0,
+                    0,
+                    0
+                  ],
+                  "scale": [
+                    1,
+                    1,
+                    1
+                  ]
+                },
+                "loot_highlight": false,
+                "model_index": null
+              },
+              "animated-patrol": {
+                "kind": "guard",
+                "source_index": 15,
+                "transform": {
+                  "position": [
+                    -1.25,
+                    0,
+                    1.2
+                  ],
+                  "rotation": [
+                    0,
+                    0,
+                    0
+                  ],
+                  "scale": [
+                    1,
+                    1,
+                    1
+                  ]
+                },
+                "loot_highlight": false,
+                "model_index": 10
+              },
+              "animated-sentry": {
+                "kind": "guard",
+                "source_index": 16,
+                "transform": {
+                  "position": [
+                    1.45,
+                    0,
+                    1.2
+                  ],
+                  "rotation": [
+                    0,
+                    0,
+                    0
+                  ],
+                  "scale": [
+                    1,
+                    1,
+                    1
+                  ]
+                },
+                "loot_highlight": false,
+                "model_index": 11
+              }
+            },
+            "enemy_types": [
+              {
+                "id": "watchman",
+                "label": "Watchman",
+                "speed": 0.8,
+                "sight_range": 6.5,
+                "hearing_range": 7.0
+              },
+              {
+                "id": "scout",
+                "label": "Scout",
+                "speed": 1.1,
+                "sight_range": 8.0,
+                "hearing_range": 8.0
+              }
+            ],
+            "enemy_instances": {
+              "animated-patrol": {
+                "enemy_type": "watchman",
+                "behavior": "patrol",
+                "patrol_ids": [
+                  "patrol-left",
+                  "patrol-right"
+                ],
+                "enemy_index": 0,
+                "speed": 0.8,
+                "sight_range": 0.3,
+                "hearing_range": 0.2,
+                "model_index": 10
+              },
+              "animated-sentry": {
+                "enemy_type": "watchman",
+                "behavior": "sentry",
+                "patrol_ids": [],
+                "enemy_index": 1,
+                "speed": 0.8,
+                "sight_range": 0.3,
+                "hearing_range": 0.2,
+                "model_index": 11
+              }
+            },
+            "test_starts": [
+              {
+                "id": "guard-front",
+                "label": "Guard animation close view",
+                "position": [
+                  1.45,
+                  0.0,
+                  3.4
+                ],
+                "yaw": 180.0,
+                "pitch": -16.0,
+                "door_open": false,
+                "crouched": false
+              },
+              {
+                "id": "two-guards",
+                "label": "Patrol and sentry",
+                "position": [
+                  -0.5,
+                  0.0,
+                  3.7
+                ],
+                "yaw": 180.0,
+                "pitch": -16.0,
+                "door_open": false,
+                "crouched": false
+              }
+            ],
+            "patrol_ids": [
+              "patrol-left",
+              "patrol-right"
+            ],
+            "changed_artifacts": [],
+            "elapsed_ms": 29.5,
+            "textures": {
+              "version": 1,
+              "textures": [
+                {
+                  "id": "texture-95f80c13eae4edf4",
+                  "uri": "assets/guard/guard-atlas.png",
+                  "width": 32,
+                  "height": 32,
+                  "format": "RGBA16",
+                  "decoded_bytes": 2048,
+                  "source_sha256": "45f3e1f49a7363965e1b2b8f7f331f5b69e344b62119e43f3e7fb8b7e139985b",
+                  "recipe_sha256": "95f80c13eae4edf4655e628319fa6570b6afcd8bc6c31cd44b2d6b6d684f7f67",
+                  "png_sha256": "33d9851289ae2c91912d20b3bcd2742f9df5587dc803bb7969509db3c812ce8a",
+                  "png_path": "editor-assets/textures/texture-95f80c13eae4edf4.png",
+                  "sprite_path": "romfs/textures/texture-95f80c13eae4edf4.sprite",
+                  "recipe": {
+                    "version": 1,
+                    "source_sha256": "45f3e1f49a7363965e1b2b8f7f331f5b69e344b62119e43f3e7fb8b7e139985b",
+                    "width": 32,
+                    "height": 32,
+                    "format": "RGBA16",
+                    "resize": "BOX",
+                    "quantization": "RGB555-floor-A1-threshold128",
+                    "pillow": "11.2.1",
+                    "cooker_sha256": "297b21f7c787f4b9285ed7b113099a01e45c3f5e5056535f4fa76c195bf516cf"
+                  }
+                }
+              ],
+              "decoded_bytes": 2048,
+              "memory_note": "Unique decoded pixel bytes only. Sprite headers, allocation overhead and renderer buffers are additional; TMEM holds one texture at a time."
+            }
+          },
+          "textures": {
+            "version": 1,
+            "mksprite_sha256": "82df8119bc3b59571b733195c93b9a5c507fff7dc5bd5be1caf978e24fd1caaa",
+            "flags": [
+              "-f",
+              "RGBA16",
+              "-D",
+              "NONE",
+              "-c",
+              "0"
+            ],
+            "textures": [
+              {
+                "id": "texture-95f80c13eae4edf4",
+                "uri": "assets/guard/guard-atlas.png",
+                "width": 32,
+                "height": 32,
+                "format": "RGBA16",
+                "decoded_bytes": 2048,
+                "source_sha256": "45f3e1f49a7363965e1b2b8f7f331f5b69e344b62119e43f3e7fb8b7e139985b",
+                "recipe_sha256": "95f80c13eae4edf4655e628319fa6570b6afcd8bc6c31cd44b2d6b6d684f7f67",
+                "png_sha256": "33d9851289ae2c91912d20b3bcd2742f9df5587dc803bb7969509db3c812ce8a",
+                "png_path": "editor-assets/textures/texture-95f80c13eae4edf4.png",
+                "sprite_path": "romfs/textures/texture-95f80c13eae4edf4.sprite",
+                "recipe": {
+                  "version": 1,
+                  "source_sha256": "45f3e1f49a7363965e1b2b8f7f331f5b69e344b62119e43f3e7fb8b7e139985b",
+                  "width": 32,
+                  "height": 32,
+                  "format": "RGBA16",
+                  "resize": "BOX",
+                  "quantization": "RGB555-floor-A1-threshold128",
+                  "pillow": "11.2.1",
+                  "cooker_sha256": "297b21f7c787f4b9285ed7b113099a01e45c3f5e5056535f4fa76c195bf516cf"
+                },
+                "signature": "d0df8a2c4492200d6749d0e42b6b7a96415df1e2770675285ea27216a25c37ea",
+                "sprite_bytes": 2184,
+                "sprite_sha256": "8c0690447ff958b2bb870931406becdcdd672e62d18295011043cfe13773bb9f"
+              }
+            ],
+            "decoded_bytes": 2048,
+            "sprite_bytes": 2184
+          }
+        }
+      ],
+      "initial_level": 0,
+      "initial_start": 1,
+      "start_in_menu": false,
+      "textures": {
+        "version": 1,
+        "textures": [
+          {
+            "id": "texture-95f80c13eae4edf4",
+            "uri": "assets/guard/guard-atlas.png",
+            "width": 32,
+            "height": 32,
+            "format": "RGBA16",
+            "decoded_bytes": 2048,
+            "source_sha256": "45f3e1f49a7363965e1b2b8f7f331f5b69e344b62119e43f3e7fb8b7e139985b",
+            "recipe_sha256": "95f80c13eae4edf4655e628319fa6570b6afcd8bc6c31cd44b2d6b6d684f7f67",
+            "png_sha256": "33d9851289ae2c91912d20b3bcd2742f9df5587dc803bb7969509db3c812ce8a",
+            "png_path": "editor-assets/textures/texture-95f80c13eae4edf4.png",
+            "sprite_path": "romfs/textures/texture-95f80c13eae4edf4.sprite",
+            "recipe": {
+              "version": 1,
+              "source_sha256": "45f3e1f49a7363965e1b2b8f7f331f5b69e344b62119e43f3e7fb8b7e139985b",
+              "width": 32,
+              "height": 32,
+              "format": "RGBA16",
+              "resize": "BOX",
+              "quantization": "RGB555-floor-A1-threshold128",
+              "pillow": "11.2.1",
+              "cooker_sha256": "297b21f7c787f4b9285ed7b113099a01e45c3f5e5056535f4fa76c195bf516cf"
+            },
+            "signature": "d0df8a2c4492200d6749d0e42b6b7a96415df1e2770675285ea27216a25c37ea",
+            "sprite_bytes": 2184,
+            "sprite_sha256": "8c0690447ff958b2bb870931406becdcdd672e62d18295011043cfe13773bb9f"
+          }
+        ],
+        "decoded_bytes": 2048,
+        "sprite_bytes": 2184,
+        "maximum_level_decoded_bytes": 2048,
+        "maximum_level_sprite_bytes": 2184
+      },
+      "resident_geometry_bytes": 26285,
+      "memory_note": "All bundled geometry and descriptors are resident. Only the active level's sprites are loaded; maximum_level_sprite_bytes excludes allocator overhead. Renderer, game, audio and display buffers are additional.",
+      "characters": {
+        "unique_assets": 1,
+        "shared_geometry_bytes": 26117,
+        "geometry_duplication_avoided_bytes": 0,
+        "shared_key_bytes": 8820,
+        "assets": [
+          {
+            "version": 1,
+            "id": "basic-guard",
+            "skeleton_id": "humanoid-v1",
+            "bones": 20,
+            "vertices": 997,
+            "triangles": 531,
+            "cross_joint_triangles": 48,
+            "clips": [
+              {
+                "id": "idle",
+                "fps": 30.0,
+                "duration": 2.0,
+                "sample_count": 61,
+                "dense_float_key_bytes": 34160,
+                "dense_int16_key_bytes": 17080,
+                "constant_stripped_key_bytes": 992,
+                "track_descriptor_bytes_n64": 32,
+                "event_bytes_n64": 0,
+                "clip_descriptor_bytes_n64": 36,
+                "omitted_rest_tracks": 36,
+                "constant_tracks": 2,
+                "animated_tracks": 2,
+                "quantization_error": {
+                  "tested_pose_samples": 121,
+                  "max_vertex_error_m": 2.168431734203979e-05,
+                  "rms_vertex_error_m": 5.70867777844535e-06,
+                  "max_socket_error_m": 1.3785254729075001e-05,
+                  "bounds_min": [
+                    -0.4550001282342639,
+                    0.004000000189989698,
+                    -0.16870667665061082
+                  ],
+                  "bounds_max": [
+                    0.4550001282342639,
+                    1.8455070229741388,
+                    0.21600000560283678
+                  ],
+                  "error_scope": "All source keys and their midpoints; sampled evidence, not a continuous-time error bound."
+                },
+                "comparison_15hz": {
+                  "fps": 15.0,
+                  "sample_count": 31,
+                  "dense_float_key_bytes": 17360,
+                  "dense_int16_key_bytes": 8680,
+                  "constant_stripped_key_bytes": 512,
+                  "track_descriptor_bytes_n64": 32,
+                  "event_bytes_n64": 0,
+                  "clip_descriptor_bytes_n64": 36,
+                  "omitted_rest_tracks": 36,
+                  "constant_tracks": 2,
+                  "animated_tracks": 2,
+                  "error": {
+                    "tested_pose_samples": 121,
+                    "max_vertex_error_m": 9.802913754787621e-05,
+                    "rms_vertex_error_m": 1.7118707842316975e-05,
+                    "max_socket_error_m": 4.0702429293664776e-05,
+                    "bounds_min": [
+                      -0.4550001282342639,
+                      0.004000000189989698,
+                      -0.16870356749955603
+                    ],
+                    "bounds_max": [
+                      0.4550001282342639,
+                      1.8455069149711303,
+                      0.21600000560283678
+                    ],
+                    "error_scope": "All source keys and their midpoints; sampled evidence, not a continuous-time error bound."
+                  }
+                }
+              },
+              {
+                "id": "notice",
+                "fps": 30.0,
+                "duration": 1.4,
+                "sample_count": 43,
+                "dense_float_key_bytes": 24080,
+                "dense_int16_key_bytes": 12040,
+                "constant_stripped_key_bytes": 1376,
+                "track_descriptor_bytes_n64": 32,
+                "event_bytes_n64": 0,
+                "clip_descriptor_bytes_n64": 36,
+                "omitted_rest_tracks": 36,
+                "constant_tracks": 0,
+                "animated_tracks": 4,
+                "quantization_error": {
+                  "tested_pose_samples": 85,
+                  "max_vertex_error_m": 4.0980250258314225e-05,
+                  "rms_vertex_error_m": 6.22573832717117e-06,
+                  "max_socket_error_m": 2.858400415280749e-05,
+                  "bounds_min": [
+                    -0.4550152893977268,
+                    0.004000000189989698,
+                    -0.16098839082470257
+                  ],
+                  "bounds_max": [
+                    0.45500013432192205,
+                    1.8454484011920524,
+                    0.47148428973119993
+                  ],
+                  "error_scope": "All source keys and their midpoints; sampled evidence, not a continuous-time error bound."
+                },
+                "comparison_15hz": {
+                  "fps": 15.000000000000002,
+                  "sample_count": 22,
+                  "dense_float_key_bytes": 12320,
+                  "dense_int16_key_bytes": 6160,
+                  "constant_stripped_key_bytes": 704,
+                  "track_descriptor_bytes_n64": 32,
+                  "event_bytes_n64": 0,
+                  "clip_descriptor_bytes_n64": 36,
+                  "omitted_rest_tracks": 36,
+                  "constant_tracks": 0,
+                  "animated_tracks": 4,
+                  "error": {
+                    "tested_pose_samples": 85,
+                    "max_vertex_error_m": 0.003019636308886621,
+                    "rms_vertex_error_m": 0.0002654952586483339,
+                    "max_socket_error_m": 0.002150813661236427,
+                    "bounds_min": [
+                      -0.4550152893977268,
+                      0.004000000189989698,
+                      -0.16097866719440895
+                    ],
+                    "bounds_max": [
+                      0.45500013432192205,
+                      1.8454482905803775,
+                      0.47148428973119993
+                    ],
+                    "error_scope": "All source keys and their midpoints; sampled evidence, not a continuous-time error bound."
+                  }
+                }
+              },
+              {
+                "id": "run",
+                "fps": 30.0,
+                "duration": 0.8,
+                "sample_count": 25,
+                "dense_float_key_bytes": 14000,
+                "dense_int16_key_bytes": 7000,
+                "constant_stripped_key_bytes": 2758,
+                "track_descriptor_bytes_n64": 120,
+                "event_bytes_n64": 8,
+                "clip_descriptor_bytes_n64": 36,
+                "omitted_rest_tracks": 25,
+                "constant_tracks": 1,
+                "animated_tracks": 14,
+                "quantization_error": {
+                  "tested_pose_samples": 49,
+                  "max_vertex_error_m": 0.00014366440712561458,
+                  "rms_vertex_error_m": 6.667966058175771e-05,
+                  "max_socket_error_m": 0.00012491168549330983,
+                  "bounds_min": [
+                    -0.4567542850034481,
+                    0.0010693970048981562,
+                    -0.4179814624315764
+                  ],
+                  "bounds_max": [
+                    0.4567542850034481,
+                    1.7492044353015361,
+                    0.5659452872290964
+                  ],
+                  "error_scope": "All source keys and their midpoints; sampled evidence, not a continuous-time error bound."
+                },
+                "comparison_15hz": {
+                  "fps": 15.0,
+                  "sample_count": 13,
+                  "dense_float_key_bytes": 7280,
+                  "dense_int16_key_bytes": 3640,
+                  "constant_stripped_key_bytes": 1438,
+                  "track_descriptor_bytes_n64": 120,
+                  "event_bytes_n64": 8,
+                  "clip_descriptor_bytes_n64": 36,
+                  "omitted_rest_tracks": 25,
+                  "constant_tracks": 1,
+                  "animated_tracks": 14,
+                  "error": {
+                    "tested_pose_samples": 49,
+                    "max_vertex_error_m": 0.024015330031041227,
+                    "rms_vertex_error_m": 0.003314693257115136,
+                    "max_socket_error_m": 0.009462710977706143,
+                    "bounds_min": [
+                      -0.4567617803300672,
+                      -0.004352309488891177,
+                      -0.4179814624315764
+                    ],
+                    "bounds_max": [
+                      0.4567617803300672,
+                      1.7492044353015361,
+                      0.5659452872290964
+                    ],
+                    "error_scope": "All source keys and their midpoints; sampled evidence, not a continuous-time error bound."
+                  }
+                }
+              },
+              {
+                "id": "turn",
+                "fps": 30.0,
+                "duration": 1.6,
+                "sample_count": 49,
+                "dense_float_key_bytes": 27440,
+                "dense_int16_key_bytes": 13720,
+                "constant_stripped_key_bytes": 784,
+                "track_descriptor_bytes_n64": 16,
+                "event_bytes_n64": 0,
+                "clip_descriptor_bytes_n64": 36,
+                "omitted_rest_tracks": 38,
+                "constant_tracks": 0,
+                "animated_tracks": 2,
+                "quantization_error": {
+                  "tested_pose_samples": 97,
+                  "max_vertex_error_m": 1.3469402050414065e-05,
+                  "rms_vertex_error_m": 3.507992951031176e-06,
+                  "max_socket_error_m": 1.1416353079223176e-05,
+                  "bounds_min": [
+                    -0.45893209860695094,
+                    0.004000000189989698,
+                    -0.1599999964237213
+                  ],
+                  "bounds_max": [
+                    0.45893209860695094,
+                    1.845000267028809,
+                    0.21600000560283678
+                  ],
+                  "error_scope": "All source keys and their midpoints; sampled evidence, not a continuous-time error bound."
+                },
+                "comparison_15hz": {
+                  "fps": 15.0,
+                  "sample_count": 25,
+                  "dense_float_key_bytes": 14000,
+                  "dense_int16_key_bytes": 7000,
+                  "constant_stripped_key_bytes": 400,
+                  "track_descriptor_bytes_n64": 16,
+                  "event_bytes_n64": 0,
+                  "clip_descriptor_bytes_n64": 36,
+                  "omitted_rest_tracks": 38,
+                  "constant_tracks": 0,
+                  "animated_tracks": 2,
+                  "error": {
+                    "tested_pose_samples": 97,
+                    "max_vertex_error_m": 0.0011218929420134956,
+                    "rms_vertex_error_m": 0.00022533616388756796,
+                    "max_socket_error_m": 0.0007794617752457498,
+                    "bounds_min": [
+                      -0.4589316174954788,
+                      0.004000000189989698,
+                      -0.1599999964237213
+                    ],
+                    "bounds_max": [
+                      0.4589316174954788,
+                      1.845000267028809,
+                      0.21600000560283678
+                    ],
+                    "error_scope": "All source keys and their midpoints; sampled evidence, not a continuous-time error bound."
+                  }
+                }
+              },
+              {
+                "id": "walk",
+                "fps": 30.0,
+                "duration": 1.2,
+                "sample_count": 37,
+                "dense_float_key_bytes": 20720,
+                "dense_int16_key_bytes": 10360,
+                "constant_stripped_key_bytes": 2910,
+                "track_descriptor_bytes_n64": 104,
+                "event_bytes_n64": 8,
+                "clip_descriptor_bytes_n64": 36,
+                "omitted_rest_tracks": 27,
+                "constant_tracks": 3,
+                "animated_tracks": 10,
+                "quantization_error": {
+                  "tested_pose_samples": 73,
+                  "max_vertex_error_m": 0.0001135704598286821,
+                  "rms_vertex_error_m": 5.5136106934465835e-05,
+                  "max_socket_error_m": 0.0001085108203169663,
+                  "bounds_min": [
+                    -0.45539828364317847,
+                    0.003795218379711577,
+                    -0.31798873098116437
+                  ],
+                  "bounds_max": [
+                    0.45539828364317847,
+                    1.7748496477178217,
+                    0.46592439632611937
+                  ],
+                  "error_scope": "All source keys and their midpoints; sampled evidence, not a continuous-time error bound."
+                },
+                "comparison_15hz": {
+                  "fps": 15.0,
+                  "sample_count": 19,
+                  "dense_float_key_bytes": 10640,
+                  "dense_int16_key_bytes": 5320,
+                  "constant_stripped_key_bytes": 1506,
+                  "track_descriptor_bytes_n64": 104,
+                  "event_bytes_n64": 8,
+                  "clip_descriptor_bytes_n64": 36,
+                  "omitted_rest_tracks": 27,
+                  "constant_tracks": 3,
+                  "animated_tracks": 10,
+                  "error": {
+                    "tested_pose_samples": 73,
+                    "max_vertex_error_m": 0.0043671122363597974,
+                    "rms_vertex_error_m": 0.0007897281631641034,
+                    "max_socket_error_m": 0.0026974506026806832,
+                    "bounds_min": [
+                      -0.45539473823121385,
+                      0.0029606442189180878,
+                      -0.31798873098116437
+                    ],
+                    "bounds_max": [
+                      0.45539473823121385,
+                      1.7748496477178217,
+                      0.46592439632611937
+                    ],
+                    "error_scope": "All source keys and their midpoints; sampled evidence, not a continuous-time error bound."
+                  }
+                }
+              }
+            ],
+            "single_joint_triangles": 483,
+            "unique_bind_positions": 316,
+            "vertex_attribute_splits": {
+              "unique_positions": 316,
+              "with_joint_identity": 316,
+              "with_quantized_normals": 693,
+              "with_texture_coordinates": 997,
+              "note": "Cumulative distinct attribute tuples, before any target cache scheduling. A shared position may still require separate vertices for normals or UV seams."
+            },
+            "joint_connections": [
+              {
+                "bones": [
+                  "upper_arm_l",
+                  "forearm_l"
+                ],
+                "triangles": 12,
+                "referenced_vertices": 24
+              },
+              {
+                "bones": [
+                  "thigh_l",
+                  "shin_l"
+                ],
+                "triangles": 12,
+                "referenced_vertices": 24
+              },
+              {
+                "bones": [
+                  "upper_arm_r",
+                  "forearm_r"
+                ],
+                "triangles": 12,
+                "referenced_vertices": 24
+              },
+              {
+                "bones": [
+                  "thigh_r",
+                  "shin_r"
+                ],
+                "triangles": 12,
+                "referenced_vertices": 24
+              }
+            ],
+            "cross_joint_skinning_note": "Triangles may reference vertices owned by different bones. Every vertex still has exactly one influence; triangles join already-deformed vertices without multi-weight interpolation.",
+            "encoded_key_bytes": 8820,
+            "dense_float_key_bytes": 120400,
+            "dense_int16_key_bytes": 60200,
+            "geometry_bytes": 26117,
+            "joint_index_bytes": 997,
+            "skeleton_descriptor_bytes_n64": 1280,
+            "asset_descriptor_bytes_n64": 52,
+            "socket_descriptor_bytes_n64": 72,
+            "clip_and_track_descriptor_bytes_n64": 500,
+            "bounds_center": [
+              0,
+              0,
+              0
+            ],
+            "bounds_radius": 2.3337224945401993,
+            "bounds_policy": "Conservative hierarchy path-length sphere includes arbitrary rigid rotation, blending and head attention.",
+            "compression_policy": "Source sample rates preserved; int16 XYZW and XYZ, rest-channel removal and single-sample constants. 15 Hz is comparison only.",
+            "memory_note": "Immutable keys and geometry shared per asset. Target descriptor estimates exclude strings, final linker alignment, pose scratch, per-actor state and renderer caches; measure target sizeof separately.",
+            "source_sha256": "69d62710e4982a640ba515a1047bb67204fb451266c9b4e3fd4b7b7d7ff0997f"
+          }
+        ],
+        "memory_note": "Character geometry, skeletons, clips and sockets are emitted once per content hash in a dedicated C unit, shared across levels and actors. Level mesh descriptors and actor render caches remain per instance/level."
+      }
+    },
+    "textures": {
+      "version": 1,
+      "mksprite_sha256": "82df8119bc3b59571b733195c93b9a5c507fff7dc5bd5be1caf978e24fd1caaa",
+      "flags": [
+        "-f",
+        "RGBA16",
+        "-D",
+        "NONE",
+        "-c",
+        "0"
+      ],
+      "textures": [
+        {
+          "id": "texture-95f80c13eae4edf4",
+          "uri": "assets/guard/guard-atlas.png",
+          "width": 32,
+          "height": 32,
+          "format": "RGBA16",
+          "decoded_bytes": 2048,
+          "source_sha256": "45f3e1f49a7363965e1b2b8f7f331f5b69e344b62119e43f3e7fb8b7e139985b",
+          "recipe_sha256": "95f80c13eae4edf4655e628319fa6570b6afcd8bc6c31cd44b2d6b6d684f7f67",
+          "png_sha256": "33d9851289ae2c91912d20b3bcd2742f9df5587dc803bb7969509db3c812ce8a",
+          "png_path": "editor-assets/textures/texture-95f80c13eae4edf4.png",
+          "sprite_path": "romfs/textures/texture-95f80c13eae4edf4.sprite",
+          "recipe": {
+            "version": 1,
+            "source_sha256": "45f3e1f49a7363965e1b2b8f7f331f5b69e344b62119e43f3e7fb8b7e139985b",
+            "width": 32,
+            "height": 32,
+            "format": "RGBA16",
+            "resize": "BOX",
+            "quantization": "RGB555-floor-A1-threshold128",
+            "pillow": "11.2.1",
+            "cooker_sha256": "297b21f7c787f4b9285ed7b113099a01e45c3f5e5056535f4fa76c195bf516cf"
+          },
+          "signature": "d0df8a2c4492200d6749d0e42b6b7a96415df1e2770675285ea27216a25c37ea",
+          "sprite_bytes": 2184,
+          "sprite_sha256": "8c0690447ff958b2bb870931406becdcdd672e62d18295011043cfe13773bb9f"
+        }
+      ],
+      "decoded_bytes": 2048,
+      "sprite_bytes": 2184
+    },
+    "size_output": "   text\t   data\t    bss\t    dec\t    hex\tfilename\n 362580\t  32672\t 258604\t 653856\t  9fa20\tC:/Users/hughe/dev/DarkLantern64/build/DarkLantern64-animation_workshop-preset-two-guards-t3d/DarkLantern64-animation_workshop-preset-two-guards-t3d.elf\n"
+  },
+  "baseline_report": "build/guard-60fps/baseline-two-guards.json",
+  "visibility_evidence": {
+    "path": "docs/evidence/guard-60fps-visibility.json",
+    "sha256": "26fb83cc3bea0a87e15f51e5a0b50430c1faac66644a4d0cc0a566d7548e76b2",
+    "method": "separate-framebuffer-visual-review",
+    "preset": "two-guards",
+    "renderer": "t3d",
+    "source_sha256": "13c4f5cf124d8a8018400fef6d937ae49e850b6e5f8fc7b50b78f4ddd48ff462",
+    "asset_sha256": "69d62710e4982a640ba515a1047bb67204fb451266c9b4e3fd4b7b7d7ff0997f",
+    "capture_rom_sha256": "41a01227e4d7498dd194817d1c019b130034b3aaa4e23d63b2f575f2521c16a1",
+    "images": [
+      {
+        "path": "../images/guard-rsp-two-idle.png",
+        "sha256": "f4afdfdf250abe63ee8583d4d5983d0442b051beee2d1126ae245be997666237"
+      },
+      {
+        "path": "../images/guard-rsp-two-walk.png",
+        "sha256": "972e1b153f0a4d4990ab1fec02219583e9ca7b4b2f8807ecbcee3065d59185f8"
+      }
+    ],
+    "visible_guards": [
+      "animated-patrol",
+      "animated-sentry"
+    ],
+    "reviewer": "Codex: inspected both raw RDP framebuffer exports. Both guards, their articulated limbs, textured materials and HUD are visible. The right guard has extremities near the viewport edge; full-body coverage is not an acceptance claim.",
+    "limitations": "Separate frozen animation-phase captures prove visible geometry. The performance run independently uses live patrol movement, idle sentry, normal audio and gameplay; capture synchronization/logging is excluded from that run."
+  },
+  "archived_report_sha256": "3195b4d2cac4d0c4119849aefe23c50b866f3ed37db2441a6508ba26978048f1",
+  "archive_note": "Project-local absolute paths normalized to repository-relative paths; measurement values and content/ROM/log hashes preserved."
+}

@@ -2,7 +2,9 @@
 import hashlib
 import importlib.util
 import json
+import os
 from pathlib import Path
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -28,9 +30,59 @@ def window(number=1, samples=None, debug=0, rate=1000, audio_calls=0):
     return "\n".join(lines) + "\n"
 
 
+def window_v2(number=1, samples=None, vis=2, presents=2, rate=1000):
+    samples = samples or [{'gameplay': 9, 'display_wait': 7, 'audio_mix': 1},
+                          {'gameplay': 11, 'display_wait': 5, 'audio_mix': 1}]
+    text = window(number, samples, rate=rate, audio_calls=len(samples))
+    elapsed = ','.join(f'{sum(s.values()):x}' for s in samples)
+    work = ','.join(f'{sum(s.values())-s.get("display_wait",0):x}' for s in samples)
+    extra = f'DL64 profile_samples window={number} first=0 count={len(samples)} elapsed={elapsed} work={work}\n'
+    extra += (f'DL64 profile_video window={number} tracked=1 vis={vis} presents={presents} '
+              f'repeats={vis-presents} ticks={vis*17} max_gap_vis={1 if vis==presents else 2} max_interval_ticks=17\n')
+    extra += f'DL64 profile_workload window={number} frames={len(samples)} geometry_mode=0 '
+    extra += ' '.join(f'{name}_{bound}={900 if name=="triangles" else 2}'
+                      for name in profiler.WORKLOAD_NAMES for bound in ('min','max')) + '\n'
+    return text.replace(f'DL64 profile_end window={number}\n', extra + f'DL64 profile_end window={number}\n')
+
+
+V2 = 'DL64 profile_enabled version=2 budget_fps=60 clock=cp0_count audio=exclusive waits=elapsed sample_capacity=128 video=vi_origin\n'
+
+
 class ProfileReportTests(unittest.TestCase):
     def report(self, text):
         return profiler.make_report(text.encode("utf-8"), ROOT / ".dev/test-profile.log")
+
+    def test_host_profiler_buffered_protocol_and_parser_roundtrip(self):
+        """The real writer must preserve records across its 512-byte chunks."""
+        compiler = next((str(path) for path in (Path('C:/msys64/ucrt64/bin/gcc.exe'),)
+                         if path.is_file()), None) or shutil.which('gcc')
+        if not compiler:
+            self.skipTest('Host GCC is unavailable')
+        environment = dict(os.environ, PATH=str(Path(compiler).parent)+os.pathsep+os.environ.get('PATH', ''))
+        with tempfile.TemporaryDirectory() as temporary:
+            executable = Path(temporary)/('profile.exe' if os.name == 'nt' else 'profile')
+            subprocess.run([compiler, '-std=c17', '-O2', '-Wall', '-Wextra', '-Werror',
+                            '-DDL_PROFILE_TEST', '-I'+str(ROOT/'src'), str(ROOT/'src/dl_profile.c'),
+                            str(ROOT/'tests/test_profile.c'), '-lm', '-o', str(executable)],
+                           env=environment, check=True, capture_output=True)
+            raw = subprocess.check_output([str(executable)], env=environment)
+        text = raw.decode().replace('\r\n', '\n')
+        expected = window(samples=[{'input': 20, 'display_wait': 32, 'audio_mix': 18, 'other': 30}],
+                          audio_calls=2)
+        extra = 'DL64 profile_samples window=1 first=0 count=1 elapsed=64 work=44\n'
+        extra += ('DL64 profile_video window=1 tracked=0 vis=0 presents=0 repeats=0 '
+                  'ticks=0 max_gap_vis=0 max_interval_ticks=0\n')
+        extra += 'DL64 profile_workload window=1 frames=0 geometry_mode=0 '
+        extra += ' '.join(f'{name}_{bound}=0' for name in profiler.WORKLOAD_NAMES
+                          for bound in ('min', 'max')) + '\n'
+        expected = V2 + expected.replace('DL64 profile_end window=1\n', extra+'DL64 profile_end window=1\n')
+        self.assertGreater(len(expected), 1024)
+        self.assertEqual(text[:len(expected)], expected)
+        report = self.report(text)
+        self.assertEqual(report['frames'], 11)
+        self.assertEqual(report['complete_windows'], 8)
+        self.assertIn('elapsed=0 work=0\n', text)
+        self.assertIn('elapsed=ffffffff work=ffffffff\n', text)
 
     def test_frame_weighted_totals_budget_and_provenance(self):
         text = "Loaded DarkLantern64\n" + window(samples=[{"input": 10, "other": 10}] * 2)
@@ -54,6 +106,51 @@ class ProfileReportTests(unittest.TestCase):
         self.assertEqual(report["frame"]["max_ms"], 20)
         self.assertEqual(report["slots"]["input"]["max_ms"], 20)
         self.assertEqual(report["slots"]["other"]["max_ms"], 20)
+
+    def test_v2_exact_distributions_and_native_presents(self):
+        report = self.report(V2 + window_v2() + window_v2(2, vis=3, presents=2))
+        self.assertEqual(report['target_fps'], 60)
+        self.assertAlmostEqual(report['frame_budget_ms'], 1000/60)
+        self.assertEqual(report['distributions']['work']['p50_ms'], 10)
+        self.assertEqual(report['distributions']['work']['p95_ms'], 12)
+        self.assertEqual(report['distributions']['elapsed']['over_budget_frames'], 4)
+        self.assertEqual(report['distributions']['work']['over_budget_frames'], 0)
+        self.assertEqual(report['video']['presents'], 4)
+        self.assertEqual(report['video']['repeats'], 1)
+        self.assertEqual(report['video']['max_gap_vis'], 2)
+        self.assertAlmostEqual(report['video']['presented_fps'], 4/.085)
+        self.assertEqual(report['workload']['heads_min'], 2)
+        self.assertAlmostEqual(report['slots']['gameplay']['percent_of_frame_budget'], 60)
+
+    def test_v2_warmup_selection_validates_whole_log_before_discarding(self):
+        text = V2 + window_v2() + window_v2(2)
+        report = profiler.make_report(text.encode(), ROOT/'fixture.log', skip_windows=1, target_fps=120)
+        self.assertEqual(report['selected_window_ids'], [2])
+        self.assertEqual(report['configured_target_fps'], 60)
+        self.assertEqual(report['target_fps'], 120)
+        self.assertEqual(report['frames'], 2)
+        self.assertEqual(report['distributions']['work']['over_budget_frames'], 2)
+        with self.assertRaises(profiler.ProfileError):
+            profiler.make_report(text.replace('presents=2 repeats=0','presents=1 repeats=0',1).encode(),
+                                 ROOT/'fixture.log', skip_windows=1)
+
+    def test_v2_corrupt_samples_and_missing_instrumentation_rejected(self):
+        for before, after in [('first=0','first=1'), ('count=2','count=1'),
+                              ('work=a,c','work=a,12'), ('elapsed=11,11','elapsed=10,11'),
+                              ('presents=2','presents=1'), ('full_min=2','full_min=3')]:
+            with self.subTest(after=after), self.assertRaises(profiler.ProfileError):
+                self.report(V2 + window_v2().replace(before, after))
+        with self.assertRaisesRegex(profiler.ProfileError, 'missing samples'):
+            self.report(V2 + window())
+
+    def test_v1_configuration_and_explicit_budget_override(self):
+        text='DL64 profile_enabled version=1 budget_fps=30 clock=cp0_count audio=exclusive waits=elapsed\n'+window()
+        report=profiler.make_report(text.encode(), ROOT/'fixture.log', target_fps=60)
+        self.assertFalse(report['exact_frame_samples_available'])
+        self.assertEqual(report['target_fps'],60)
+        self.assertEqual(report['configured_target_fps'],30)
+        with self.assertRaises(profiler.ProfileError):
+            self.report(text.replace('budget_fps=30','budget_fps=0'))
 
     def test_trailing_partial_block_is_not_included(self):
         text = window() + window(2).split("DL64 profile_slot window=2 name=transforms")[0]

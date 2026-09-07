@@ -1,0 +1,239 @@
+{
+  "schema_version": 1,
+  "passed": true,
+  "scope": "Default Tiny3D mission and bundled-level correctness regressions; not a performance acceptance measurement.",
+  "started_at_utc": "2026-09-07T03:24:57Z",
+  "commands": [
+    "python tools/smoke_ares.py",
+    "python tools/smoke_bundle.py"
+  ],
+  "renderer": "t3d",
+  "tiny3d_revision": "ec557373e986b5e041cc102a7ff787eb07921937",
+  "tiny3d_library_sha256": "f4ac41f4d9ada8e80bdca3d68a7484e57ca02cdf8b6b01fb43024f940327d819",
+  "mission_checks": {
+    "four_mib_expansion_pak_rejection": true,
+    "eight_mib_full_3d_boot": true,
+    "uncaught_scripted_heist_completed": true,
+    "audio_callback_active": true,
+    "rom_hash_content_and_replay_mode_match_manifest": true
+  },
+  "bundle_checks": [
+    "Ordinary menu renders without starting a level; 4 MiB boot gate works",
+    "Every bundled default/test start launches and restarts three times",
+    "Position, view, stance, door and clean mission state match authored starts",
+    "Repeated textured/untextured switches reach a stable per-start heap",
+    "Menu resume preserves paused simulation time",
+    "Both bundle and standalone ROMs bypass the menu into a named start"
+  ],
+  "bundled_levels": 4,
+  "start_variants": 11,
+  "launch_restart_transitions": 66,
+  "resume_checks": 33,
+  "heap_by_start": {
+    "lantern-store/default": {
+      "samples": 6,
+      "minimum_bytes": 1106680,
+      "maximum_bytes": 1106680,
+      "steady_bytes": 1106680,
+      "steady_after_first_launch_restart_pair": true
+    },
+    "lantern-store/loot-crate": {
+      "samples": 6,
+      "minimum_bytes": 1106680,
+      "maximum_bytes": 1106680,
+      "steady_bytes": 1106680,
+      "steady_after_first_launch_restart_pair": true
+    },
+    "moonlit-yard/default": {
+      "samples": 6,
+      "minimum_bytes": 1191040,
+      "maximum_bytes": 1191040,
+      "steady_bytes": 1191040,
+      "steady_after_first_launch_restart_pair": true
+    },
+    "moonlit-yard/loot-counter": {
+      "samples": 6,
+      "minimum_bytes": 1191040,
+      "maximum_bytes": 1191040,
+      "steady_bytes": 1191040,
+      "steady_after_first_launch_restart_pair": true
+    },
+    "enemy-workshop/default": {
+      "samples": 6,
+      "minimum_bytes": 1160024,
+      "maximum_bytes": 1160024,
+      "steady_bytes": 1160024,
+      "steady_after_first_launch_restart_pair": true
+    },
+    "enemy-workshop/store-door-open": {
+      "samples": 6,
+      "minimum_bytes": 1160024,
+      "maximum_bytes": 1160024,
+      "steady_bytes": 1160024,
+      "steady_after_first_launch_restart_pair": true
+    },
+    "enemy-workshop/scout-observation": {
+      "samples": 6,
+      "minimum_bytes": 1160024,
+      "maximum_bytes": 1160024,
+      "steady_bytes": 1160024,
+      "steady_after_first_launch_restart_pair": true
+    },
+    "enemy-workshop/loot-crate": {
+      "samples": 6,
+      "minimum_bytes": 1160024,
+      "maximum_bytes": 1160024,
+      "steady_bytes": 1160024,
+      "steady_after_first_launch_restart_pair": true
+    },
+    "animation_workshop/default": {
+      "samples": 6,
+      "minimum_bytes": 1006248,
+      "maximum_bytes": 1006248,
+      "steady_bytes": 1006248,
+      "steady_after_first_launch_restart_pair": true
+    },
+    "animation_workshop/guard-front": {
+      "samples": 6,
+      "minimum_bytes": 1006248,
+      "maximum_bytes": 1006248,
+      "steady_bytes": 1006248,
+      "steady_after_first_launch_restart_pair": true
+    },
+    "animation_workshop/two-guards": {
+      "samples": 6,
+      "minimum_bytes": 1006248,
+      "maximum_bytes": 1006248,
+      "steady_bytes": 1006248,
+      "steady_after_first_launch_restart_pair": true
+    }
+  },
+  "maximum_steady_level_heap_bytes": 1191040,
+  "roms": {
+    "DarkLantern64-t3d.z64": {
+      "sha256": "73222bfe1281d9123e99e147969c3ee4db03fa9a0b29b1bb757048061441db74",
+      "bytes": 376832,
+      "build_signature": "53fd56354e34a064008075b8c3f9b74176432fec2ef7b91836e97dfb16a9c9bd",
+      "source_sha256": "38afc6d393b6a224dc8cb7ec6b5fe5cfbe5afeead82ed1d16e13c3f826bf8a98",
+      "renderer": "t3d",
+      "autoplay": false,
+      "menu_test": false
+    },
+    "DarkLantern64-autoplay-t3d.z64": {
+      "sha256": "300ac78ede641a37b2900400a87d9ee053f4c630b709c934f1cf51dfa1f76eb6",
+      "bytes": 376832,
+      "build_signature": "c2a6c921d62f7fbe01d8ddcd958ddf9b122d3d801a260358103f6c5246a7bcf1",
+      "source_sha256": "38afc6d393b6a224dc8cb7ec6b5fe5cfbe5afeead82ed1d16e13c3f826bf8a98",
+      "renderer": "t3d",
+      "autoplay": true,
+      "menu_test": false
+    },
+    "DarkLantern64-bundle-level_bundle-menu-t3d.z64": {
+      "sha256": "8ed044f1efe644dcfdfb31df922fd26b58acef4320e81b6d532786ac32708863",
+      "bytes": 425984,
+      "build_signature": "3ee8057de6676fc48b95fb15bfecff661ffcd37f24db8ecb3cf6dccffe545ac9",
+      "source_sha256": "749bf6c365215dc81df018093f250c13004b5aaf87676f8877a452d3c25b9845",
+      "renderer": "t3d",
+      "autoplay": false,
+      "menu_test": false
+    },
+    "DarkLantern64-bundle-level_bundle-menu-menu-test-t3d.z64": {
+      "sha256": "4d9dc2fed1fe63849e08d8193ac75cf3146f59fb263f30b7e5349d028f8399be",
+      "bytes": 425984,
+      "build_signature": "beed51a01547d4286f9230ddaf0c4ace07c4b9df07d5dfec51cb19dca429f6f2",
+      "source_sha256": "749bf6c365215dc81df018093f250c13004b5aaf87676f8877a452d3c25b9845",
+      "renderer": "t3d",
+      "autoplay": false,
+      "menu_test": true
+    },
+    "DarkLantern64-bundle-level_bundle-start-enemy-workshop-preset-store-door-open-t3d.z64": {
+      "sha256": "6095520f50e80c276e13a03190e036f69baf3421d1da996c4a102f05d0b240b5",
+      "bytes": 425984,
+      "build_signature": "0fa6afded6e6ea799df6ef27aa59b0585c94c840bf9429df7355ecc337fb0840",
+      "source_sha256": "749bf6c365215dc81df018093f250c13004b5aaf87676f8877a452d3c25b9845",
+      "renderer": "t3d",
+      "autoplay": false,
+      "menu_test": false
+    },
+    "DarkLantern64-enemy_patrols-preset-scout-observation-t3d.z64": {
+      "sha256": "37ba9878cb0e4cc370ba6603e4c735765ff4f58149ddf344c8d0161bae416f5b",
+      "bytes": 376832,
+      "build_signature": "6b000ccc1beeaa827c118a980d432dc6330f26b0d1668c7b9c05ea00526898ea",
+      "source_sha256": "4c1d929f474bdd9442068f42e62391f7494be0e4ed3f41f83247aeb43d95c0cd",
+      "renderer": "t3d",
+      "autoplay": false,
+      "menu_test": false
+    }
+  },
+  "runs": [
+    {
+      "name": "smoke-4mb",
+      "passed": true,
+      "rom": "DarkLantern64-t3d.z64",
+      "elapsed_host_seconds": 3.516,
+      "terminal_event": "DL64 boot_failed reason=expansion_pak memory=4194304 required=8388608"
+    },
+    {
+      "name": "smoke-8mb",
+      "passed": true,
+      "rom": "DarkLantern64-autoplay-t3d.z64",
+      "elapsed_host_seconds": 24.219,
+      "terminal_event": "DL64 profile_replay_done complete=1 caught=0"
+    },
+    {
+      "name": "bundle-idle",
+      "passed": true,
+      "rom": "DarkLantern64-bundle-level_bundle-menu-t3d.z64",
+      "elapsed_host_seconds": 4.266,
+      "terminal_event": "DL64 profile_end window=1"
+    },
+    {
+      "name": "bundle-4mb",
+      "passed": true,
+      "rom": "DarkLantern64-bundle-level_bundle-menu-t3d.z64",
+      "elapsed_host_seconds": 3.516,
+      "terminal_event": "DL64 boot_failed reason=expansion_pak memory=4194304 required=8388608"
+    },
+    {
+      "name": "bundle-switching",
+      "passed": true,
+      "rom": "DarkLantern64-bundle-level_bundle-menu-menu-test-t3d.z64",
+      "elapsed_host_seconds": 88.156,
+      "terminal_event": "DL64 menu_test_complete transitions=66 variants=11 cycles=3"
+    },
+    {
+      "name": "bundle-direct",
+      "passed": true,
+      "rom": "DarkLantern64-bundle-level_bundle-start-enemy-workshop-preset-store-door-open-t3d.z64",
+      "elapsed_host_seconds": 4.016,
+      "terminal_event": "DL64 frame n=0 t=0.02 ms=16.67 cpu_ms=0.00 heap=1160024/7535168 triangles=0 player=2.50,0.00,0.00 yaw=1.571 pitch=0.000 grounded=1 guard=3.01,0.00,-4.00 light=0.184 alert=0.000 state=PATROL door=1 complete=0 caught=0"
+    },
+    {
+      "name": "single-direct-preset",
+      "passed": true,
+      "rom": "DarkLantern64-enemy_patrols-preset-scout-observation-t3d.z64",
+      "elapsed_host_seconds": 4.016,
+      "terminal_event": "DL64 frame n=0 t=0.02 ms=16.67 cpu_ms=0.00 heap=1159976/7668752 triangles=0 player=-6.00,0.00,2.70 yaw=3.142 pitch=-0.070 grounded=1 guard=3.01,0.00,-4.00 light=0.080 alert=0.000 state=PATROL door=0 complete=0 caught=0"
+    }
+  ],
+  "process_cleanup": {
+    "owned_ares_sessions": 7,
+    "owned_sessions_remaining": 0,
+    "method": "Each harness waits for its child process exit in finally; final Win32 process inspection matched the seven isolated run IDs and found none.",
+    "user_sessions_and_settings_untouched": true
+  },
+  "local_reports": [
+    "build/guard-60fps/smoke-mission.json",
+    "build/guard-60fps/smoke-bundle.json"
+  ],
+  "console_logs": [
+    "build/guard-60fps/smoke-ares.log",
+    "build/guard-60fps/smoke-bundle.log"
+  ],
+  "limitations": [
+    "Ares emulator; original N64/M64 validation remains pending.",
+    "Includes diagnostic replay/menu scripting and scene preparation; timings here must not be used as sustained frame-rate claims.",
+    "Renderer sources were frozen; a separate profiler serialization update was developed concurrently and requires its own final timing run.",
+    "Heap values are sampled allocated heap, not total RDRAM use; linker/static allocations and framebuffer ownership require their own accounting."
+  ]
+}

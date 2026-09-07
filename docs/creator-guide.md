@@ -15,6 +15,8 @@ There are two everyday tasks:
 
 PowerShell alternatives, from the repository folder: `python tools/build.py --editor --run` opens the editor; `python tools/build.py --bundle content/level_bundle.json --run` builds and launches the game menu. Tests, captures and other specialist commands live in the [developer tools guide](developer-tools.md).
 
+Game launches now use Tiny3D on the N64's RSP by default, including **Launch game**, **Play level**, and **Play game menu**. If this checkout predates that dependency setup, run `python tools/build_tiny3d.py --fetch` once from the repository folder. It explicitly fetches and builds the pinned library; normal game builds use the local checkout. There is no new everyday task or renderer choice to configure. See the [setup notes](../tools/tiny3d/README.md) if preparation fails.
+
 ### Manage levels
 
 The **Levels** panel lists source levels in `content/`, including levels that are not yet included in the game menu. **New level** creates a bounded starter room with a player spawn, switch, door and objective, built from the shared block model. **Duplicate** creates an independent copy of the selected saved level. Enter a unique **Source name** and **Title**, then click **Create**; the new level opens for editing. Shared meshes and textures remain shared.
@@ -62,6 +64,8 @@ Use **Build & Diagnostics** for the fastest loop:
 
 The **Launch game** VS Code task also opens the selector, but reads saved files directly. **Save + Cook first** when launching from VS Code. Close the previous Ares game window before launching another, and let each build finish before starting another.
 
+For a developer-requested comparison with the CPU reference renderer, run `python tools/build.py --bundle content/level_bundle.json --renderer cpu --run`. Ordinary launches keep the RSP renderer; the two versions use separate build outputs.
+
 In the game menu, use arrows or the stick to choose a level; left/right chooses a test start where available. Press **A/Start** to launch. During play, **Z + Start** returns to the selector and **B** resumes the paused run. On the keyboard these are **Z + Tab** and **N**. See the [level-select guide](level-select.md) for the menu and authored test starts.
 
 Ares launches with 8 MiB enabled and these keyboard controls:
@@ -82,7 +86,7 @@ On an N64 controller, the **stick looks in both axes** (up looks up). **C-Up/Dow
 
 For Blender-made props, use the [Blender asset workflow](blender-assets.md): edit and save the `.blend`, export an asset pack, import it into the level editor, and place reusable prefab instances. The supplied loot pack shares one small atlas across five modeled props. Enemies and waypoints have the controls described above.
 
-For animated characters, start with [the guard animation workflow](guard-animation-prototype.md). Open **Guard Animation Workshop**, select a guard in **Room Objects**, and use **Character animation → Focus guard**. Choose a clip, play or scrub it, experiment with **Blend preview**, and adjust **Attention yaw/pitch**. These controls preview motion without changing saved behavior. The current game uses idle and walking; its CPU animation renderer is still a slow prototype.
+For animated characters, start with [the guard animation workflow](guard-animation-prototype.md). Open **Guard Animation Workshop**, select a guard in **Room Objects**, and use **Character animation → Focus guard**. Choose a clip, play or scrub it, experiment with **Blend preview**, and adjust **Attention yaw/pitch**. These controls preview motion without changing saved behavior. The current game uses idle and walking, with the default RSP renderer handling the guard's skeletal deformation. Run, notice and turn remain preview clips.
 
 Edit and save [art/guard.blend](../art/guard.blend), then run `python tools/guard_assets.py` from the repository root. Return to the editor and **Save + Cook**, then **Play level**. The exporter reads the saved Blender file, including its five named Actions and atlas; unsaved Blender edits are not exported.
 

@@ -4,6 +4,17 @@
 #include "render_shading.h"
 #include "render_camera.h"
 #include "animation.h"
+#ifdef DL_RENDER_T3D
+#include "render_batches.h"
+#include "render_lighting.h"
+#include "render_transform.h"
+#include "render_texture_packing.h"
+#include <t3d/t3d.h>
+#include <malloc.h>
+static void gpu_prepare(const DlGame *g);
+static void gpu_release(void);
+static void gpu_report(void);
+#endif
 
 #include <libdragon.h>
 #include <math.h>
@@ -32,8 +43,11 @@ typedef struct { color_t front,back; } VertexColors;
 typedef struct { DlVec3 position; DlVec2 uv; DlVec3 color; } ClipVertex;
 typedef struct { DlVec3 eye,right,up,forward; } Camera;
 static ModelCache models[MAX_MODELS];
-static DlVec3 world_vertices[MAX_VERTICES],camera_vertices[MAX_VERTICES];
+static DlVec3 world_vertices[MAX_VERTICES];
+#ifndef DL_RENDER_T3D
+static DlVec3 camera_vertices[MAX_VERTICES];
 static uint8_t clip_codes[MAX_VERTICES];
+#endif
 static FaceCache faces[MAX_TRIANGLES];
 /* Allocate only the authored triangle count. Both door states are prepared
  * before play, so opening the gate never retraces every static light ray. */
@@ -56,6 +70,8 @@ static DlVec3 *animation_normals;
 static int animation_normal_count,animation_model_count;
 static uint64_t animation_sample_ticks,animation_skin_ticks;
 static uint32_t animation_frames,animation_poses,animation_sample_max,animation_skin_max;
+static void hud_cache_prepare(const DlGame *g);
+static void hud_cache_release(void);
 #ifdef DL_CAPTURE
 static const char *animation_preview_clip;
 static float animation_preview_time,animation_preview_yaw,animation_preview_pitch;
@@ -340,6 +356,9 @@ static void load_textures(const DlGame *g){
 static void build_cache(const DlGame *g){
     uint32_t start=TICKS_READ();
     load_textures(g);
+#ifdef DL_RENDER_T3D
+    gpu_release();
+#endif
     vertex_count=triangle_count=smooth_vertex_count=0;
     animation_normal_count=animation_model_count=0;
     assertf(g->level->model_count<=MAX_MODELS,"Scene exceeds %d model instances",MAX_MODELS);
@@ -446,6 +465,10 @@ static void build_cache(const DlGame *g){
         (unsigned)(animation_normal_count*sizeof(DlVec3)),(unsigned)(2*sizeof(float)));
     animation_sample_ticks=animation_skin_ticks=0;
     animation_frames=animation_poses=animation_sample_max=animation_skin_max=0;
+#ifdef DL_RENDER_T3D
+    gpu_prepare(g);
+#endif
+    hud_cache_prepare(g);
 }
 void dl_render_prepare_scene(const DlGame *game){if(cached_level!=game->level)build_cache(game);}
 void dl_render_release_scene(void){
@@ -453,6 +476,10 @@ void dl_render_release_scene(void){
      * memory still referenced by the RSP/RDP; never keep both levels' caches. */
     rspq_flush();
     rspq_wait();
+#ifdef DL_RENDER_T3D
+    gpu_release();
+#endif
+    hud_cache_release();
     for(int i=0;i<64;++i){if(textures[i])sprite_free(textures[i]);textures[i]=NULL;}
     for(int i=0;i<2;++i){free(night_colors[i]);night_colors[i]=NULL;}
     free(smooth_colors);smooth_colors=NULL;smooth_vertex_count=0;
@@ -465,6 +492,9 @@ void dl_render_release_scene(void){
 }
 void dl_render_report_animation(void){
     if(!animation_frames)return;
+#ifdef DL_RENDER_T3D
+    gpu_report();
+#endif
     if(animation_model_count)debugf("DL64 animation_profile frames=%lu poses=%lu sample_ticks=%llu per_pose_sample_max_ticks=%lu skin_ticks=%llu per_pose_skin_max_ticks=%lu ticks_per_second=%lu nested_in=transforms skin_scope=deform_normals_instance\n",
         (unsigned long)animation_frames,(unsigned long)animation_poses,(unsigned long long)animation_sample_ticks,
         (unsigned long)animation_sample_max,(unsigned long long)animation_skin_ticks,(unsigned long)animation_skin_max,
@@ -477,6 +507,10 @@ static Camera make_camera(const DlGame *g){
     return (Camera){.eye=dl_player_eye(g),.right=basis.right,.up=basis.up,.forward=basis.forward};
 }
 
+#ifdef DL_RENDER_T3D
+#include "render_t3d.inc"
+#define geometry geometry_gpu
+#else
 /* Clip against all six frustum planes before perspective division. */
 static float clip_distance(DlVec3 v,int plane){
     switch(plane){
@@ -556,6 +590,7 @@ static void geometry(const DlGame *g){
     }
     bool lighting_changed=cached_door!=g->door_open;
     ++animation_frames;
+    unsigned animated=0,full=0,drawn=0,overlays=0;
     mark=dl_profile_mark();
     Camera camera=make_camera(g);
     visible_models=transformed_vertices=0;
@@ -577,6 +612,11 @@ static void geometry(const DlGame *g){
         if(models[i].visible)++visible_models;
         if((dynamic&&models[i].visible)||(lighting_changed&&role==DL_MODEL_DOOR)){
             transform_model_vertices(g,i,&pose);
+            if(models[i].visible&&g->level->meshes[g->level->models[i].mesh].animation){
+                ++animated;
+                const DlEnemy *enemy=model_enemy(g,&g->level->models[i]);
+                if(enemy&&(enemy->sees_player||enemy->state==DL_INVESTIGATE||enemy->state==DL_CHASE))++overlays;
+            }
         }
     }
     dl_profile_record(DL_PROFILE_TRANSFORMS,mark);
@@ -603,6 +643,11 @@ static void geometry(const DlGame *g){
             DlVec3 rel=sub(world_vertices[i],camera.eye);
             camera_vertices[i]=(DlVec3){dot(rel,camera.right),dot(rel,camera.up),dot(rel,camera.forward)};
             clip_codes[i]=clip_code(camera_vertices[i]);
+        }
+        if(g->level->models[m].role==DL_MODEL_GUARD){
+            bool inside=true;
+            for(int v=0;v<count;++v)if(clip_codes[models[m].vertex_start+v])inside=false;
+            if(inside)++full;
         }
     }
     dl_profile_record(DL_PROFILE_TRANSFORMS,mark);
@@ -639,6 +684,7 @@ static void geometry(const DlGame *g){
             }
             bound_texture=texture;
         }
+        int previous_triangles=submitted_triangles;
         for(int t=0;t<mesh->index_count/3;++t){
             const FaceCache *face=&faces[cache->triangle_start+t];
             const NightColors *colors=g->level->environment.enabled?&night_colors[g->door_open][cache->triangle_start+t]:NULL;
@@ -661,10 +707,13 @@ static void geometry(const DlGame *g){
             }
             triangle(corners[0],corners[1],corners[2],&g->level->environment,texture>=0?&g->level->textures[texture]:NULL,code[0]|code[1]|code[2]);
         }
+        if(model->role==DL_MODEL_GUARD&&submitted_triangles>previous_triangles)++drawn;
     }
     rdpq_set_scissor(0,0,SCREEN_W,SCREEN_H);rdpq_set_mode_fill(rgb(0,0,0));
     dl_profile_record(DL_PROFILE_TRIANGLES,mark);
+    dl_profile_workload(animated,full,drawn,submitted_triangles,overlays);
 }
+#endif
 
 /* Top-down projection of actual oriented collision proxies, with no tiles. */
 static void map_line(int x0,int y0,int x1,int y1,color_t color){
@@ -724,9 +773,9 @@ static void profile_hud(const DlGame *g,const DlRenderStats *stats){
             /* Float formatting is paid once per profiling window, and all
              * three table columns are laid out/submitted in three calls. */
             size_t avg_used=(size_t)snprintf(averages,sizeof(averages),"^02Avg ms\n^00");
-            size_t budget_used=(size_t)snprintf(budgets,sizeof(budgets),"^02%%30fps\n^00");
+            size_t budget_used=(size_t)snprintf(budgets,sizeof(budgets),"^02%%%dfps\n^00",DL_PROFILE_TARGET_FPS);
             for(unsigned i=0;i<sizeof(rows)/sizeof(rows[0]);++i){
-                float elapsed=profile->avg_ms[rows[i]],share=elapsed*3.0f;
+                float elapsed=profile->avg_ms[rows[i]],share=elapsed*(DL_PROFILE_TARGET_FPS/10.0f);
                 const char *newline=i+1<sizeof(rows)/sizeof(rows[0])?"\n":"";
                 int n=elapsed<999.95f?
                     snprintf(averages+avg_used,sizeof(averages)-avg_used,"%5.1f%s",elapsed,newline):
@@ -756,6 +805,7 @@ static void profile_hud(const DlGame *g,const DlRenderStats *stats){
     rdpq_text_printf(&columns,1,210,173,"E%d S%d H%d\n%dM heap %dK",g->enemy_count,
         seeing,hearing,stats->memory_bytes/(1024*1024),stats->heap_used/1024);
 }
+#include "render_hud_cache.inc"
 static void hud(const DlGame *g,const DlRenderStats *stats){
     DlProfileMark mark=dl_profile_mark();
     box(0,0,SCREEN_W,VIEW_TOP,rgb(9,12,17));box(0,24,SCREEN_W,26,rgb(131,97,45));
@@ -767,23 +817,12 @@ static void hud(const DlGame *g,const DlRenderStats *stats){
     box(192,198,192+(int)(61*clampf(awareness,0,1)),204,awareness>0.65f?rgb(219,78,56):rgb(207,141,71));
     box(158,(int)horizon,162,(int)horizon+1,rgb(212,195,155));
     box(159,(int)horizon-1,160,(int)horizon+3,rgb(212,195,155));
-    rdpq_text_print(NULL,1,9,12,"^01D A R K L A N T E R N  6 4");
-    char title[97];int end=0;
-    for(int i=0;i<48&&g->level->title[i];++i){
-        char ch=g->level->title[i];if(ch=='^'||ch=='$')title[end++]=ch;
-        title[end++]=ch=='\n'||ch=='\r'||ch=='\t'?' ':ch;
-    }
-    title[end]='\0';rdpq_text_print(NULL,1,9,22,title);
-    rdpq_text_print(NULL,1,9,204,"LIGHT");rdpq_text_print(NULL,1,138,204,"ALERT");
-    rdpq_text_print(NULL,1,263,204,g->crouched?"^01CROUCH":"STAND");
-    const char *prompt=g->door_open?"Gate open. Find the gold relic and press A.":"Find the switch, open the gate, take the relic.";
+    HudPrompt prompt=g->door_open?HUD_PROMPT_OPEN:HUD_PROMPT_CLOSED;
     DlVec3 eye=dl_player_eye(g);
-    if(dot(sub(eye,g->level->control),sub(eye,g->level->control))<2.25f&&dl_line_of_sight(g,eye,g->level->control))prompt="A: operate the gate switch";
-    if(dot(sub(eye,g->level->objective),sub(eye,g->level->objective))<2.25f&&dl_line_of_sight(g,eye,g->level->objective))prompt="A: take the relic";
-    if(enemy_chasing(g))prompt="Spotted! Break sight and retreat into shadow.";
-    rdpq_text_print(NULL,1,9,215,prompt);
-    rdpq_text_print(NULL,1,9,226,"^02Stick: look  C: move/strafe  Z: crouch");
-    rdpq_text_print(NULL,1,9,236,"^02A: use B: noise L: jump R: reset START: debug");
+    if(dot(sub(eye,g->level->control),sub(eye,g->level->control))<2.25f&&dl_line_of_sight(g,eye,g->level->control))prompt=HUD_PROMPT_SWITCH;
+    if(dot(sub(eye,g->level->objective),sub(eye,g->level->objective))<2.25f&&dl_line_of_sight(g,eye,g->level->objective))prompt=HUD_PROMPT_RELIC;
+    if(enemy_chasing(g))prompt=HUD_PROMPT_CHASE;
+    hud_cache_draw(g,prompt);
     dl_profile_record(DL_PROFILE_HUD,mark);
     if(stats->debug){
         mark=dl_profile_mark();
@@ -794,13 +833,21 @@ static void hud(const DlGame *g,const DlRenderStats *stats){
         mark=dl_profile_mark();
         rdpq_set_mode_fill(rgb(0,0,0));
         box(38,80,282,139,rgb(10,13,18));box(38,80,282,82,g->caught?rgb(183,60,48):rgb(218,181,87));
-        rdpq_text_print(NULL,1,66,99,g->caught?"^01CAUGHT BY THE WATCH":"^01RELIC ACQUIRED");
-        rdpq_text_print(NULL,1,54,114,g->caught?"Use shadow, quiet steps and distractions.":"A quiet theft. The first heist is complete.");
-        rdpq_text_print(NULL,1,107,130,"^02R: try again");
+        hud_cache_result(g->caught);
         dl_profile_record(DL_PROFILE_HUD,mark);
     }
 }
 void dl_render_init(void){
+#ifdef DL_RENDER_T3D
+    t3d_init((T3DInitParams){0});
+    dl_profile_set_geometry_evidence(true);
+    for(int i=0;i<GPU_FRAMES;++i){
+        gpu_viewports[i]=t3d_viewport_create();
+        t3d_viewport_set_area(&gpu_viewports[i],0,VIEW_TOP,SCREEN_W,VIEW_BOTTOM-VIEW_TOP);
+        t3d_viewport_set_projection(&gpu_viewports[i],2*atanf((VIEW_BOTTOM-VIEW_TOP)*0.5f/focal),near_plane*gpu_units,far_plane*gpu_units);
+        t3d_mat4_identity(&gpu_viewports[i].matCamera);
+    }
+#endif
     frustum=dl_render_frustum(near_plane,far_plane,SCREEN_W*0.5f/focal,(horizon-VIEW_TOP)/focal);
     depth_buffer=surface_alloc(FMT_RGBA16,SCREEN_W,SCREEN_H);
     rdpq_font_t *font=rdpq_font_load_builtin(FONT_BUILTIN_DEBUG_VAR);

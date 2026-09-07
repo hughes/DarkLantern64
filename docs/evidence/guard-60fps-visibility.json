@@ -1,0 +1,24 @@
+{
+  "method": "separate-framebuffer-visual-review",
+  "preset": "two-guards",
+  "renderer": "t3d",
+  "source_sha256": "13c4f5cf124d8a8018400fef6d937ae49e850b6e5f8fc7b50b78f4ddd48ff462",
+  "asset_sha256": "69d62710e4982a640ba515a1047bb67204fb451266c9b4e3fd4b7b7d7ff0997f",
+  "capture_rom_sha256": "41a01227e4d7498dd194817d1c019b130034b3aaa4e23d63b2f575f2521c16a1",
+  "images": [
+    {
+      "path": "../images/guard-rsp-two-idle.png",
+      "sha256": "f4afdfdf250abe63ee8583d4d5983d0442b051beee2d1126ae245be997666237"
+    },
+    {
+      "path": "../images/guard-rsp-two-walk.png",
+      "sha256": "972e1b153f0a4d4990ab1fec02219583e9ca7b4b2f8807ecbcee3065d59185f8"
+    }
+  ],
+  "visible_guards": [
+    "animated-patrol",
+    "animated-sentry"
+  ],
+  "reviewer": "Codex: inspected both raw RDP framebuffer exports. Both guards, their articulated limbs, textured materials and HUD are visible. The right guard has extremities near the viewport edge; full-body coverage is not an acceptance claim.",
+  "limitations": "Separate frozen animation-phase captures prove visible geometry. The performance run independently uses live patrol movement, idle sentry, normal audio and gameplay; capture synchronization/logging is excluded from that run."
+}

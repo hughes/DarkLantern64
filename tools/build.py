@@ -50,8 +50,10 @@ def scene_paths(level=None):
 
 def build_rom(sdk, autoplay=False, debug_overlay=False, level=None, capture=False,
               scale_bench=False, disable_model_cull=False, *, bundle=None,
-              start_level=None, start_preset=None, menu_test=False):
+              start_level=None, start_preset=None, menu_test=False, renderer="t3d"):
     start = time.perf_counter()
+    if renderer not in ("cpu", "t3d"):
+        raise ValueError("Renderer must be cpu or t3d")
     if bundle is not None and level is not None:
         raise ValueError("--level and --bundle are mutually exclusive")
     if (bundle is not None or start_preset is not None) and (autoplay or capture or scale_bench):
@@ -93,6 +95,8 @@ def build_rom(sdk, autoplay=False, debug_overlay=False, level=None, capture=Fals
         name += "-unculled"
     if menu_test:
         name += "-menu-test"
+    if renderer != "cpu":
+        name += "-" + renderer
     work = BUILD / name
     work.mkdir(parents=True, exist_ok=True)
     bundle_output = work / "catalog"
@@ -118,6 +122,21 @@ def build_rom(sdk, autoplay=False, debug_overlay=False, level=None, capture=Fals
               "-falign-functions=32", "-ffunction-sections", "-fdata-sections", "-DN64",
               "-I" + str(sdk / "mips64-elf/include"), "-I" + str(ROOT / "src"),
               "-I" + str(bundle_output / "generated"), "-I" + str(work)]
+    renderer_libraries = []
+    renderer_inputs = []
+    renderer_dependency = None
+    if renderer == "t3d":
+        try:
+            from build_tiny3d import build_library, SOURCE as t3d_source, REVISION as t3d_revision
+        except ModuleNotFoundError:
+            from tools.build_tiny3d import build_library, SOURCE as t3d_source, REVISION as t3d_revision
+        t3d_library = build_library(sdk)
+        renderer_libraries.append(t3d_library)
+        renderer_inputs = [t3d_library, ROOT / "tools/build_tiny3d.py", ROOT / "dependencies.json"]
+        renderer_inputs += sorted((t3d_source / "src").rglob("*.h"))
+        common += ["-DDL_RENDER_T3D=1", "-I" + str(t3d_source / "src")]
+        renderer_dependency = {"revision": t3d_revision, "library": str(t3d_library),
+                               "library_sha256": hashlib.sha256(t3d_library.read_bytes()).hexdigest()}
     if autoplay:
         common += ["-DDL_AUTOPLAY=1"]
     if debug_overlay:
@@ -148,13 +167,15 @@ def build_rom(sdk, autoplay=False, debug_overlay=False, level=None, capture=Fals
         capture_header.write_text("static const struct { DlVec3 position; float yaw,pitch; bool door_open; float animation_time; const char *animation_clip; float head_yaw,head_pitch; } dl_capture_views[]={" +
                                   ",".join(rows) + "};\n#define DL_CAPTURE_VIEW_COUNT " + str(len(rows)) + "\n")
         extra_headers.append(capture_header)
-    sources = [ROOT / "src" / f for f in ("game.c", "main.c", "dl_profile.c", "launch.c", "animation.c")]
+    sources = [ROOT / "src" / f for f in ("game.c", "main.c", "dl_profile.c", "launch.c", "animation.c",
+                                         "render_lighting.c", "render_batches.c", "render_transform.c", "render_texture_packing.c")]
     sources += generated_sources
     if scale_bench:
         sources.append(ROOT / "src/scale_bench.c")
     if (ROOT / "src/render.c").exists():
         sources.append(ROOT / "src/render.c")
-    headers = sorted((ROOT / "src").glob("*.h")) + sorted((ROOT / "src").glob("*.def")) + extra_headers
+    headers = (sorted((ROOT / "src").glob("*.h")) + sorted((ROOT / "src").glob("*.def"))
+               + sorted((ROOT / "src").glob("*.inc")) + extra_headers)
     headers += [bundle_output / "generated/bundle.h"]
     for entry in catalog["levels"]:
         entry_output = Path(entry["cooked_dir"])
@@ -167,8 +188,9 @@ def build_rom(sdk, autoplay=False, debug_overlay=False, level=None, capture=Fals
     sdk_inputs = [lib / n for n in ("libdragon.a", "libdragonsys.a", "n64.ld")]
     sdk_inputs += sorted((sdk / "mips64-elf/include").rglob("*.h"))
     compiler_version = run([tools["mips64-elf-gcc"], "--version"], env=env, capture=True).stdout.splitlines()[0]
-    signature = fingerprint(sources + headers + sdk_inputs + [Path(__file__)],
-                            {"flags": common, "compiler": compiler_version,
+    kernel_flags = {"render_lighting.c": ["-O3"], "render_transform.c": ["-O3"]}
+    signature = fingerprint(sources + headers + sdk_inputs + renderer_inputs + [Path(__file__)],
+                            {"flags": common, "kernel_flags": kernel_flags, "compiler": compiler_version, "renderer": renderer,
                              "tools": {n: (p.stat().st_size, p.stat().st_mtime_ns) for n, p in tools.items()}})
     manifest = work / "build.json"
     rom = BUILD / (name + ".z64")
@@ -180,11 +202,11 @@ def build_rom(sdk, autoplay=False, debug_overlay=False, level=None, capture=Fals
     objects = []
     for source in sources:
         obj = work / (source.stem + ".o")
-        run([tools["mips64-elf-gcc"], *common, "-c", source, "-o", obj], env=env)
+        run([tools["mips64-elf-gcc"], *common, *kernel_flags.get(source.name, []), "-c", source, "-o", obj], env=env)
         objects.append(obj)
     elf = work / (name + ".elf")
     run([tools["mips64-elf-g++"], "-mabi=o64", "-g", "-o", elf, *objects,
-         "-L" + str(lib), "-lc", "-ldragon", "-lm", "-ldragonsys",
+         *renderer_libraries, "-L" + str(lib), "-lc", "-ldragon", "-lm", "-ldragonsys",
          "-Wl,-T," + str(lib / "n64.ld"), "-Wl,--gc-sections,--wrap,__do_global_ctors",
          "-Wl,-Map=" + str(work / (name + ".map"))], env=env)
     symbols = work / (name + ".sym")
@@ -219,6 +241,7 @@ def build_rom(sdk, autoplay=False, debug_overlay=False, level=None, capture=Fals
     source_sha256 = content["source_sha256"] if bundle is None else hashlib.sha256(
         bundle.read_bytes() + "".join(entry["content"]["source_sha256"] for entry in catalog["levels"]).encode()).hexdigest()
     report = {"signature": signature, "compiler": compiler_version, "sdk": str(sdk),
+              "renderer": renderer, "renderer_dependency": renderer_dependency, "kernel_flags": kernel_flags,
               "source_sha256": source_sha256, "rom": str(rom.relative_to(ROOT)),
               "rom_bytes": rom.stat().st_size, "rom_sha256": hashlib.sha256(rom.read_bytes()).hexdigest(),
               "static_image_bytes": image_bytes, "elapsed_seconds": round(time.perf_counter() - start, 3),
@@ -230,6 +253,7 @@ def build_rom(sdk, autoplay=False, debug_overlay=False, level=None, capture=Fals
               "level_catalog": catalog, "textures": texture_report, "size_output": size}
     manifest.write_text(json.dumps(report, indent=2) + "\n")
     print(json.dumps({"manifest": str(manifest.relative_to(ROOT)), "rom": report["rom"],
+                      "renderer": renderer,
                       "rom_bytes": report["rom_bytes"], "rom_sha256": report["rom_sha256"],
                       "static_image_bytes": image_bytes, "elapsed_seconds": report["elapsed_seconds"],
                       "start_in_menu": catalog["start_in_menu"],
@@ -289,6 +313,19 @@ def run_tests():
          "tests/test_render_shading.c", "-lm", "-o", shading_output], env=env)
     run([shading_output], env=env)
 
+    render_checks = {
+        "test_render_lighting": ["src/render_lighting.c", "src/render_transform.c", "src/animation.c"],
+        "test_render_batches": ["src/render_batches.c"],
+        "test_render_transform": ["src/render_transform.c", "src/animation.c"],
+        "test_hud_cache": [],
+        "test_render_texture_packing": ["src/render_texture_packing.c", "src/render_batches.c"],
+    }
+    for name, sources in render_checks.items():
+        render_output = BUILD / (name + ".exe")
+        run([compiler, "-std=c17", "-O2", "-Wall", "-Wextra", "-Werror", "-Isrc",
+             *sources, f"tests/{name}.c", "-lm", "-o", render_output], env=env)
+        run([render_output], env=env)
+
     run([compiler, "-std=c17", "-O2", "-Wall", "-Wextra", "-Werror", "-Isrc",
          "src/launch.c", "tests/test_launch.c", "-lm", "-o", output], env=env)
     run([output], env=env)
@@ -318,6 +355,8 @@ def main():
     parser.add_argument("--run", action="store_true")
     parser.add_argument("--autoplay", action="store_true")
     parser.add_argument("--debug-overlay", action="store_true", help="Start with the timing overlay visible")
+    parser.add_argument("--renderer", choices=("cpu", "t3d"), default="t3d",
+                        help="Developer renderer selection; Tiny3D writes separate ROM/build outputs")
     sources = parser.add_mutually_exclusive_group()
     sources.add_argument("--level", type=Path, help="Canonical content JSON (default: content/first_room.json)")
     sources.add_argument("--bundle", type=Path, help="Level catalog JSON; starts in the level menu")
@@ -340,7 +379,8 @@ def main():
         elif not args.test:
             rom = build_rom(args.sdk.resolve(), args.autoplay, args.debug_overlay, args.level, args.capture,
                             args.scale_bench, args.disable_model_cull, bundle=args.bundle,
-                            start_level=args.start_level, start_preset=args.start_preset, menu_test=args.menu_test)
+                            start_level=args.start_level, start_preset=args.start_preset, menu_test=args.menu_test,
+                            renderer=args.renderer)
             if args.run:
                 ares = os.environ.get("ARES_EXE", str(Path(os.environ.get("LOCALAPPDATA", "")) / "ares/ares.exe"))
                 if not Path(ares).is_file():

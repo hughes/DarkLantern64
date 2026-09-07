@@ -3,6 +3,11 @@
 
 #include "game.h"
 #include "launch.h"
+#ifdef DL_RENDER_T3D
+#define DL_RENDER_BACKEND "rsp-tiny3d"
+#else
+#define DL_RENDER_BACKEND "cpu-rdpq"
+#endif
 
 typedef struct {
     bool debug;

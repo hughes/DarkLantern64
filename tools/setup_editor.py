@@ -1,7 +1,9 @@
-"""Check out the pinned LightEngine revision without changing existing work."""
+"""Set up pinned editor dependencies; --tiny3d explicitly acquires the RSP library."""
 from __future__ import annotations
 
+import argparse
 import json
+import os
 from pathlib import Path
 import subprocess
 import sys
@@ -27,8 +29,16 @@ def setup():
 
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--tiny3d", action="store_true",
+                        help="Also fetch and build the pinned Tiny3D library locally, without SDK installation")
+    parser.add_argument("--sdk", type=Path, default=Path(os.environ.get("N64_INST", "C:/n64-toolchain")))
+    args = parser.parse_args()
     try:
         setup()
-    except (OSError, ValueError, subprocess.CalledProcessError) as error:
+        if args.tiny3d:
+            from build_tiny3d import build_library
+            build_library(args.sdk, fetch=True)
+    except (OSError, ValueError, RuntimeError, subprocess.CalledProcessError) as error:
         print(f"Editor setup failed: {error}", file=sys.stderr)
         raise SystemExit(1)

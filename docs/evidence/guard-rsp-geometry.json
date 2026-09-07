@@ -1,0 +1,38 @@
+{
+  "method": "portable C checks using the cooked guard mesh and sampled poses",
+  "asset_sha256": "69d62710e4982a640ba515a1047bb67204fb451266c9b4e3fd4b7b7d7ff0997f",
+  "limitations": "Fixture measurements; not universal error bounds or hardware timings. General regression cases are committed under tests/test_render_*.c.",
+  "batch": {
+    "source_sha256": "69d62710e4982a640ba515a1047bb67204fb451266c9b4e3fd4b7b7d7ff0997f",
+    "source_vertices": 997,
+    "triangles": 531,
+    "cross_bone_triangles": 48,
+    "normal_groups": 318,
+    "batches": 15,
+    "packed_vertex_loads": 1002,
+    "matrix_groups": 35,
+    "max_cache_vertices": 70,
+    "batch_metadata_bytes": 5946,
+    "triangle_topology_verified": true
+  },
+  "lighting": {
+    "vertices_checked": 84745,
+    "gpu_units_per_metre": 64,
+    "packed_units_per_metre": 1024,
+    "max_world_error_metres": 2.66560079e-07,
+    "max_normal_error": 1.89074541e-07,
+    "max_packed_fixed_view_error_metres": 0.00124180538,
+    "scalar_colors_changed": 0,
+    "max_rgb_byte_error": 0,
+    "groups": 318
+  },
+  "transform": {
+    "vertices_checked": 84745,
+    "gpu_units_per_metre": 64,
+    "packed_units_per_metre": 1024,
+    "max_world_error_metres": 2.66560079e-07,
+    "max_normal_error": 1.89074541e-07,
+    "max_packed_fixed_view_error_metres": 0.00124180538,
+    "scalar_colors_changed": 0
+  }
+}

@@ -124,6 +124,8 @@ def main(argv=None):
     parser.add_argument("--sdk", type=Path, default=Path(os.environ.get("N64_INST", "C:/n64-toolchain")))
     parser.add_argument("--ares", type=Path, default=Path(os.environ.get("ARES_EXE", str(Path(os.environ.get("LOCALAPPDATA", "")) / "ares/ares.exe"))))
     parser.add_argument("--timeout", type=float, default=180)
+    parser.add_argument("--renderer", choices=("cpu", "t3d"), default="t3d",
+                        help="Renderer to capture; Tiny3D preserves the CPU capture report")
     args = parser.parse_args(argv)
     try:
         validate_timeout(args.timeout)
@@ -132,7 +134,7 @@ def main(argv=None):
         from build import build_rom, scene_paths
         from smoke_ares import exercise
         level, cooked, _ = scene_paths(args.level)
-        rom = build_rom(args.sdk, level=level, capture=True)
+        rom = build_rom(args.sdk, level=level, capture=True, renderer=args.renderer)
         settings = ROOT / ".dev/ares/settings-8mb.bml"
         if not settings.is_file():
             settings = args.ares.parent / "settings.bml"
@@ -148,8 +150,9 @@ def main(argv=None):
             Image.frombytes("RGB", (width, height), pixels).save(destination)
             captures.append({"view": views[ident-1], "image": str(destination),
                              "sha256": hashlib.sha256(destination.read_bytes()).hexdigest()})
-        report = dict(result, captures=captures, measurement="Raw RDP framebuffer before VI filtering; capture timings are diagnostic only")
-        report_path = cooked / "captures.json"
+        report = dict(result, renderer=args.renderer, captures=captures,
+                      measurement="Raw RDP framebuffer before VI filtering; capture timings are diagnostic only")
+        report_path = cooked / ("captures.json" if args.renderer == "cpu" else "captures-t3d.json")
         report_path.write_text(json.dumps(report, indent=2) + "\n")
         print(json.dumps(report, indent=2))
         return 0

@@ -2,7 +2,7 @@
 
 The first animated guard proves the Blender → cooked asset → LightEngine → N64 ROM path. It has **20 bones, five editable Actions, a 32 × 32 texture atlas, and connected elbow and knee geometry**. Simple compression reduces its animation keys from **120,400 to 8,820 bytes** with a maximum sampled vertex error of **0.144 mm**.
 
-This is a correctness and budgeting experiment. The current CPU reference renderer takes about **99.64 ms per frame, roughly 10 fps**, in the measured two-guard workshop. It establishes an asset workflow and exposes the next performance work; it does not establish a production guard budget. Original N64 and M64 testing remains pending.
+This began as a correctness and budgeting experiment. The initial CPU reference renderer took about **99.64 ms per frame, roughly 10 fps**, in the measured two-guard workshop. That historical measurement establishes the asset workflow, not a production guard budget. The subsequent Tiny3D backend and its performance acceptance criteria are described in [Guard renderer architecture and performance evidence](guard-renderer-performance.md). Original N64 and M64 testing remains pending.
 
 ## Try the guard
 
@@ -63,9 +63,9 @@ Each vertex follows one bone, while a triangle can join vertices following diffe
 
 Kaze describes the applicable N64 technique at approximately 13:38–14:05: transform one vertex group with one matrix, another group with another matrix, then connect the retained results. Nintendo's `gSPVertex` reference explicitly states that cached vertices retain their transformed positions when the matrix changes, and identifies joints as a use case. [Kaze's explanation](https://www.youtube.com/watch?v=xwls5SpNn1s&t=818s), [Nintendo `gSPVertex` reference](https://ultra64.ca/files/documentation/online-manuals/man/n64man/gsp/gSPVertex.html)
 
-Fast64 provides working exporter examples: its F3D writer groups vertices by limb, loads matrices and vertices, then emits triangles. Its SM64 seam exporter also checks connecting-vertex capacity and accounts for UV/normal/material splits. These are concrete references for a future RSP conversion pass, not code already used by our renderer. [Pinned F3D implementation](https://github.com/Fast-64/fast64/blob/44b7bd9603382f1ac7c0d1c1c5f1b3abe3008405/fast64_internal/f3d/f3d_writer.py#L957), [pinned SM64 seam implementation](https://github.com/Fast-64/fast64/blob/44b7bd9603382f1ac7c0d1c1c5f1b3abe3008405/fast64_internal/sm64/sm64_geolayout_writer.py#L2726)
+Fast64 provides working exporter examples: its F3D writer groups vertices by limb, loads matrices and vertices, then emits triangles. Its SM64 seam exporter also checks connecting-vertex capacity and accounts for UV/normal/material splits. These informed the design; our Tiny3D path uses the project's own batch builder. [Pinned F3D implementation](https://github.com/Fast-64/fast64/blob/44b7bd9603382f1ac7c0d1c1c5f1b3abe3008405/fast64_internal/f3d/f3d_writer.py#L957), [pinned SM64 seam implementation](https://github.com/Fast-64/fast64/blob/44b7bd9603382f1ac7c0d1c1c5f1b3abe3008405/fast64_internal/sm64/sm64_geolayout_writer.py#L2726)
 
-Our current N64 renderer performs this deformation on the CPU and sends triangles through libdragon/RDPQ. It does **not** yet issue the matrix/vertex-cache sequence above or use Tiny3D. The connected topology proves the one-influence asset policy can express these joints; the acceleration remains to be implemented and measured with a compatible graphics backend and SDK.
+The initial CPU reference renderer performs this deformation on the CPU and sends triangles through libdragon/RDPQ. The subsequent Tiny3D backend now issues the matrix/vertex-cache sequence above on the RSP, preserving these connected triangles. Its isolated matrix/culling proof, buffering policy, SDK compatibility pin and sustained-performance criteria are documented in [the renderer evidence](guard-renderer-performance.md).
 
 The saving is avoiding extra weighted deformation math at the connection. Matrix commands, vertex loads, cache management and triangle rasterization still have costs. Cache capacity and allowed load offsets depend on the selected microcode; an SM64 exporter's parent/child restrictions are not a universal N64 hardware rule.
 
@@ -113,9 +113,9 @@ There are two separate correctness comparisons. [Blender parity](evidence/guard-
 
 The shared asset rows total **39,886 bytes including atlas pixels**, before string storage, linker alignment and sprite/allocator overhead. Do not multiply them by the guard count. Conversely, the normal cache and existing renderer instance buffers do grow with placed actors. The current 4,096-instanced-vertex limit leaves only 108 vertices for scenery after four copies of this guard; eight copies exceed it. This model is a deformation study, not a finished crowd asset.
 
-## Runtime performance and next work
+## Initial CPU runtime measurement and next work
 
-The [ordinary-ROM runtime report](evidence/guard-runtime.json) covers 62 frames and 124 poses with two independently animated guards, normal audio, a stationary camera and no debug overlay. It verifies a moving patrol and a stationary sentry. Timings use the emulated N64 CPU clock; they are neither host CPU utilization nor measurements from original hardware.
+The initial CPU [ordinary-ROM runtime report](evidence/guard-runtime.json) covers 62 frames and 124 poses with two independently animated guards, normal audio, a stationary camera and no debug overlay. It verifies a moving patrol and a stationary sentry. Timings use the emulated N64 CPU clock; they are neither host CPU utilization nor measurements from original hardware. These historical numbers do not describe the subsequent Tiny3D renderer.
 
 | Measured scope | Average per frame |
 | --- | ---: |
@@ -126,11 +126,11 @@ The [ordinary-ROM runtime report](evidence/guard-runtime.json) covers 62 frames 
 | Triangle submission, including internal stalls | 32.43 ms |
 | Complete frame, including waits | **99.64 ms** |
 
-The first two rows are nested within transforms and must not be added to that slot again. The result is well over a 33.33 ms frame budget. An RSP geometry path, fewer split vertices, cheaper character lighting and submission changes matter far more immediately than saving another few kilobytes of clip keys. Ares timing, this short workload and current profiling overhead limit the result; crowded chases and worst-case audio are unmeasured.
+The first two rows are nested within transforms and must not be added to that slot again. The initial result was well over a 33.33 ms frame budget. It motivated the RSP geometry path, shared normal lighting and recorded command submission described in [the renderer evidence](guard-renderer-performance.md), while preserving this mesh and clip data. Ares timing, this short workload and its profiling overhead limit the result; crowded chases and worst-case audio are unmeasured.
 
 The runtime already advances walking from collision-resolved distance and evaluates foot-contact markers even for culled guards. Those markers currently feed the existing audible guard-step path; a shared gameplay sound-event queue, terrain-specific foot contacts and AI reactions to other guards' sounds remain future work. Head attention follows the player or investigation target when applicable, with bounded yaw/pitch, while the AI eye and sight tests retain their existing gameplay rules. Hand/head socket data is exported, but attached weapons/lights and foot IK are not implemented.
 
-The next useful comparison is the same guard, room, camera, lighting and audio through the CPU reference and a supported RSP backend. Keep the portable sampler and connected-mesh regression as the correctness reference. Then test cheaper mesh/normal/UV layouts and 1/2/4 actors before expanding the geometry budget or adding more animation-controller features. The [architecture document](character-animation.md) retains the longer-term design.
+The accelerated backend's acceptance uses the same authored guard, room, camera, lighting and audio as its CPU comparison. Keep the portable sampler and connected-mesh regression as the correctness reference. After that acceptance, test 1/2/4 actors and alternative mesh/normal/UV layouts before expanding the geometry budget or adding more animation-controller features. The [architecture document](character-animation.md) retains the longer-term design.
 
 ## Verification evidence
 

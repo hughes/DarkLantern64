@@ -599,12 +599,12 @@
       "id": "two-guards",
       "label": "Patrol and sentry",
       "position": [
+        -0.5,
         0,
-        0,
-        3.4
+        3.7
       ],
       "yaw": 180,
-      "pitch": -12
+      "pitch": -16
     }
   ],
   "views": [
@@ -689,6 +689,34 @@
       "pitch": -16,
       "animation_clip": "turn",
       "animation_time": 0.6,
+      "head_yaw": 0,
+      "head_pitch": 0
+    },
+    {
+      "id": "two-guards-idle",
+      "position": [
+        -0.5,
+        0,
+        3.7
+      ],
+      "yaw": 180,
+      "pitch": -16,
+      "animation_clip": "idle",
+      "animation_time": 0,
+      "head_yaw": 0,
+      "head_pitch": 0
+    },
+    {
+      "id": "two-guards-walk",
+      "position": [
+        -0.5,
+        0,
+        3.7
+      ],
+      "yaw": 180,
+      "pitch": -16,
+      "animation_clip": "walk",
+      "animation_time": 0.3,
       "head_yaw": 0,
       "head_pitch": 0
     }

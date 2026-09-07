@@ -1,0 +1,65 @@
+{
+  "source": "content/moonlit_courtyard.json",
+  "source_sha256": "d1e35537e00444e03fa71b593e3926090a2f1ddb0aa910cbabecf9a76f82bb92",
+  "cpu_rom_sha256": "c0118841f81d3b6cb64784fdccac7776107f1f41b2e211f55805e052d01b7880",
+  "rsp_rom_sha256": "3e016148aaf2ec696e95c9ea4b66b63a327dd1585c8997bed7f512066ad7bba0",
+  "measurement": "Raw RDP framebuffer, 320x165 scene viewport only; unchanged captured viewpoints. Fixed-point geometry/interpolation and 8-bit packed shade/fog can change pixels. This is not a claim of pixel-identical backends.",
+  "views": [
+    {
+      "view": "shelter-to-courtyard",
+      "cpu_image_sha256": "5d49d6dc6b7abacf5157c53b0bfe4d2c98de2e19f74169f074b69337ec8b8b90",
+      "rsp_image_sha256": "0eee8b084c5765c1216017d5d836f71e2b0fbc043747ff5cc802df9f965ac8ed",
+      "mean_absolute_channel_error": 4.1024242424242425,
+      "pixels_within_8_percent": 85.41856060606061,
+      "pixels_within_32_percent": 97.45833333333333
+    },
+    {
+      "view": "warm-lamp-cool-roofs",
+      "cpu_image_sha256": "c820d91b3af175250e5d84320ff2128945f0c92c1d6f88fd60e346e455e1af42",
+      "rsp_image_sha256": "062724e874c589fd88874b09982039b9b9c54bba6fc202eac51b4241ff818f34",
+      "mean_absolute_channel_error": 3.1084343434343435,
+      "pixels_within_8_percent": 91.75,
+      "pixels_within_32_percent": 98.28977272727273
+    },
+    {
+      "view": "doorway-landmark",
+      "cpu_image_sha256": "702d8b2de22c3a9d5328ed7d7e796399ce11080eb434f929bbb5ac5b37669980",
+      "rsp_image_sha256": "d2f7aa84bc50a7ec92a2a5655d1a936b3c2c20843f3d432467101ef09a74ea4d",
+      "mean_absolute_channel_error": 4.71959595959596,
+      "pixels_within_8_percent": 77.28598484848484,
+      "pixels_within_32_percent": 97.57386363636364
+    },
+    {
+      "view": "doorway-open",
+      "cpu_image_sha256": "9ed1e157cc1e41804a01405fa07a50a39e853bd327f173ce5be4d3ae336ce970",
+      "rsp_image_sha256": "6c68c3c2463bb8eb7e8aeceb7c55947a3f60ed4f5d6e7c533c8a7406bef5f267",
+      "mean_absolute_channel_error": 4.875707070707071,
+      "pixels_within_8_percent": 76.26136363636364,
+      "pixels_within_32_percent": 97.36363636363636
+    },
+    {
+      "view": "blender-loot-counter",
+      "cpu_image_sha256": "73ea4fabfbfc6915877e45c6e3bf1c2f3dd7313d4602a8baff3a30b14743caa2",
+      "rsp_image_sha256": "2b8617271697902bc3fc7b1ed25b30316aa30df5dc11f7225e6d95bff61e493f",
+      "mean_absolute_channel_error": 4.748308080808081,
+      "pixels_within_8_percent": 81.25757575757575,
+      "pixels_within_32_percent": 95.89393939393939
+    },
+    {
+      "view": "loot-pulse-phase-a",
+      "cpu_image_sha256": "483bc35b6a9cf5ef855db2d2ad3c9174fbf894dbf5df1960013d0ef3afc66017",
+      "rsp_image_sha256": "ab8403ad58dddd65e884c0a29506c712c1f03be9856146a917634f21133f34ac",
+      "mean_absolute_channel_error": 4.812588383838384,
+      "pixels_within_8_percent": 81.2594696969697,
+      "pixels_within_32_percent": 95.79356060606061
+    },
+    {
+      "view": "loot-pulse-phase-b",
+      "cpu_image_sha256": "e10c882999c584e22ffcb1d6407182cd2a2180717b9a321985e3cec63aaf56de",
+      "rsp_image_sha256": "b3fbcfc492ffd97850d6832f092613caf6bd68fd20e0697d25e45dfaf00cf8cb",
+      "mean_absolute_channel_error": 4.766300505050505,
+      "pixels_within_8_percent": 81.28977272727273,
+      "pixels_within_32_percent": 95.7784090909091
+    }
+  ]
+}

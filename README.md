@@ -12,7 +12,9 @@ Our development approach is to extend **LightEngine** into a productive content 
 
 **Creating models?** The [Blender asset guide](docs/blender-assets.md) covers the editable loot set, exporter, material budget, prefab placement, and a direct launch at the courtyard's loot counter.
 
-**Animating characters?** The [guard animation study](docs/guard-animation-prototype.md) covers the editable Blender guard, five Actions, connected joints, editor playback/head attention and measured N64 costs. Its clips compress to 8.61 KiB; the CPU reference renderer still needs substantial performance work.
+**Animating characters?** The [guard animation study](docs/guard-animation-prototype.md) covers the editable Blender guard, five Actions, connected joints, editor playback/head attention and measured N64 costs. Its clips compress to 8.61 KiB. The default renderer now uses Tiny3D on the RSP for model transforms and rigid skeletal deformation.
+
+The two-guard workshop [sustains every native refresh in Ares](docs/guard-renderer-performance.md): 1,800 fresh frames over 30 seconds, with no repeats and a 16.276 ms maximum CPU work sample. Original hardware validation remains pending.
 
 ## Build and play
 
@@ -20,13 +22,17 @@ Our development approach is to extend **LightEngine** into a productive content 
 
 The current development host is Windows. Install Python 3.11+ with Pillow (`python -m pip install Pillow`), the Windows libdragon SDK from our fork (default `C:\n64-toolchain`, or set `N64_INST`), and Ares. Open Ares once so it creates its settings file. MSYS2/MinGW GCC is needed for host simulation tests.
 
-VS Code has two project tasks: **DarkLantern64: Launch editor** and **DarkLantern64: Launch game**. The game task (also **Ctrl+Shift+B**) builds saved levels included in `content/level_bundle.json` and opens the level selector. Save editor edits first when using that task. Within the editor, **Play level** saves and cooks the current level before a direct launch; **Play game menu** saves it before building the bundle.
+Prepare the pinned Tiny3D dependency once with `python tools/build_tiny3d.py --fetch`. This explicitly fetches its source and builds the library locally; ordinary ROM builds require that checkout and never fetch it or install files into the SDK. See the [Tiny3D setup notes](tools/tiny3d/README.md) for its MSYS2 build requirements. `python tools/setup_editor.py --tiny3d` prepares both editor and renderer dependencies instead.
+
+VS Code has two project tasks: **DarkLantern64: Launch editor** and **DarkLantern64: Launch game**. The game task (also **Ctrl+Shift+B**) builds saved levels included in `content/level_bundle.json` and opens the level selector. Save editor edits first when using that task. Within the editor, **Play level** saves and cooks the current level before a direct launch; **Play game menu** saves it before building the bundle. These game launches use the RSP renderer by default; no additional task or editor setting is needed.
 
 ```powershell
 python tools/build.py --bundle content/level_bundle.json --run
 ```
 
 Direct launches, Blender export, profiling, captures and verification remain available as commands in the [developer tools guide](docs/developer-tools.md).
+
+For a rendering comparison, add `--renderer cpu` to a `tools/build.py` command. The CPU reference and default `--renderer t3d` use separate ROM/build outputs.
 
 N64 controller: the **stick looks left/right/up/down** (push up to look up); **C-Up/Down move forward/backward**, and **C-Left/Right strafe**. Z crouches, L jumps, A interacts, B makes noise, R restarts, and Start toggles debug. The D-pad also provides digital look controls.
 
@@ -73,4 +79,4 @@ The engine revision is recorded in [dependencies.json](dependencies.json). Proje
 
 Prototype implementation in progress, dated 2026-09-06. The repository now contains a portable gameplay module, N64 runtime, content compiler, LightEngine project editor, and build/debug tools. Placeholder mesh assets are authored in `content/`; generated outputs are kept in ignored `build/` and `.dev/` directories.
 
-The 3D renderer uses CPU transforms and RDP hardware triangles/depth, with flat-color or textured models. The courtyard adds colored vertex lighting, occlusion, emissive surfaces and fog; its source texture pixels are cooked into the ROM. The guard workshop adds skeletal clips, connected one-influence geometry and bounded head attention through a measured CPU reference path. Collision uses upright rotated boxes; sloped mesh collision, RSP animation acceleration, richer navigation, and SDK provisioning remain future work. Original N64 and M64 validation is **pending**. See [First playable](docs/first-playable.md) for acceptance details.
+The default 3D renderer uses Tiny3D on the RSP for model transforms, skeletal deformation and clipping, followed by RDP hardware triangles/depth. CPU code samples animation clips and calculates lighting; the CPU renderer remains available for reference comparisons. The courtyard adds colored vertex lighting, occlusion, emissive surfaces and fog, with source texture pixels cooked into the ROM. The guard workshop uses connected one-influence geometry and bounded head attention. Collision uses upright rotated boxes; sloped mesh collision, richer navigation, and SDK provisioning remain future work. Original N64 and M64 validation is **pending**. See [First playable](docs/first-playable.md) for acceptance details.

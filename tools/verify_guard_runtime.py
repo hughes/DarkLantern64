@@ -1,4 +1,4 @@
-"""Measure the ordinary animated workshop ROM in an isolated Ares session.
+"""Measure the reference CPU animated workshop in an isolated Ares session.
 
 Uses the existing patrol/sentry scene, normal audio, no capture freezing, and
 six complete profiling windows. This is not a maximum crowd/hardware benchmark.
@@ -25,7 +25,7 @@ def main():
     report={'passed':False,'source_sha256':hashlib.sha256(original).hexdigest()}
     try:
         sdk=Path(os.environ.get('N64_INST','C:/n64-toolchain'))
-        rom=build_rom(sdk,level=source)
+        rom=build_rom(sdk,level=source,renderer="cpu")
         executable=Path(os.environ.get('ARES_EXE',str(Path(os.environ['LOCALAPPDATA'])/'ares/ares.exe')))
         settings=ROOT/'.dev/ares/settings-8mb.bml'
         if not settings.is_file(): settings=executable.parent/'settings.bml'

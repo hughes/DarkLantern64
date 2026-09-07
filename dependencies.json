@@ -10,5 +10,11 @@
     "inspected_fork_commit": "7a82f8e50e82ad4601d530801630d8bd0d2fcd00",
     "sdk": "N64_INST or C:/n64-toolchain",
     "note": "ROM builds use the installed SDK; build reports fingerprint headers, libraries, compiler identity, and tools. This is not yet an automatically provisioned SDK pin."
+  },
+  "tiny3d": {
+    "repository": "https://github.com/HailToDodongo/tiny3d.git",
+    "commit": "ec557373e986b5e041cc102a7ff787eb07921937",
+    "path": "external/tiny3d",
+    "note": "SDK compatibility pin, validated with the installed libdragon SDK. Built locally without installing into the SDK. Fetch only through explicit setup or build_tiny3d.py --fetch; ordinary ROM builds never fetch Tiny3D."
   }
 }

@@ -16,9 +16,9 @@
       "profile": {
         "schema_version": 2,
         "measurement": "Emulated CPU-timer elapsed time; not CPU utilization or host CPU time",
-        "source_log": ".dev/ares/runs/40551c59f35544318bf89c2ec718fe17/sponza-performance-courtyard.log",
-        "source_log_sha256": "aa6faf3a0de1056e6d7cabc5897ff1ed5dfcba47f936effde986f420df091306",
-        "source_log_bytes": 102279,
+        "source_log": ".dev/ares/runs/af0bad17f57748efb5513c6c1fd9ab68/sponza-performance-courtyard.log",
+        "source_log_sha256": "f2b50990826487b78596ea45b211f3c3183e9074442d14b382c3e7164a98a22f",
+        "source_log_bytes": 90105,
         "complete_windows": 30,
         "selected_window_ids": [
           4,
@@ -53,7 +53,7 @@
           33
         ],
         "skipped_warmup_windows": 3,
-        "frames": 1245,
+        "frames": 560,
         "ignored_trailing_partial_window": false,
         "ticks_per_second": 46875000,
         "target_fps": 60,
@@ -63,54 +63,54 @@
           0
         ],
         "debug_frames": {
-          "0": 1245
+          "0": 560
         },
-        "audio_calls": 758,
+        "audio_calls": 770,
         "frame": {
-          "total_ticks": 1418142286,
-          "max_ticks": 1517762,
-          "average_ms": 24.30016233038822,
-          "max_ms": 32.37892266666667,
-          "percent_of_frame_budget": 145.8009739823293,
-          "percent_of_30fps_budget": 72.90048699116466,
+          "total_ticks": 1440937815,
+          "max_ticks": 3069496,
+          "average_ms": 54.892869142857144,
+          "max_ms": 65.48258133333333,
+          "percent_of_frame_budget": 329.3572148571428,
+          "percent_of_30fps_budget": 164.67860742857144,
           "percent_of_frame_elapsed": 100.0
         },
         "slots": {
           "input": {
-            "total_ticks": 2474795,
-            "max_ticks": 4915,
-            "average_ms": 0.042406125836680054,
-            "max_ms": 0.10485333333333334,
-            "percent_of_frame_budget": 0.25443675502008034,
-            "percent_of_30fps_budget": 0.12721837751004017,
-            "percent_of_frame_elapsed": 0.17450964014199066
+            "total_ticks": 1196098,
+            "max_ticks": 4959,
+            "average_ms": 0.045565638095238094,
+            "max_ms": 0.105792,
+            "percent_of_frame_budget": 0.2733938285714286,
+            "percent_of_30fps_budget": 0.1366969142857143,
+            "percent_of_frame_elapsed": 0.08300830109035622
           },
           "gameplay": {
-            "total_ticks": 320216537,
-            "max_ticks": 303765,
-            "average_ms": 5.486976805354752,
-            "max_ms": 6.48032,
-            "percent_of_frame_budget": 32.92186083212851,
-            "percent_of_30fps_budget": 16.460930416064258,
-            "percent_of_frame_elapsed": 22.580000622025032
+            "total_ticks": 713534527,
+            "max_ticks": 1283956,
+            "average_ms": 27.182267695238096,
+            "max_ms": 27.391061333333333,
+            "percent_of_frame_budget": 163.09360617142858,
+            "percent_of_30fps_budget": 81.54680308571429,
+            "percent_of_frame_elapsed": 49.518759211687424
           },
           "audio_events": {
-            "total_ticks": 3202985,
-            "max_ticks": 19928,
-            "average_ms": 0.05488381258366801,
-            "max_ms": 0.42513066666666666,
-            "percent_of_frame_budget": 0.32930287550200804,
-            "percent_of_30fps_budget": 0.16465143775100402,
-            "percent_of_frame_elapsed": 0.22585780225440652
+            "total_ticks": 3045003,
+            "max_ticks": 91797,
+            "average_ms": 0.11600011428571429,
+            "max_ms": 1.958336,
+            "percent_of_frame_budget": 0.6960006857142857,
+            "percent_of_30fps_budget": 0.3480003428571429,
+            "percent_of_frame_elapsed": 0.21132091671839426
           },
           "audio_mix": {
-            "total_ticks": 22870804,
-            "max_ticks": 126976,
-            "average_ms": 0.3918959721552878,
-            "max_ms": 2.7088213333333333,
-            "percent_of_frame_budget": 2.351375832931727,
-            "percent_of_30fps_budget": 1.1756879164658636,
-            "percent_of_frame_elapsed": 1.6127298526940617
+            "total_ticks": 22146867,
+            "max_ticks": 253006,
+            "average_ms": 0.8436901714285714,
+            "max_ms": 5.397461333333333,
+            "percent_of_frame_budget": 5.062141028571428,
+            "percent_of_30fps_budget": 2.531070514285714,
+            "percent_of_frame_elapsed": 1.5369759034327237
           },
           "cache": {
             "total_ticks": 0,
@@ -122,40 +122,40 @@
             "percent_of_frame_elapsed": 0.0
           },
           "transforms": {
-            "total_ticks": 373769654,
-            "max_ticks": 351392,
-            "average_ms": 6.404620577242302,
-            "max_ms": 7.496362666666666,
-            "percent_of_frame_budget": 38.427723463453816,
-            "percent_of_30fps_budget": 19.213861731726908,
-            "percent_of_frame_elapsed": 26.356287213905137
+            "total_ticks": 211362069,
+            "max_ticks": 416286,
+            "average_ms": 8.051888342857143,
+            "max_ms": 8.880768,
+            "percent_of_frame_budget": 48.31133005714286,
+            "percent_of_30fps_budget": 24.15566502857143,
+            "percent_of_frame_elapsed": 14.66836853053232
           },
           "lighting": {
-            "total_ticks": 334387011,
-            "max_ticks": 365129,
-            "average_ms": 5.729790817670683,
-            "max_ms": 7.789418666666666,
-            "percent_of_frame_budget": 34.378744906024096,
-            "percent_of_30fps_budget": 17.189372453012048,
-            "percent_of_frame_elapsed": 23.579228565503758
+            "total_ticks": 339919812,
+            "max_ticks": 840990,
+            "average_ms": 12.94932617142857,
+            "max_ms": 17.94112,
+            "percent_of_frame_budget": 77.69595702857143,
+            "percent_of_30fps_budget": 38.847978514285714,
+            "percent_of_frame_elapsed": 23.590179150097466
           },
           "triangles": {
-            "total_ticks": 223381925,
-            "max_ticks": 254269,
-            "average_ms": 3.8276956358768404,
-            "max_ms": 5.4244053333333335,
-            "percent_of_frame_budget": 22.96617381526104,
-            "percent_of_30fps_budget": 11.483086907630522,
-            "percent_of_frame_elapsed": 15.751728666808825
+            "total_ticks": 99462055,
+            "max_ticks": 238682,
+            "average_ms": 3.7890306666666667,
+            "max_ms": 5.091882666666667,
+            "percent_of_frame_budget": 22.734184,
+            "percent_of_30fps_budget": 11.367092,
+            "percent_of_frame_elapsed": 6.902591767986879
           },
           "hud": {
-            "total_ticks": 3339669,
-            "max_ticks": 7398,
-            "average_ms": 0.05722592128514056,
-            "max_ms": 0.157824,
-            "percent_of_frame_budget": 0.3433555277108434,
-            "percent_of_30fps_budget": 0.1716777638554217,
-            "percent_of_frame_elapsed": 0.2354960452818766
+            "total_ticks": 1530983,
+            "max_ticks": 5966,
+            "average_ms": 0.0583231619047619,
+            "max_ms": 0.12727466666666667,
+            "percent_of_frame_budget": 0.3499389714285714,
+            "percent_of_30fps_budget": 0.17496948571428572,
+            "percent_of_frame_elapsed": 0.10624906807654291
           },
           "debug_hud": {
             "total_ticks": 0,
@@ -167,31 +167,31 @@
             "percent_of_frame_elapsed": 0.0
           },
           "render_setup": {
-            "total_ticks": 26300702,
-            "max_ticks": 26683,
-            "average_ms": 0.4506679860776439,
-            "max_ms": 0.5692373333333334,
-            "percent_of_frame_budget": 2.7040079164658635,
-            "percent_of_30fps_budget": 1.3520039582329317,
-            "percent_of_frame_elapsed": 1.854588376613713
+            "total_ticks": 11829713,
+            "max_ticks": 25402,
+            "average_ms": 0.4506557333333333,
+            "max_ms": 0.5419093333333334,
+            "percent_of_frame_budget": 2.7039344,
+            "percent_of_30fps_budget": 1.3519671999999998,
+            "percent_of_frame_elapsed": 0.8209731798870168
           },
           "display_wait": {
-            "total_ticks": 1087212,
-            "max_ticks": 3335,
-            "average_ms": 0.018629603212851405,
-            "max_ms": 0.07114666666666666,
-            "percent_of_frame_budget": 0.11177761927710843,
-            "percent_of_30fps_budget": 0.055888809638554214,
-            "percent_of_frame_elapsed": 0.07666452165858342
+            "total_ticks": 536624,
+            "max_ticks": 2497,
+            "average_ms": 0.020442819047619045,
+            "max_ms": 0.053269333333333335,
+            "percent_of_frame_budget": 0.12265691428571428,
+            "percent_of_30fps_budget": 0.06132845714285713,
+            "percent_of_frame_elapsed": 0.03724130176984772
           },
           "other": {
-            "total_ticks": 107110992,
-            "max_ticks": 249924,
-            "average_ms": 1.8353690730923697,
-            "max_ms": 5.331712,
-            "percent_of_frame_budget": 11.012214438554219,
-            "percent_of_30fps_budget": 5.506107219277109,
-            "percent_of_frame_elapsed": 7.5529086931126175
+            "total_ticks": 36374064,
+            "max_ticks": 219719,
+            "average_ms": 1.3856786285714286,
+            "max_ms": 4.687338666666666,
+            "percent_of_frame_budget": 8.314071771428571,
+            "percent_of_30fps_budget": 4.157035885714286,
+            "percent_of_frame_elapsed": 2.5243326687210303
           }
         },
         "limitations": [
@@ -204,42 +204,42 @@
         "exact_frame_samples_available": true,
         "distributions": {
           "elapsed": {
-            "samples": 1245,
-            "average_ms": 24.30016233038822,
-            "min_ms": 20.781248,
-            "max_ms": 32.37892266666667,
-            "p50_ms": 22.779925333333335,
-            "p95_ms": 28.671317333333334,
-            "p99_ms": 30.481578666666667,
-            "over_budget_frames": 1245,
+            "samples": 560,
+            "average_ms": 54.892869142857144,
+            "min_ms": 48.382976,
+            "max_ms": 65.48258133333333,
+            "p50_ms": 53.33354666666666,
+            "p95_ms": 61.82698666666667,
+            "p99_ms": 63.539712,
+            "over_budget_frames": 560,
             "quantile_method": "nearest rank of every exact CP0-tick sample"
           },
           "work": {
-            "samples": 1245,
-            "average_ms": 24.281532727175367,
-            "min_ms": 20.762538666666668,
-            "max_ms": 32.355456,
-            "p50_ms": 22.761813333333333,
-            "p95_ms": 28.653141333333334,
-            "p99_ms": 30.458112,
-            "over_budget_frames": 1245,
+            "samples": 560,
+            "average_ms": 54.87242632380953,
+            "min_ms": 48.364437333333335,
+            "max_ms": 65.46065066666667,
+            "p50_ms": 53.31191466666667,
+            "p95_ms": 61.804928,
+            "p99_ms": 63.517738666666666,
+            "over_budget_frames": 560,
             "quantile_method": "nearest rank of every exact CP0-tick sample"
           }
         },
         "video": {
-          "vis": 1810,
-          "presents": 1245,
-          "repeats": 565,
-          "ticks": 1418170688,
+          "vis": 1839,
+          "presents": 560,
+          "repeats": 1279,
+          "ticks": 1440892255,
           "tracked": true,
-          "max_gap_vis": 2,
-          "max_interval_ms": 18.284565333333333,
-          "seconds": 30.254308010666666,
-          "native_refresh_hz": 59.826190682062666,
-          "presented_fps": 41.15116430893261
+          "max_gap_vis": 4,
+          "max_interval_ms": 18.980821333333335,
+          "seconds": 30.739034773333334,
+          "native_refresh_hz": 59.82621164134164,
+          "presented_fps": 18.217878476971894
         },
         "workload": {
-          "frames": 1245,
+          "frames": 560,
           "geometry_modes": [
             1
           ],
@@ -262,7 +262,7 @@
         "ground-guard": [
           {
             "position": [
-              8.06,
+              8.01,
               0.0,
               4.7
             ],
@@ -271,7 +271,7 @@
           },
           {
             "position": [
-              7.36,
+              7.29,
               0.0,
               4.7
             ],
@@ -280,7 +280,7 @@
           },
           {
             "position": [
-              6.66,
+              6.56,
               0.0,
               4.7
             ],
@@ -289,7 +289,7 @@
           },
           {
             "position": [
-              5.96,
+              5.84,
               0.0,
               4.7
             ],
@@ -298,7 +298,7 @@
           },
           {
             "position": [
-              5.26,
+              5.12,
               0.0,
               4.7
             ],
@@ -307,7 +307,7 @@
           },
           {
             "position": [
-              4.56,
+              4.45,
               0.0,
               4.7
             ],
@@ -316,7 +316,7 @@
           },
           {
             "position": [
-              3.86,
+              3.79,
               0.0,
               4.7
             ],
@@ -325,7 +325,7 @@
           },
           {
             "position": [
-              3.15,
+              3.16,
               0.0,
               4.7
             ],
@@ -334,7 +334,7 @@
           },
           {
             "position": [
-              2.44,
+              2.53,
               0.0,
               4.7
             ],
@@ -343,7 +343,7 @@
           },
           {
             "position": [
-              1.73,
+              1.93,
               0.0,
               4.7
             ],
@@ -352,7 +352,7 @@
           },
           {
             "position": [
-              1.03,
+              1.34,
               0.0,
               4.7
             ],
@@ -361,7 +361,7 @@
           },
           {
             "position": [
-              0.32,
+              0.74,
               0.0,
               4.7
             ],
@@ -370,7 +370,7 @@
           },
           {
             "position": [
-              -0.39,
+              0.15,
               0.0,
               4.7
             ],
@@ -379,7 +379,7 @@
           },
           {
             "position": [
-              -1.1,
+              -0.45,
               0.0,
               4.7
             ],
@@ -388,7 +388,7 @@
           },
           {
             "position": [
-              -1.8,
+              -1.04,
               0.0,
               4.7
             ],
@@ -397,7 +397,7 @@
           },
           {
             "position": [
-              -2.5,
+              -1.64,
               0.0,
               4.7
             ],
@@ -406,7 +406,7 @@
           },
           {
             "position": [
-              -3.21,
+              -2.23,
               0.0,
               4.7
             ],
@@ -415,7 +415,7 @@
           },
           {
             "position": [
-              -3.92,
+              -2.83,
               0.0,
               4.7
             ],
@@ -424,7 +424,7 @@
           },
           {
             "position": [
-              -4.63,
+              -3.42,
               0.0,
               4.7
             ],
@@ -433,7 +433,7 @@
           },
           {
             "position": [
-              -5.33,
+              -4.02,
               0.0,
               4.7
             ],
@@ -442,7 +442,7 @@
           },
           {
             "position": [
-              -6.04,
+              -4.65,
               0.0,
               4.7
             ],
@@ -451,7 +451,7 @@
           },
           {
             "position": [
-              -6.75,
+              -5.31,
               0.0,
               4.7
             ],
@@ -460,7 +460,7 @@
           },
           {
             "position": [
-              -7.45,
+              -5.98,
               0.0,
               4.7
             ],
@@ -469,7 +469,7 @@
           },
           {
             "position": [
-              -8.16,
+              -6.64,
               0.0,
               4.7
             ],
@@ -478,7 +478,7 @@
           },
           {
             "position": [
-              -8.87,
+              -7.31,
               0.0,
               4.7
             ],
@@ -487,7 +487,7 @@
           },
           {
             "position": [
-              -9.57,
+              -7.97,
               0.0,
               4.7
             ],
@@ -496,36 +496,36 @@
           },
           {
             "position": [
-              -10.08,
+              -8.64,
               0.0,
-              4.5
+              4.7
             ],
             "state": "PATROL",
-            "patrol_index": 2
+            "patrol_index": 1
+          },
+          {
+            "position": [
+              -9.33,
+              0.0,
+              4.7
+            ],
+            "state": "PATROL",
+            "patrol_index": 1
+          },
+          {
+            "position": [
+              -10.06,
+              0.0,
+              4.7
+            ],
+            "state": "PATROL",
+            "patrol_index": 1
           },
           {
             "position": [
               -10.09,
               0.0,
-              3.79
-            ],
-            "state": "PATROL",
-            "patrol_index": 2
-          },
-          {
-            "position": [
-              -10.1,
-              0.0,
-              3.08
-            ],
-            "state": "PATROL",
-            "patrol_index": 2
-          },
-          {
-            "position": [
-              -10.11,
-              0.0,
-              2.37
+              4.0
             ],
             "state": "PATROL",
             "patrol_index": 2
@@ -534,7 +534,7 @@
         "upper-guard": [
           {
             "position": [
-              -7.76,
+              -7.7,
               5.3,
               -4.7
             ],
@@ -543,7 +543,7 @@
           },
           {
             "position": [
-              -6.96,
+              -6.87,
               5.3,
               -4.7
             ],
@@ -552,7 +552,7 @@
           },
           {
             "position": [
-              -6.16,
+              -6.04,
               5.3,
               -4.7
             ],
@@ -561,7 +561,7 @@
           },
           {
             "position": [
-              -5.35,
+              -5.22,
               5.3,
               -4.7
             ],
@@ -570,7 +570,7 @@
           },
           {
             "position": [
-              -4.55,
+              -4.39,
               5.3,
               -4.7
             ],
@@ -579,7 +579,7 @@
           },
           {
             "position": [
-              -3.75,
+              -3.63,
               5.3,
               -4.7
             ],
@@ -588,7 +588,7 @@
           },
           {
             "position": [
-              -2.95,
+              -2.87,
               5.3,
               -4.7
             ],
@@ -597,7 +597,7 @@
           },
           {
             "position": [
-              -2.14,
+              -2.15,
               5.3,
               -4.7
             ],
@@ -606,7 +606,7 @@
           },
           {
             "position": [
-              -1.33,
+              -1.43,
               5.3,
               -4.7
             ],
@@ -615,7 +615,7 @@
           },
           {
             "position": [
-              -0.52,
+              -0.75,
               5.3,
               -4.7
             ],
@@ -624,7 +624,7 @@
           },
           {
             "position": [
-              0.28,
+              -0.07,
               5.3,
               -4.7
             ],
@@ -633,7 +633,7 @@
           },
           {
             "position": [
-              1.09,
+              0.61,
               5.3,
               -4.7
             ],
@@ -642,7 +642,7 @@
           },
           {
             "position": [
-              1.9,
+              1.29,
               5.3,
               -4.7
             ],
@@ -651,7 +651,7 @@
           },
           {
             "position": [
-              2.71,
+              1.97,
               5.3,
               -4.7
             ],
@@ -660,7 +660,7 @@
           },
           {
             "position": [
-              3.52,
+              2.65,
               5.3,
               -4.7
             ],
@@ -669,7 +669,7 @@
           },
           {
             "position": [
-              4.32,
+              3.33,
               5.3,
               -4.7
             ],
@@ -678,7 +678,7 @@
           },
           {
             "position": [
-              5.13,
+              4.01,
               5.3,
               -4.7
             ],
@@ -687,7 +687,7 @@
           },
           {
             "position": [
-              5.93,
+              4.69,
               5.3,
               -4.7
             ],
@@ -696,7 +696,7 @@
           },
           {
             "position": [
-              6.75,
+              5.37,
               5.3,
               -4.7
             ],
@@ -705,7 +705,7 @@
           },
           {
             "position": [
-              7.55,
+              6.05,
               5.3,
               -4.7
             ],
@@ -714,7 +714,7 @@
           },
           {
             "position": [
-              8.36,
+              6.77,
               5.3,
               -4.7
             ],
@@ -723,7 +723,7 @@
           },
           {
             "position": [
-              9.17,
+              7.53,
               5.3,
               -4.7
             ],
@@ -732,7 +732,25 @@
           },
           {
             "position": [
-              9.98,
+              8.29,
+              5.3,
+              -4.7
+            ],
+            "state": "PATROL",
+            "patrol_index": 1
+          },
+          {
+            "position": [
+              9.05,
+              5.3,
+              -4.7
+            ],
+            "state": "PATROL",
+            "patrol_index": 1
+          },
+          {
+            "position": [
+              9.81,
               5.3,
               -4.7
             ],
@@ -743,7 +761,7 @@
             "position": [
               10.09,
               5.3,
-              -4.0
+              -4.21
             ],
             "state": "PATROL",
             "patrol_index": 2
@@ -752,7 +770,7 @@
             "position": [
               10.1,
               5.3,
-              -3.2
+              -3.45
             ],
             "state": "PATROL",
             "patrol_index": 2
@@ -761,7 +779,7 @@
             "position": [
               10.11,
               5.3,
-              -2.38
+              -2.66
             ],
             "state": "PATROL",
             "patrol_index": 2
@@ -770,7 +788,7 @@
             "position": [
               10.12,
               5.3,
-              -1.58
+              -1.83
             ],
             "state": "PATROL",
             "patrol_index": 2
@@ -779,25 +797,7 @@
             "position": [
               10.13,
               5.3,
-              -0.77
-            ],
-            "state": "PATROL",
-            "patrol_index": 2
-          },
-          {
-            "position": [
-              10.14,
-              5.3,
-              0.04
-            ],
-            "state": "PATROL",
-            "patrol_index": 2
-          },
-          {
-            "position": [
-              10.15,
-              5.3,
-              0.85
+              -1.0
             ],
             "state": "PATROL",
             "patrol_index": 2
@@ -805,12 +805,12 @@
         ]
       },
       "actor_displacement_metres": {
-        "ground-guard": 18.318782710649746,
-        "upper-guard": 18.750215998755856
+        "ground-guard": 18.113530854032852,
+        "upper-guard": 18.20985722074723
       },
       "heap_bytes": {
-        "sampled_peak": 1474808,
-        "sampled_total": 7550128
+        "sampled_peak": 1474776,
+        "sampled_total": 7568512
       },
       "meets_60fps_sample": false,
       "scene_work_samples": [
@@ -906,13 +906,13 @@
         },
         {
           "models": "114",
-          "visible": "84",
-          "camera_vertices": "3608"
+          "visible": "85",
+          "camera_vertices": "4617"
         },
         {
           "models": "114",
-          "visible": "84",
-          "camera_vertices": "3608"
+          "visible": "85",
+          "camera_vertices": "4617"
         },
         {
           "models": "114",
@@ -974,26 +974,26 @@
       "run": {
         "name": "sponza-performance-courtyard",
         "passed": true,
-        "log": ".dev/ares/runs/40551c59f35544318bf89c2ec718fe17/sponza-performance-courtyard.log",
-        "tested_rom": ".dev/ares/runs/40551c59f35544318bf89c2ec718fe17/DarkLantern64-sponza_courtyard-preset-courtyard-t3d.z64",
-        "rom_sha256": "39199f0cd478936cc5113f34d29f8ae0252a38e36e3f288c0a0a68c5dd2810f8",
-        "rom_bytes": 491520,
-        "settings": ".dev/ares/runs/40551c59f35544318bf89c2ec718fe17/settings.bml",
+        "log": ".dev/ares/runs/af0bad17f57748efb5513c6c1fd9ab68/sponza-performance-courtyard.log",
+        "tested_rom": ".dev/ares/runs/af0bad17f57748efb5513c6c1fd9ab68/DarkLantern64-sponza_courtyard-preset-courtyard-t3d.z64",
+        "rom_sha256": "a0ab9328fa0f84977d504b89a3cfe7857238c97143e9907ef37b2e80aaca288f",
+        "rom_bytes": 425984,
+        "settings": ".dev/ares/runs/af0bad17f57748efb5513c6c1fd9ab68/settings.bml",
         "settings_source_sha256": "010e6ec4df82b1750292c4a1e50b1e513f9e2d4b7c604d345be0c1d28b6b140a",
         "profile_report": null,
-        "elapsed_seconds": 37.797,
-        "peak_sampled_heap_bytes": 1474808,
-        "max_reported_cpu_ms": 29.7,
+        "elapsed_seconds": 54.328,
+        "peak_sampled_heap_bytes": 1474776,
+        "max_reported_cpu_ms": 63.32,
         "boot": "DL64 boot_ok memory=8388608 scene=\"DarkLantern64 - Sponza After Hours\" meshes=70 models=114 colliders=118 version=2 world=3d renderer=rsp-tiny3d depth=hardware",
         "terminal_event": "DL64 profile_end window=33"
       },
       "source_sha256": "a75fb0e9415d405a1a004469048c2a7288bbcd49f34ea5db90a95c89f5a60164",
       "build": {
-        "signature": "580d46f0227ab751ae41b11f392c9c3d103ac69857206c01e47efce345a532c1",
-        "rom_sha256": "39199f0cd478936cc5113f34d29f8ae0252a38e36e3f288c0a0a68c5dd2810f8",
-        "rom_bytes": 491520,
+        "signature": "1c24f93f3040ee3fd0dd7a01d844b40aa88ed8b2eb78142174fb431d57e6a368",
+        "rom_sha256": "a0ab9328fa0f84977d504b89a3cfe7857238c97143e9907ef37b2e80aaca288f",
+        "rom_bytes": 425984,
         "source_sha256": "951850167ca81b5d7a152225fbafac6c8754f30be5d4b77eedf6955a530d846e",
-        "static_image_bytes": 772304,
+        "static_image_bytes": 753912,
         "renderer": "t3d",
         "renderer_dependency": {
           "revision": "ec557373e986b5e041cc102a7ff787eb07921937",
@@ -1270,11 +1270,6 @@
           "decoded_bytes": 26624,
           "memory_note": "Unique decoded pixel bytes only. Sprite headers, allocation overhead and renderer buffers are additional; TMEM holds one texture at a time."
         }
-      },
-      "before_optimization": {
-        "rom_sha256": "a0ab9328fa0f84977d504b89a3cfe7857238c97143e9907ef37b2e80aaca288f",
-        "presented_fps": 18.217878476971894,
-        "work_average_ms": 54.87242632380953
       }
     },
     "upper-gallery": {
@@ -1291,9 +1286,9 @@
       "profile": {
         "schema_version": 2,
         "measurement": "Emulated CPU-timer elapsed time; not CPU utilization or host CPU time",
-        "source_log": ".dev/ares/runs/01f1b02aedd648faa1be01e59a41cd5d/sponza-performance-upper-gallery.log",
-        "source_log_sha256": "161125fe030c7cd1a2676d88a572a1d2612fbd22cb1f3ffa0ac82499ba0c4ab4",
-        "source_log_bytes": 109774,
+        "source_log": ".dev/ares/runs/ceaf61fb0e4a4b4aa7c1d2f756a791c2/sponza-performance-upper-gallery.log",
+        "source_log_sha256": "62df7bfcc9978e13db1f4598ec3879187a4afed7290b1f00f7f1037668265e4a",
+        "source_log_bytes": 107973,
         "complete_windows": 30,
         "selected_window_ids": [
           4,
@@ -1328,7 +1323,7 @@
           33
         ],
         "skipped_warmup_windows": 3,
-        "frames": 1802,
+        "frames": 1728,
         "ignored_trailing_partial_window": false,
         "ticks_per_second": 46875000,
         "target_fps": 60,
@@ -1338,54 +1333,54 @@
           0
         ],
         "debug_frames": {
-          "0": 1802
+          "0": 1728
         },
-        "audio_calls": 754,
+        "audio_calls": 756,
         "frame": {
-          "total_ticks": 1411724004,
-          "max_ticks": 1014048,
-          "average_ms": 16.712973780244173,
-          "max_ms": 21.633024,
-          "percent_of_frame_budget": 100.27784268146505,
-          "percent_of_30fps_budget": 50.13892134073252,
+          "total_ticks": 1414405091,
+          "max_ticks": 1176726,
+          "average_ms": 17.46179124691358,
+          "max_ms": 25.103488,
+          "percent_of_frame_budget": 104.77074748148148,
+          "percent_of_30fps_budget": 52.38537374074075,
           "percent_of_frame_elapsed": 100.0
         },
         "slots": {
           "input": {
-            "total_ticks": 3656791,
-            "max_ticks": 3393,
-            "average_ms": 0.04329164335923048,
-            "max_ms": 0.072384,
-            "percent_of_frame_budget": 0.2597498601553829,
-            "percent_of_30fps_budget": 0.12987493007769146,
-            "percent_of_frame_elapsed": 0.25903016380247085
+            "total_ticks": 3699097,
+            "max_ticks": 5838,
+            "average_ms": 0.04566786419753086,
+            "max_ms": 0.124544,
+            "percent_of_frame_budget": 0.2740071851851852,
+            "percent_of_30fps_budget": 0.1370035925925926,
+            "percent_of_frame_elapsed": 0.2615302379451065
           },
           "gameplay": {
-            "total_ticks": 252665775,
-            "max_ticks": 157536,
-            "average_ms": 2.991233740288568,
-            "max_ms": 3.360768,
-            "percent_of_frame_budget": 17.947402441731406,
-            "percent_of_30fps_budget": 8.973701220865705,
-            "percent_of_frame_elapsed": 17.89767506142086
+            "total_ticks": 394611748,
+            "max_ticks": 249355,
+            "average_ms": 4.871749975308642,
+            "max_ms": 5.3195733333333335,
+            "percent_of_frame_budget": 29.230499851851853,
+            "percent_of_30fps_budget": 14.615249925925927,
+            "percent_of_frame_elapsed": 27.89948583407637
           },
           "audio_events": {
-            "total_ticks": 4351043,
-            "max_ticks": 13801,
-            "average_ms": 0.05151068294487606,
-            "max_ms": 0.2944213333333333,
-            "percent_of_frame_budget": 0.30906409766925635,
-            "percent_of_30fps_budget": 0.15453204883462818,
-            "percent_of_frame_elapsed": 0.30820776495063407
+            "total_ticks": 6643092,
+            "max_ticks": 79063,
+            "average_ms": 0.08201348148148149,
+            "max_ms": 1.6866773333333334,
+            "percent_of_frame_budget": 0.49208088888888896,
+            "percent_of_30fps_budget": 0.24604044444444448,
+            "percent_of_frame_elapsed": 0.46967393162472715
           },
           "audio_mix": {
-            "total_ticks": 19069214,
-            "max_ticks": 73551,
-            "average_ms": 0.2257546607473178,
-            "max_ms": 1.569088,
-            "percent_of_frame_budget": 1.3545279644839066,
-            "percent_of_30fps_budget": 0.6772639822419534,
-            "percent_of_frame_elapsed": 1.3507749351834355
+            "total_ticks": 18797192,
+            "max_ticks": 73089,
+            "average_ms": 0.23206409876543208,
+            "max_ms": 1.559232,
+            "percent_of_frame_budget": 1.3923845925925924,
+            "percent_of_30fps_budget": 0.6961922962962962,
+            "percent_of_frame_elapsed": 1.3289822074035507
           },
           "cache": {
             "total_ticks": 0,
@@ -1397,40 +1392,40 @@
             "percent_of_frame_elapsed": 0.0
           },
           "transforms": {
-            "total_ticks": 281314770,
-            "max_ticks": 196369,
-            "average_ms": 3.3304005327413986,
-            "max_ms": 4.189205333333334,
-            "percent_of_frame_budget": 19.98240319644839,
-            "percent_of_30fps_budget": 9.991201598224196,
-            "percent_of_frame_elapsed": 19.927037381451225
+            "total_ticks": 373315150,
+            "max_ticks": 257515,
+            "average_ms": 4.608829012345679,
+            "max_ms": 5.4936533333333335,
+            "percent_of_frame_budget": 27.652974074074073,
+            "percent_of_30fps_budget": 13.826487037037037,
+            "percent_of_frame_elapsed": 26.393792865667788
           },
           "lighting": {
-            "total_ticks": 117776187,
-            "max_ticks": 147254,
-            "average_ms": 1.394316679245283,
-            "max_ms": 3.1414186666666666,
-            "percent_of_frame_budget": 8.365900075471698,
-            "percent_of_30fps_budget": 4.182950037735849,
-            "percent_of_frame_elapsed": 8.342720437301567
+            "total_ticks": 149514964,
+            "max_ticks": 316481,
+            "average_ms": 1.8458637530864197,
+            "max_ms": 6.751594666666667,
+            "percent_of_frame_budget": 11.075182518518519,
+            "percent_of_30fps_budget": 5.537591259259259,
+            "percent_of_frame_elapsed": 10.570872867425221
           },
           "triangles": {
-            "total_ticks": 178776350,
-            "max_ticks": 109753,
-            "average_ms": 2.116479171291158,
-            "max_ms": 2.3413973333333336,
-            "percent_of_frame_budget": 12.698875027746949,
-            "percent_of_30fps_budget": 6.349437513873474,
-            "percent_of_frame_elapsed": 12.663689892178104
+            "total_ticks": 172776063,
+            "max_ticks": 111035,
+            "average_ms": 2.133037814814815,
+            "max_ms": 2.3687466666666666,
+            "percent_of_frame_budget": 12.79822688888889,
+            "percent_of_30fps_budget": 6.3991134444444455,
+            "percent_of_frame_elapsed": 12.215458223347133
           },
           "hud": {
-            "total_ticks": 4749591,
-            "max_ticks": 4615,
-            "average_ms": 0.056228972253052165,
-            "max_ms": 0.09845333333333334,
-            "percent_of_frame_budget": 0.337373833518313,
-            "percent_of_30fps_budget": 0.16868691675915648,
-            "percent_of_frame_elapsed": 0.3364390622063829
+            "total_ticks": 4569450,
+            "max_ticks": 8952,
+            "average_ms": 0.05641296296296296,
+            "max_ms": 0.190976,
+            "percent_of_frame_budget": 0.33847777777777777,
+            "percent_of_30fps_budget": 0.16923888888888888,
+            "percent_of_frame_elapsed": 0.3230651550306107
           },
           "debug_hud": {
             "total_ticks": 0,
@@ -1442,31 +1437,31 @@
             "percent_of_frame_elapsed": 0.0
           },
           "render_setup": {
-            "total_ticks": 38055122,
-            "max_ticks": 24530,
-            "average_ms": 0.4505230869404366,
-            "max_ms": 0.5233066666666667,
-            "percent_of_frame_budget": 2.7031385216426194,
-            "percent_of_30fps_budget": 1.3515692608213097,
-            "percent_of_frame_elapsed": 2.695648858571084
+            "total_ticks": 36095610,
+            "max_ticks": 25085,
+            "average_ms": 0.4456248148148148,
+            "max_ms": 0.5351466666666667,
+            "percent_of_frame_budget": 2.6737488888888885,
+            "percent_of_30fps_budget": 1.3368744444444445,
+            "percent_of_frame_elapsed": 2.5519994398832377
           },
           "display_wait": {
-            "total_ticks": 377009838,
-            "max_ticks": 347402,
-            "average_ms": 4.4633055183129855,
-            "max_ms": 7.411242666666666,
-            "percent_of_frame_budget": 26.779833109877917,
-            "percent_of_30fps_budget": 13.389916554938956,
-            "percent_of_frame_elapsed": 26.70563346176552
+            "total_ticks": 169312654,
+            "max_ticks": 250457,
+            "average_ms": 2.0902796790123457,
+            "max_ms": 5.343082666666667,
+            "percent_of_frame_budget": 12.541678074074074,
+            "percent_of_30fps_budget": 6.270839037037037,
+            "percent_of_frame_elapsed": 11.97059138696214
           },
           "other": {
-            "total_ticks": 134299323,
-            "max_ticks": 245158,
-            "average_ms": 1.5899290921198668,
-            "max_ms": 5.230037333333334,
-            "percent_of_frame_budget": 9.5395745527192,
-            "percent_of_30fps_budget": 4.7697872763596,
-            "percent_of_frame_elapsed": 9.513142981168718
+            "total_ticks": 85070071,
+            "max_ticks": 227832,
+            "average_ms": 1.0502477901234568,
+            "max_ms": 4.860416,
+            "percent_of_frame_budget": 6.3014867407407404,
+            "percent_of_30fps_budget": 3.1507433703703702,
+            "percent_of_frame_elapsed": 6.0145478506341155
           }
         },
         "limitations": [
@@ -1479,42 +1474,42 @@
         "exact_frame_samples_available": true,
         "distributions": {
           "elapsed": {
-            "samples": 1802,
-            "average_ms": 16.712973780244173,
-            "min_ms": 12.025834666666666,
-            "max_ms": 21.633024,
-            "p50_ms": 16.715072,
-            "p95_ms": 17.235008,
-            "p99_ms": 18.352213333333335,
-            "over_budget_frames": 1307,
+            "samples": 1728,
+            "average_ms": 17.46179124691358,
+            "min_ms": 11.501226666666666,
+            "max_ms": 25.103488,
+            "p50_ms": 17.175125333333334,
+            "p95_ms": 20.926485333333332,
+            "p99_ms": 21.506624,
+            "over_budget_frames": 1475,
             "quantile_method": "nearest rank of every exact CP0-tick sample"
           },
           "work": {
-            "samples": 1802,
-            "average_ms": 12.249668261931188,
-            "min_ms": 9.290752,
-            "max_ms": 18.868842666666666,
-            "p50_ms": 11.877461333333333,
-            "p95_ms": 14.831957333333333,
-            "p99_ms": 15.960064,
-            "over_budget_frames": 15,
+            "samples": 1728,
+            "average_ms": 15.371511567901235,
+            "min_ms": 11.367488,
+            "max_ms": 25.080234666666666,
+            "p50_ms": 13.484864,
+            "p95_ms": 20.903978666666667,
+            "p99_ms": 21.448234666666668,
+            "over_budget_frames": 795,
             "quantile_method": "nearest rank of every exact CP0-tick sample"
           }
         },
         "video": {
-          "vis": 1802,
-          "presents": 1802,
-          "repeats": 0,
-          "ticks": 1411902866,
+          "vis": 1805,
+          "presents": 1727,
+          "repeats": 78,
+          "ticks": 1414253545,
           "tracked": true,
-          "max_gap_vis": 1,
-          "max_interval_ms": 18.293077333333333,
-          "seconds": 30.120594474666667,
-          "native_refresh_hz": 59.826176455965914,
-          "presented_fps": 59.826176455965914
+          "max_gap_vis": 2,
+          "max_interval_ms": 18.1968,
+          "seconds": 30.170742293333333,
+          "native_refresh_hz": 59.82617140973827,
+          "presented_fps": 57.24088533219834
         },
         "workload": {
-          "frames": 1802,
+          "frames": 1728,
           "geometry_modes": [
             1
           ],
@@ -1537,7 +1532,7 @@
         "ground-guard": [
           {
             "position": [
-              8.08,
+              8.07,
               0.0,
               4.7
             ],
@@ -1546,7 +1541,7 @@
           },
           {
             "position": [
-              7.38,
+              7.36,
               0.0,
               4.7
             ],
@@ -1555,7 +1550,7 @@
           },
           {
             "position": [
-              6.67,
+              6.65,
               0.0,
               4.7
             ],
@@ -1564,7 +1559,7 @@
           },
           {
             "position": [
-              5.97,
+              5.94,
               0.0,
               4.7
             ],
@@ -1573,7 +1568,7 @@
           },
           {
             "position": [
-              5.27,
+              5.23,
               0.0,
               4.7
             ],
@@ -1582,7 +1577,7 @@
           },
           {
             "position": [
-              4.57,
+              4.52,
               0.0,
               4.7
             ],
@@ -1591,7 +1586,7 @@
           },
           {
             "position": [
-              3.86,
+              3.82,
               0.0,
               4.7
             ],
@@ -1600,7 +1595,7 @@
           },
           {
             "position": [
-              3.16,
+              3.12,
               0.0,
               4.7
             ],
@@ -1609,7 +1604,7 @@
           },
           {
             "position": [
-              2.45,
+              2.41,
               0.0,
               4.7
             ],
@@ -1618,7 +1613,7 @@
           },
           {
             "position": [
-              1.75,
+              1.71,
               0.0,
               4.7
             ],
@@ -1627,7 +1622,7 @@
           },
           {
             "position": [
-              1.05,
+              1.01,
               0.0,
               4.7
             ],
@@ -1636,7 +1631,7 @@
           },
           {
             "position": [
-              0.35,
+              0.31,
               0.0,
               4.7
             ],
@@ -1645,7 +1640,7 @@
           },
           {
             "position": [
-              -0.36,
+              -0.4,
               0.0,
               4.7
             ],
@@ -1654,7 +1649,7 @@
           },
           {
             "position": [
-              -1.06,
+              -1.1,
               0.0,
               4.7
             ],
@@ -1663,7 +1658,7 @@
           },
           {
             "position": [
-              -1.76,
+              -1.8,
               0.0,
               4.7
             ],
@@ -1672,7 +1667,7 @@
           },
           {
             "position": [
-              -2.46,
+              -2.5,
               0.0,
               4.7
             ],
@@ -1681,7 +1676,7 @@
           },
           {
             "position": [
-              -3.16,
+              -3.2,
               0.0,
               4.7
             ],
@@ -1690,7 +1685,7 @@
           },
           {
             "position": [
-              -3.87,
+              -3.9,
               0.0,
               4.7
             ],
@@ -1699,7 +1694,7 @@
           },
           {
             "position": [
-              -4.57,
+              -4.61,
               0.0,
               4.7
             ],
@@ -1708,7 +1703,7 @@
           },
           {
             "position": [
-              -5.27,
+              -5.31,
               0.0,
               4.7
             ],
@@ -1717,7 +1712,7 @@
           },
           {
             "position": [
-              -5.97,
+              -6.01,
               0.0,
               4.7
             ],
@@ -1726,7 +1721,7 @@
           },
           {
             "position": [
-              -6.67,
+              -6.71,
               0.0,
               4.7
             ],
@@ -1735,7 +1730,7 @@
           },
           {
             "position": [
-              -7.38,
+              -7.41,
               0.0,
               4.7
             ],
@@ -1744,7 +1739,7 @@
           },
           {
             "position": [
-              -8.08,
+              -8.13,
               0.0,
               4.7
             ],
@@ -1753,7 +1748,7 @@
           },
           {
             "position": [
-              -8.78,
+              -8.84,
               0.0,
               4.7
             ],
@@ -1762,7 +1757,7 @@
           },
           {
             "position": [
-              -9.49,
+              -9.54,
               0.0,
               4.7
             ],
@@ -1773,7 +1768,7 @@
             "position": [
               -10.08,
               0.0,
-              4.59
+              4.54
             ],
             "state": "PATROL",
             "patrol_index": 2
@@ -1782,7 +1777,7 @@
             "position": [
               -10.09,
               0.0,
-              3.89
+              3.84
             ],
             "state": "PATROL",
             "patrol_index": 2
@@ -1791,7 +1786,7 @@
             "position": [
               -10.1,
               0.0,
-              3.19
+              3.14
             ],
             "state": "PATROL",
             "patrol_index": 2
@@ -1800,7 +1795,7 @@
             "position": [
               -10.11,
               0.0,
-              2.49
+              2.44
             ],
             "state": "PATROL",
             "patrol_index": 2
@@ -1809,7 +1804,7 @@
         "upper-guard": [
           {
             "position": [
-              -7.77,
+              -7.76,
               5.3,
               -4.7
             ],
@@ -1818,7 +1813,7 @@
           },
           {
             "position": [
-              -6.97,
+              -6.95,
               5.3,
               -4.7
             ],
@@ -1827,7 +1822,7 @@
           },
           {
             "position": [
-              -6.17,
+              -6.14,
               5.3,
               -4.7
             ],
@@ -1836,7 +1831,7 @@
           },
           {
             "position": [
-              -5.37,
+              -5.33,
               5.3,
               -4.7
             ],
@@ -1845,7 +1840,7 @@
           },
           {
             "position": [
-              -4.56,
+              -4.52,
               5.3,
               -4.7
             ],
@@ -1854,7 +1849,7 @@
           },
           {
             "position": [
-              -3.76,
+              -3.71,
               5.3,
               -4.7
             ],
@@ -1863,7 +1858,7 @@
           },
           {
             "position": [
-              -2.96,
+              -2.91,
               5.3,
               -4.7
             ],
@@ -1872,7 +1867,7 @@
           },
           {
             "position": [
-              -2.16,
+              -2.11,
               5.3,
               -4.7
             ],
@@ -1881,7 +1876,7 @@
           },
           {
             "position": [
-              -1.35,
+              -1.3,
               5.3,
               -4.7
             ],
@@ -1890,7 +1885,7 @@
           },
           {
             "position": [
-              -0.54,
+              -0.5,
               5.3,
               -4.7
             ],
@@ -1899,7 +1894,7 @@
           },
           {
             "position": [
-              0.26,
+              0.3,
               5.3,
               -4.7
             ],
@@ -1908,7 +1903,7 @@
           },
           {
             "position": [
-              1.06,
+              1.11,
               5.3,
               -4.7
             ],
@@ -1917,7 +1912,7 @@
           },
           {
             "position": [
-              1.86,
+              1.91,
               5.3,
               -4.7
             ],
@@ -1926,7 +1921,7 @@
           },
           {
             "position": [
-              2.67,
+              2.71,
               5.3,
               -4.7
             ],
@@ -1935,7 +1930,7 @@
           },
           {
             "position": [
-              3.47,
+              3.51,
               5.3,
               -4.7
             ],
@@ -1944,7 +1939,7 @@
           },
           {
             "position": [
-              4.27,
+              4.31,
               5.3,
               -4.7
             ],
@@ -1953,7 +1948,7 @@
           },
           {
             "position": [
-              5.07,
+              5.12,
               5.3,
               -4.7
             ],
@@ -1962,7 +1957,7 @@
           },
           {
             "position": [
-              5.88,
+              5.92,
               5.3,
               -4.7
             ],
@@ -1971,7 +1966,7 @@
           },
           {
             "position": [
-              6.68,
+              6.72,
               5.3,
               -4.7
             ],
@@ -1980,7 +1975,7 @@
           },
           {
             "position": [
-              7.48,
+              7.52,
               5.3,
               -4.7
             ],
@@ -1989,7 +1984,7 @@
           },
           {
             "position": [
-              8.28,
+              8.33,
               5.3,
               -4.7
             ],
@@ -1998,7 +1993,7 @@
           },
           {
             "position": [
-              9.09,
+              9.13,
               5.3,
               -4.7
             ],
@@ -2007,7 +2002,7 @@
           },
           {
             "position": [
-              9.89,
+              9.93,
               5.3,
               -4.7
             ],
@@ -2018,7 +2013,7 @@
             "position": [
               10.09,
               5.3,
-              -4.09
+              -4.03
             ],
             "state": "PATROL",
             "patrol_index": 2
@@ -2027,7 +2022,7 @@
             "position": [
               10.1,
               5.3,
-              -3.29
+              -3.22
             ],
             "state": "PATROL",
             "patrol_index": 2
@@ -2036,7 +2031,7 @@
             "position": [
               10.11,
               5.3,
-              -2.48
+              -2.42
             ],
             "state": "PATROL",
             "patrol_index": 2
@@ -2045,7 +2040,7 @@
             "position": [
               10.12,
               5.3,
-              -1.68
+              -1.62
             ],
             "state": "PATROL",
             "patrol_index": 2
@@ -2054,7 +2049,7 @@
             "position": [
               10.13,
               5.3,
-              -0.88
+              -0.82
             ],
             "state": "PATROL",
             "patrol_index": 2
@@ -2063,7 +2058,7 @@
             "position": [
               10.14,
               5.3,
-              -0.08
+              -0.02
             ],
             "state": "PATROL",
             "patrol_index": 2
@@ -2072,7 +2067,7 @@
             "position": [
               10.15,
               5.3,
-              0.72
+              0.78
             ],
             "state": "PATROL",
             "patrol_index": 2
@@ -2080,12 +2075,12 @@
         ]
       },
       "actor_displacement_metres": {
-        "ground-guard": 18.323760531070032,
-        "upper-guard": 18.7217200064524
+        "ground-guard": 18.319934497699492,
+        "upper-guard": 18.729615586017776
       },
       "heap_bytes": {
-        "sampled_peak": 1474808,
-        "sampled_total": 7550128
+        "sampled_peak": 1474776,
+        "sampled_total": 7568512
       },
       "meets_60fps_sample": false,
       "scene_work_samples": [
@@ -2249,26 +2244,26 @@
       "run": {
         "name": "sponza-performance-upper-gallery",
         "passed": true,
-        "log": ".dev/ares/runs/01f1b02aedd648faa1be01e59a41cd5d/sponza-performance-upper-gallery.log",
-        "tested_rom": ".dev/ares/runs/01f1b02aedd648faa1be01e59a41cd5d/DarkLantern64-sponza_courtyard-preset-upper-gallery-t3d.z64",
-        "rom_sha256": "fc80ab22de99cd5c3ea04b0a27501148f90a0b280cb7a998dfbf8983233bf87f",
-        "rom_bytes": 491520,
-        "settings": ".dev/ares/runs/01f1b02aedd648faa1be01e59a41cd5d/settings.bml",
+        "log": ".dev/ares/runs/ceaf61fb0e4a4b4aa7c1d2f756a791c2/sponza-performance-upper-gallery.log",
+        "tested_rom": ".dev/ares/runs/ceaf61fb0e4a4b4aa7c1d2f756a791c2/DarkLantern64-sponza_courtyard-preset-upper-gallery-t3d.z64",
+        "rom_sha256": "f16c8ee974297ad01979177644f243ea931f929c5e29c2fed535ca40b4ad4602",
+        "rom_bytes": 425984,
+        "settings": ".dev/ares/runs/ceaf61fb0e4a4b4aa7c1d2f756a791c2/settings.bml",
         "settings_source_sha256": "010e6ec4df82b1750292c4a1e50b1e513f9e2d4b7c604d345be0c1d28b6b140a",
         "profile_report": null,
-        "elapsed_seconds": 37.796,
-        "peak_sampled_heap_bytes": 1474808,
-        "max_reported_cpu_ms": 14.72,
+        "elapsed_seconds": 54.093,
+        "peak_sampled_heap_bytes": 1474776,
+        "max_reported_cpu_ms": 22.28,
         "boot": "DL64 boot_ok memory=8388608 scene=\"DarkLantern64 - Sponza After Hours\" meshes=70 models=114 colliders=118 version=2 world=3d renderer=rsp-tiny3d depth=hardware",
         "terminal_event": "DL64 profile_end window=33"
       },
       "source_sha256": "a75fb0e9415d405a1a004469048c2a7288bbcd49f34ea5db90a95c89f5a60164",
       "build": {
-        "signature": "ddb93e23a9d38cd1798716ba7f24d8ee21c9f7c6de93ff51adfd39af82c0f56b",
-        "rom_sha256": "fc80ab22de99cd5c3ea04b0a27501148f90a0b280cb7a998dfbf8983233bf87f",
-        "rom_bytes": 491520,
+        "signature": "23073076be72a45f2472cbe4fb6573e3f6787dfc0400b288dc557f1e7f692fb5",
+        "rom_sha256": "f16c8ee974297ad01979177644f243ea931f929c5e29c2fed535ca40b4ad4602",
+        "rom_bytes": 425984,
         "source_sha256": "951850167ca81b5d7a152225fbafac6c8754f30be5d4b77eedf6955a530d846e",
-        "static_image_bytes": 772304,
+        "static_image_bytes": 753912,
         "renderer": "t3d",
         "renderer_dependency": {
           "revision": "ec557373e986b5e041cc102a7ff787eb07921937",
@@ -2545,47 +2540,37 @@
           "decoded_bytes": 26624,
           "memory_note": "Unique decoded pixel bytes only. Sprite headers, allocation overhead and renderer buffers are additional; TMEM holds one texture at a time."
         }
-      },
-      "before_optimization": {
-        "rom_sha256": "f16c8ee974297ad01979177644f243ea931f929c5e29c2fed535ca40b4ad4602",
-        "presented_fps": 57.24088533219834,
-        "work_average_ms": 15.371511567901235
       }
     }
   },
-  "before_optimization_reference": {
-    "path": "docs/evidence/sponza-performance-before.json",
-    "sha256": "72b8a80f604a6a9490a5b7d4031d6db9efd2851927c8cd83b2fb475da0c2ea1b",
-    "scope": "Same authored scene and presets; preserved before-optimization ROM and timing evidence."
-  },
   "workshop_reference": {
-    "evidence_sha256": "6ed5f151bc8de079b5dcb722b694a8af1cbcf23915fa80d7dbbbe4ee6e90c706",
+    "evidence_sha256": "3051b4f8e344b348a7d93734de60559cbb593ae41c850a5e17951a396be34c31",
     "passed": true,
-    "rom_sha256": "0072e89963129d76379b82309c760a4f9a146e88d6319df107ee5d01c01bb7d1",
+    "rom_sha256": "6bcb5aafab401c16f512f4dc7f1b5886725f4c59ef81f441ab01b79d1e1a8731",
     "video": {
       "vis": 1800,
       "presents": 1800,
       "repeats": 0,
-      "ticks": 1410335688,
+      "ticks": 1410335734,
       "tracked": true,
       "max_gap_vis": 1,
-      "max_interval_ms": 18.253674666666665,
-      "seconds": 30.087161344,
-      "native_refresh_hz": 59.82618231809221,
-      "presented_fps": 59.82618231809221
+      "max_interval_ms": 18.15569066666667,
+      "seconds": 30.087162325333335,
+      "native_refresh_hz": 59.82618036678066,
+      "presented_fps": 59.82618036678066
     },
     "work": {
       "samples": 1800,
-      "average_ms": 10.791728865185187,
-      "min_ms": 10.284906666666666,
-      "max_ms": 15.396032,
-      "p50_ms": 10.535253333333333,
-      "p95_ms": 12.077354666666666,
-      "p99_ms": 13.801258666666667,
+      "average_ms": 11.687906524444445,
+      "min_ms": 11.033408,
+      "max_ms": 16.480021333333333,
+      "p50_ms": 11.529002666666667,
+      "p95_ms": 12.992981333333333,
+      "p99_ms": 14.84224,
       "over_budget_frames": 0,
       "quantile_method": "nearest rank of every exact CP0-tick sample"
     },
-    "scope": "Two-guard workshop reference, different geometry and camera; comparative evidence, not an equal-workload speedup.",
-    "evidence_path": "docs/evidence/guard-60fps.json"
-  }
+    "scope": "Two-guard workshop reference, different geometry and camera; comparative evidence, not an equal-workload speedup."
+  },
+  "diagnostic_valid": true
 }

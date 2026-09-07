@@ -77,6 +77,9 @@ python tools/smoke_ares.py
 # Bundled levels, test starts, restart/resume and resource lifetime
 python tools/smoke_bundle.py
 
+# Static lighting bake parity, per-stage load times and fallback fixtures
+python tools/verify_level_loading.py
+
 # Enemy runtime behavior in Ares
 python tools/smoke_enemies.py
 

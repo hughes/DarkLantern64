@@ -128,9 +128,60 @@ static int conventions(void){
     return 0;
 }
 
+static int cached_instances(void){
+    DlRenderPoseCache caches[4]={0};
+    for(int level=0;level<2;++level){
+        /* A new level can reuse every model slot with different authored data. */
+        memset(caches,0,sizeof caches);
+        unsigned rebuilt[4]={0};
+        for(int frame=0;frame<120;++frame){
+            DlVec3 eye={frame*.031f,1.7f+level,cosf(frame*.07f)*7};
+            DlCameraBasis camera=dl_camera_basis(frame*.013f,frame*.003f);
+            for(int kind=0;kind<4;++kind){
+                /* Scenery, hinged door, moving guard, spinning objective. */
+                bool dynamic=kind>=2;
+                bool door=kind==1&&((frame/30+level)%2!=0);
+                DlVec3 position={3.1f+level*9,level*5.3f,-2.7f},rotation={.17f,-.8f,.11f};
+                DlVec3 scale={level?-1.3f:.8f,1.9f,.4f};
+                if(kind==2){position.x+=sinf(frame*.1f);position.y+=frame*.01f;rotation.y+=frame*.04f;}
+                if(kind==3)rotation.y+=frame*.017f;
+                float hx=-.6f*scale.x,hz=.2f*scale.z;
+                DlRenderPoseCache before=caches[kind];
+                bool changed=dl_render_pose_cache_update(&caches[kind],dynamic,&position,&rotation,&scale,door,hx,hz);
+                rebuilt[kind]+=changed;
+                if(!changed)CHECK(memcmp(&before,&caches[kind],sizeof before)==0);
+                DlVec3 sine={sinf(rotation.x),sinf(rotation.y),sinf(rotation.z)};
+                DlVec3 cosine={cosf(rotation.x),cosf(rotation.y),cosf(rotation.z)};
+                DlAnimMatrix view;
+                dl_render_modelview(&view,&caches[kind].world,eye,camera,64,1024);
+                for(int vertex=0;vertex<8;++vertex){
+                    DlVec3 point={vertex&1?.7f:-.9f,vertex&2?1.6f:-.1f,vertex&4?.4f:-.3f};
+                    DlVec3 expected=reference_point(point,position,scale,sine,cosine,door,hx,hz);
+                    CHECK(distance(expected,dl_render_matrix_point(&caches[kind].world,point))<.00002f);
+                    DlVec3 actual_view=dl_render_matrix_point(&view,(DlVec3){point.x*1024,point.y*1024,point.z*1024});
+                    actual_view=(DlVec3){actual_view.x/64,actual_view.y/64,actual_view.z/64};
+                    CHECK(distance(reference_camera(expected,eye,camera),actual_view)<.00003f);
+                }
+            }
+        }
+        CHECK(rebuilt[0]==1&&rebuilt[1]==4&&rebuilt[2]==120&&rebuilt[3]==120);
+    }
+    /* Lighting warmup can visit the alternate hinge state. Restoring the real
+     * state must restore the matrix even if the authored transform is static. */
+    DlRenderPoseCache door={0};DlVec3 p={4,0,-2},r={0,.6f,0},s={1,2,.3f};
+    CHECK(dl_render_pose_cache_update(&door,false,&p,&r,&s,false,-.5f,0));
+    DlAnimMatrix closed=door.world;
+    CHECK(dl_render_pose_cache_update(&door,false,&p,&r,&s,true,-.5f,0));
+    CHECK(memcmp(&closed,&door.world,sizeof closed)!=0);
+    CHECK(dl_render_pose_cache_update(&door,false,&p,&r,&s,false,-.5f,0));
+    CHECK(memcmp(&closed,&door.world,sizeof closed)==0);
+    return 0;
+}
+
 int main(void){
-    CHECK(parity()==0);CHECK(conventions()==0);
+    CHECK(parity()==0);CHECK(conventions()==0);CHECK(cached_instances()==0);
     printf("render transform: 38400 old-path comparisons passed; max point %.9g m, normal %.9g, view %.9g m; packed/fixed max %.9g m\n",
         max_point_error,max_normal_error,max_view_error,max_fixed_error);
+    printf("render pose cache: 7680 moving-camera comparisons, two level resets, dynamic motion and hinge warmup passed; %u bytes/instance\n",(unsigned)sizeof(DlRenderPoseCache));
     return 0;
 }

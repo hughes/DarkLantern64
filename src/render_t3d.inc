@@ -17,6 +17,7 @@ typedef struct {
     rspq_block_t *commands;
     int color_state[GPU_FRAMES];
     bool color_fog[GPU_FRAMES];
+    DlRenderPoseCache transform;
 } GpuModel;
 static GpuModel gpu_models[MAX_MODELS];
 static T3DViewport gpu_viewports[GPU_FRAMES];
@@ -40,6 +41,17 @@ static void gpu_report(void){
 
 static uint32_t gpu_color(color_t c){return (uint32_t)c.r<<24|(uint32_t)c.g<<16|(uint32_t)c.b<<8|c.a;}
 static color_t gpu_native(DlLightingColor c){return (color_t){c.r,c.g,c.b,c.a};}
+static void gpu_update_pose(const DlGame *g,int index,bool dynamic){
+    const DlModelInstance *instance=&g->level->models[index];
+    DlRenderPoseCache *transform=&gpu_models[index].transform;
+    const DlVec3 *position=&instance->position,*rotation=&instance->rotation;
+    DlVec3 moving_position,moving_rotation;
+    if(dynamic){model_placement(g,index,&moving_position,&moving_rotation);position=&moving_position;rotation=&moving_rotation;}
+    ModelCache *cache=&models[index];
+    if(dl_render_pose_cache_update(transform,dynamic,position,rotation,&instance->scale,
+        instance->role==DL_MODEL_DOOR&&g->door_open,cache->hinge_x,cache->hinge_z))
+        cache->bounds_center=transform_scaled_point(cache->scaled_center,cache,&transform->pose);
+}
 static void gpu_release(void){
     for(int i=0;i<MAX_MODELS;++i){
         GpuModel *model=&gpu_models[i];
@@ -62,6 +74,9 @@ static void gpu_prepare(const DlGame *g){
         const DlModelInstance *instance=&g->level->models[i];
         const DlMesh *mesh=&g->level->meshes[instance->mesh];
         GpuModel *model=&gpu_models[i];
+        /* Cache construction follows both-door lighting warmup and uses the
+         * actual game state. gpu_release clears validity on every level load. */
+        gpu_update_pose(g,i,instance->role==DL_MODEL_GUARD||instance->role==DL_MODEL_OBJECTIVE||mesh->animation);
         for(int j=0;j<i;++j)if(g->level->models[j].mesh==instance->mesh){model->mesh=gpu_models[j].mesh;break;}
         if(!model->mesh){
             model->mesh=calloc(1,sizeof(GpuMesh));model->owns_mesh=true;
@@ -142,7 +157,8 @@ static void gpu_prepare(const DlGame *g){
         model->commands=rspq_block_end();
         batch_count+=batches->batch_count;loads+=batches->vertex_count;
     }
-    debugf("DL64 rsp_ready backend=tiny3d buffers=%d cache_vertices=70 batches=%u vertex_loads=%u data_bytes=%u units_per_meter=64\n",GPU_FRAMES,batch_count,loads,bytes);
+    debugf("DL64 rsp_ready backend=tiny3d buffers=%d cache_vertices=70 batches=%u vertex_loads=%u data_bytes=%u units_per_meter=64 pose_cache_bytes=%u\n",GPU_FRAMES,batch_count,loads,bytes,
+        (unsigned)(sizeof(DlRenderPoseCache)*MAX_MODELS));
 }
 static void gpu_actor_colors(const DlGame *g,int index,const ModelPose *pose){
     DlProfileMark mark=dl_profile_mark();
@@ -252,7 +268,8 @@ static void geometry_gpu(const DlGame *g){
         const DlModelInstance *instance=&g->level->models[i];const DlMesh *mesh=&g->level->meshes[instance->mesh];
         ModelCache *cache=&models[i];GpuModel *model=&gpu_models[i];
         bool dynamic=instance->role==DL_MODEL_GUARD||instance->role==DL_MODEL_OBJECTIVE||mesh->animation;
-        mark=dl_profile_mark();ModelPose pose=update_model_pose(g,i);
+        mark=dl_profile_mark();gpu_update_pose(g,i,dynamic);
+        const ModelPose *pose=&model->transform.pose;
         DlVec3 rel=sub(cache->bounds_center,camera.eye);
         DlVec3 center={dot(rel,camera.right),dot(rel,camera.up),dot(rel,camera.forward)};
 #ifdef DL_DISABLE_MODEL_CULL
@@ -271,11 +288,11 @@ static void geometry_gpu(const DlGame *g){
                 const DlEnemy *enemy=model_enemy(g,instance);
                 if(enemy&&(enemy->sees_player||enemy->state==DL_INVESTIGATE||enemy->state==DL_CHASE))++overlays;
             }
-            DlAnimMatrix world;dl_render_instance_matrix(&world,pose.position,instance->scale,pose.sine,pose.cosine,pose.door_open,cache->hinge_x,cache->hinge_z);
+            const DlAnimMatrix *world=&model->transform.world;
             int count=mesh->animation?mesh->animation->bone_count:1;
             for(int b=0;b<count;++b){
-                DlAnimMatrix joint=world,view;T3DMat4 matrix;
-                if(mesh->animation)dl_render_affine_compose(&joint,&world,&animation_skin[b]);
+                DlAnimMatrix joint=*world,view;T3DMat4 matrix;
+                if(mesh->animation)dl_render_affine_compose(&joint,world,&animation_skin[b]);
                 gpu_world_palette[b]=joint;
                 dl_render_modelview(&view,&joint,camera.eye,basis,gpu_units,model->mesh->packed_units);
                 for(int component=0;component<12;++component)
@@ -288,13 +305,13 @@ static void geometry_gpu(const DlGame *g){
         /* Small dynamic flat props retain the reference lighting path. Smooth
          * guards do no CPU vertex deformation or per-face cross products. */
         if(!grouped&&((dynamic&&cache->visible)||(lighting_changed&&instance->role==DL_MODEL_DOOR)))
-            transform_model_vertices(g,i,&pose);
+            transform_model_vertices(g,i,pose);
         dl_profile_record(DL_PROFILE_TRANSFORMS,mark);
         mark=dl_profile_mark();
         if(!grouped&&((dynamic&&cache->visible)||(!dynamic&&lighting_changed)))
             light_model(g,i,dynamic||!g->level->environment.enabled);
         if(!cache->visible){dl_profile_record(DL_PROFILE_LIGHTING,mark);continue;}
-        if(grouped)gpu_actor_colors(g,i,&pose);
+        if(grouped)gpu_actor_colors(g,i,pose);
         float highlight=instance->loot_highlight?dl_loot_highlight_lift(g->elapsed,sqrtf(dot(rel,rel)),(float)i*0.73f):0;
         bool fog=center.z+cache->bounds_radius>(g->level->environment.enabled?g->level->environment.fog_near:8);
         if(dynamic||instance->loot_highlight||fog||model->color_fog[frame]||model->color_state[frame]!=(int)g->door_open)

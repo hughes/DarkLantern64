@@ -553,6 +553,73 @@ static bool animation_tracks_real_horizontal_travel(void) {
     CHECK(g.enemies[0].animation_distance==0&&g.enemies[0].animation_speed==0);
     return true;
 }
+/* Frozen pre-optimization slab algorithm: preserve its closed endpoints and
+ * near-parallel threshold, including the last-bit rounding of grazing rays. */
+static bool reference_ray_box(const DlCollider *box, DlVec3 a, DlVec3 b) {
+    DlVec3 p={a.x-box->center.x,a.y-box->center.y,a.z-box->center.z};
+    DlVec3 q={b.x-box->center.x,b.y-box->center.y,b.z-box->center.z};
+    if(box->yaw!=0) {
+        float c=cosf(box->yaw),s=sinf(box->yaw);
+        p=(DlVec3){c*p.x-s*p.z,p.y,s*p.x+c*p.z};
+        q=(DlVec3){c*q.x-s*q.z,q.y,s*q.x+c*q.z};
+    }
+    float origin[3]={p.x,p.y,p.z},delta[3]={q.x-p.x,q.y-p.y,q.z-p.z};
+    float half[3]={box->half_size.x,box->half_size.y,box->half_size.z};
+    float entry=0,exit=1;
+    for(int axis=0;axis<3;++axis) {
+        if(fabsf(delta[axis])<.000001f) {
+            if(origin[axis]<-half[axis]||origin[axis]>half[axis])return false;
+        } else {
+            float lo=(-half[axis]-origin[axis])/delta[axis],hi=(half[axis]-origin[axis])/delta[axis];
+            if(lo>hi){float temporary=lo;lo=hi;hi=temporary;}
+            entry=fmaxf(entry,lo);exit=fminf(exit,hi);
+            if(entry>exit)return false;
+        }
+    }
+    return exit>=0&&entry<=1;
+}
+static uint32_t ray_random_state=0x7341a1u;
+static float ray_random(void) {
+    ray_random_state=ray_random_state*1664525u+1013904223u;
+    return ((int)(ray_random_state&65535u)-32768)*.00390625f;
+}
+static bool ray_query_reference_parity(void) {
+    DlCollider box={{0,0,0},{1,1,1},0,false};
+    DlLevel level={.colliders=&box,.collider_count=1};DlGame g={.level=&level};
+    const float endpoints[]={-4,-1.00001f,-1,-.9999999f,0,.9999999f,1,1.00001f,4};
+    /* Crossing, parallel, zero-length, on-face, and nextafter-outside endpoints.
+     * Scale and translation also exercise cancellation in local coordinates. */
+    for(int translated=0;translated<2;++translated)for(int axis=0;axis<3;++axis)
+        for(unsigned i=0;i<sizeof(endpoints)/sizeof(*endpoints);++i)
+            for(unsigned j=0;j<sizeof(endpoints)/sizeof(*endpoints);++j) {
+                float center=translated?1023:0;box.center=(DlVec3){center,center,center};
+                float a[3]={center,center,center},b[3]={center,center,center};
+                a[axis]+=endpoints[i];b[axis]+=endpoints[j];
+                DlVec3 from={a[0],a[1],a[2]},to={b[0],b[1],b[2]};
+                CHECK(dl_line_of_sight(&g,from,to)==!reference_ray_box(&box,from,to));
+            }
+    box.center=(DlVec3){0};
+    for(int axis=0;axis<3;++axis)for(int sign=-1;sign<=1;sign+=2)
+        for(int ulps=0;ulps<32;++ulps) {
+            float edge=(float)sign;for(int n=0;n<ulps;++n)edge=nextafterf(edge,sign*INFINITY);
+            float a[3]={0,0,0},b[3]={0,0,0};a[axis]=sign*1024.f;b[axis]=edge;
+            DlVec3 from={a[0],a[1],a[2]},to={b[0],b[1],b[2]};
+            CHECK(dl_line_of_sight(&g,from,to)==!reference_ray_box(&box,from,to));
+        }
+    for(int i=0;i<50000;++i) {
+        box.center=(DlVec3){ray_random(),ray_random(),ray_random()};
+        box.half_size=(DlVec3){fabsf(ray_random())*.1f+.001f,fabsf(ray_random())*.1f+.001f,fabsf(ray_random())*.1f+.001f};
+        box.yaw=i%3==0?0:i%3==1?PI/2:-.713f;
+        DlVec3 a={ray_random(),ray_random(),ray_random()},b={ray_random(),ray_random(),ray_random()};
+        if(i%4==0)b=a;
+        if(i%4==1)b.y=a.y+.0000005f;
+        CHECK(dl_line_of_sight(&g,a,b)==!reference_ray_box(&box,a,b));
+    }
+    box=(DlCollider){{0,0,0},{1,1,1},0,true};g.door_open=true;
+    CHECK(dl_line_of_sight(&g,(DlVec3){-2,0,0},(DlVec3){2,0,0}));
+    CHECK(!dl_line_of_sight(&g,(DlVec3){NAN,0,0},(DlVec3){2,0,0}));
+    return true;
+}
 int main(void) {
     struct { const char *name; bool (*run)(void); } cases[]={
         {"rotated wall collision and sliding",rotated_wall_sliding},{"stairs and falling",stairs_and_falling},
@@ -577,7 +644,8 @@ int main(void) {
         {"invalid start selection preserves the current game",invalid_start_selection_preserves_game},
         {"camera matches right-handed editor and asymmetric loot placement",camera_matches_right_handed_editor},
         {"player strafe and turning follow screen right",player_controls_follow_screen_right},
-        {"animation follows actual travel and stops at blocked routes",animation_tracks_real_horizontal_travel}
+        {"animation follows actual travel and stops at blocked routes",animation_tracks_real_horizontal_travel},
+        {"ray queries preserve reference crossings, grazing endpoints and rotated boxes",ray_query_reference_parity}
     };
     int failures=0;
     for(unsigned i=0;i<sizeof(cases)/sizeof(cases[0]);++i) {

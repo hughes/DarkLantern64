@@ -29,9 +29,11 @@ except ModuleNotFoundError:
 
 try:
     from cook_textures import prepare_texture, validate_texture
+    from cook_lighting import prepare_lighting
     from asset_pack import resolve_asset_packs
 except ModuleNotFoundError:
     from tools.cook_textures import prepare_texture, validate_texture
+    from tools.cook_lighting import prepare_lighting
     from tools.asset_pack import resolve_asset_packs
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -559,6 +561,8 @@ def header(data, state):
         env=dict(env,moon_direction=[v/length for v in direction])
         environment="{.enabled=true, "+", ".join("."+key+"="+(vec(value) if isinstance(value,list) else f(value)) for key,value in env.items() if key in ("ambient","moon_direction","moon_color","moon_intensity","fog_color","fog_near","fog_far","sky_top","sky_bottom","exposure"))+"}"
     lines.append("static const DlLevel dl_demo_level = {\n    "+f".version=2, .title={json.dumps(data['title'])}, .colliders=dl_demo_colliders, .collider_count={len(state['colliders'])},\n    .meshes=dl_demo_meshes, .mesh_count={len(mesh_ids)}, .models=dl_demo_models, .model_count={len(state['models'])},\n    .spawn={vec(spawn['transform']['position'])}, .spawn_yaw={f(math.radians(spawn['transform']['rotation'][1]))},\n    .enemies="+("dl_demo_enemies" if state["enemies"] else "NULL")+f", .enemy_count={len(state['enemies'])}, .control={vec(kinds['control'][0]['transform']['position'])}, .objective={vec(kinds['objective'][0]['transform']['position'])},\n    .lights=dl_demo_lights, .light_count={len(kinds['light'])},\n    .environment={environment}, .textures="+("dl_demo_textures" if state["textures"] else "NULL")+f", .texture_count={len(state['textures'])},\n    .test_starts="+("dl_demo_test_starts" if state["test_starts"] else "NULL")+f", .test_start_count={len(state['test_starts'])}\n"+"};\n#endif\n")
+    if state.get("baked_lighting"):
+        lines[-1] = lines[-1].replace("\n};\n#endif", ", .baked_lighting=" + json.dumps(state["baked_lighting"]) + "\n};\n#endif")
     return "\n".join(lines)
 
 
@@ -633,7 +637,20 @@ def compile_level(source=ROOT/"content/first_room.json",output=ROOT/"build",asse
             shared_characters[character["symbol"]] = character
     digest=hashlib.sha256(raw)
     for uri,path in state["dependencies"]: digest.update(uri.encode()); digest.update(b"\0"); digest.update(path.read_bytes())
+    lighting, lighting_payload = None, None
+    if data.get("environment") is not None and any(
+            e["kind"] not in ("guard", "objective") and e["model"] not in state["characters"]
+            for e in state["models"]):
+        # The worker needs complete character definitions even when the ROM
+        # bundle shares those arrays in a separate translation unit. Bake the
+        # unlinked, unbaked header so no path/signature feeds back into its key.
+        standalone = dict(state, shared_characters=False)
+        lighting, lighting_payload = prepare_lighting(header(data, standalone))
+        state["baked_lighting"] = "rom:/" + lighting["path"][len("romfs/"):]
     artifacts={output/"generated/demo_level.h":header(data,state),output/"editor-assets/levels/first_room.json":json.dumps(preview_scene(data,state),indent=2)+"\n"}
+    if lighting is not None:
+        artifacts[output/lighting["path"]] = lighting_payload
+    artifacts[output/"generated/lighting_report.json"] = json.dumps(lighting, indent=2)+"\n"
     artifacts.update((output/path,png) for path,png in state["texture_artifacts"].items())
     for ident,mesh in state["meshes"].items(): artifacts[output/f"editor-assets/meshes/{ident}.gltf"]=json.dumps(mesh_gltf(mesh),separators=(",",":"))+"\n"
     for ident, character in state["characters"].items():
@@ -680,7 +697,7 @@ def compile_level(source=ROOT/"content/first_room.json",output=ROOT/"build",asse
     normal_bytes=sum(len(m.get("normals",[]))*3 for m in compiled_meshes)
     arrays=sum(len(m["vertices"])*12+len(m["indices"])*2+len(m.get("uvs",[]))*8 for m in compiled_meshes)+normal_bytes
     report={
-        "version":2, "source_sha256":digest.hexdigest(), "title":data["title"],
+        "version":2, "source_sha256":digest.hexdigest(), "title":data["title"], "lighting":lighting,
         "resolved_catalog":state["resolved_catalog"], "limits":dict(LIMITS),
         "dependencies":[{"uri":uri,"sha256":hashlib.sha256(path.read_bytes()).hexdigest()} for uri,path in state["dependencies"]],
         "counts":{"entities":len(data["entities"]), "meshes":len(state["meshes"]), "models":len(state["models"]),

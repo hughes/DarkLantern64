@@ -180,6 +180,43 @@ frame versus 1,030–1,565 upstairs. These are different views and workloads,
 not a claim that adding a floor has a fixed performance cost. The baseline is
 preserved for the targeted collision/query and immutable-transform fixes.
 
+Those two fixes improve the same scene without changing its geometry or textures.
+The final recheck also includes the subsequent lighting-load optimization:
+
+| Authored view | Before: fresh frames/s | After: fresh frames/s | After: average / maximum CPU work |
+| --- | ---: | ---: | ---: |
+| Courtyard | 18.22 | **41.15** | 24.28 / 32.355 ms |
+| Upper gallery | 57.24 | **59.83** | 12.25 / 18.869 ms |
+
+The courtyard presented 1,245 fresh frames over 1,810 native refreshes; the
+gallery presented 1,802 over 1,802. The gallery still had 15 CPU work samples
+above 16.667 ms, so sustained presentation does not imply spare CPU time on
+every frame. The courtyard remains above the 60 fps work budget. These are
+stationary authored views with moving guards, normal audio and active gameplay
+in Ares, not original-hardware measurements or worst-case combat guarantees.
+See the [before](evidence/sponza-performance-before.json) and
+[after](evidence/sponza-performance.json) reports for exact inputs and timings.
+
+Ray-box tests now reject clearly separated segments before divisions, preserve
+grazing/endpoint cases for the original interval test, and avoid repeated libm
+min/max calls. Vertical movement skips horizontal checks when no floor or
+ceiling crossing is possible. Together these reduced courtyard gameplay CPU
+time from 27.18 to 5.49 ms. Static scenery also retains its pose and world
+matrix, saving 666 trigonometric calls each frame; camera transforms and moving
+entities still update normally. That cache occupies 11.5 KiB.
+
+The optimized single-level ROM reports 772,304 bytes of static image and a
+sampled peak heap allocation of 1,474,808 bytes. These are separate quantities;
+the game bundle has a larger resident asset set, and sampled heap use is not a
+proof of every transient peak. No new scene vertex/triangle allocation was
+introduced to achieve the speedup.
+
+Static night lighting now runs during content cooking. A separate
+[loading study](level-loading.md) reduces Sponza renderer preparation from
+3.70 seconds to 0.43 seconds, retaining exact static colors for both door
+states. Its 51,292-byte ROM bake streams into the existing lighting cache.
+Geometry, materials and lights still use the normal Save + Cook workflow.
+
 Scenery is split into bays and tiers so existing per-model frustum rejection
 can discard geometry outside the view. There is no portal/PVS renderer yet.
 The open atrium deliberately exposes both storeys at once; a portal system

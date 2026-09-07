@@ -1,4 +1,4 @@
-"""Compile a bounded level catalog into independent C units and one texture set."""
+"""Compile a level catalog into independent C units and shared ROM assets."""
 from __future__ import annotations
 
 import hashlib
@@ -78,15 +78,15 @@ def selection(entries, start_level=None, start_preset=None, *, menu=False):
     return level_index, start_index, bool(menu and start_level is None)
 
 
-def union_textures(levels, output):
+def union_assets(levels, output):
     """Replace only the bundle's package directory with an exact, checked union.
 
-    Source level cooks remain untouched. Stale sprite files cannot leak into the
-    DragonFS when the bundle loses a level or a texture recipe changes.
+    Source level cooks remain untouched. Removed sprites and lighting bakes
+    cannot leak into DragonFS after a level or recipe changes.
     """
     output = Path(output).resolve()
     output.mkdir(parents=True, exist_ok=True)
-    artifacts, records = {}, {}
+    artifacts, records, lighting_records = {}, {}, {}
     for level in levels:
         cooked = Path(level["cooked_dir"]).resolve()
         for record in level["textures"]["textures"]:
@@ -103,6 +103,19 @@ def union_textures(levels, output):
                         f"Bundle texture metadata collision: {relative}")
             else:
                 artifacts[relative], records[relative] = payload, record
+        lighting = level.get("content", {}).get("lighting")
+        if lighting and lighting.get("path"):
+            relative = lighting["path"]
+            require(isinstance(relative, str) and re.fullmatch(r"romfs/lighting/lighting-[0-9a-f]{64}\.bin", relative),
+                    "Invalid bundle lighting path")
+            source = (cooked / relative).resolve()
+            require(source.is_relative_to(cooked / "romfs/lighting") and source.is_file(), "Missing bundle lighting bake")
+            payload = source.read_bytes()
+            require(len(payload) == lighting["bytes"] and hashlib.sha256(payload).hexdigest() == lighting["sha256"],
+                    "Bundle lighting hash or size mismatch")
+            if relative in artifacts:
+                require(artifacts[relative] == payload, f"Bundle lighting path collision: {relative}")
+            artifacts[relative], lighting_records[relative] = payload, lighting
     with tempfile.TemporaryDirectory(prefix="package-", dir=output) as temporary:
         stage = Path(temporary) / "romfs"
         stage.mkdir()
@@ -118,11 +131,18 @@ def union_textures(levels, output):
             shutil.rmtree(destination)
         os.replace(stage, destination)
     textures = [records[key] for key in sorted(records)]
-    return {"version": 1, "textures": textures,
+    texture_report = {"version": 1, "textures": textures,
             "decoded_bytes": sum(t["decoded_bytes"] for t in textures),
             "sprite_bytes": sum(t["sprite_bytes"] for t in textures),
             "maximum_level_decoded_bytes": max((level["textures"]["decoded_bytes"] for level in levels), default=0),
             "maximum_level_sprite_bytes": max((level["textures"]["sprite_bytes"] for level in levels), default=0)}
+    lighting = [lighting_records[key] for key in sorted(lighting_records)]
+    assets = [{"path": key, "sha256": hashlib.sha256(payload).hexdigest(), "bytes": len(payload),
+               "kind": "lighting" if key in lighting_records else "texture"}
+              for key, payload in sorted(artifacts.items())]
+    return {"textures": texture_report, "rom_assets": assets,
+            "lighting": {"assets": lighting, "bytes": sum(record["bytes"] for record in lighting),
+                         "maximum_level_bytes": max((record["bytes"] for record in lighting), default=0)}}
 
 
 def prepare_bundle(entries, title, output, sdk, *, start_level=None, start_preset=None,
@@ -163,7 +183,8 @@ def prepare_bundle(entries, title, output, sdk, *, start_level=None, start_prese
         atomic_write(unit, '#include <stddef.h>\n#include "animation.h"\n'+
                      "\n".join(character_c(c, shared=True) for c in shared_characters.values())+"\n")
         units.append(unit)
-    textures = union_textures(levels, output)
+    package = union_assets(levels, output)
+    textures = package["textures"]
     header = generated / "bundle.h"
     atomic_write(header, '#ifndef DL_GENERATED_BUNDLE_H\n#define DL_GENERATED_BUNDLE_H\n#include "launch.h"\nextern const DlBundle dl_bundle;\n#endif\n')
     declarations = "\n".join(f"extern const DlLevel *dl_get_level_{i}(void);" for i in range(len(levels)))
@@ -172,14 +193,14 @@ def prepare_bundle(entries, title, output, sdk, *, start_level=None, start_prese
     descriptor = ('#include "bundle.h"\n' + declarations + '\nstatic const DlLevelEntry dl_bundle_levels[] = {\n' + rows + '\n};\n' +
                   'const DlBundle dl_bundle = {\n' + f'    .title={json.dumps(title)}, .levels=dl_bundle_levels, .level_count={len(levels)},\n' +
                   f'    .initial_level={initial_level}, .initial_start={initial_start}, .start_in_menu={str(start_in_menu).lower()},\n' +
-                  f'    .has_textures={str(bool(textures["textures"])).lower()}\n' + '};\n')
+                  f'    .has_rom_assets={str(bool(package["rom_assets"])).lower()}\n' + '};\n')
     unit = generated / "bundle.c"
     atomic_write(unit, descriptor)
     units.append(unit)
     report = {"version": 1, "title": title, "levels": levels, "initial_level": initial_level,
-              "initial_start": initial_start, "start_in_menu": start_in_menu, "textures": textures,
+              "initial_start": initial_start, "start_in_menu": start_in_menu, **package,
               "resident_geometry_bytes": sum(level["content"]["compiled_geometry_bytes"] for level in levels),
-              "memory_note": "All bundled geometry and descriptors are resident. Only the active level's sprites are loaded; maximum_level_sprite_bytes excludes allocator overhead. Renderer, game, audio and display buffers are additional."}
+              "memory_note": "All bundled geometry and descriptors are resident. Only active-level sprites are loaded and its lighting bake is streamed into existing renderer caches. maximum_level_sprite_bytes excludes allocator overhead. Renderer, game, audio and display buffers are additional."}
     duplicated_character_geometry = sum(sum({c["source_sha256"]: c["geometry_bytes"]
                                              for c in level["content"].get("characters", {}).values()}.values())
                                         for level in levels)

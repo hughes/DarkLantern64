@@ -4,7 +4,7 @@
   "renderer": "t3d",
   "source_sha256": "0480ac4b7343b82b1f5c709c93d3496f8fd89ea846315a6b68b96028cb9fb8fd",
   "asset_sha256": "5a4b7b78522eb3e4f8986f9e37e0109441f64d3f62e0e2bbcdb90d31d4837ae2",
-  "capture_rom_sha256": "661b2e115fb2f0e3fde2f9efb93954496706460c2b39437a2d6daf07823e8aa0",
+  "capture_rom_sha256": "5fb45b51497e66ebb3d8f05202b2fdfc8e5e165f3594026977700eea8b7de7ec",
   "images": [
     {
       "path": "../images/guard-rsp-two-idle.png",
@@ -19,7 +19,11 @@
     "animated-patrol",
     "animated-sentry"
   ],
-  "reviewer": "Codex: inspected both raw RDP framebuffer exports after integrating the reciprocal/viewport correction and shared sleeve asset. Both articulated, textured guards and the HUD are visible. The right guard has extremities near the viewport edge; full-body coverage is not an acceptance claim.",
+  "reviewer": "Codex: both final workshop raw framebuffer captures match the previously inspected accepted two-guard images byte-for-byte after offline lighting integration. Both articulated textured guards remain visible; right-side extremities are close to the viewport edge.",
   "limitations": "Separate frozen animation-phase captures prove visible geometry. The performance run independently uses live patrol movement, idle sentry, normal audio and gameplay; capture synchronization/logging is excluded from that run.",
-  "renderer_library_sha256": "df33d2e57efdd0476d6a533d225cc1c1576f8645121d39a8620696d9f109281f"
+  "renderer_library_sha256": "df33d2e57efdd0476d6a533d225cc1c1576f8645121d39a8620696d9f109281f",
+  "previous_image_hashes_match": [
+    true,
+    true
+  ]
 }

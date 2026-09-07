@@ -53,6 +53,8 @@ def replace_once(text, before, after):
 def snapshot(output, verification):
     destination = output / "baseline"
     evidence = json.loads(verification.read_text())
+    if any(evidence.get("manifest", {}).get(key, False) for key in ("lighting_bake_verify", "disable_lighting_bake")):
+        raise ValueError("Baseline is not ordinary: lighting bake diagnostics are enabled")
     if destination.exists():
         saved = json.loads((destination / "snapshot.json").read_text())
         requested = evidence.get("manifest", {})
@@ -87,7 +89,8 @@ def snapshot(output, verification):
     shutil.copytree(includes, destination / "tiny3d/src")
     shutil.copytree(work / "catalog", destination / "catalog")
     (destination / "objects").mkdir()
-    for name in OBJECTS:
+    object_names = OBJECTS + [name for name in ("static_lighting", "lighting_bake") if (work / (name + ".o")).exists()]
+    for name in object_names:
         shutil.copyfile(work / (name + ".o"), destination / "objects" / (name + ".o"))
     shutil.copyfile(library, destination / "tiny3d/libt3d.a")
     for source, target in ((work / "textures.dfs", "textures.dfs"),
@@ -255,7 +258,8 @@ def build_variant(base, output, mode, field_pacing=1):
               "-I"+str(base/"catalog/generated"), "-I"+str(base/"tiny3d/src")]
     if field_pacing==2: common.append("-DDL_VIDEO_STUDY_PACED=1")
     objects = []
-    for name in OBJECTS:
+    object_names = OBJECTS + [name for name in ("static_lighting", "lighting_bake") if (base / "objects" / (name + ".o")).exists()]
+    for name in object_names:
         obj = destination / (name + ".o")
         if name in ("main", "render", "dl_profile"):
             run([bins/"mips64-elf-gcc.exe", *common, "-c", destination/"src"/(name+".c"), "-o", obj], env)

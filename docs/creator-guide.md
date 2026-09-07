@@ -42,6 +42,8 @@ Positions use metres; **Y is up**. Rotations use degrees; scale values must stay
 
 Lights expose radius, intensity (0–16), and color; the control exposes **Linked door**. In the courtyard, **Night environment** controls ambient, moon, sky, fog and exposure. **Material** controls color, emission and existing texture dimensions; changes affect every object using that material. Assign a new source image through the saved JSON or API as described in the [texture guide](texture-pipeline.md). Save + Cook refreshes these changes. Check final lighting in Ares; the desktop preview displays cooked textures but uses LightEngine's renderer.
 
+Static night lighting is baked automatically during **Save + Cook** and game builds, so opening a level in the game only loads its prepared colors. Editing geometry, materials, lights or the environment regenerates the bake. Guards retain runtime lighting, and both door states are prepared. No additional task or export step is needed; see the [loading notes](level-loading.md).
+
 Use **Save + Cook**, **File → Save scene**, or **Ctrl+S** to save canonical level content. Stock **Add/Import/Duplicate/Delete**, material tools, and native **Play** mode affect the desktop preview; use the project panels for saved game authoring. Check game lighting and collision in Ares.
 
 ### Place enemies and author patrols

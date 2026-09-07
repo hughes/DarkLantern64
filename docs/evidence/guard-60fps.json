@@ -4,9 +4,9 @@
   "profile": {
     "schema_version": 2,
     "measurement": "Emulated CPU-timer elapsed time; not CPU utilization or host CPU time",
-    "source_log": ".dev/ares/runs/567cf3157fe2434ab92dc3134ce7568b/guard-performance.log",
-    "source_log_sha256": "73e08cdce2c06df155ffe625c139a8636e7d5e2c464f050c02b66666fdf181bd",
-    "source_log_bytes": 109584,
+    "source_log": ".dev/ares/runs/a0889f727d1b4b369a7d01bfa8ffcc73/guard-performance.log",
+    "source_log_sha256": "6e1a2bc8de62f54cfd78e7196aae676bd4e636339432dbf8c82af180531e0bd6",
+    "source_log_bytes": 109994,
     "complete_windows": 30,
     "selected_window_ids": [
       4,
@@ -55,50 +55,50 @@
     },
     "audio_calls": 754,
     "frame": {
-      "total_ticks": 1410333537,
-      "max_ticks": 865652,
-      "average_ms": 16.71506414222222,
-      "max_ms": 18.467242666666667,
-      "percent_of_frame_budget": 100.29038485333334,
-      "percent_of_30fps_budget": 50.14519242666667,
+      "total_ticks": 1410335073,
+      "max_ticks": 865437,
+      "average_ms": 16.715082346666666,
+      "max_ms": 18.462656,
+      "percent_of_frame_budget": 100.29049408,
+      "percent_of_30fps_budget": 50.14524704,
       "percent_of_frame_elapsed": 100.0
     },
     "slots": {
       "input": {
-        "total_ticks": 3667390,
-        "max_ticks": 3639,
-        "average_ms": 0.04346536296296296,
-        "max_ms": 0.077632,
-        "percent_of_frame_budget": 0.26079217777777775,
-        "percent_of_30fps_budget": 0.13039608888888887,
-        "percent_of_frame_elapsed": 0.2600370695148548
+        "total_ticks": 3769250,
+        "max_ticks": 3802,
+        "average_ms": 0.0446725925925926,
+        "max_ms": 0.08110933333333334,
+        "percent_of_frame_budget": 0.2680355555555556,
+        "percent_of_30fps_budget": 0.1340177777777778,
+        "percent_of_frame_elapsed": 0.26725918344937877
       },
       "gameplay": {
-        "total_ticks": 96670308,
-        "max_ticks": 63189,
-        "average_ms": 1.1457221688888888,
-        "max_ms": 1.348032,
-        "percent_of_frame_budget": 6.874333013333333,
-        "percent_of_30fps_budget": 3.4371665066666663,
-        "percent_of_frame_elapsed": 6.854428790343656
+        "total_ticks": 48563691,
+        "max_ticks": 32091,
+        "average_ms": 0.5755696711111111,
+        "max_ms": 0.684608,
+        "percent_of_frame_budget": 3.4534180266666668,
+        "percent_of_30fps_budget": 1.7267090133333334,
+        "percent_of_frame_elapsed": 3.4434151096233854
       },
       "audio_events": {
-        "total_ticks": 4129893,
-        "max_ticks": 12384,
-        "average_ms": 0.04894688,
-        "max_ms": 0.264192,
-        "percent_of_frame_budget": 0.29368128,
-        "percent_of_30fps_budget": 0.14684064,
-        "percent_of_frame_elapsed": 0.2928309432947988
+        "total_ticks": 3722944,
+        "max_ticks": 5351,
+        "average_ms": 0.04412378074074074,
+        "max_ms": 0.11415466666666667,
+        "percent_of_frame_budget": 0.26474268444444443,
+        "percent_of_30fps_budget": 0.13237134222222222,
+        "percent_of_frame_elapsed": 0.2639758502269056
       },
       "audio_mix": {
-        "total_ticks": 22313110,
-        "max_ticks": 73111,
-        "average_ms": 0.26445167407407405,
-        "max_ms": 1.5597013333333334,
-        "percent_of_frame_budget": 1.5867100444444442,
-        "percent_of_30fps_budget": 0.7933550222222221,
-        "percent_of_frame_elapsed": 1.582115819741724
+        "total_ticks": 22635318,
+        "max_ticks": 73596,
+        "average_ms": 0.2682704355555555,
+        "max_ms": 1.570048,
+        "percent_of_frame_budget": 1.6096226133333331,
+        "percent_of_30fps_budget": 0.8048113066666666,
+        "percent_of_frame_elapsed": 1.6049602986793197
       },
       "cache": {
         "total_ticks": 0,
@@ -110,40 +110,40 @@
         "percent_of_frame_elapsed": 0.0
       },
       "transforms": {
-        "total_ticks": 252941358,
-        "max_ticks": 147820,
-        "average_ms": 2.997823502222222,
-        "max_ms": 3.1534933333333335,
-        "percent_of_frame_budget": 17.98694101333333,
-        "percent_of_30fps_budget": 8.993470506666666,
-        "percent_of_frame_elapsed": 17.934860893831242
+        "total_ticks": 298173755,
+        "max_ticks": 169592,
+        "average_ms": 3.53391117037037,
+        "max_ms": 3.6179626666666667,
+        "percent_of_frame_budget": 21.20346702222222,
+        "percent_of_30fps_budget": 10.60173351111111,
+        "percent_of_frame_elapsed": 21.142050616789845
       },
       "lighting": {
-        "total_ticks": 523626825,
-        "max_ticks": 296861,
-        "average_ms": 6.205947555555555,
-        "max_ms": 6.333034666666666,
-        "percent_of_frame_budget": 37.235685333333336,
-        "percent_of_30fps_budget": 18.617842666666668,
-        "percent_of_frame_elapsed": 37.12787161779023
+        "total_ticks": 461284629,
+        "max_ticks": 260729,
+        "average_ms": 5.467077084444444,
+        "max_ms": 5.562218666666666,
+        "percent_of_frame_budget": 32.802462506666664,
+        "percent_of_30fps_budget": 16.401231253333332,
+        "percent_of_frame_elapsed": 32.707449302723255
       },
       "triangles": {
-        "total_ticks": 30932933,
-        "max_ticks": 20222,
-        "average_ms": 0.36661253925925924,
-        "max_ms": 0.43140266666666666,
-        "percent_of_frame_budget": 2.1996752355555556,
-        "percent_of_30fps_budget": 1.0998376177777778,
-        "percent_of_frame_elapsed": 2.19330620654453
+        "total_ticks": 26173522,
+        "max_ticks": 17934,
+        "average_ms": 0.31020470518518517,
+        "max_ms": 0.382592,
+        "percent_of_frame_budget": 1.8612282311111108,
+        "percent_of_30fps_budget": 0.9306141155555555,
+        "percent_of_frame_elapsed": 1.855837134102103
       },
       "hud": {
-        "total_ticks": 4743203,
-        "max_ticks": 4540,
-        "average_ms": 0.05621573925925926,
-        "max_ms": 0.09685333333333333,
-        "percent_of_frame_budget": 0.33729443555555555,
-        "percent_of_30fps_budget": 0.16864721777777777,
-        "percent_of_frame_elapsed": 0.3363178195485257
+        "total_ticks": 4764862,
+        "max_ticks": 6530,
+        "average_ms": 0.05647243851851852,
+        "max_ms": 0.13930666666666666,
+        "percent_of_frame_budget": 0.3388346311111111,
+        "percent_of_30fps_budget": 0.16941731555555556,
+        "percent_of_frame_elapsed": 0.3378531876020359
       },
       "debug_hud": {
         "total_ticks": 0,
@@ -155,31 +155,31 @@
         "percent_of_frame_elapsed": 0.0
       },
       "render_setup": {
-        "total_ticks": 16685507,
-        "max_ticks": 12499,
-        "average_ms": 0.19775415703703705,
-        "max_ms": 0.26664533333333335,
-        "percent_of_frame_budget": 1.1865249422222224,
-        "percent_of_30fps_budget": 0.5932624711111112,
-        "percent_of_frame_elapsed": 1.1830894297169365
+        "total_ticks": 17268207,
+        "max_ticks": 13172,
+        "average_ms": 0.20466023111111112,
+        "max_ms": 0.2810026666666667,
+        "percent_of_frame_budget": 1.2279613866666668,
+        "percent_of_30fps_budget": 0.6139806933333334,
+        "percent_of_frame_elapsed": 1.2244045638933068
       },
       "display_wait": {
-        "total_ticks": 424166424,
-        "max_ticks": 267070,
-        "average_ms": 5.027157617777778,
-        "max_ms": 5.697493333333333,
-        "percent_of_frame_budget": 30.16294570666667,
-        "percent_of_30fps_budget": 15.081472853333334,
-        "percent_of_frame_elapsed": 30.07561068867924
+        "total_ticks": 499782950,
+        "max_ticks": 302312,
+        "average_ms": 5.923353481481481,
+        "max_ms": 6.449322666666666,
+        "percent_of_frame_budget": 35.540120888888886,
+        "percent_of_30fps_budget": 17.770060444444443,
+        "percent_of_frame_elapsed": 35.4371779847242
       },
       "other": {
-        "total_ticks": 30456586,
-        "max_ticks": 172170,
-        "average_ms": 0.3609669451851852,
-        "max_ms": 3.67296,
-        "percent_of_frame_budget": 2.1658016711111108,
-        "percent_of_30fps_budget": 1.0829008355555556,
-        "percent_of_frame_elapsed": 2.1595307209942636
+        "total_ticks": 24195945,
+        "max_ticks": 165310,
+        "average_ms": 0.28676675555555553,
+        "max_ms": 3.526613333333333,
+        "percent_of_frame_budget": 1.720600533333333,
+        "percent_of_30fps_budget": 0.8603002666666666,
+        "percent_of_frame_elapsed": 1.7156167681862649
       }
     },
     "limitations": [
@@ -193,23 +193,23 @@
     "distributions": {
       "elapsed": {
         "samples": 1800,
-        "average_ms": 16.71506414222222,
-        "min_ms": 15.028736,
-        "max_ms": 18.467242666666667,
-        "p50_ms": 16.709418666666668,
-        "p95_ms": 17.393408,
-        "p99_ms": 18.332501333333333,
-        "over_budget_frames": 1109,
+        "average_ms": 16.715082346666666,
+        "min_ms": 15.030165333333333,
+        "max_ms": 18.462656,
+        "p50_ms": 16.705450666666668,
+        "p95_ms": 17.468885333333333,
+        "p99_ms": 18.36032,
+        "over_budget_frames": 1150,
         "quantile_method": "nearest rank of every exact CP0-tick sample"
       },
       "work": {
         "samples": 1800,
-        "average_ms": 11.687906524444445,
-        "min_ms": 11.033408,
-        "max_ms": 16.480021333333333,
-        "p50_ms": 11.529002666666667,
-        "p95_ms": 12.992981333333333,
-        "p99_ms": 14.84224,
+        "average_ms": 10.791728865185187,
+        "min_ms": 10.284906666666666,
+        "max_ms": 15.396032,
+        "p50_ms": 10.535253333333333,
+        "p95_ms": 12.077354666666666,
+        "p99_ms": 13.801258666666667,
         "over_budget_frames": 0,
         "quantile_method": "nearest rank of every exact CP0-tick sample"
       }
@@ -218,13 +218,13 @@
       "vis": 1800,
       "presents": 1800,
       "repeats": 0,
-      "ticks": 1410335734,
+      "ticks": 1410335688,
       "tracked": true,
       "max_gap_vis": 1,
-      "max_interval_ms": 18.15569066666667,
-      "seconds": 30.087162325333335,
-      "native_refresh_hz": 59.82618036678066,
-      "presented_fps": 59.82618036678066
+      "max_interval_ms": 18.253674666666665,
+      "seconds": 30.087161344,
+      "native_refresh_hz": 59.82618231809221,
+      "presented_fps": 59.82618231809221
     },
     "workload": {
       "frames": 1800,
@@ -306,7 +306,7 @@
     "animated-patrol": [
       {
         "position": [
-          -1.08,
+          -1.1,
           0.0,
           1.2
         ],
@@ -315,7 +315,7 @@
       },
       {
         "position": [
-          -1.55,
+          -1.53,
           0.0,
           1.2
         ],
@@ -324,7 +324,7 @@
       },
       {
         "position": [
-          -2.36,
+          -2.33,
           0.0,
           1.2
         ],
@@ -333,7 +333,7 @@
       },
       {
         "position": [
-          -1.6,
+          -1.64,
           0.0,
           1.2
         ],
@@ -342,7 +342,7 @@
       },
       {
         "position": [
-          -1.03,
+          -1.0,
           0.0,
           1.2
         ],
@@ -351,133 +351,7 @@
       },
       {
         "position": [
-          -1.83,
-          0.0,
-          1.2
-        ],
-        "patrol_index": 0,
-        "state": "PATROL"
-      },
-      {
-        "position": [
-          -2.12,
-          0.0,
-          1.2
-        ],
-        "patrol_index": 1,
-        "state": "PATROL"
-      },
-      {
-        "position": [
-          -1.32,
-          0.0,
-          1.2
-        ],
-        "patrol_index": 1,
-        "state": "PATROL"
-      },
-      {
-        "position": [
-          -1.32,
-          0.0,
-          1.2
-        ],
-        "patrol_index": 0,
-        "state": "PATROL"
-      },
-      {
-        "position": [
-          -2.12,
-          0.0,
-          1.2
-        ],
-        "patrol_index": 0,
-        "state": "PATROL"
-      },
-      {
-        "position": [
-          -1.84,
-          0.0,
-          1.2
-        ],
-        "patrol_index": 1,
-        "state": "PATROL"
-      },
-      {
-        "position": [
-          -1.04,
-          0.0,
-          1.2
-        ],
-        "patrol_index": 1,
-        "state": "PATROL"
-      },
-      {
-        "position": [
-          -1.6,
-          0.0,
-          1.2
-        ],
-        "patrol_index": 0,
-        "state": "PATROL"
-      },
-      {
-        "position": [
-          -2.36,
-          0.0,
-          1.2
-        ],
-        "patrol_index": 1,
-        "state": "PATROL"
-      },
-      {
-        "position": [
-          -1.56,
-          0.0,
-          1.2
-        ],
-        "patrol_index": 1,
-        "state": "PATROL"
-      },
-      {
-        "position": [
-          -1.08,
-          0.0,
-          1.2
-        ],
-        "patrol_index": 0,
-        "state": "PATROL"
-      },
-      {
-        "position": [
-          -1.88,
-          0.0,
-          1.2
-        ],
-        "patrol_index": 0,
-        "state": "PATROL"
-      },
-      {
-        "position": [
-          -2.08,
-          0.0,
-          1.2
-        ],
-        "patrol_index": 1,
-        "state": "PATROL"
-      },
-      {
-        "position": [
-          -1.28,
-          0.0,
-          1.2
-        ],
-        "patrol_index": 1,
-        "state": "PATROL"
-      },
-      {
-        "position": [
-          -1.36,
+          -1.8,
           0.0,
           1.2
         ],
@@ -490,12 +364,12 @@
           0.0,
           1.2
         ],
-        "patrol_index": 0,
+        "patrol_index": 1,
         "state": "PATROL"
       },
       {
         "position": [
-          -1.79,
+          -1.36,
           0.0,
           1.2
         ],
@@ -504,16 +378,7 @@
       },
       {
         "position": [
-          -0.99,
-          0.0,
-          1.2
-        ],
-        "patrol_index": 1,
-        "state": "PATROL"
-      },
-      {
-        "position": [
-          -1.65,
+          -1.28,
           0.0,
           1.2
         ],
@@ -522,25 +387,7 @@
       },
       {
         "position": [
-          -2.31,
-          0.0,
-          1.2
-        ],
-        "patrol_index": 1,
-        "state": "PATROL"
-      },
-      {
-        "position": [
-          -1.51,
-          0.0,
-          1.2
-        ],
-        "patrol_index": 1,
-        "state": "PATROL"
-      },
-      {
-        "position": [
-          -1.12,
+          -2.08,
           0.0,
           1.2
         ],
@@ -549,16 +396,7 @@
       },
       {
         "position": [
-          -1.93,
-          0.0,
-          1.2
-        ],
-        "patrol_index": 0,
-        "state": "PATROL"
-      },
-      {
-        "position": [
-          -2.03,
+          -1.88,
           0.0,
           1.2
         ],
@@ -567,7 +405,169 @@
       },
       {
         "position": [
-          -1.23,
+          -1.08,
+          0.0,
+          1.2
+        ],
+        "patrol_index": 1,
+        "state": "PATROL"
+      },
+      {
+        "position": [
+          -1.56,
+          0.0,
+          1.2
+        ],
+        "patrol_index": 0,
+        "state": "PATROL"
+      },
+      {
+        "position": [
+          -2.36,
+          0.0,
+          1.2
+        ],
+        "patrol_index": 0,
+        "state": "PATROL"
+      },
+      {
+        "position": [
+          -1.6,
+          0.0,
+          1.2
+        ],
+        "patrol_index": 1,
+        "state": "PATROL"
+      },
+      {
+        "position": [
+          -1.05,
+          0.0,
+          1.2
+        ],
+        "patrol_index": 0,
+        "state": "PATROL"
+      },
+      {
+        "position": [
+          -1.85,
+          0.0,
+          1.2
+        ],
+        "patrol_index": 0,
+        "state": "PATROL"
+      },
+      {
+        "position": [
+          -2.11,
+          0.0,
+          1.2
+        ],
+        "patrol_index": 1,
+        "state": "PATROL"
+      },
+      {
+        "position": [
+          -1.31,
+          0.0,
+          1.2
+        ],
+        "patrol_index": 1,
+        "state": "PATROL"
+      },
+      {
+        "position": [
+          -1.33,
+          0.0,
+          1.2
+        ],
+        "patrol_index": 0,
+        "state": "PATROL"
+      },
+      {
+        "position": [
+          -2.13,
+          0.0,
+          1.2
+        ],
+        "patrol_index": 0,
+        "state": "PATROL"
+      },
+      {
+        "position": [
+          -1.83,
+          0.0,
+          1.2
+        ],
+        "patrol_index": 1,
+        "state": "PATROL"
+      },
+      {
+        "position": [
+          -1.03,
+          0.0,
+          1.2
+        ],
+        "patrol_index": 1,
+        "state": "PATROL"
+      },
+      {
+        "position": [
+          -1.61,
+          0.0,
+          1.2
+        ],
+        "patrol_index": 0,
+        "state": "PATROL"
+      },
+      {
+        "position": [
+          -2.35,
+          0.0,
+          1.2
+        ],
+        "patrol_index": 1,
+        "state": "PATROL"
+      },
+      {
+        "position": [
+          -1.55,
+          0.0,
+          1.2
+        ],
+        "patrol_index": 1,
+        "state": "PATROL"
+      },
+      {
+        "position": [
+          -1.09,
+          0.0,
+          1.2
+        ],
+        "patrol_index": 0,
+        "state": "PATROL"
+      },
+      {
+        "position": [
+          -1.89,
+          0.0,
+          1.2
+        ],
+        "patrol_index": 0,
+        "state": "PATROL"
+      },
+      {
+        "position": [
+          -2.07,
+          0.0,
+          1.2
+        ],
+        "patrol_index": 1,
+        "state": "PATROL"
+      },
+      {
+        "position": [
+          -1.26,
           0.0,
           1.2
         ],
@@ -865,9 +865,9 @@
       "frames": 1800,
       "windows": 30,
       "average_ms_per_frame": {
-        "probe": 1.0632195555555555,
-        "normal": 2.2405383703703703,
-        "color_upload": 2.5384616059259257
+        "probe": 0.32788429037037037,
+        "normal": 2.349165499259259,
+        "color_upload": 2.507319158518518
       },
       "scope": "Nested CPU elapsed excluding audio; independent report windows selected inside steady interval. Do not add to parent slots."
     },
@@ -875,7 +875,7 @@
       "frames": 1800,
       "windows": 30,
       "average_ms_per_frame": {
-        "sample": 1.055949025185185,
+        "sample": 1.1055042488888889,
         "skin": 0.0
       },
       "scope": "Nested CPU elapsed excluding audio; independent report windows selected inside steady interval. Do not add to parent slots."
@@ -894,23 +894,23 @@
   "run": {
     "name": "guard-performance",
     "passed": true,
-    "log": ".dev\\ares\\runs\\567cf3157fe2434ab92dc3134ce7568b\\guard-performance.log",
-    "tested_rom": ".dev\\ares\\runs\\567cf3157fe2434ab92dc3134ce7568b\\DarkLantern64-animation_workshop-preset-two-guards-t3d.z64",
-    "rom_sha256": "6bcb5aafab401c16f512f4dc7f1b5886725f4c59ef81f441ab01b79d1e1a8731",
+    "log": ".dev/ares/runs/a0889f727d1b4b369a7d01bfa8ffcc73/guard-performance.log",
+    "tested_rom": ".dev/ares/runs/a0889f727d1b4b369a7d01bfa8ffcc73/DarkLantern64-animation_workshop-preset-two-guards-t3d.z64",
+    "rom_sha256": "0072e89963129d76379b82309c760a4f9a146e88d6319df107ee5d01c01bb7d1",
     "rom_bytes": 376832,
-    "settings": ".dev\\ares\\runs\\567cf3157fe2434ab92dc3134ce7568b\\settings.bml",
-    "settings_source_sha256": "792881a14980e13000dbc3d59ea5439507e0379fb162fcdfaa7dd54067fa5047",
+    "settings": ".dev/ares/runs/a0889f727d1b4b369a7d01bfa8ffcc73/settings.bml",
+    "settings_source_sha256": "010e6ec4df82b1750292c4a1e50b1e513f9e2d4b7c604d345be0c1d28b6b140a",
     "profile_report": null,
-    "elapsed_seconds": 37.062,
+    "elapsed_seconds": 37.532,
     "peak_sampled_heap_bytes": 1007984,
-    "max_reported_cpu_ms": 12.71,
+    "max_reported_cpu_ms": 12.07,
     "boot": "DL64 boot_ok memory=8388608 scene=\"DarkLantern64 - Guard Animation Workshop\" meshes=2 models=12 colliders=8 version=2 world=3d renderer=rsp-tiny3d depth=hardware",
     "terminal_event": "DL64 profile_end window=33"
   },
   "manifest": {
-    "signature": "337650140d69666064b1e41a676505f62613da6c4e5c90c9217c1615e28423f6",
+    "signature": "38c9ca7b08bb825fb5f762c0f39caef0a65dde2d760d596734fd368cef7abab1",
     "compiler": "mips64-elf-gcc.exe (GCC) 16.2.0",
-    "sdk": "C:\\n64-toolchain",
+    "sdk": "C:/n64-toolchain",
     "renderer": "t3d",
     "renderer_dependency": {
       "revision": "ec557373e986b5e041cc102a7ff787eb07921937",
@@ -933,17 +933,19 @@
       ]
     },
     "source_sha256": "aedfc172e12a9364f00ec7198a4d801d6f7e48480f9d72056803fd0cadfbf459",
-    "rom": "build\\DarkLantern64-animation_workshop-preset-two-guards-t3d.z64",
+    "rom": "build/DarkLantern64-animation_workshop-preset-two-guards-t3d.z64",
     "rom_bytes": 376832,
-    "rom_sha256": "6bcb5aafab401c16f512f4dc7f1b5886725f4c59ef81f441ab01b79d1e1a8731",
-    "static_image_bytes": 678736,
-    "elapsed_seconds": 7.497,
+    "rom_sha256": "0072e89963129d76379b82309c760a4f9a146e88d6319df107ee5d01c01bb7d1",
+    "static_image_bytes": 697032,
+    "elapsed_seconds": 6.8,
     "autoplay": false,
     "debug_overlay": false,
     "capture": false,
     "scale_bench": false,
     "model_culling": true,
-    "level": "content\\animation_workshop.json",
+    "lighting_bake_verify": false,
+    "disable_lighting_bake": false,
+    "level": "content/animation_workshop.json",
     "bundle": null,
     "start_level": null,
     "start_preset": "two-guards",
@@ -960,6 +962,7 @@
             "version": 2,
             "source_sha256": "aedfc172e12a9364f00ec7198a4d801d6f7e48480f9d72056803fd0cadfbf459",
             "title": "DarkLantern64 - Guard Animation Workshop",
+            "lighting": null,
             "resolved_catalog": {
               "assets": [
                 {
@@ -1959,7 +1962,7 @@
               "patrol-right"
             ],
             "changed_artifacts": [],
-            "elapsed_ms": 30.73,
+            "elapsed_ms": 27.04,
             "textures": {
               "version": 1,
               "textures": [
@@ -2076,8 +2079,21 @@
         "maximum_level_decoded_bytes": 2048,
         "maximum_level_sprite_bytes": 2184
       },
+      "rom_assets": [
+        {
+          "path": "romfs/textures/texture-95f80c13eae4edf4.sprite",
+          "sha256": "8c0690447ff958b2bb870931406becdcdd672e62d18295011043cfe13773bb9f",
+          "bytes": 2184,
+          "kind": "texture"
+        }
+      ],
+      "lighting": {
+        "assets": [],
+        "bytes": 0,
+        "maximum_level_bytes": 0
+      },
       "resident_geometry_bytes": 26585,
-      "memory_note": "All bundled geometry and descriptors are resident. Only the active level's sprites are loaded; maximum_level_sprite_bytes excludes allocator overhead. Renderer, game, audio and display buffers are additional.",
+      "memory_note": "All bundled geometry and descriptors are resident. Only active-level sprites are loaded and its lighting bake is streamed into existing renderer caches. maximum_level_sprite_bytes excludes allocator overhead. Renderer, game, audio and display buffers are additional.",
       "characters": {
         "unique_assets": 1,
         "shared_geometry_bytes": 26417,
@@ -2515,18 +2531,23 @@
       "decoded_bytes": 2048,
       "sprite_bytes": 2184
     },
-    "size_output": "   text\t   data\t    bss\t    dec\t    hex\tfilename\n 362980\t  32576\t 283180\t 678736\t  a5b50\tC:/Users/hughe/dev/DarkLantern64/build/DarkLantern64-animation_workshop-preset-two-guards-t3d/DarkLantern64-animation_workshop-preset-two-guards-t3d.elf\n"
+    "lighting": {
+      "assets": [],
+      "bytes": 0,
+      "maximum_level_bytes": 0
+    },
+    "size_output": "   text\t   data\t    bss\t    dec\t    hex\tfilename\n 369500\t  32576\t 294956\t 697032\t  aa2c8\tbuild/DarkLantern64-animation_workshop-preset-two-guards-t3d/DarkLantern64-animation_workshop-preset-two-guards-t3d.elf\n"
   },
   "baseline_report": "build/guard-60fps/baseline-two-guards.json",
   "visibility_evidence": {
     "path": "docs/evidence/guard-60fps-visibility.json",
-    "sha256": "f2d0b63d6843052b290761054c3d54d3e858eab5ffa51c86915ae5ac388022f7",
+    "sha256": "299b1c2bb6f38c3575602bd9671981f7edabfafdbf9f2c714b9774e946cc7424",
     "method": "separate-framebuffer-visual-review",
     "preset": "two-guards",
     "renderer": "t3d",
     "source_sha256": "0480ac4b7343b82b1f5c709c93d3496f8fd89ea846315a6b68b96028cb9fb8fd",
     "asset_sha256": "5a4b7b78522eb3e4f8986f9e37e0109441f64d3f62e0e2bbcdb90d31d4837ae2",
-    "capture_rom_sha256": "661b2e115fb2f0e3fde2f9efb93954496706460c2b39437a2d6daf07823e8aa0",
+    "capture_rom_sha256": "5fb45b51497e66ebb3d8f05202b2fdfc8e5e165f3594026977700eea8b7de7ec",
     "images": [
       {
         "path": "../images/guard-rsp-two-idle.png",
@@ -2541,8 +2562,12 @@
       "animated-patrol",
       "animated-sentry"
     ],
-    "reviewer": "Codex: inspected both raw RDP framebuffer exports after integrating the reciprocal/viewport correction and shared sleeve asset. Both articulated, textured guards and the HUD are visible. The right guard has extremities near the viewport edge; full-body coverage is not an acceptance claim.",
+    "reviewer": "Codex: both final workshop raw framebuffer captures match the previously inspected accepted two-guard images byte-for-byte after offline lighting integration. Both articulated textured guards remain visible; right-side extremities are close to the viewport edge.",
     "limitations": "Separate frozen animation-phase captures prove visible geometry. The performance run independently uses live patrol movement, idle sentry, normal audio and gameplay; capture synchronization/logging is excluded from that run.",
-    "renderer_library_sha256": "df33d2e57efdd0476d6a533d225cc1c1576f8645121d39a8620696d9f109281f"
+    "renderer_library_sha256": "df33d2e57efdd0476d6a533d225cc1c1576f8645121d39a8620696d9f109281f",
+    "previous_image_hashes_match": [
+      true,
+      true
+    ]
   }
 }

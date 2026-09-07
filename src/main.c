@@ -211,6 +211,7 @@ static void require_expansion_pak(int memory) {
 
 static void start_level(DlGame *game, const DlLauncher *launcher, DlRenderStats *stats,
                         float *guard_step, DlVec3 *previous_guard) {
+    uint32_t load_start = TICKS_READ();
     clear_sounds();
     dl_render_release_scene();
     const DlLevel *level = dl_launcher_active_level(launcher);
@@ -233,6 +234,9 @@ static void start_level(DlGame *game, const DlLauncher *launcher, DlRenderStats 
     stats->heap_used = heap.used; stats->heap_total = heap.total;
     const char *preset = launcher->active_start < 0 ? "default" :
         level->test_starts[launcher->active_start].id;
+    debugf("DL64 level_load id=%s preset=%s total_ticks=%lu ticks_per_second=%lu scope=reset_to_ready_including_interrupts\n",
+        launcher->bundle->levels[launcher->active_level].id,preset,
+        (unsigned long)(uint32_t)(TICKS_READ()-load_start),(unsigned long)TICKS_PER_SECOND);
     debugf("DL64 level_start id=%s preset=%s heap=%d/%d player=%.2f,%.2f,%.2f yaw=%.3f pitch=%.3f door=%d crouched=%d enemies=%d elapsed=%.2f complete=%d caught=%d\n",
         launcher->bundle->levels[launcher->active_level].id,preset,heap.used,heap.total,
         game->player.x,game->player.y,game->player.z,game->yaw,game->pitch,
@@ -316,7 +320,7 @@ int main(void) {
     dl_scale_benchmark(dl_bundle.levels[dl_bundle.initial_level].load());
     while(1)wait_ms(100);
 #endif
-    if(dl_bundle.has_textures)assertf(dfs_init(DFS_DEFAULT_LOCATION)==DFS_ESUCCESS,"ROM texture filesystem unavailable");
+    if(dl_bundle.has_rom_assets)assertf(dfs_init(DFS_DEFAULT_LOCATION)==DFS_ESUCCESS,"ROM asset filesystem unavailable");
     dl_render_init();
 
     DlLauncher launcher;

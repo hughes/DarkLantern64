@@ -3,7 +3,7 @@
   "input_sha256": {
     "content/assets/sponza/geometry.json": "c465e020ef5fd0624bfc24daf3676570cb93651c8a9881deb7fd1973f4662f22",
     "content/sponza_courtyard.json": "a75fb0e9415d405a1a004469048c2a7288bbcd49f34ea5db90a95c89f5a60164",
-    "src/game.c": "c49455b07c9210be8718376f2b36540ade3d77d688378fc5a393a1e674712274",
+    "src/game.c": "83f1cf981a4cddca035a80b96dbf493e239aa6560119d310deb2ea9718d89429",
     "tests/test_sponza_physics.c": "99b9c942fdd0f93f41a712c1d051a66b3fbd6b0e66b687478a280729d4b19bdf",
     "src/game.h": "fc85c72ced23e3259964bb1b29207278db2b6c64635bf4982b117eaa38aaba47",
     "src/enemy_types.def": "c7dc61a6e285278279d633a0b4e41be904bc26897e78fb1f5c61b79ccffae1e4",

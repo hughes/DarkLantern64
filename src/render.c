@@ -5,10 +5,12 @@
 #include "render_camera.h"
 #include "animation.h"
 #include "content_limits.h"
+#include "render_transform.h"
+#include "static_lighting.h"
+#include "lighting_bake.h"
 #ifdef DL_RENDER_T3D
 #include "render_batches.h"
 #include "render_lighting.h"
-#include "render_transform.h"
 #include "render_texture_packing.h"
 #include <t3d/t3d.h>
 #include <malloc.h>
@@ -20,6 +22,7 @@ static void gpu_report(void);
 #include <libdragon.h>
 #include <math.h>
 #include <stdio.h>
+#include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -38,9 +41,13 @@ typedef struct {
     DlVec3 scaled_center,bounds_center;
     bool visible;
 } ModelCache;
-typedef struct { DlVec3 position,sine,cosine; bool door_open; } ModelPose;
+typedef DlRenderPose ModelPose;
 typedef struct { DlVec3 center,normal; color_t front,back; } FaceCache;
 typedef struct { color_t front[3],back[3]; } NightColors;
+_Static_assert(sizeof(color_t)==4&&offsetof(color_t,r)==0&&offsetof(color_t,g)==1&&
+    offsetof(color_t,b)==2&&offsetof(color_t,a)==3,"Lighting bake requires byte RGBA colors");
+_Static_assert(sizeof(NightColors)==24&&offsetof(NightColors,front)==0&&offsetof(NightColors,back)==12&&
+    sizeof(NightColors)==sizeof(DlStaticLightingColor),"Lighting bake triangle layout");
 typedef struct { color_t front,back; } VertexColors;
 typedef struct { DlVec3 position; DlVec2 uv; DlVec3 color; } ClipVertex;
 typedef struct { DlVec3 eye,right,up,forward; } Camera;
@@ -72,6 +79,23 @@ static DlVec3 *animation_normals;
 static int animation_normal_count,animation_model_count;
 static uint64_t animation_sample_ticks,animation_skin_ticks;
 static uint32_t animation_frames,animation_poses,animation_sample_max,animation_skin_max;
+#ifdef DL_VERIFY_LIGHTING_BAKE
+static struct {
+    bool active;
+    uint32_t bytes,mismatches,max_delta,baked_hash,reference_hash;
+} lighting_verify;
+static void verify_lighting_triangle(const NightColors *baked,const NightColors *reference){
+    const uint8_t *a=(const uint8_t*)baked,*b=(const uint8_t*)reference;
+    for(size_t i=0;i<sizeof(*baked);++i){
+        unsigned delta=a[i]>b[i]?a[i]-b[i]:b[i]-a[i];
+        lighting_verify.mismatches+=delta!=0;
+        if(delta>lighting_verify.max_delta)lighting_verify.max_delta=delta;
+        lighting_verify.baked_hash=(lighting_verify.baked_hash^a[i])*16777619u;
+        lighting_verify.reference_hash=(lighting_verify.reference_hash^b[i])*16777619u;
+        ++lighting_verify.bytes;
+    }
+}
+#endif
 static void hud_cache_prepare(const DlGame *g);
 static void hud_cache_release(void);
 #ifdef DL_CAPTURE
@@ -131,16 +155,20 @@ static DlVec3 transform_scaled_point(DlVec3 p,const ModelCache *cache,const Mode
 }
 /* Bounds and vertices use exactly the same S, hinge, Rx, Ry, Rz, T transform.
  * Updating this one point lets an offscreen moving actor skip its entire mesh. */
-static ModelPose update_model_pose(const DlGame *g,int index){
+static void model_placement(const DlGame *g,int index,DlVec3 *position,DlVec3 *rotation){
     const DlModelInstance *model=&g->level->models[index];
-    DlVec3 position=model->position,rotation=model->rotation;
+    *position=model->position;*rotation=model->rotation;
     const DlEnemy *enemy=model_enemy(g,model);
     if(enemy){
         const DlEnemyDef *def=&g->level->enemies[model->enemy_index];
-        position=add(position,sub(enemy->position,def->spawn));
-        rotation.y+=enemy->yaw-def->yaw;
+        *position=add(*position,sub(enemy->position,def->spawn));
+        rotation->y+=enemy->yaw-def->yaw;
     }
-    if(model->role==DL_MODEL_OBJECTIVE)rotation.y+=g->elapsed*0.45f;
+    if(model->role==DL_MODEL_OBJECTIVE)rotation->y+=g->elapsed*0.45f;
+}
+static ModelPose update_model_pose(const DlGame *g,int index){
+    const DlModelInstance *model=&g->level->models[index];
+    DlVec3 position,rotation;model_placement(g,index,&position,&rotation);
     ModelPose pose={position,{sinf(rotation.x),sinf(rotation.y),sinf(rotation.z)},
         {cosf(rotation.x),cosf(rotation.y),cosf(rotation.z)},model->role==DL_MODEL_DOOR&&g->door_open};
     models[index].bounds_center=transform_scaled_point(models[index].scaled_center,&models[index],&pose);
@@ -298,6 +326,10 @@ static void light_model(const DlGame *g,int index,bool illuminate){
         DlVec3 back_normal=mul(face->normal,-1);
         if(g->level->environment.enabled){
             NightColors *colors=&night_colors[g->door_open][cache->triangle_start+t];
+#ifdef DL_VERIFY_LIGHTING_BAKE
+            NightColors baked_before={0};
+            if(lighting_verify.active)baked_before=*colors;
+#endif
             if(actor){
                 /* Body probes already represent the whole actor. Reuse their
                  * display color instead of repeating identical square roots
@@ -330,6 +362,9 @@ static void light_model(const DlGame *g,int index,bool illuminate){
                 colors->front[corner]=night_color(g,model,front);
                 colors->back[corner]=night_color(g,model,back);
             }
+#ifdef DL_VERIFY_LIGHTING_BAKE
+            if(lighting_verify.active)verify_lighting_triangle(&baked_before,colors);
+#endif
             continue;
         }
         if(mesh->normals)continue; /* scalar colors were cached per vertex */
@@ -344,6 +379,59 @@ static void light_model(const DlGame *g,int index,bool illuminate){
         face->back=face_color(g,model,back_normal,back_light);
     }
 }
+#ifndef DL_DISABLE_LIGHTING_BAKE
+static size_t read_lighting_bake(void *context,void *destination,size_t bytes){
+    int count=dfs_read(destination,1,(int)bytes,(uint32_t)*(int*)context);
+    return count>0?(size_t)count:0;
+}
+#endif
+static bool load_lighting_bake(const DlGame *g){
+    const char *path=g->level->baked_lighting;
+    if(!g->level->environment.enabled){debugf("DL64 lighting_bake status=absent reason=legacy\n");return false;}
+#ifdef DL_DISABLE_LIGHTING_BAKE
+    (void)path;
+    debugf("DL64 lighting_bake status=disabled reason=build_flag\n");return false;
+#else
+    if(!path||!*path){debugf("DL64 lighting_bake status=absent reason=unconfigured\n");return false;}
+    if(strncmp(path,"rom:/",5)){debugf("DL64 lighting_bake status=rejected reason=path\n");return false;}
+    int handle=dfs_open(path+4);
+    if(handle<0){debugf("DL64 lighting_bake status=rejected reason=open path=%s\n",path);return false;}
+    int size=dfs_size((uint32_t)handle);
+    DlLightingBakeResult result={.status=DL_LIGHTING_BAKE_TRUNCATED};
+    if(size>=0)result=dl_lighting_bake_decode(g->level,read_lighting_bake,&handle,(size_t)size,
+        night_colors[0],night_colors[1],(size_t)triangle_count);
+    dfs_close((uint32_t)handle);
+    debugf("DL64 lighting_bake status=%s reason=%s models=%lu triangles=%lu states=2 rgb_bytes=%lu crc32=%08lx path=%s\n",
+        result.status==DL_LIGHTING_BAKE_OK?"loaded":"rejected",dl_lighting_bake_status_name(result.status),
+        (unsigned long)result.models,(unsigned long)result.triangles,(unsigned long)result.payload_bytes,
+        (unsigned long)result.crc32,path);
+    return result.status==DL_LIGHTING_BAKE_OK;
+#endif
+}
+#ifdef DL_VERIFY_LIGHTING_BAKE
+static void verify_baked_lighting(const DlGame *g){
+    lighting_verify.active=true;lighting_verify.bytes=lighting_verify.mismatches=lighting_verify.max_delta=0;
+    lighting_verify.baked_hash=lighting_verify.reference_hash=2166136261u;
+    unsigned count=0,triangles=0;
+    for(int state=0;state<2;++state){
+        DlGame reference=*g;reference.door_open=state!=0;
+        for(int i=0;i<g->level->model_count;++i)if(dl_static_lighting_eligible(g->level,i)){
+            const DlModelInstance *model=&g->level->models[i];
+            if(model->role==DL_MODEL_DOOR)transform_model(&reference,i);
+            light_model(&reference,i,true);
+            if(!state){++count;triangles+=(unsigned)g->level->meshes[model->mesh].index_count/3;}
+        }
+    }
+    lighting_verify.active=false;
+    for(int i=0;i<g->level->model_count;++i)if(g->level->models[i].role==DL_MODEL_DOOR){
+        transform_model(g,i);light_model(g,i,false);
+    }
+    debugf("DL64 lighting_bake_verify models=%u triangles=%u states=2 bytes=%lu mismatches=%lu max_channel_delta=%lu baked_fnv1a=%08lx reference_fnv1a=%08lx\n",
+        count,triangles,(unsigned long)lighting_verify.bytes,(unsigned long)lighting_verify.mismatches,
+        (unsigned long)lighting_verify.max_delta,(unsigned long)lighting_verify.baked_hash,(unsigned long)lighting_verify.reference_hash);
+    assertf(lighting_verify.mismatches==0,"Baked lighting differs from original target lighting");
+}
+#endif
 static void load_textures(const DlGame *g){
     if(texture_level==g->level)return;
     rspq_wait();
@@ -355,12 +443,21 @@ static void load_textures(const DlGame *g){
     }
     texture_level=g->level;
 }
+static uint32_t scene_load_lap(uint32_t *previous){
+    uint32_t now=TICKS_READ(),elapsed=now-*previous;
+    *previous=now;return elapsed;
+}
 static void build_cache(const DlGame *g){
-    uint32_t start=TICKS_READ();
+    /* Loading is user-visible elapsed time, including audio/VI interrupts.
+     * Raw tick stages avoid rounded milliseconds and cover RSP/HUD setup too;
+     * the older scene_prepared record intentionally keeps its original scope. */
+    uint32_t start=TICKS_READ(),load_mark=start;
     load_textures(g);
+    uint32_t texture_ticks=scene_load_lap(&load_mark);
 #ifdef DL_RENDER_T3D
     gpu_release();
 #endif
+    uint32_t retire_ticks=scene_load_lap(&load_mark);
     vertex_count=triangle_count=smooth_vertex_count=0;
     animation_normal_count=animation_model_count=0;
     assertf(g->level->model_count<=MAX_MODELS,"Scene exceeds %d model instances",MAX_MODELS);
@@ -442,16 +539,29 @@ static void build_cache(const DlGame *g){
             assertf(night_colors[state],"Cannot allocate night lighting cache");
         }
     }
-    for(int i=0;i<g->level->model_count;++i)light_model(g,i,true);
+    uint32_t geometry_ticks=scene_load_lap(&load_mark);
+    bool baked=load_lighting_bake(g);
+    uint32_t bake_ticks=scene_load_lap(&load_mark);
+#ifdef DL_VERIFY_LIGHTING_BAKE
+    if(baked)verify_baked_lighting(g);
+#endif
+    uint32_t bake_verify_ticks=scene_load_lap(&load_mark);
+    /* Any failed partial decode is discarded by recomputing BOTH states. */
+    for(int i=0;i<g->level->model_count;++i)
+        light_model(g,i,!baked||!dl_static_lighting_eligible(g->level,i));
+    uint32_t lighting_ticks=scene_load_lap(&load_mark),alternate_ticks=0,restore_ticks=0;
     if(g->level->environment.enabled){
         DlGame alternate=*g;alternate.door_open=!g->door_open;
         for(int i=0;i<g->level->model_count;++i){
             if(g->level->models[i].role==DL_MODEL_DOOR)transform_model(&alternate,i);
-            light_model(&alternate,i,true);
+            bool precomputed=baked&&dl_static_lighting_eligible(g->level,i);
+            if(!precomputed||g->level->models[i].role==DL_MODEL_DOOR)light_model(&alternate,i,!precomputed);
         }
+        alternate_ticks=scene_load_lap(&load_mark);
         for(int i=0;i<g->level->model_count;++i)if(g->level->models[i].role==DL_MODEL_DOOR){
             transform_model(g,i);light_model(g,i,false);
         }
+        restore_ticks=scene_load_lap(&load_mark);
     }
     cached_level=g->level;cached_door=g->door_open;
     debugf("DL64 geometry_ready models=%d meshes=%d vertices=%d triangles=%d depth=hardware transform=xyz-euler dynamic_lighting=two-body-probes objective_lighting=emissive\n",
@@ -467,10 +577,18 @@ static void build_cache(const DlGame *g){
         (unsigned)(animation_normal_count*sizeof(DlVec3)),(unsigned)(2*sizeof(float)));
     animation_sample_ticks=animation_skin_ticks=0;
     animation_frames=animation_poses=animation_sample_max=animation_skin_max=0;
+    uint32_t report_ticks=scene_load_lap(&load_mark);
 #ifdef DL_RENDER_T3D
     gpu_prepare(g);
 #endif
+    uint32_t gpu_ticks=scene_load_lap(&load_mark);
     hud_cache_prepare(g);
+    uint32_t hud_ticks=scene_load_lap(&load_mark);
+    debugf("DL64 scene_load total_ticks=%lu textures_ticks=%lu retire_ticks=%lu geometry_ticks=%lu bake_ticks=%lu bake_verify_ticks=%lu lighting_ticks=%lu alternate_lighting_ticks=%lu restore_ticks=%lu reports_ticks=%lu gpu_ticks=%lu hud_ticks=%lu ticks_per_second=%lu scope=renderer_prepare_including_interrupts\n",
+        (unsigned long)(load_mark-start),(unsigned long)texture_ticks,(unsigned long)retire_ticks,
+        (unsigned long)geometry_ticks,(unsigned long)bake_ticks,(unsigned long)bake_verify_ticks,(unsigned long)lighting_ticks,(unsigned long)alternate_ticks,
+        (unsigned long)restore_ticks,(unsigned long)report_ticks,(unsigned long)gpu_ticks,
+        (unsigned long)hud_ticks,(unsigned long)TICKS_PER_SECOND);
 }
 void dl_render_prepare_scene(const DlGame *game){if(cached_level!=game->level)build_cache(game);}
 void dl_render_release_scene(void){

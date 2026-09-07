@@ -106,6 +106,7 @@ typedef struct {
     int texture_count;
     const DlStartPreset *test_starts;
     int test_start_count;
+    const char *baked_lighting; /* optional rom:/lighting/lighting-<recipe SHA256>.bin */
 } DlLevel;
 
 typedef enum { DL_PATROL, DL_INVESTIGATE, DL_SEARCH, DL_CHASE } DlGuardState;

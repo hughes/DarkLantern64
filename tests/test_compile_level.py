@@ -198,7 +198,8 @@ class CompileLevelTests(unittest.TestCase):
             source, output = Path(td)/"source.json", Path(td)/"out"
             source.write_text(json.dumps(self.level))
             first = compiler.compile_level(source, output, ROOT/"content")
-            self.assertEqual(len(first["changed_artifacts"]), len(self.level["assets"])+2)
+            self.assertEqual(len(first["changed_artifacts"]), len(self.level["assets"])+3)
+            self.assertIsNone(json.loads((output/"generated/lighting_report.json").read_text()))
             generated = output/"generated/demo_level.h"
             stamp = generated.stat().st_mtime_ns
             second = compiler.compile_level(source, output, ROOT/"content")

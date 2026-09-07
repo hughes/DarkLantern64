@@ -1,0 +1,58 @@
+{
+  "passed": true,
+  "method": "all-eight-PNG-byte-parity",
+  "before_rom_sha256": "ac3b10241b3007142939bf62b6c4a77999462cfafbdddc33fe5a113c0fd4f214",
+  "after_rom_sha256": "d4c82dc85e3ea6a5b52bff04c938ba658f37bfc84f93c3be6bb8011faf79ef02",
+  "captures": [
+    {
+      "view": "entrance-axis",
+      "sha256": "d2ad9c4b686a35f08ad17aecc682849890e18ed6df76debf490e0c9539fa6d0d",
+      "matches_before": true,
+      "door_open": false
+    },
+    {
+      "view": "courtyard-arcades",
+      "sha256": "477bdc269b2a7900fa9f955fc185376a8c9d5be75831d0ab1155f7d7561cbc67",
+      "matches_before": true,
+      "door_open": false
+    },
+    {
+      "view": "lower-gallery",
+      "sha256": "fcbc48e821bbcce82cd6662e07a7c11e6d9b2157dd9d855901adfbcae0157b58",
+      "matches_before": true,
+      "door_open": false
+    },
+    {
+      "view": "upper-lookdown",
+      "sha256": "9b62f80c96db39fdc932ea6d218a4a25cf8ec5b809333a10a68869704f8b94c0",
+      "matches_before": true,
+      "door_open": false
+    },
+    {
+      "view": "gallery-control",
+      "sha256": "ca12c01569d93fef9c545adc05c266f563bd68437ed1a3d19743e30de29a97a2",
+      "matches_before": true,
+      "door_open": false
+    },
+    {
+      "view": "east-stair",
+      "sha256": "fdeafa580c34b22d2ef5e8de1737773d7f842da51c0f01009bc5c9bc34d8df92",
+      "matches_before": true,
+      "door_open": false
+    },
+    {
+      "view": "west-stair",
+      "sha256": "bf66f6f72c0bb01e71913017876d9f2208852beeedfdb6239ef475f389ece27d",
+      "matches_before": true,
+      "door_open": false
+    },
+    {
+      "view": "vault-jewel",
+      "sha256": "04cf7dda84e32daea16dd25ecb7e1adb193a7cb3cc83ca9bc01374182fe25408",
+      "matches_before": true,
+      "door_open": true
+    }
+  ],
+  "run_log": ".dev/ares/runs/4dd63f06f17643dd81f32a35d8d0b53b/capture-sponza_courtyard.log",
+  "scope": "Separate ordinary baked capture ROM, verification macro disabled; raw RDP framebuffer before VI filtering."
+}

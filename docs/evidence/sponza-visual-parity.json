@@ -1,0 +1,71 @@
+{
+  "passed": true,
+  "method": "Exact PNG byte comparison of all authored raw RDP captures with frozen content and phase",
+  "capture_rom_sha256": "ac3b10241b3007142939bf62b6c4a77999462cfafbdddc33fe5a113c0fd4f214",
+  "views": [
+    {
+      "view": "entrance-axis",
+      "before_image": ".dev/ares/runs/872e5eb7532b40e7af56aaaab4945d1f/entrance-axis.png",
+      "after_image": ".dev/ares/runs/feacc871b6324c98a6b233fe49624ed4/entrance-axis.png",
+      "before_sha256": "d2ad9c4b686a35f08ad17aecc682849890e18ed6df76debf490e0c9539fa6d0d",
+      "after_sha256": "d2ad9c4b686a35f08ad17aecc682849890e18ed6df76debf490e0c9539fa6d0d",
+      "identical": true
+    },
+    {
+      "view": "courtyard-arcades",
+      "before_image": ".dev/ares/runs/872e5eb7532b40e7af56aaaab4945d1f/courtyard-arcades.png",
+      "after_image": ".dev/ares/runs/feacc871b6324c98a6b233fe49624ed4/courtyard-arcades.png",
+      "before_sha256": "477bdc269b2a7900fa9f955fc185376a8c9d5be75831d0ab1155f7d7561cbc67",
+      "after_sha256": "477bdc269b2a7900fa9f955fc185376a8c9d5be75831d0ab1155f7d7561cbc67",
+      "identical": true
+    },
+    {
+      "view": "lower-gallery",
+      "before_image": ".dev/ares/runs/872e5eb7532b40e7af56aaaab4945d1f/lower-gallery.png",
+      "after_image": ".dev/ares/runs/feacc871b6324c98a6b233fe49624ed4/lower-gallery.png",
+      "before_sha256": "fcbc48e821bbcce82cd6662e07a7c11e6d9b2157dd9d855901adfbcae0157b58",
+      "after_sha256": "fcbc48e821bbcce82cd6662e07a7c11e6d9b2157dd9d855901adfbcae0157b58",
+      "identical": true
+    },
+    {
+      "view": "upper-lookdown",
+      "before_image": ".dev/ares/runs/872e5eb7532b40e7af56aaaab4945d1f/upper-lookdown.png",
+      "after_image": ".dev/ares/runs/feacc871b6324c98a6b233fe49624ed4/upper-lookdown.png",
+      "before_sha256": "9b62f80c96db39fdc932ea6d218a4a25cf8ec5b809333a10a68869704f8b94c0",
+      "after_sha256": "9b62f80c96db39fdc932ea6d218a4a25cf8ec5b809333a10a68869704f8b94c0",
+      "identical": true
+    },
+    {
+      "view": "gallery-control",
+      "before_image": ".dev/ares/runs/872e5eb7532b40e7af56aaaab4945d1f/gallery-control.png",
+      "after_image": ".dev/ares/runs/feacc871b6324c98a6b233fe49624ed4/gallery-control.png",
+      "before_sha256": "ca12c01569d93fef9c545adc05c266f563bd68437ed1a3d19743e30de29a97a2",
+      "after_sha256": "ca12c01569d93fef9c545adc05c266f563bd68437ed1a3d19743e30de29a97a2",
+      "identical": true
+    },
+    {
+      "view": "east-stair",
+      "before_image": ".dev/ares/runs/872e5eb7532b40e7af56aaaab4945d1f/east-stair.png",
+      "after_image": ".dev/ares/runs/feacc871b6324c98a6b233fe49624ed4/east-stair.png",
+      "before_sha256": "fdeafa580c34b22d2ef5e8de1737773d7f842da51c0f01009bc5c9bc34d8df92",
+      "after_sha256": "fdeafa580c34b22d2ef5e8de1737773d7f842da51c0f01009bc5c9bc34d8df92",
+      "identical": true
+    },
+    {
+      "view": "west-stair",
+      "before_image": ".dev/ares/runs/872e5eb7532b40e7af56aaaab4945d1f/west-stair.png",
+      "after_image": ".dev/ares/runs/feacc871b6324c98a6b233fe49624ed4/west-stair.png",
+      "before_sha256": "bf66f6f72c0bb01e71913017876d9f2208852beeedfdb6239ef475f389ece27d",
+      "after_sha256": "bf66f6f72c0bb01e71913017876d9f2208852beeedfdb6239ef475f389ece27d",
+      "identical": true
+    },
+    {
+      "view": "vault-jewel",
+      "before_image": ".dev/ares/runs/872e5eb7532b40e7af56aaaab4945d1f/vault-jewel.png",
+      "after_image": ".dev/ares/runs/feacc871b6324c98a6b233fe49624ed4/vault-jewel.png",
+      "before_sha256": "04cf7dda84e32daea16dd25ecb7e1adb193a7cb3cc83ca9bc01374182fe25408",
+      "after_sha256": "04cf7dda84e32daea16dd25ecb7e1adb193a7cb3cc83ca9bc01374182fe25408",
+      "identical": true
+    }
+  ]
+}

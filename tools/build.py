@@ -53,10 +53,13 @@ def scene_paths(level=None):
 
 def build_rom(sdk, autoplay=False, debug_overlay=False, level=None, capture=False,
               scale_bench=False, disable_model_cull=False, *, bundle=None,
-              start_level=None, start_preset=None, menu_test=False, renderer="t3d"):
+              start_level=None, start_preset=None, menu_test=False, renderer="t3d",
+              lighting_bake_verify=False, disable_lighting_bake=False):
     start = time.perf_counter()
     if renderer not in ("cpu", "t3d"):
         raise ValueError("Renderer must be cpu or t3d")
+    if lighting_bake_verify and disable_lighting_bake:
+        raise ValueError("Lighting bake verification and bypass are separate diagnostics")
     if bundle is not None and level is not None:
         raise ValueError("--level and --bundle are mutually exclusive")
     if (bundle is not None or start_preset is not None) and (autoplay or capture or scale_bench):
@@ -98,6 +101,10 @@ def build_rom(sdk, autoplay=False, debug_overlay=False, level=None, capture=Fals
         name += "-unculled"
     if menu_test:
         name += "-menu-test"
+    if lighting_bake_verify:
+        name += "-verify-lighting"
+    if disable_lighting_bake:
+        name += "-runtime-lighting"
     if renderer != "cpu":
         name += "-" + renderer
     work = BUILD / name
@@ -114,7 +121,7 @@ def build_rom(sdk, autoplay=False, debug_overlay=False, level=None, capture=Fals
     tool_names = ["mips64-elf-gcc", "mips64-elf-g++", "n64sym",
                   "mips64-elf-strip", "n64elfcompress", "n64tool", "mips64-elf-size"]
     tools = {n: bins / (n + ".exe") for n in tool_names}
-    if texture_report["textures"]:
+    if catalog["rom_assets"]:
         tools["mkdfs"] = bins / "mkdfs.exe"
     for path in list(tools.values()) + [lib / n for n in ("libdragon.a", "libdragonsys.a", "n64.ld")]:
         if not path.is_file():
@@ -152,6 +159,10 @@ def build_rom(sdk, autoplay=False, debug_overlay=False, level=None, capture=Fals
         common += ["-DDL_DISABLE_MODEL_CULL=1"]
     if menu_test:
         common += ["-DDL_MENU_TEST=1"]
+    if lighting_bake_verify:
+        common += ["-DDL_VERIFY_LIGHTING_BAKE=1"]
+    if disable_lighting_bake:
+        common += ["-DDL_DISABLE_LIGHTING_BAKE=1"]
     extra_headers = []
     if capture:
         common += ["-DDL_CAPTURE=1"]
@@ -173,7 +184,8 @@ def build_rom(sdk, autoplay=False, debug_overlay=False, level=None, capture=Fals
                                   ",".join(rows) + "};\n#define DL_CAPTURE_VIEW_COUNT " + str(len(rows)) + "\n")
         extra_headers.append(capture_header)
     sources = [ROOT / "src" / f for f in ("game.c", "main.c", "dl_profile.c", "launch.c", "animation.c",
-                                         "render_lighting.c", "render_batches.c", "render_transform.c", "render_texture_packing.c")]
+                                         "render_lighting.c", "render_batches.c", "render_transform.c", "render_texture_packing.c",
+                                         "static_lighting.c", "lighting_bake.c")]
     sources += generated_sources
     if scale_bench:
         sources.append(ROOT / "src/scale_bench.c")
@@ -186,10 +198,11 @@ def build_rom(sdk, autoplay=False, debug_overlay=False, level=None, capture=Fals
         entry_output = Path(entry["cooked_dir"])
         headers += [Path(entry["source"]), entry_output / "generated/demo_level.h",
                     entry_output / "generated/texture_runtime_report.json"]
-    headers += [bundle_output / texture["sprite_path"] for texture in texture_report["textures"]]
+    headers += [bundle_output / asset["path"] for asset in catalog["rom_assets"]]
     if bundle is not None:
         headers.append(bundle)
-    headers += [ROOT / "tools" / name for name in ("compile_bundle.py", "compile_level.py", "cook_textures.py", "character_assets.py", "asset_pack.py")]
+    headers += [ROOT / "tools" / name for name in ("compile_bundle.py", "compile_level.py", "cook_textures.py", "cook_lighting.py",
+                                                  "bake_lighting.c", "character_assets.py", "asset_pack.py")]
     sdk_inputs = [lib / n for n in ("libdragon.a", "libdragonsys.a", "n64.ld")]
     sdk_inputs += sorted((sdk / "mips64-elf/include").rglob("*.h"))
     compiler_version = run([tools["mips64-elf-gcc"], "--version"], env=env, capture=True).stdout.splitlines()[0]
@@ -229,7 +242,9 @@ def build_rom(sdk, autoplay=False, debug_overlay=False, level=None, capture=Fals
     pack = [tools["n64tool"], "--title", "DarkLantern64", "--toc", "--output", candidate,
          "--align", "256", compressed_dir / "program.elf", "--align", "8", symbols,
          "--align", "8"]
-    if texture_report["textures"]:
+    if catalog["rom_assets"]:
+        # Keep the established artifact name for the video-study freezer;
+        # the filesystem now contains lighting as well as texture assets.
         filesystem = work / "textures.dfs"
         run([tools["mkdfs"], filesystem, bundle_output / "romfs"], env=env, capture=True)
         pack = pack[:-2] + ["--align", "16", filesystem]
@@ -253,10 +268,11 @@ def build_rom(sdk, autoplay=False, debug_overlay=False, level=None, capture=Fals
               "static_image_bytes": image_bytes, "elapsed_seconds": round(time.perf_counter() - start, 3),
               "autoplay": autoplay, "debug_overlay": debug_overlay, "capture": capture,
               "scale_bench": scale_bench, "model_culling": not disable_model_cull,
+              "lighting_bake_verify": lighting_bake_verify, "disable_lighting_bake": disable_lighting_bake,
               "level": str(level.relative_to(ROOT)) if level is not None else None,
               "bundle": str(bundle.relative_to(ROOT)) if bundle is not None else None,
               "start_level": start_level, "start_preset": start_preset, "menu_test": menu_test,
-              "level_catalog": catalog, "textures": texture_report, "size_output": size}
+              "level_catalog": catalog, "textures": texture_report, "lighting": catalog["lighting"], "size_output": size}
     manifest.write_text(json.dumps(report, indent=2) + "\n")
     print(json.dumps({"manifest": str(manifest.relative_to(ROOT)), "rom": report["rom"],
                       "renderer": renderer,
@@ -272,6 +288,7 @@ def build_rom(sdk, autoplay=False, debug_overlay=False, level=None, capture=Fals
                                  for entry in catalog["levels"]],
                       "resident_geometry_bytes": catalog["resident_geometry_bytes"],
                       "packaged_sprite_bytes": catalog["textures"]["sprite_bytes"],
+                      "packaged_lighting_bytes": catalog["lighting"]["bytes"],
                       "maximum_level_sprite_bytes": catalog["textures"]["maximum_level_sprite_bytes"]}, indent=2))
     return rom
 
@@ -325,6 +342,8 @@ def run_tests():
         "test_render_transform": ["src/render_transform.c", "src/animation.c"],
         "test_hud_cache": [],
         "test_render_texture_packing": ["src/render_texture_packing.c", "src/render_batches.c"],
+        "test_lighting_bake": ["src/lighting_bake.c", "src/static_lighting.c", "src/game.c"],
+        "test_static_lighting": ["src/static_lighting.c", "src/game.c"],
     }
     for name, sources in render_checks.items():
         render_output = BUILD / (name + ".exe")
@@ -372,6 +391,8 @@ def main():
     parser.add_argument("--capture", action="store_true", help="Diagnostic framebuffer export at authored views")
     parser.add_argument("--scale-bench", action="store_true", help="Diagnostic CPU workload sweeps, without rendering")
     parser.add_argument("--disable-model-cull", action="store_true", help="Disable early bounds rejection for controlled A/B measurements")
+    parser.add_argument("--verify-lighting-bake", action="store_true", help="Diagnostic comparison of baked colors with runtime lighting")
+    parser.add_argument("--disable-lighting-bake", action="store_true", help="Diagnostic runtime lighting fallback for load comparisons")
     parser.add_argument("--editor", action="store_true")
     parser.add_argument("--test", action="store_true")
     args = parser.parse_args()
@@ -386,7 +407,8 @@ def main():
             rom = build_rom(args.sdk.resolve(), args.autoplay, args.debug_overlay, args.level, args.capture,
                             args.scale_bench, args.disable_model_cull, bundle=args.bundle,
                             start_level=args.start_level, start_preset=args.start_preset, menu_test=args.menu_test,
-                            renderer=args.renderer)
+                            renderer=args.renderer, lighting_bake_verify=args.verify_lighting_bake,
+                            disable_lighting_bake=args.disable_lighting_bake)
             if args.run:
                 ares = os.environ.get("ARES_EXE", str(Path(os.environ.get("LOCALAPPDATA", "")) / "ares/ares.exe"))
                 if not Path(ares).is_file():

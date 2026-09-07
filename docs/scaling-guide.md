@@ -159,7 +159,7 @@ Static loot should use shared meshes/materials and compact per-item state such a
 | Moving shadow | Restricted occluders and targeted receiver updates | Visibility queries and shadow quality |
 | Emissive glass/flame | Material emission, optional restrained glow | Pixels/overdraw rather than illumination queries |
 
-The current courtyard prepares static colors at startup and selects between two gate states. Once cached, drawing a static surface does not loop over every authored lamp. But startup work and memory still cost something, and moving actors/player visibility still query lights. **Static lighting is not globally free.** Move static preparation into the cooker and add spatial light candidates or baked probes so runtime queries do not scan an entire mission.
+The current courtyard bakes static night colors during content cooking and loads two gate states from ROM. Drawing a static surface does not loop over every authored lamp. Memory and preparation still cost something, and moving actors/player visibility still query lights. **Static lighting is not globally free.** The [loading study](level-loading.md) measures the completed cooker change; spatial light candidates or baked probes remain useful so runtime queries do not scan an entire mission.
 
 For switches and flicker, retain linear irradiance contributions before exposure and clamping. Combine a small number of relevant contributions, then apply the display response. Keep the same light state in stealth calculations. Separately scaled static lighting layers have a useful precedent in Quake II's original lightmap builder; our vertex/probe implementation would be new work. [id Software, `R_BuildLightMap`](https://github.com/id-Software/Quake-2/blob/master/ref_gl/gl_light.c)
 

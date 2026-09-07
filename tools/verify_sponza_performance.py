@@ -91,6 +91,8 @@ def measure(args, preset):
     require(manifest["rom_sha256"] == sha(rom), "ROM/manifest hash mismatch")
     require(all(manifest.get(key) is False for key in ("autoplay", "capture", "debug_overlay", "scale_bench", "menu_test")),
             "Ordinary gameplay build required")
+    require(all(manifest.get(key, False) is False for key in ("lighting_bake_verify", "disable_lighting_bake")),
+            "Ordinary gameplay cannot use lighting bake verification or bypass")
     require(manifest.get("model_culling") is True and manifest.get("start_preset") == preset and
             str(manifest.get("level")).replace("\\", "/") == "content/sponza_courtyard.json", "Incorrect level/start")
     validate_content(manifest)
@@ -120,9 +122,16 @@ def main():
     parser.add_argument("--warmup", type=int, default=3)
     parser.add_argument("--timeout", type=float, default=300)
     parser.add_argument("--workshop", type=Path, default=ROOT / "docs/evidence/guard-60fps.json")
+    parser.add_argument("--before", type=Path, default=ROOT / "docs/evidence/sponza-performance-before.json",
+                        help="Optional preserved performance baseline; comparisons require unchanged level content")
     args = parser.parse_args()
     require(args.windows > 0 and args.warmup >= 0, "Invalid profile window counts")
     report = {"schema_version": 1, "command": "python tools/verify_sponza_performance.py", "cases": {}}
+    before = json.loads(args.before.read_text()) if args.before.is_file() else None
+    if before is not None:
+        report["before_optimization_reference"] = {
+            "path": args.before.resolve().relative_to(ROOT).as_posix() if args.before.resolve().is_relative_to(ROOT) else args.before.name,
+            "sha256": sha(args.before), "scope": "Same authored scene and presets; preserved before-optimization ROM and timing evidence."}
     if args.workshop.is_file():
         baseline = json.loads(args.workshop.read_text())
         report["workshop_reference"] = {"evidence_sha256": sha(args.workshop), "passed": baseline["passed"],
@@ -131,6 +140,15 @@ def main():
             "scope": "Two-guard workshop reference, different geometry and camera; comparative evidence, not an equal-workload speedup."}
     for preset in args.presets:
         case = measure(args, preset)
+        if before is not None and preset in before["cases"]:
+            previous = before["cases"][preset]
+            require(previous["source_sha256"] == case["source_sha256"] and
+                    previous["build"]["source_sha256"] == case["build"]["source_sha256"],
+                    "Cannot compare optimization after authored level or asset dependencies changed")
+            case["before_optimization"] = {"rom_sha256": previous["build"]["rom_sha256"],
+                "presented_fps": previous["profile"]["video"]["presented_fps"],
+                "work_average_ms": previous["profile"]["distributions"]["work"]["average_ms"]}
+            write_report(args.output / (preset + ".json"), case)
         report["cases"][preset] = case
         write_report(args.output / "report.json", report)
         print(json.dumps({"preset": preset, "diagnostic_valid": case["diagnostic_valid"],

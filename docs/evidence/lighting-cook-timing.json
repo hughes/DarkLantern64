@@ -1,0 +1,35 @@
+{
+  "version": 1,
+  "source_sha256": "951850167ca81b5d7a152225fbafac6c8754f30be5d4b77eedf6955a530d846e",
+  "compiler": "C:/ProgramData/mingw64/mingw64/bin/gcc.exe",
+  "flags": [
+    "-std=c17",
+    "-O2",
+    "-Wall",
+    "-Wextra",
+    "-Werror",
+    "-ffp-contract=off",
+    "-fexcess-precision=standard"
+  ],
+  "runs": [
+    {
+      "run": "cold",
+      "full_cook_seconds": 3.5982599000017217,
+      "lighting_cook_seconds": 0.6760536000001593,
+      "lighting_signature": "1c689a6decf513ee2b336d568aadfbcfd7a3133fcbb252d0d088ce8e589c17b5",
+      "lighting_file_sha256": "8b625a63f9e03b99a69428ad964115423202c53bb2268fd357460c36d9b1cbe1",
+      "bytes": 51292,
+      "rgb_bytes": 49896
+    },
+    {
+      "run": "warm",
+      "full_cook_seconds": 0.31649259999903734,
+      "lighting_cook_seconds": 0.0620909000026586,
+      "lighting_signature": "1c689a6decf513ee2b336d568aadfbcfd7a3133fcbb252d0d088ce8e589c17b5",
+      "lighting_file_sha256": "8b625a63f9e03b99a69428ad964115423202c53bb2268fd357460c36d9b1cbe1",
+      "bytes": 51292,
+      "rgb_bytes": 49896
+    }
+  ],
+  "scope": "Private cache and output directories; complete Sponza content cooking including previews. Cold compiles host core and level worker; warm validates hashes and reuses bytes."
+}

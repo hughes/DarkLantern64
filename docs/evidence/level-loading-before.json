@@ -1,0 +1,59 @@
+{
+  "passed": true,
+  "scope": "Ordinary Sponza courtyard renderer startup; interrupts included; three profile windows prove completed boot, not a steady performance benchmark",
+  "run": {
+    "name": "sponza-load-baseline",
+    "passed": true,
+    "log": ".dev/ares/runs/8159b505341f4c40bfbed23af18e3c5d/sponza-load-baseline.log",
+    "tested_rom": ".dev/ares/runs/8159b505341f4c40bfbed23af18e3c5d/DarkLantern64-sponza_courtyard-preset-courtyard-t3d.z64",
+    "rom_sha256": "0e8ffcac5901ce399bbc253fb84906a31963067774439d29259ec05234512e5f",
+    "rom_bytes": 425984,
+    "settings": ".dev/ares/runs/8159b505341f4c40bfbed23af18e3c5d/settings.bml",
+    "settings_source_sha256": "010e6ec4df82b1750292c4a1e50b1e513f9e2d4b7c604d345be0c1d28b6b140a",
+    "profile_report": null,
+    "elapsed_seconds": 10.797,
+    "peak_sampled_heap_bytes": 1474776,
+    "max_reported_cpu_ms": 22.13,
+    "boot": "DL64 boot_ok memory=8388608 scene=\"DarkLantern64 - Sponza After Hours\" meshes=70 models=114 colliders=118 version=2 world=3d renderer=rsp-tiny3d depth=hardware",
+    "terminal_event": "DL64 profile_end window=3"
+  },
+  "rom_sha256": "0e8ffcac5901ce399bbc253fb84906a31963067774439d29259ec05234512e5f",
+  "rom": "build/sponza-load/before-stage.z64",
+  "build_signature": "f271304fbd0f1f133d131eea626acc3c7e4f0908ce39caaa6f5aa3f5a325af70",
+  "content_sha256": "951850167ca81b5d7a152225fbafac6c8754f30be5d4b77eedf6955a530d846e",
+  "renderer_sources": {
+    "src/render.c": "9e295739c7e61006909b8e1216a6d2be17dc3ab44b0447aefa12a39c8e482f11",
+    "src/render_t3d.inc": "741fb748c5c38abb71ff01105b17b53b374c1bf6a2625ee594ca295d6015fb25",
+    "src/game.c": "83f1cf981a4cddca035a80b96dbf493e239aa6560119d310deb2ea9718d89429",
+    "src/render_transform.c": "e5babbdf290016deb179de97077b34ddd2af705b576dea49aca9bacb4ecc62e2",
+    "src/render_transform.h": "0b9258c728c688184387265d74e7abfe9a6067dcb41c90d815fe3dbd9fabc655"
+  },
+  "record": {
+    "total_ticks": "173234819",
+    "textures_ticks": "317424",
+    "retire_ticks": "69435",
+    "geometry_ticks": "3221186",
+    "lighting_ticks": "79538439",
+    "alternate_lighting_ticks": "79385941",
+    "restore_ticks": "13682",
+    "reports_ticks": "30542",
+    "gpu_ticks": "10441753",
+    "hud_ticks": "216417",
+    "ticks_per_second": "46875000",
+    "scope": "renderer_prepare_including_interrupts"
+  },
+  "milliseconds": {
+    "total": 3695.6761386666667,
+    "textures": 6.771712,
+    "retire": 1.48128,
+    "geometry": 68.71863466666667,
+    "lighting": 1696.820032,
+    "alternate_lighting": 1693.5667413333333,
+    "restore": 0.2918826666666667,
+    "reports": 0.6515626666666666,
+    "gpu": 222.75739733333333,
+    "hud": 4.616896
+  },
+  "log_sha256": "8b865904119b9b306335999c657f7a71c28c713d5680bc9daafb7e9ac8b30276",
+  "stage_sum_exact": true
+}

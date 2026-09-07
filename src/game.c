@@ -1,4 +1,5 @@
 #include "game.h"
+#include <float.h>
 #include <math.h>
 #include <string.h>
 
@@ -62,9 +63,21 @@ bool dl_position_clear(const DlGame *g, DlVec3 feet, float radius, float height)
     }
     return true;
 }
+static bool outside_slab(float a, float b, float half_size) {
+    /* Only reject clear separation. The original division-based narrow phase
+     * can round a just-outside endpoint onto t=1, so leave contacts within a
+     * few arithmetic ulps to it rather than changing existing grazing rays. */
+    float margin = 4 * FLT_EPSILON * (fabsf(a) + fabsf(b) + fabsf(half_size) + 1);
+    return (a < -half_size - margin && b < -half_size - margin) ||
+           (a > half_size + margin && b > half_size + margin);
+}
 static bool ray_hits_box(const DlCollider *box, DlVec3 a, DlVec3 b) {
     DlVec3 p = {a.x - box->center.x, a.y - box->center.y, a.z - box->center.z};
     DlVec3 q = {b.x - box->center.x, b.y - box->center.y, b.z - box->center.z};
+    /* A segment with both endpoints outside one side cannot enter that slab.
+     * Reject separate floors/ceilings before rotation or divisions. Equality
+     * still reaches the closed-interval test, retaining endpoint occlusion. */
+    if (outside_slab(p.y, q.y, box->half_size.y)) return false;
     /* Most authored proxies are axis aligned. Rotated proxies share one
      * sine/cosine pair across both endpoints of this segment. */
     if (box->yaw != 0) {
@@ -72,6 +85,8 @@ static bool ray_hits_box(const DlCollider *box, DlVec3 a, DlVec3 b) {
         p = (DlVec3){c * p.x - s * p.z, p.y, s * p.x + c * p.z};
         q = (DlVec3){c * q.x - s * q.z, q.y, s * q.x + c * q.z};
     }
+    if (outside_slab(p.x, q.x, box->half_size.x) ||
+        outside_slab(p.z, q.z, box->half_size.z)) return false;
     float origin[3] = {p.x, p.y, p.z};
     float delta[3] = {q.x - p.x, q.y - p.y, q.z - p.z};
     float half[3] = {box->half_size.x, box->half_size.y, box->half_size.z};
@@ -83,7 +98,11 @@ static bool ray_hits_box(const DlCollider *box, DlVec3 a, DlVec3 b) {
             float lo = (-half[axis] - origin[axis]) / delta[axis];
             float hi = (half[axis] - origin[axis]) / delta[axis];
             if (lo > hi) { float temporary = lo; lo = hi; hi = temporary; }
-            entry = fmaxf(entry, lo); exit = fminf(exit, hi);
+            /* entry/exit start finite and these comparisons also retain the
+             * prior fmaxf/fminf behavior if a malformed slab produces NaN.
+             * Avoid two out-of-line libm calls and their spills per axis. */
+            if (lo > entry) entry = lo;
+            if (hi < exit) exit = hi;
             if (entry > exit) return false;
         }
     }
@@ -248,12 +267,13 @@ static bool move_vertical(const DlGame *g, DlVec3 *feet, float *velocity,
     bool grounded = false, ceiling = false;
     for (int i = 0; i < collider_count(g); ++i) {
         const DlCollider *box = &g->level->colliders[i];
-        if (!active(g, box) || !horizontal_overlap(box, *feet, radius)) continue;
+        if (!active(g, box)) continue;
         float top = box->center.y + box->half_size.y, bottom = box->center.y - box->half_size.y;
-        if (*velocity <= 0 && previous >= top - EPSILON && next <= top) { next = top; grounded = true; }
-        else if (*velocity > 0 && previous + height <= bottom + EPSILON && next + height >= bottom) {
-            next = bottom - height; ceiling = true;
-        }
+        bool floor_crossing = *velocity <= 0 && previous >= top - EPSILON && next <= top;
+        bool ceiling_crossing = *velocity > 0 && previous + height <= bottom + EPSILON && next + height >= bottom;
+        if (!(floor_crossing || ceiling_crossing) || !horizontal_overlap(box, *feet, radius)) continue;
+        if (floor_crossing) { next = top; grounded = true; }
+        else { next = bottom - height; ceiling = true; }
     }
     if (grounded || ceiling) *velocity = 0;
     feet->y = next;

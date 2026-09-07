@@ -16,13 +16,13 @@ Our development approach is to extend **LightEngine** into a productive content 
 
 **Animating characters?** The [guard animation study](docs/guard-animation-prototype.md) covers the editable Blender guard, five Actions, connected joints, editor playback/head attention and measured N64 costs. Its clips compress to 8.61 KiB. The default renderer now uses Tiny3D on the RSP for model transforms and rigid skeletal deformation.
 
-The two-guard workshop [sustains every native refresh in Ares](docs/guard-renderer-performance.md): 1,800 fresh frames over 30 seconds, with no repeats and a 16.480 ms maximum CPU work sample after the shared-resource, sleeve and depth corrections. Original hardware validation remains pending.
+The two-guard workshop [sustains every native refresh in Ares](docs/guard-renderer-performance.md): 1,800 fresh frames over 30 seconds, with no repeats and a 15.396 ms maximum CPU work sample after the shared-resource, sleeve, depth, Sponza scaling and loading corrections. Original hardware validation remains pending.
 
 ## Build and play
 
 **Full 3D prototype:** the model compiler, desktop editor, and both ROM variants build. The editor's XYZ/rotation save round trip and Ares startup/mission replay have passed. Original N64 and M64 validation remains pending; this is still placeholder content and a prototype rendering/audio backend.
 
-The current development host is Windows. Install Python 3.11+ with Pillow (`python -m pip install Pillow`), the Windows libdragon SDK from our fork (default `C:\n64-toolchain`, or set `N64_INST`), and Ares. Open Ares once so it creates its settings file. MSYS2/MinGW GCC is needed for host simulation tests.
+The current development host is Windows. Install Python 3.11+ with Pillow (`python -m pip install Pillow`), the Windows libdragon SDK from our fork (default `C:\n64-toolchain`, or set `N64_INST`), and Ares. Open Ares once so it creates its settings file. MSYS2/MinGW GCC is needed for static lighting cooks and host simulation tests; see the [level loading notes](docs/level-loading.md).
 
 Prepare the pinned Tiny3D dependency once with `python tools/build_tiny3d.py --fetch`. This explicitly fetches its source and builds the library locally; ordinary ROM builds require that checkout and never fetch it or install files into the SDK. See the [Tiny3D setup notes](tools/tiny3d/README.md) for its MSYS2 build requirements. `python tools/setup_editor.py --tiny3d` prepares both editor and renderer dependencies instead.
 

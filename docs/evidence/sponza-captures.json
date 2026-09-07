@@ -1,16 +1,16 @@
 {
   "name": "capture-sponza_courtyard",
   "passed": true,
-  "log": ".dev/ares/runs/872e5eb7532b40e7af56aaaab4945d1f/capture-sponza_courtyard.log",
-  "tested_rom": ".dev/ares/runs/872e5eb7532b40e7af56aaaab4945d1f/DarkLantern64-sponza_courtyard-capture-t3d.z64",
-  "rom_sha256": "edae7dc8ad638bc3a4286532299c832bdfd0d024137aeaed4bfa1e2c461e4bfd",
-  "rom_bytes": 425984,
-  "settings": ".dev/ares/runs/872e5eb7532b40e7af56aaaab4945d1f/settings.bml",
+  "log": ".dev/ares/runs/4dd63f06f17643dd81f32a35d8d0b53b/capture-sponza_courtyard.log",
+  "tested_rom": ".dev/ares/runs/4dd63f06f17643dd81f32a35d8d0b53b/DarkLantern64-sponza_courtyard-capture-t3d.z64",
+  "rom_sha256": "d4c82dc85e3ea6a5b52bff04c938ba658f37bfc84f93c3be6bb8011faf79ef02",
+  "rom_bytes": 491520,
+  "settings": ".dev/ares/runs/4dd63f06f17643dd81f32a35d8d0b53b/settings.bml",
   "settings_source_sha256": "010e6ec4df82b1750292c4a1e50b1e513f9e2d4b7c604d345be0c1d28b6b140a",
   "profile_report": null,
-  "elapsed_seconds": 34.313,
+  "elapsed_seconds": 15.922,
   "peak_sampled_heap_bytes": 1474800,
-  "max_reported_cpu_ms": 220.76,
+  "max_reported_cpu_ms": 240.09,
   "boot": "DL64 boot_ok memory=8388608 scene=\"DarkLantern64 - Sponza After Hours\" meshes=70 models=114 colliders=118 version=2 world=3d renderer=rsp-tiny3d depth=hardware",
   "terminal_event": "DL64 capture_complete views=8",
   "renderer": "t3d",
@@ -130,18 +130,8 @@
     }
   ],
   "measurement": "Raw RDP framebuffer before VI filtering; capture timings are diagnostic only",
-  "visual_review": {
-    "accepted": true,
-    "views": 8,
-    "method": "All final images inspected, or byte-identical to the inspected third-pass image; changed stair/courtyard images individually reviewed.",
-    "findings": [
-      "Both gallery storeys and real arch apertures visible",
-      "Warm stair-entry pools reveal tread/riser steps",
-      "Wall pools survive self-occlusion correction",
-      "Upper control and west jewel readable",
-      "No observed courtyard/window-style depth tearing"
-    ],
-    "limitation": "Raw 320x240 pre-VI diagnostic captures, not timing or original-hardware evidence."
-  },
-  "canonical_level_sha256": "a75fb0e9415d405a1a004469048c2a7288bbcd49f34ea5db90a95c89f5a60164"
+  "level_source_sha256": "a75fb0e9415d405a1a004469048c2a7288bbcd49f34ea5db90a95c89f5a60164",
+  "before_rom_sha256": "ac3b10241b3007142939bf62b6c4a77999462cfafbdddc33fe5a113c0fd4f214",
+  "lighting_parity_evidence": "docs/evidence/level-loading-visual-parity.json",
+  "lighting_parity_evidence_sha256": "4bba38010b5ddb1d1333e2d47e59046531163332638126748c9fc14bd474de9f"
 }

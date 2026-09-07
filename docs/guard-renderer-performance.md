@@ -6,15 +6,15 @@ The two-guard workshop **passes the sustained 60 fps target in Ares**, presentin
 
 | Steady measurement | Result |
 | --- | ---: |
-| Average CPU work | 11.688 ms |
-| 95th / 99th percentile work | 12.993 / 14.842 ms |
-| Maximum CPU work | 16.480 ms |
+| Average CPU work | 10.792 ms |
+| 95th / 99th percentile work | 12.077 / 13.801 ms |
+| Maximum CPU work | 15.396 ms |
 | Work samples exceeding 16.667 ms | 0 / 1,800 |
 | Fresh framebuffers / VI scans | 1,800 / 1,800 |
-| Average transforms / lighting / triangle submission | 2.998 / 6.206 / 0.367 ms |
+| Average transforms / lighting / triangle submission | 3.534 / 5.467 / 0.310 ms |
 | Average normal HUD | 0.056 ms |
 
-Work includes audio, reporting and queue stalls, and excludes display-buffer waiting. The debug overlay is off; profiling continues in the background. Two posed guards and 1,190 candidate scene triangles were submitted in every measured frame. The patrol moves along its route while the sentry holds position. This quiet scene has no active attention overlays and does not establish crowded combat, worst-case audio or original N64/M64 performance. This recheck includes the shared-resource migration, integrated sleeve stripe and [perspective precision correction](depth-precision.md). The verified ROM SHA-256 is `6bcb5aafab401c16f512f4dc7f1b5886725f4c59ef81f441ab01b79d1e1a8731`.
+Work includes audio, reporting and queue stalls, and excludes display-buffer waiting. The debug overlay is off; profiling continues in the background. Two posed guards and 1,190 candidate scene triangles were submitted in every measured frame. The patrol moves along its route while the sentry holds position. This quiet scene has no active attention overlays and does not establish crowded combat, worst-case audio or original N64/M64 performance. This recheck includes the shared-resource migration, integrated sleeve stripe, [perspective precision correction](depth-precision.md), [Sponza query/static-transform optimizations](sponza-study.md), and the [offline lighting loader](level-loading.md). The verified ROM SHA-256 is `0072e89963129d76379b82309c760a4f9a146e88d6319df107ee5d01c01bb7d1`.
 
 The earlier [animation prototype measurement](evidence/guard-runtime.json) averaged **99.64 ms per frame** with the CPU reference renderer. That is a historical workflow/correctness measurement, not a controlled speedup denominator: the final authored camera was adjusted to frame the two guards. Short diagnostic runs and reciprocal CPU work time do not establish presentation throughput; the final result checks actual scanout changes separately.
 

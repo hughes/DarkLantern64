@@ -66,6 +66,8 @@ def ordinary_manifest(path, rom):
     require(manifest.get('rom_sha256') == sha(rom), 'Build manifest does not match measured ROM')
     require(all(manifest.get(name) is False for name in ('autoplay', 'capture', 'debug_overlay', 'scale_bench', 'menu_test')),
             'Performance measurement requires an ordinary ROM with diagnostics/replay disabled')
+    require(all(manifest.get(name, False) is False for name in ('lighting_bake_verify', 'disable_lighting_bake')),
+            'Performance measurement requires an ordinary ROM without lighting bake diagnostics')
     require(manifest.get('model_culling') is True, 'Performance measurement requires ordinary model culling')
     require(str(manifest.get('level')).replace('\\','/') == 'content/animation_workshop.json'
             and manifest.get('start_preset') == 'two-guards',

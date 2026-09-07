@@ -1,0 +1,1931 @@
+{
+  "schema_version": 1,
+  "passed": true,
+  "command": "python tools/verify_level_loading.py",
+  "limitations": [
+    "Ares emulated CPU elapsed timers include interrupts; original N64/M64 pending.",
+    "Renderer prepare and full level reset have distinct scopes; neither includes the first presented frame or host ROM opening.",
+    "Three gameplay windows prove completed startup, not steady gameplay performance.",
+    "Verify-mode computes both methods and is deliberately excluded from ordinary loading comparisons."
+  ],
+  "historical_sponza_comparison": {
+    "renderer_before_ms": 3695.6761386666667,
+    "renderer_after_ms": 427.5444053333333,
+    "saved_ms": 3268.1317333333336,
+    "speedup": 8.64395859837143,
+    "scope": "renderer_prepare_including_interrupts",
+    "evidence": "docs/evidence/level-loading-before.json",
+    "sha256": "fb40062000a47782636fcee07e24023edcc81d728a621f82cb469161de3af680",
+    "rom_sha256": "0e8ffcac5901ce399bbc253fb84906a31963067774439d29259ec05234512e5f",
+    "raw_artifacts": {
+      "log": {
+        "path": ".dev/ares/runs/8159b505341f4c40bfbed23af18e3c5d/sponza-load-baseline.log",
+        "sha256": "8b865904119b9b306335999c657f7a71c28c713d5680bc9daafb7e9ac8b30276",
+        "available_locally": true,
+        "revalidated_locally": true
+      },
+      "rom": {
+        "path": "build/sponza-load/before-stage.z64",
+        "sha256": "0e8ffcac5901ce399bbc253fb84906a31963067774439d29259ec05234512e5f",
+        "available_locally": true,
+        "revalidated_locally": true
+      }
+    },
+    "baseline_basis": "Checked-in historical CP0 measurements; available raw artifacts rehashed. Missing ignored artifacts are not claimed as freshly validated."
+  },
+  "complete_suite": true,
+  "regression_evidence": {
+    "pixel_parity": {
+      "path": "docs/evidence/level-loading-visual-parity.json",
+      "sha256": "4bba38010b5ddb1d1333e2d47e59046531163332638126748c9fc14bd474de9f"
+    },
+    "workshop_60fps": {
+      "path": "docs/evidence/guard-60fps.json",
+      "sha256": "6ed5f151bc8de079b5dcb722b694a8af1cbcf23915fa80d7dbbbe4ee6e90c706"
+    },
+    "bundle_switching": {
+      "path": "docs/evidence/sponza-bundle.json",
+      "sha256": "33c707b30c756ce1af13142e375ca48d65a61c0e5e87bb0f89fa5c38ebc627f2"
+    },
+    "sponza_performance": {
+      "path": "docs/evidence/sponza-performance.json",
+      "sha256": "e346ff4ac1bbfbf1716ace490dccef34119266111b9b93b60aa2fd8446238eb4"
+    }
+  },
+  "cpu_reference_compile": {
+    "signature": "e4c884297d1425e9e6095b0e8f4a34c6ae2676686f922fc5f1b6ebfa1a3a4604",
+    "source_sha256": "951850167ca81b5d7a152225fbafac6c8754f30be5d4b77eedf6955a530d846e",
+    "rom": "build/DarkLantern64-sponza_courtyard.z64",
+    "rom_sha256": "638173480a7408402845d8f1d487feacf4283bccba0b2eacac9d9c8f5aaf3a6a",
+    "rom_bytes": 458752,
+    "static_image_bytes": 736352,
+    "renderer": "cpu",
+    "scope": "Compile and link only; no CPU-framebuffer or timing claim."
+  },
+  "final_menu_rom": {
+    "rom": "build/DarkLantern64-bundle-level_bundle-menu-t3d.z64",
+    "rom_sha256": "e0fd0009f59273b98686fb9bc54e1653001ca09b5c86de360ba1518897978c8d",
+    "rom_bytes": 573440,
+    "signature": "58db5c53590d5c1a94cd665cc7e2e741a8377609304007abd733148d76f5eb87",
+    "source_sha256": "15b087445f462baf28e138e667d73489fa8ddbe3f5a31202275776b618596a36",
+    "renderer": "t3d",
+    "ordinary_menu_boot_verified": true
+  },
+  "verifier_sha256": "8464bc9eddaad72e7be2f33382d92d009f0f75f70579fec0bd59f42f597883bd",
+  "cases": {
+    "first_room": {
+      "ordinary": {
+        "passed": true,
+        "mode": "ordinary",
+        "level": "first_room",
+        "content_sha256": "2b7cb7e875fcccf7ec4c48a62c4bea4314b82ba9bb5894808894ba22d807fc5b",
+        "level_source_sha256": "c1fb19e6b114fe9fa8459922dcacf55771ed86e2f9feb7ec25fe6aadf2009105",
+        "renderer_prepare": {
+          "ticks": {
+            "textures": 59971,
+            "retire": 69590,
+            "geometry": 1592266,
+            "bake": 3085,
+            "bake_verify": 0,
+            "lighting": 7692853,
+            "alternate_lighting": 0,
+            "restore": 0,
+            "reports": 31125,
+            "gpu": 7596214,
+            "hud": 227308,
+            "total": 17272412
+          },
+          "ticks_per_second": 46875000,
+          "milliseconds": {
+            "textures": 1.2793813333333333,
+            "retire": 1.4845866666666667,
+            "geometry": 33.968341333333335,
+            "bake": 0.06581333333333333,
+            "bake_verify": 0.0,
+            "lighting": 164.11419733333332,
+            "alternate_lighting": 0.0,
+            "restore": 0.0,
+            "reports": 0.664,
+            "gpu": 162.05256533333332,
+            "hud": 4.849237333333333,
+            "total": 368.47812266666665
+          },
+          "scope": "renderer_prepare_including_interrupts",
+          "stage_sum_exact": true
+        },
+        "level_reset": {
+          "ticks": 17385700,
+          "ticks_per_second": 46875000,
+          "milliseconds": 370.8949333333333,
+          "scope": "reset_to_ready_including_interrupts"
+        },
+        "bake": {
+          "status": "absent",
+          "reason": "legacy"
+        },
+        "parity": null,
+        "textures": 2,
+        "lighting_asset": null,
+        "geometry": {
+          "models": 25,
+          "meshes": 9,
+          "vertices": 2683,
+          "triangles": 1763
+        },
+        "heap_bytes": 1176736,
+        "ordinary_load_timing": true,
+        "fixture_unconfigured": false,
+        "fixture_zero_textures": false,
+        "log_sha256": "65a9f7f16808a5eb925bdcf6fd58ec28b37c58e035075766351a90a2e99bb52a",
+        "rom_sha256": "c18b801aabdf0dc3d2dd9c0ee08859e1ca54e7ef976d374ab62e3a68df88646a",
+        "build_signature": "5016a7fdd7a6db637318fc9d6aeb999879636075f09dd711db1c896c45d5123e",
+        "static_image_bytes": 733736,
+        "packaged_assets": [
+          {
+            "path": "romfs/textures/texture-7ef072606e4c877f.sprite",
+            "sha256": "cbf5330e91db96a294a6d389557f353852f38d12c0acb95ec3f5a286a77edab0",
+            "bytes": 2184,
+            "kind": "texture"
+          },
+          {
+            "path": "romfs/textures/texture-95f80c13eae4edf4.sprite",
+            "sha256": "8c0690447ff958b2bb870931406becdcdd672e62d18295011043cfe13773bb9f",
+            "bytes": 2184,
+            "kind": "texture"
+          }
+        ],
+        "run": {
+          "log": ".dev/ares/runs/fc8a36dfb2c84725ba511ab41b318d5d/level-loading-first_room-ordinary.log",
+          "tested_rom": ".dev/ares/runs/fc8a36dfb2c84725ba511ab41b318d5d/DarkLantern64-t3d.z64",
+          "rom_sha256": "c18b801aabdf0dc3d2dd9c0ee08859e1ca54e7ef976d374ab62e3a68df88646a",
+          "settings_source_sha256": "010e6ec4df82b1750292c4a1e50b1e513f9e2d4b7c604d345be0c1d28b6b140a"
+        },
+        "runtime_source_hashes": {
+          "src/animation.c": "58aa0b71836522082d5a7b13b340d7133736562f9357ceb51d88eb7cfa7d420e",
+          "src/animation.h": "c713072cc18969c4acbc8c8fba0cfe8ea2831eb578a97f38fbc1b1f6f9fda3a9",
+          "src/content_limits.h": "ec4c37638a9ee2e7bc4fb415caa1071d20a1f5b64ee60f54d1f27bcf1183a591",
+          "src/dl_profile.c": "fdc17f9433a99c2e5e8242842e15503132c2caa3207f199234a4369648ddcfa2",
+          "src/dl_profile.h": "14cac33253e708654add600681b7247712d9e8719622fcaea7270c758c55fd66",
+          "src/enemy_types.def": "c7dc61a6e285278279d633a0b4e41be904bc26897e78fb1f5c61b79ccffae1e4",
+          "src/game.c": "83f1cf981a4cddca035a80b96dbf493e239aa6560119d310deb2ea9718d89429",
+          "src/game.h": "baeccaab8a5663c0d24e48266edddc50e84f02687b2388939a3e8d1e67f662c1",
+          "src/launch.c": "aea06d3be767ab74dcea9dd524f4dfc89a0aac9f36f8136ab588f14b14b7e1ed",
+          "src/launch.h": "82711d01a50c3c05fc50289beaaa784b123ccafcb6362ea00dea3ab72b1b0449",
+          "src/lighting_bake.c": "f0dfb2c749e547adc7e25979d3b76bdd6aef8d52f864365d7e6867dc51770cd6",
+          "src/lighting_bake.h": "ac0d29317f42dd9ebea1ca8f13d35d5f967c3fa09a5792907a7ccec47355795d",
+          "src/main.c": "ce6faed71a0d0002ebfcd52fd28826d6076310d5f9d2fcc842bda5ffcc1d396f",
+          "src/render.c": "9eaa6b91fe52167916a920a6c017adf9588b02cfeb7d4564910f4e85a3f7a444",
+          "src/render.h": "4e75f62eb0d7a3a1ed1eff02dbaeeb6e6a8430bb6f4f22f8ce5bf05d4b77d8b8",
+          "src/render_batches.c": "72e25ffa0b72ce2aa6650a3db81a309e0ffcdb8807196efb8040755f2155cbb9",
+          "src/render_batches.h": "8c316c65bc4527d4396db56ea6f851d8359e4b0bc34c74b6a68ab46e7dcc2a7b",
+          "src/render_camera.h": "fe1fa0001829200ad6d6bedc53b4b61904986dc34b68910c5d1b02c7f1154108",
+          "src/render_hud_cache.inc": "7c3ebe9da6acba712731f811e73243b29474cd7f527e6e758be1127f369af1db",
+          "src/render_lighting.c": "cdbc1bd34c20f664aabb128243b6facda3be7420cf31015e6a882de5c6584792",
+          "src/render_lighting.h": "55479d327432df3d7cdf5e6bfb3856e268630800c2d44369c5b2ac1139d2a45f",
+          "src/render_shading.h": "a12a9fb4d1c8008208e755188078420d43271b5c4d1a9ecb95167985a43d314d",
+          "src/render_t3d.inc": "741fb748c5c38abb71ff01105b17b53b374c1bf6a2625ee594ca295d6015fb25",
+          "src/render_texture_packing.c": "487ddd384af8d1bab1673a3efbddc9529afc21da42d4306071e436fe9b4116d0",
+          "src/render_texture_packing.h": "9788346f3a8b17734408d339983b0327fd18eb549c320a3f0c328bda53c72cde",
+          "src/render_transform.c": "e5babbdf290016deb179de97077b34ddd2af705b576dea49aca9bacb4ecc62e2",
+          "src/render_transform.h": "0b9258c728c688184387265d74e7abfe9a6067dcb41c90d815fe3dbd9fabc655",
+          "src/render_visibility.h": "58d4a2fb1f0e1740e13ae3bed38387b0990b0118b2c2ad52ecd8a2582e2ebb59",
+          "src/scale_bench.c": "e6757e000b8fb4ef83d5f8c5b2442152475b8e781bc89b65c75125e02e00c5ec",
+          "src/scale_bench.h": "0febfeb6d49b6cbf5ea0a551a502a4e7c3b34ee4f1d7ca8db74eefa936ea7c7b",
+          "src/static_lighting.c": "68b54ef7baaab6d297b534ae690eecce40924e3304717d4991e1d717db5c2bbc",
+          "src/static_lighting.h": "411a980f5b8f6cf7f3b40734aae184f24c2406c99e685165c82e128e0da8380d"
+        }
+      }
+    },
+    "moonlit_courtyard": {
+      "ordinary": {
+        "passed": true,
+        "mode": "ordinary",
+        "level": "moonlit_courtyard",
+        "content_sha256": "cfba2dca0b75af7bb6eb4c15172f73f5864fd6cdeb27b75322daec9ddef25861",
+        "level_source_sha256": "412ec992cefcfc7dc714aeabd0618cfc50e57b22e268fd30c3346bd86a03ff8e",
+        "renderer_prepare": {
+          "ticks": {
+            "textures": 133779,
+            "retire": 68985,
+            "geometry": 2056643,
+            "bake": 1460012,
+            "bake_verify": 0,
+            "lighting": 1048608,
+            "alternate_lighting": 568712,
+            "restore": 10294,
+            "reports": 32618,
+            "gpu": 8423836,
+            "hud": 249854,
+            "total": 14053341
+          },
+          "ticks_per_second": 46875000,
+          "milliseconds": {
+            "textures": 2.853952,
+            "retire": 1.47168,
+            "geometry": 43.87505066666667,
+            "bake": 31.146922666666665,
+            "bake_verify": 0.0,
+            "lighting": 22.370304,
+            "alternate_lighting": 12.132522666666667,
+            "restore": 0.21960533333333335,
+            "reports": 0.6958506666666666,
+            "gpu": 179.70850133333334,
+            "hud": 5.330218666666667,
+            "total": 299.804608
+          },
+          "scope": "renderer_prepare_including_interrupts",
+          "stage_sum_exact": true
+        },
+        "level_reset": {
+          "ticks": 14192891,
+          "ticks_per_second": 46875000,
+          "milliseconds": 302.7816746666667,
+          "scope": "reset_to_ready_including_interrupts"
+        },
+        "bake": {
+          "status": "loaded",
+          "reason": "ok",
+          "models": "47",
+          "triangles": "1632",
+          "states": "2",
+          "rgb_bytes": "29376",
+          "crc32": "d52ca9e3",
+          "path": "rom:/lighting/lighting-8d8edddf909d473ab984308d05dde16b391207c1cdc432355f57b75a41796e32.bin"
+        },
+        "parity": null,
+        "textures": 4,
+        "lighting_asset": {
+          "path": "romfs/lighting/lighting-8d8edddf909d473ab984308d05dde16b391207c1cdc432355f57b75a41796e32.bin",
+          "signature": "8d8edddf909d473ab984308d05dde16b391207c1cdc432355f57b75a41796e32",
+          "sha256": "1e30552abdac29c471395d6e583ac51f503666beb1859b584f41320c61738fe4",
+          "bytes": 30004,
+          "rgb_bytes": 29376,
+          "static_models": 47,
+          "static_triangles": 1632,
+          "states": 2
+        },
+        "geometry": {
+          "models": 49,
+          "meshes": 14,
+          "vertices": 4195,
+          "triangles": 2239
+        },
+        "heap_bytes": 1287024,
+        "ordinary_load_timing": true,
+        "fixture_unconfigured": false,
+        "fixture_zero_textures": false,
+        "log_sha256": "f5495c8b3d7ef3cedd0c305ec794b4d7687ad97466acc25eb8f7091879b822e4",
+        "rom_sha256": "deacaf6c73d020faa1d75787310da7df62df9278975799125adc9ff20998e22a",
+        "build_signature": "6a8288789d8bae53575ecfc7f458203570de3a4160e697d8057e11a7d05c82c0",
+        "static_image_bytes": 747912,
+        "packaged_assets": [
+          {
+            "path": "romfs/lighting/lighting-8d8edddf909d473ab984308d05dde16b391207c1cdc432355f57b75a41796e32.bin",
+            "sha256": "1e30552abdac29c471395d6e583ac51f503666beb1859b584f41320c61738fe4",
+            "bytes": 30004,
+            "kind": "lighting"
+          },
+          {
+            "path": "romfs/textures/texture-7ef072606e4c877f.sprite",
+            "sha256": "cbf5330e91db96a294a6d389557f353852f38d12c0acb95ec3f5a286a77edab0",
+            "bytes": 2184,
+            "kind": "texture"
+          },
+          {
+            "path": "romfs/textures/texture-95f80c13eae4edf4.sprite",
+            "sha256": "8c0690447ff958b2bb870931406becdcdd672e62d18295011043cfe13773bb9f",
+            "bytes": 2184,
+            "kind": "texture"
+          },
+          {
+            "path": "romfs/textures/texture-a07f17d201b4641d.sprite",
+            "sha256": "6ea249500909084ee07d9318bff72f207e9fe770a235b8c9905371dba5ba75bc",
+            "bytes": 4232,
+            "kind": "texture"
+          },
+          {
+            "path": "romfs/textures/texture-b8c33a7246d7ec3a.sprite",
+            "sha256": "180320fd20c4bc4711022fe8a598a8ee0f0bc51ea7ea4e5586663142f550e449",
+            "bytes": 2184,
+            "kind": "texture"
+          }
+        ],
+        "run": {
+          "log": ".dev/ares/runs/41f1e94f53aa402d9fc9ff27356fa8a1/level-loading-moonlit_courtyard-ordinary.log",
+          "tested_rom": ".dev/ares/runs/41f1e94f53aa402d9fc9ff27356fa8a1/DarkLantern64-moonlit_courtyard-t3d.z64",
+          "rom_sha256": "deacaf6c73d020faa1d75787310da7df62df9278975799125adc9ff20998e22a",
+          "settings_source_sha256": "010e6ec4df82b1750292c4a1e50b1e513f9e2d4b7c604d345be0c1d28b6b140a"
+        },
+        "runtime_source_hashes": {
+          "src/animation.c": "58aa0b71836522082d5a7b13b340d7133736562f9357ceb51d88eb7cfa7d420e",
+          "src/animation.h": "c713072cc18969c4acbc8c8fba0cfe8ea2831eb578a97f38fbc1b1f6f9fda3a9",
+          "src/content_limits.h": "ec4c37638a9ee2e7bc4fb415caa1071d20a1f5b64ee60f54d1f27bcf1183a591",
+          "src/dl_profile.c": "fdc17f9433a99c2e5e8242842e15503132c2caa3207f199234a4369648ddcfa2",
+          "src/dl_profile.h": "14cac33253e708654add600681b7247712d9e8719622fcaea7270c758c55fd66",
+          "src/enemy_types.def": "c7dc61a6e285278279d633a0b4e41be904bc26897e78fb1f5c61b79ccffae1e4",
+          "src/game.c": "83f1cf981a4cddca035a80b96dbf493e239aa6560119d310deb2ea9718d89429",
+          "src/game.h": "baeccaab8a5663c0d24e48266edddc50e84f02687b2388939a3e8d1e67f662c1",
+          "src/launch.c": "aea06d3be767ab74dcea9dd524f4dfc89a0aac9f36f8136ab588f14b14b7e1ed",
+          "src/launch.h": "82711d01a50c3c05fc50289beaaa784b123ccafcb6362ea00dea3ab72b1b0449",
+          "src/lighting_bake.c": "f0dfb2c749e547adc7e25979d3b76bdd6aef8d52f864365d7e6867dc51770cd6",
+          "src/lighting_bake.h": "ac0d29317f42dd9ebea1ca8f13d35d5f967c3fa09a5792907a7ccec47355795d",
+          "src/main.c": "ce6faed71a0d0002ebfcd52fd28826d6076310d5f9d2fcc842bda5ffcc1d396f",
+          "src/render.c": "9eaa6b91fe52167916a920a6c017adf9588b02cfeb7d4564910f4e85a3f7a444",
+          "src/render.h": "4e75f62eb0d7a3a1ed1eff02dbaeeb6e6a8430bb6f4f22f8ce5bf05d4b77d8b8",
+          "src/render_batches.c": "72e25ffa0b72ce2aa6650a3db81a309e0ffcdb8807196efb8040755f2155cbb9",
+          "src/render_batches.h": "8c316c65bc4527d4396db56ea6f851d8359e4b0bc34c74b6a68ab46e7dcc2a7b",
+          "src/render_camera.h": "fe1fa0001829200ad6d6bedc53b4b61904986dc34b68910c5d1b02c7f1154108",
+          "src/render_hud_cache.inc": "7c3ebe9da6acba712731f811e73243b29474cd7f527e6e758be1127f369af1db",
+          "src/render_lighting.c": "cdbc1bd34c20f664aabb128243b6facda3be7420cf31015e6a882de5c6584792",
+          "src/render_lighting.h": "55479d327432df3d7cdf5e6bfb3856e268630800c2d44369c5b2ac1139d2a45f",
+          "src/render_shading.h": "a12a9fb4d1c8008208e755188078420d43271b5c4d1a9ecb95167985a43d314d",
+          "src/render_t3d.inc": "741fb748c5c38abb71ff01105b17b53b374c1bf6a2625ee594ca295d6015fb25",
+          "src/render_texture_packing.c": "487ddd384af8d1bab1673a3efbddc9529afc21da42d4306071e436fe9b4116d0",
+          "src/render_texture_packing.h": "9788346f3a8b17734408d339983b0327fd18eb549c320a3f0c328bda53c72cde",
+          "src/render_transform.c": "e5babbdf290016deb179de97077b34ddd2af705b576dea49aca9bacb4ecc62e2",
+          "src/render_transform.h": "0b9258c728c688184387265d74e7abfe9a6067dcb41c90d815fe3dbd9fabc655",
+          "src/render_visibility.h": "58d4a2fb1f0e1740e13ae3bed38387b0990b0118b2c2ad52ecd8a2582e2ebb59",
+          "src/scale_bench.c": "e6757e000b8fb4ef83d5f8c5b2442152475b8e781bc89b65c75125e02e00c5ec",
+          "src/scale_bench.h": "0febfeb6d49b6cbf5ea0a551a502a4e7c3b34ee4f1d7ca8db74eefa936ea7c7b",
+          "src/static_lighting.c": "68b54ef7baaab6d297b534ae690eecce40924e3304717d4991e1d717db5c2bbc",
+          "src/static_lighting.h": "411a980f5b8f6cf7f3b40734aae184f24c2406c99e685165c82e128e0da8380d"
+        }
+      },
+      "bypass": {
+        "passed": true,
+        "mode": "bypass",
+        "level": "moonlit_courtyard",
+        "content_sha256": "cfba2dca0b75af7bb6eb4c15172f73f5864fd6cdeb27b75322daec9ddef25861",
+        "level_source_sha256": "412ec992cefcfc7dc714aeabd0618cfc50e57b22e268fd30c3346bd86a03ff8e",
+        "renderer_prepare": {
+          "ticks": {
+            "textures": 135167,
+            "retire": 69006,
+            "geometry": 2111363,
+            "bake": 3781,
+            "bake_verify": 0,
+            "lighting": 38357185,
+            "alternate_lighting": 37965698,
+            "restore": 12312,
+            "reports": 34874,
+            "gpu": 8328576,
+            "hud": 221672,
+            "total": 87239634
+          },
+          "ticks_per_second": 46875000,
+          "milliseconds": {
+            "textures": 2.8835626666666667,
+            "retire": 1.472128,
+            "geometry": 45.04241066666667,
+            "bake": 0.08066133333333333,
+            "bake_verify": 0.0,
+            "lighting": 818.2866133333333,
+            "alternate_lighting": 809.9348906666667,
+            "restore": 0.262656,
+            "reports": 0.7439786666666667,
+            "gpu": 177.676288,
+            "hud": 4.729002666666666,
+            "total": 1861.112192
+          },
+          "scope": "renderer_prepare_including_interrupts",
+          "stage_sum_exact": true
+        },
+        "level_reset": {
+          "ticks": 87372805,
+          "ticks_per_second": 46875000,
+          "milliseconds": 1863.9531733333333,
+          "scope": "reset_to_ready_including_interrupts"
+        },
+        "bake": {
+          "status": "disabled",
+          "reason": "build_flag"
+        },
+        "parity": null,
+        "textures": 4,
+        "lighting_asset": {
+          "path": "romfs/lighting/lighting-8d8edddf909d473ab984308d05dde16b391207c1cdc432355f57b75a41796e32.bin",
+          "signature": "8d8edddf909d473ab984308d05dde16b391207c1cdc432355f57b75a41796e32",
+          "sha256": "1e30552abdac29c471395d6e583ac51f503666beb1859b584f41320c61738fe4",
+          "bytes": 30004,
+          "rgb_bytes": 29376,
+          "static_models": 47,
+          "static_triangles": 1632,
+          "states": 2
+        },
+        "geometry": {
+          "models": 49,
+          "meshes": 14,
+          "vertices": 4195,
+          "triangles": 2239
+        },
+        "heap_bytes": 1287024,
+        "ordinary_load_timing": true,
+        "fixture_unconfigured": false,
+        "fixture_zero_textures": false,
+        "log_sha256": "b932ef5a850bf9a3d4a6ed9bd3655c64174e24f0c94ba4851efc70e8f7f458a2",
+        "rom_sha256": "7b1713b00db1897a9d18967491df7230e863e67115963cd9ebc650a7fea294a7",
+        "build_signature": "1038cc4718c5498b0550477feed0bd9fd7fc191b6c784bc58a02089ced429c10",
+        "static_image_bytes": 743984,
+        "packaged_assets": [
+          {
+            "path": "romfs/lighting/lighting-8d8edddf909d473ab984308d05dde16b391207c1cdc432355f57b75a41796e32.bin",
+            "sha256": "1e30552abdac29c471395d6e583ac51f503666beb1859b584f41320c61738fe4",
+            "bytes": 30004,
+            "kind": "lighting"
+          },
+          {
+            "path": "romfs/textures/texture-7ef072606e4c877f.sprite",
+            "sha256": "cbf5330e91db96a294a6d389557f353852f38d12c0acb95ec3f5a286a77edab0",
+            "bytes": 2184,
+            "kind": "texture"
+          },
+          {
+            "path": "romfs/textures/texture-95f80c13eae4edf4.sprite",
+            "sha256": "8c0690447ff958b2bb870931406becdcdd672e62d18295011043cfe13773bb9f",
+            "bytes": 2184,
+            "kind": "texture"
+          },
+          {
+            "path": "romfs/textures/texture-a07f17d201b4641d.sprite",
+            "sha256": "6ea249500909084ee07d9318bff72f207e9fe770a235b8c9905371dba5ba75bc",
+            "bytes": 4232,
+            "kind": "texture"
+          },
+          {
+            "path": "romfs/textures/texture-b8c33a7246d7ec3a.sprite",
+            "sha256": "180320fd20c4bc4711022fe8a598a8ee0f0bc51ea7ea4e5586663142f550e449",
+            "bytes": 2184,
+            "kind": "texture"
+          }
+        ],
+        "run": {
+          "log": ".dev/ares/runs/10039e09c5bc43cb8bded7970c091791/level-loading-moonlit_courtyard-bypass.log",
+          "tested_rom": ".dev/ares/runs/10039e09c5bc43cb8bded7970c091791/DarkLantern64-moonlit_courtyard-runtime-lighting-t3d.z64",
+          "rom_sha256": "7b1713b00db1897a9d18967491df7230e863e67115963cd9ebc650a7fea294a7",
+          "settings_source_sha256": "010e6ec4df82b1750292c4a1e50b1e513f9e2d4b7c604d345be0c1d28b6b140a"
+        },
+        "runtime_source_hashes": {
+          "src/animation.c": "58aa0b71836522082d5a7b13b340d7133736562f9357ceb51d88eb7cfa7d420e",
+          "src/animation.h": "c713072cc18969c4acbc8c8fba0cfe8ea2831eb578a97f38fbc1b1f6f9fda3a9",
+          "src/content_limits.h": "ec4c37638a9ee2e7bc4fb415caa1071d20a1f5b64ee60f54d1f27bcf1183a591",
+          "src/dl_profile.c": "fdc17f9433a99c2e5e8242842e15503132c2caa3207f199234a4369648ddcfa2",
+          "src/dl_profile.h": "14cac33253e708654add600681b7247712d9e8719622fcaea7270c758c55fd66",
+          "src/enemy_types.def": "c7dc61a6e285278279d633a0b4e41be904bc26897e78fb1f5c61b79ccffae1e4",
+          "src/game.c": "83f1cf981a4cddca035a80b96dbf493e239aa6560119d310deb2ea9718d89429",
+          "src/game.h": "baeccaab8a5663c0d24e48266edddc50e84f02687b2388939a3e8d1e67f662c1",
+          "src/launch.c": "aea06d3be767ab74dcea9dd524f4dfc89a0aac9f36f8136ab588f14b14b7e1ed",
+          "src/launch.h": "82711d01a50c3c05fc50289beaaa784b123ccafcb6362ea00dea3ab72b1b0449",
+          "src/lighting_bake.c": "f0dfb2c749e547adc7e25979d3b76bdd6aef8d52f864365d7e6867dc51770cd6",
+          "src/lighting_bake.h": "ac0d29317f42dd9ebea1ca8f13d35d5f967c3fa09a5792907a7ccec47355795d",
+          "src/main.c": "ce6faed71a0d0002ebfcd52fd28826d6076310d5f9d2fcc842bda5ffcc1d396f",
+          "src/render.c": "9eaa6b91fe52167916a920a6c017adf9588b02cfeb7d4564910f4e85a3f7a444",
+          "src/render.h": "4e75f62eb0d7a3a1ed1eff02dbaeeb6e6a8430bb6f4f22f8ce5bf05d4b77d8b8",
+          "src/render_batches.c": "72e25ffa0b72ce2aa6650a3db81a309e0ffcdb8807196efb8040755f2155cbb9",
+          "src/render_batches.h": "8c316c65bc4527d4396db56ea6f851d8359e4b0bc34c74b6a68ab46e7dcc2a7b",
+          "src/render_camera.h": "fe1fa0001829200ad6d6bedc53b4b61904986dc34b68910c5d1b02c7f1154108",
+          "src/render_hud_cache.inc": "7c3ebe9da6acba712731f811e73243b29474cd7f527e6e758be1127f369af1db",
+          "src/render_lighting.c": "cdbc1bd34c20f664aabb128243b6facda3be7420cf31015e6a882de5c6584792",
+          "src/render_lighting.h": "55479d327432df3d7cdf5e6bfb3856e268630800c2d44369c5b2ac1139d2a45f",
+          "src/render_shading.h": "a12a9fb4d1c8008208e755188078420d43271b5c4d1a9ecb95167985a43d314d",
+          "src/render_t3d.inc": "741fb748c5c38abb71ff01105b17b53b374c1bf6a2625ee594ca295d6015fb25",
+          "src/render_texture_packing.c": "487ddd384af8d1bab1673a3efbddc9529afc21da42d4306071e436fe9b4116d0",
+          "src/render_texture_packing.h": "9788346f3a8b17734408d339983b0327fd18eb549c320a3f0c328bda53c72cde",
+          "src/render_transform.c": "e5babbdf290016deb179de97077b34ddd2af705b576dea49aca9bacb4ecc62e2",
+          "src/render_transform.h": "0b9258c728c688184387265d74e7abfe9a6067dcb41c90d815fe3dbd9fabc655",
+          "src/render_visibility.h": "58d4a2fb1f0e1740e13ae3bed38387b0990b0118b2c2ad52ecd8a2582e2ebb59",
+          "src/scale_bench.c": "e6757e000b8fb4ef83d5f8c5b2442152475b8e781bc89b65c75125e02e00c5ec",
+          "src/scale_bench.h": "0febfeb6d49b6cbf5ea0a551a502a4e7c3b34ee4f1d7ca8db74eefa936ea7c7b",
+          "src/static_lighting.c": "68b54ef7baaab6d297b534ae690eecce40924e3304717d4991e1d717db5c2bbc",
+          "src/static_lighting.h": "411a980f5b8f6cf7f3b40734aae184f24c2406c99e685165c82e128e0da8380d"
+        }
+      },
+      "verify": {
+        "passed": true,
+        "mode": "verify",
+        "level": "moonlit_courtyard",
+        "content_sha256": "cfba2dca0b75af7bb6eb4c15172f73f5864fd6cdeb27b75322daec9ddef25861",
+        "level_source_sha256": "412ec992cefcfc7dc714aeabd0618cfc50e57b22e268fd30c3346bd86a03ff8e",
+        "renderer_prepare": {
+          "ticks": {
+            "textures": 126990,
+            "retire": 68948,
+            "geometry": 2059252,
+            "bake": 1441977,
+            "bake_verify": 76445815,
+            "lighting": 1061090,
+            "alternate_lighting": 557803,
+            "restore": 11459,
+            "reports": 31061,
+            "gpu": 8410866,
+            "hud": 254652,
+            "total": 90469913
+          },
+          "ticks_per_second": 46875000,
+          "milliseconds": {
+            "textures": 2.70912,
+            "retire": 1.4708906666666666,
+            "geometry": 43.93070933333333,
+            "bake": 30.762176,
+            "bake_verify": 1630.8440533333332,
+            "lighting": 22.636586666666666,
+            "alternate_lighting": 11.899797333333334,
+            "restore": 0.24445866666666666,
+            "reports": 0.6626346666666667,
+            "gpu": 179.431808,
+            "hud": 5.432576,
+            "total": 1930.0248106666666
+          },
+          "scope": "renderer_prepare_including_interrupts",
+          "stage_sum_exact": true
+        },
+        "level_reset": {
+          "ticks": 90606094,
+          "ticks_per_second": 46875000,
+          "milliseconds": 1932.9300053333334,
+          "scope": "reset_to_ready_including_interrupts"
+        },
+        "bake": {
+          "status": "loaded",
+          "reason": "ok",
+          "models": "47",
+          "triangles": "1632",
+          "states": "2",
+          "rgb_bytes": "29376",
+          "crc32": "d52ca9e3",
+          "path": "rom:/lighting/lighting-8d8edddf909d473ab984308d05dde16b391207c1cdc432355f57b75a41796e32.bin"
+        },
+        "parity": {
+          "models": "47",
+          "triangles": "1632",
+          "states": "2",
+          "bytes": "78336",
+          "mismatches": "0",
+          "max_channel_delta": "0",
+          "baked_fnv1a": "3d42cde1",
+          "reference_fnv1a": "3d42cde1"
+        },
+        "textures": 4,
+        "lighting_asset": {
+          "path": "romfs/lighting/lighting-8d8edddf909d473ab984308d05dde16b391207c1cdc432355f57b75a41796e32.bin",
+          "signature": "8d8edddf909d473ab984308d05dde16b391207c1cdc432355f57b75a41796e32",
+          "sha256": "1e30552abdac29c471395d6e583ac51f503666beb1859b584f41320c61738fe4",
+          "bytes": 30004,
+          "rgb_bytes": 29376,
+          "static_models": 47,
+          "static_triangles": 1632,
+          "states": 2
+        },
+        "geometry": {
+          "models": 49,
+          "meshes": 14,
+          "vertices": 4195,
+          "triangles": 2239
+        },
+        "heap_bytes": 1287024,
+        "ordinary_load_timing": false,
+        "fixture_unconfigured": false,
+        "fixture_zero_textures": false,
+        "log_sha256": "95d89f3cab81b783dd492f62a5da93623f11df63a00ce5bb07d808e30ced99bd",
+        "rom_sha256": "d4da26eba9e3b612f387ba8810737bf68969b103a7f3ad6aab5d8b2237646bd8",
+        "build_signature": "42f4a99c3af11b82b663da7073754e79916b90df2eb429d5b3d992127a76a5ae",
+        "static_image_bytes": 749200,
+        "packaged_assets": [
+          {
+            "path": "romfs/lighting/lighting-8d8edddf909d473ab984308d05dde16b391207c1cdc432355f57b75a41796e32.bin",
+            "sha256": "1e30552abdac29c471395d6e583ac51f503666beb1859b584f41320c61738fe4",
+            "bytes": 30004,
+            "kind": "lighting"
+          },
+          {
+            "path": "romfs/textures/texture-7ef072606e4c877f.sprite",
+            "sha256": "cbf5330e91db96a294a6d389557f353852f38d12c0acb95ec3f5a286a77edab0",
+            "bytes": 2184,
+            "kind": "texture"
+          },
+          {
+            "path": "romfs/textures/texture-95f80c13eae4edf4.sprite",
+            "sha256": "8c0690447ff958b2bb870931406becdcdd672e62d18295011043cfe13773bb9f",
+            "bytes": 2184,
+            "kind": "texture"
+          },
+          {
+            "path": "romfs/textures/texture-a07f17d201b4641d.sprite",
+            "sha256": "6ea249500909084ee07d9318bff72f207e9fe770a235b8c9905371dba5ba75bc",
+            "bytes": 4232,
+            "kind": "texture"
+          },
+          {
+            "path": "romfs/textures/texture-b8c33a7246d7ec3a.sprite",
+            "sha256": "180320fd20c4bc4711022fe8a598a8ee0f0bc51ea7ea4e5586663142f550e449",
+            "bytes": 2184,
+            "kind": "texture"
+          }
+        ],
+        "run": {
+          "log": ".dev/ares/runs/c7aa52b421a5469aabd2e7e0a8cf706d/level-loading-moonlit_courtyard-verify.log",
+          "tested_rom": ".dev/ares/runs/c7aa52b421a5469aabd2e7e0a8cf706d/DarkLantern64-moonlit_courtyard-verify-lighting-t3d.z64",
+          "rom_sha256": "d4da26eba9e3b612f387ba8810737bf68969b103a7f3ad6aab5d8b2237646bd8",
+          "settings_source_sha256": "010e6ec4df82b1750292c4a1e50b1e513f9e2d4b7c604d345be0c1d28b6b140a"
+        },
+        "runtime_source_hashes": {
+          "src/animation.c": "58aa0b71836522082d5a7b13b340d7133736562f9357ceb51d88eb7cfa7d420e",
+          "src/animation.h": "c713072cc18969c4acbc8c8fba0cfe8ea2831eb578a97f38fbc1b1f6f9fda3a9",
+          "src/content_limits.h": "ec4c37638a9ee2e7bc4fb415caa1071d20a1f5b64ee60f54d1f27bcf1183a591",
+          "src/dl_profile.c": "fdc17f9433a99c2e5e8242842e15503132c2caa3207f199234a4369648ddcfa2",
+          "src/dl_profile.h": "14cac33253e708654add600681b7247712d9e8719622fcaea7270c758c55fd66",
+          "src/enemy_types.def": "c7dc61a6e285278279d633a0b4e41be904bc26897e78fb1f5c61b79ccffae1e4",
+          "src/game.c": "83f1cf981a4cddca035a80b96dbf493e239aa6560119d310deb2ea9718d89429",
+          "src/game.h": "baeccaab8a5663c0d24e48266edddc50e84f02687b2388939a3e8d1e67f662c1",
+          "src/launch.c": "aea06d3be767ab74dcea9dd524f4dfc89a0aac9f36f8136ab588f14b14b7e1ed",
+          "src/launch.h": "82711d01a50c3c05fc50289beaaa784b123ccafcb6362ea00dea3ab72b1b0449",
+          "src/lighting_bake.c": "f0dfb2c749e547adc7e25979d3b76bdd6aef8d52f864365d7e6867dc51770cd6",
+          "src/lighting_bake.h": "ac0d29317f42dd9ebea1ca8f13d35d5f967c3fa09a5792907a7ccec47355795d",
+          "src/main.c": "ce6faed71a0d0002ebfcd52fd28826d6076310d5f9d2fcc842bda5ffcc1d396f",
+          "src/render.c": "9eaa6b91fe52167916a920a6c017adf9588b02cfeb7d4564910f4e85a3f7a444",
+          "src/render.h": "4e75f62eb0d7a3a1ed1eff02dbaeeb6e6a8430bb6f4f22f8ce5bf05d4b77d8b8",
+          "src/render_batches.c": "72e25ffa0b72ce2aa6650a3db81a309e0ffcdb8807196efb8040755f2155cbb9",
+          "src/render_batches.h": "8c316c65bc4527d4396db56ea6f851d8359e4b0bc34c74b6a68ab46e7dcc2a7b",
+          "src/render_camera.h": "fe1fa0001829200ad6d6bedc53b4b61904986dc34b68910c5d1b02c7f1154108",
+          "src/render_hud_cache.inc": "7c3ebe9da6acba712731f811e73243b29474cd7f527e6e758be1127f369af1db",
+          "src/render_lighting.c": "cdbc1bd34c20f664aabb128243b6facda3be7420cf31015e6a882de5c6584792",
+          "src/render_lighting.h": "55479d327432df3d7cdf5e6bfb3856e268630800c2d44369c5b2ac1139d2a45f",
+          "src/render_shading.h": "a12a9fb4d1c8008208e755188078420d43271b5c4d1a9ecb95167985a43d314d",
+          "src/render_t3d.inc": "741fb748c5c38abb71ff01105b17b53b374c1bf6a2625ee594ca295d6015fb25",
+          "src/render_texture_packing.c": "487ddd384af8d1bab1673a3efbddc9529afc21da42d4306071e436fe9b4116d0",
+          "src/render_texture_packing.h": "9788346f3a8b17734408d339983b0327fd18eb549c320a3f0c328bda53c72cde",
+          "src/render_transform.c": "e5babbdf290016deb179de97077b34ddd2af705b576dea49aca9bacb4ecc62e2",
+          "src/render_transform.h": "0b9258c728c688184387265d74e7abfe9a6067dcb41c90d815fe3dbd9fabc655",
+          "src/render_visibility.h": "58d4a2fb1f0e1740e13ae3bed38387b0990b0118b2c2ad52ecd8a2582e2ebb59",
+          "src/scale_bench.c": "e6757e000b8fb4ef83d5f8c5b2442152475b8e781bc89b65c75125e02e00c5ec",
+          "src/scale_bench.h": "0febfeb6d49b6cbf5ea0a551a502a4e7c3b34ee4f1d7ca8db74eefa936ea7c7b",
+          "src/static_lighting.c": "68b54ef7baaab6d297b534ae690eecce40924e3304717d4991e1d717db5c2bbc",
+          "src/static_lighting.h": "411a980f5b8f6cf7f3b40734aae184f24c2406c99e685165c82e128e0da8380d"
+        }
+      },
+      "comparison": {
+        "renderer_before_ms": 1861.112192,
+        "renderer_after_ms": 299.804608,
+        "saved_ms": 1561.3075840000001,
+        "speedup": 6.207750455923613,
+        "scope": "renderer_prepare_including_interrupts"
+      }
+    },
+    "enemy_patrols": {
+      "ordinary": {
+        "passed": true,
+        "mode": "ordinary",
+        "level": "enemy_patrols",
+        "content_sha256": "0c57f78e3891673029ccf0b0a5e0a1cff266cda00c9909c106bfec311b92d950",
+        "level_source_sha256": "26d61c6300b298a6b2d73de2f32030c9759536d490e611d7d7ee2200d89e450d",
+        "renderer_prepare": {
+          "ticks": {
+            "textures": 60519,
+            "retire": 69439,
+            "geometry": 3202322,
+            "bake": 3221,
+            "bake_verify": 0,
+            "lighting": 7652717,
+            "alternate_lighting": 0,
+            "restore": 0,
+            "reports": 28808,
+            "gpu": 9341014,
+            "hud": 240642,
+            "total": 20598682
+          },
+          "ticks_per_second": 46875000,
+          "milliseconds": {
+            "textures": 1.291072,
+            "retire": 1.4813653333333334,
+            "geometry": 68.31620266666667,
+            "bake": 0.06871466666666666,
+            "bake_verify": 0.0,
+            "lighting": 163.25796266666666,
+            "alternate_lighting": 0.0,
+            "restore": 0.0,
+            "reports": 0.6145706666666667,
+            "gpu": 199.27496533333334,
+            "hud": 5.133696,
+            "total": 439.43854933333336
+          },
+          "scope": "renderer_prepare_including_interrupts",
+          "stage_sum_exact": true
+        },
+        "level_reset": {
+          "ticks": 20714060,
+          "ticks_per_second": 46875000,
+          "milliseconds": 441.89994666666666,
+          "scope": "reset_to_ready_including_interrupts"
+        },
+        "bake": {
+          "status": "absent",
+          "reason": "legacy"
+        },
+        "parity": null,
+        "textures": 2,
+        "lighting_asset": null,
+        "geometry": {
+          "models": 27,
+          "meshes": 9,
+          "vertices": 4701,
+          "triangles": 2833
+        },
+        "heap_bytes": 1338200,
+        "ordinary_load_timing": true,
+        "fixture_unconfigured": false,
+        "fixture_zero_textures": false,
+        "log_sha256": "0d33d9cec4544f26feb8704dc027475b1de1fd8efa36b5c9bb959512988866eb",
+        "rom_sha256": "46e4472035089f95cf1cb51470416fa4bb5e718b7ec6e5e822e68f8a21d7cfd0",
+        "build_signature": "25e9e2f5972a7be26d18260818ff084a21ad9d2472b21ee8930d83febdbd6fb7",
+        "static_image_bytes": 734160,
+        "packaged_assets": [
+          {
+            "path": "romfs/textures/texture-7ef072606e4c877f.sprite",
+            "sha256": "cbf5330e91db96a294a6d389557f353852f38d12c0acb95ec3f5a286a77edab0",
+            "bytes": 2184,
+            "kind": "texture"
+          },
+          {
+            "path": "romfs/textures/texture-95f80c13eae4edf4.sprite",
+            "sha256": "8c0690447ff958b2bb870931406becdcdd672e62d18295011043cfe13773bb9f",
+            "bytes": 2184,
+            "kind": "texture"
+          }
+        ],
+        "run": {
+          "log": ".dev/ares/runs/d0253c68837a4ddf82db835488c720a8/level-loading-enemy_patrols-ordinary.log",
+          "tested_rom": ".dev/ares/runs/d0253c68837a4ddf82db835488c720a8/DarkLantern64-enemy_patrols-t3d.z64",
+          "rom_sha256": "46e4472035089f95cf1cb51470416fa4bb5e718b7ec6e5e822e68f8a21d7cfd0",
+          "settings_source_sha256": "010e6ec4df82b1750292c4a1e50b1e513f9e2d4b7c604d345be0c1d28b6b140a"
+        },
+        "runtime_source_hashes": {
+          "src/animation.c": "58aa0b71836522082d5a7b13b340d7133736562f9357ceb51d88eb7cfa7d420e",
+          "src/animation.h": "c713072cc18969c4acbc8c8fba0cfe8ea2831eb578a97f38fbc1b1f6f9fda3a9",
+          "src/content_limits.h": "ec4c37638a9ee2e7bc4fb415caa1071d20a1f5b64ee60f54d1f27bcf1183a591",
+          "src/dl_profile.c": "fdc17f9433a99c2e5e8242842e15503132c2caa3207f199234a4369648ddcfa2",
+          "src/dl_profile.h": "14cac33253e708654add600681b7247712d9e8719622fcaea7270c758c55fd66",
+          "src/enemy_types.def": "c7dc61a6e285278279d633a0b4e41be904bc26897e78fb1f5c61b79ccffae1e4",
+          "src/game.c": "83f1cf981a4cddca035a80b96dbf493e239aa6560119d310deb2ea9718d89429",
+          "src/game.h": "baeccaab8a5663c0d24e48266edddc50e84f02687b2388939a3e8d1e67f662c1",
+          "src/launch.c": "aea06d3be767ab74dcea9dd524f4dfc89a0aac9f36f8136ab588f14b14b7e1ed",
+          "src/launch.h": "82711d01a50c3c05fc50289beaaa784b123ccafcb6362ea00dea3ab72b1b0449",
+          "src/lighting_bake.c": "f0dfb2c749e547adc7e25979d3b76bdd6aef8d52f864365d7e6867dc51770cd6",
+          "src/lighting_bake.h": "ac0d29317f42dd9ebea1ca8f13d35d5f967c3fa09a5792907a7ccec47355795d",
+          "src/main.c": "ce6faed71a0d0002ebfcd52fd28826d6076310d5f9d2fcc842bda5ffcc1d396f",
+          "src/render.c": "9eaa6b91fe52167916a920a6c017adf9588b02cfeb7d4564910f4e85a3f7a444",
+          "src/render.h": "4e75f62eb0d7a3a1ed1eff02dbaeeb6e6a8430bb6f4f22f8ce5bf05d4b77d8b8",
+          "src/render_batches.c": "72e25ffa0b72ce2aa6650a3db81a309e0ffcdb8807196efb8040755f2155cbb9",
+          "src/render_batches.h": "8c316c65bc4527d4396db56ea6f851d8359e4b0bc34c74b6a68ab46e7dcc2a7b",
+          "src/render_camera.h": "fe1fa0001829200ad6d6bedc53b4b61904986dc34b68910c5d1b02c7f1154108",
+          "src/render_hud_cache.inc": "7c3ebe9da6acba712731f811e73243b29474cd7f527e6e758be1127f369af1db",
+          "src/render_lighting.c": "cdbc1bd34c20f664aabb128243b6facda3be7420cf31015e6a882de5c6584792",
+          "src/render_lighting.h": "55479d327432df3d7cdf5e6bfb3856e268630800c2d44369c5b2ac1139d2a45f",
+          "src/render_shading.h": "a12a9fb4d1c8008208e755188078420d43271b5c4d1a9ecb95167985a43d314d",
+          "src/render_t3d.inc": "741fb748c5c38abb71ff01105b17b53b374c1bf6a2625ee594ca295d6015fb25",
+          "src/render_texture_packing.c": "487ddd384af8d1bab1673a3efbddc9529afc21da42d4306071e436fe9b4116d0",
+          "src/render_texture_packing.h": "9788346f3a8b17734408d339983b0327fd18eb549c320a3f0c328bda53c72cde",
+          "src/render_transform.c": "e5babbdf290016deb179de97077b34ddd2af705b576dea49aca9bacb4ecc62e2",
+          "src/render_transform.h": "0b9258c728c688184387265d74e7abfe9a6067dcb41c90d815fe3dbd9fabc655",
+          "src/render_visibility.h": "58d4a2fb1f0e1740e13ae3bed38387b0990b0118b2c2ad52ecd8a2582e2ebb59",
+          "src/scale_bench.c": "e6757e000b8fb4ef83d5f8c5b2442152475b8e781bc89b65c75125e02e00c5ec",
+          "src/scale_bench.h": "0febfeb6d49b6cbf5ea0a551a502a4e7c3b34ee4f1d7ca8db74eefa936ea7c7b",
+          "src/static_lighting.c": "68b54ef7baaab6d297b534ae690eecce40924e3304717d4991e1d717db5c2bbc",
+          "src/static_lighting.h": "411a980f5b8f6cf7f3b40734aae184f24c2406c99e685165c82e128e0da8380d"
+        }
+      }
+    },
+    "animation_workshop": {
+      "ordinary": {
+        "passed": true,
+        "mode": "ordinary",
+        "level": "animation_workshop",
+        "content_sha256": "aedfc172e12a9364f00ec7198a4d801d6f7e48480f9d72056803fd0cadfbf459",
+        "level_source_sha256": "0480ac4b7343b82b1f5c709c93d3496f8fd89ea846315a6b68b96028cb9fb8fd",
+        "renderer_prepare": {
+          "ticks": {
+            "textures": 35157,
+            "retire": 70174,
+            "geometry": 1784493,
+            "bake": 3333,
+            "bake_verify": 0,
+            "lighting": 1437467,
+            "alternate_lighting": 0,
+            "restore": 0,
+            "reports": 30139,
+            "gpu": 4228136,
+            "hud": 215350,
+            "total": 7804249
+          },
+          "ticks_per_second": 46875000,
+          "milliseconds": {
+            "textures": 0.750016,
+            "retire": 1.4970453333333333,
+            "geometry": 38.069184,
+            "bake": 0.071104,
+            "bake_verify": 0.0,
+            "lighting": 30.665962666666665,
+            "alternate_lighting": 0.0,
+            "restore": 0.0,
+            "reports": 0.6429653333333334,
+            "gpu": 90.20023466666666,
+            "hud": 4.594133333333334,
+            "total": 166.49064533333333
+          },
+          "scope": "renderer_prepare_including_interrupts",
+          "stage_sum_exact": true
+        },
+        "level_reset": {
+          "ticks": 7912430,
+          "ticks_per_second": 46875000,
+          "milliseconds": 168.79850666666667,
+          "scope": "reset_to_ready_including_interrupts"
+        },
+        "bake": {
+          "status": "absent",
+          "reason": "legacy"
+        },
+        "parity": null,
+        "textures": 1,
+        "lighting_asset": null,
+        "geometry": {
+          "models": 12,
+          "meshes": 2,
+          "vertices": 2098,
+          "triangles": 1190
+        },
+        "heap_bytes": 1007984,
+        "ordinary_load_timing": true,
+        "fixture_unconfigured": false,
+        "fixture_zero_textures": false,
+        "log_sha256": "2eb9241a84b9517d6e363c90b75fd8db978175405b97eb70ad96116145280212",
+        "rom_sha256": "f6f40315f82c2bfe846ec05a3e73adcbb125877d6337264d7577b4db1833c4dd",
+        "build_signature": "3f195ac0f01f2a4eb2a62d142e421ea29bccc7af4e70be2d8e4b474a53411012",
+        "static_image_bytes": 697032,
+        "packaged_assets": [
+          {
+            "path": "romfs/textures/texture-95f80c13eae4edf4.sprite",
+            "sha256": "8c0690447ff958b2bb870931406becdcdd672e62d18295011043cfe13773bb9f",
+            "bytes": 2184,
+            "kind": "texture"
+          }
+        ],
+        "run": {
+          "log": ".dev/ares/runs/b9c434e3f04d4f71b31110b498674eea/level-loading-animation_workshop-ordinary.log",
+          "tested_rom": ".dev/ares/runs/b9c434e3f04d4f71b31110b498674eea/DarkLantern64-animation_workshop-t3d.z64",
+          "rom_sha256": "f6f40315f82c2bfe846ec05a3e73adcbb125877d6337264d7577b4db1833c4dd",
+          "settings_source_sha256": "010e6ec4df82b1750292c4a1e50b1e513f9e2d4b7c604d345be0c1d28b6b140a"
+        },
+        "runtime_source_hashes": {
+          "src/animation.c": "58aa0b71836522082d5a7b13b340d7133736562f9357ceb51d88eb7cfa7d420e",
+          "src/animation.h": "c713072cc18969c4acbc8c8fba0cfe8ea2831eb578a97f38fbc1b1f6f9fda3a9",
+          "src/content_limits.h": "ec4c37638a9ee2e7bc4fb415caa1071d20a1f5b64ee60f54d1f27bcf1183a591",
+          "src/dl_profile.c": "fdc17f9433a99c2e5e8242842e15503132c2caa3207f199234a4369648ddcfa2",
+          "src/dl_profile.h": "14cac33253e708654add600681b7247712d9e8719622fcaea7270c758c55fd66",
+          "src/enemy_types.def": "c7dc61a6e285278279d633a0b4e41be904bc26897e78fb1f5c61b79ccffae1e4",
+          "src/game.c": "83f1cf981a4cddca035a80b96dbf493e239aa6560119d310deb2ea9718d89429",
+          "src/game.h": "baeccaab8a5663c0d24e48266edddc50e84f02687b2388939a3e8d1e67f662c1",
+          "src/launch.c": "aea06d3be767ab74dcea9dd524f4dfc89a0aac9f36f8136ab588f14b14b7e1ed",
+          "src/launch.h": "82711d01a50c3c05fc50289beaaa784b123ccafcb6362ea00dea3ab72b1b0449",
+          "src/lighting_bake.c": "f0dfb2c749e547adc7e25979d3b76bdd6aef8d52f864365d7e6867dc51770cd6",
+          "src/lighting_bake.h": "ac0d29317f42dd9ebea1ca8f13d35d5f967c3fa09a5792907a7ccec47355795d",
+          "src/main.c": "ce6faed71a0d0002ebfcd52fd28826d6076310d5f9d2fcc842bda5ffcc1d396f",
+          "src/render.c": "9eaa6b91fe52167916a920a6c017adf9588b02cfeb7d4564910f4e85a3f7a444",
+          "src/render.h": "4e75f62eb0d7a3a1ed1eff02dbaeeb6e6a8430bb6f4f22f8ce5bf05d4b77d8b8",
+          "src/render_batches.c": "72e25ffa0b72ce2aa6650a3db81a309e0ffcdb8807196efb8040755f2155cbb9",
+          "src/render_batches.h": "8c316c65bc4527d4396db56ea6f851d8359e4b0bc34c74b6a68ab46e7dcc2a7b",
+          "src/render_camera.h": "fe1fa0001829200ad6d6bedc53b4b61904986dc34b68910c5d1b02c7f1154108",
+          "src/render_hud_cache.inc": "7c3ebe9da6acba712731f811e73243b29474cd7f527e6e758be1127f369af1db",
+          "src/render_lighting.c": "cdbc1bd34c20f664aabb128243b6facda3be7420cf31015e6a882de5c6584792",
+          "src/render_lighting.h": "55479d327432df3d7cdf5e6bfb3856e268630800c2d44369c5b2ac1139d2a45f",
+          "src/render_shading.h": "a12a9fb4d1c8008208e755188078420d43271b5c4d1a9ecb95167985a43d314d",
+          "src/render_t3d.inc": "741fb748c5c38abb71ff01105b17b53b374c1bf6a2625ee594ca295d6015fb25",
+          "src/render_texture_packing.c": "487ddd384af8d1bab1673a3efbddc9529afc21da42d4306071e436fe9b4116d0",
+          "src/render_texture_packing.h": "9788346f3a8b17734408d339983b0327fd18eb549c320a3f0c328bda53c72cde",
+          "src/render_transform.c": "e5babbdf290016deb179de97077b34ddd2af705b576dea49aca9bacb4ecc62e2",
+          "src/render_transform.h": "0b9258c728c688184387265d74e7abfe9a6067dcb41c90d815fe3dbd9fabc655",
+          "src/render_visibility.h": "58d4a2fb1f0e1740e13ae3bed38387b0990b0118b2c2ad52ecd8a2582e2ebb59",
+          "src/scale_bench.c": "e6757e000b8fb4ef83d5f8c5b2442152475b8e781bc89b65c75125e02e00c5ec",
+          "src/scale_bench.h": "0febfeb6d49b6cbf5ea0a551a502a4e7c3b34ee4f1d7ca8db74eefa936ea7c7b",
+          "src/static_lighting.c": "68b54ef7baaab6d297b534ae690eecce40924e3304717d4991e1d717db5c2bbc",
+          "src/static_lighting.h": "411a980f5b8f6cf7f3b40734aae184f24c2406c99e685165c82e128e0da8380d"
+        }
+      }
+    },
+    "sponza_courtyard": {
+      "ordinary": {
+        "passed": true,
+        "mode": "ordinary",
+        "level": "sponza_courtyard",
+        "content_sha256": "951850167ca81b5d7a152225fbafac6c8754f30be5d4b77eedf6955a530d846e",
+        "level_source_sha256": "a75fb0e9415d405a1a004469048c2a7288bbcd49f34ea5db90a95c89f5a60164",
+        "renderer_prepare": {
+          "ticks": {
+            "textures": 323362,
+            "retire": 66348,
+            "geometry": 3237638,
+            "bake": 2443343,
+            "bake_verify": 0,
+            "lighting": 1907989,
+            "alternate_lighting": 1099305,
+            "restore": 13237,
+            "reports": 31180,
+            "gpu": 10649144,
+            "hud": 269598,
+            "total": 20041144
+          },
+          "ticks_per_second": 46875000,
+          "milliseconds": {
+            "textures": 6.898389333333333,
+            "retire": 1.415424,
+            "geometry": 69.06961066666666,
+            "bake": 52.12465066666667,
+            "bake_verify": 0.0,
+            "lighting": 40.70376533333334,
+            "alternate_lighting": 23.45184,
+            "restore": 0.2823893333333333,
+            "reports": 0.6651733333333333,
+            "gpu": 227.18173866666666,
+            "hud": 5.751424,
+            "total": 427.5444053333333
+          },
+          "scope": "renderer_prepare_including_interrupts",
+          "stage_sum_exact": true
+        },
+        "level_reset": {
+          "ticks": 20196929,
+          "ticks_per_second": 46875000,
+          "milliseconds": 430.86781866666666,
+          "scope": "reset_to_ready_including_interrupts"
+        },
+        "bake": {
+          "status": "loaded",
+          "reason": "ok",
+          "models": "111",
+          "triangles": "2772",
+          "states": "2",
+          "rgb_bytes": "49896",
+          "crc32": "3d0382f3",
+          "path": "rom:/lighting/lighting-1c689a6decf513ee2b336d568aadfbcfd7a3133fcbb252d0d088ce8e589c17b5.bin"
+        },
+        "parity": null,
+        "textures": 10,
+        "lighting_asset": {
+          "path": "romfs/lighting/lighting-1c689a6decf513ee2b336d568aadfbcfd7a3133fcbb252d0d088ce8e589c17b5.bin",
+          "signature": "1c689a6decf513ee2b336d568aadfbcfd7a3133fcbb252d0d088ce8e589c17b5",
+          "sha256": "8b625a63f9e03b99a69428ad964115423202c53bb2268fd357460c36d9b1cbe1",
+          "bytes": 51292,
+          "rgb_bytes": 49896,
+          "static_models": 111,
+          "static_triangles": 2772,
+          "states": 2
+        },
+        "geometry": {
+          "models": 114,
+          "meshes": 70,
+          "vertices": 5898,
+          "triangles": 3902
+        },
+        "heap_bytes": 1474808,
+        "ordinary_load_timing": true,
+        "fixture_unconfigured": false,
+        "fixture_zero_textures": false,
+        "log_sha256": "b722bf1eb28cc24debee007386416cb627966c288b34dc5e9f6547f04684f5ac",
+        "rom_sha256": "ba138fa7d17e8b46644f8a11ef01723be9fa44f4f8914f09852c65488baaa6a2",
+        "build_signature": "6593ca929621c65eb27333bb0596d8a8f2b44c3fcdede414455b352e69103fad",
+        "static_image_bytes": 772304,
+        "packaged_assets": [
+          {
+            "path": "romfs/lighting/lighting-1c689a6decf513ee2b336d568aadfbcfd7a3133fcbb252d0d088ce8e589c17b5.bin",
+            "sha256": "8b625a63f9e03b99a69428ad964115423202c53bb2268fd357460c36d9b1cbe1",
+            "bytes": 51292,
+            "kind": "lighting"
+          },
+          {
+            "path": "romfs/textures/texture-2c51fc16ded205c8.sprite",
+            "sha256": "4ea34a68abf63791460d0993aae2f93af0e193949722b6691447fe2df5a9d6ba",
+            "bytes": 4232,
+            "kind": "texture"
+          },
+          {
+            "path": "romfs/textures/texture-3fc82cf01226fa2e.sprite",
+            "sha256": "e4b3b080de3cb070ff0c4c196f423fd0aeb66b5e6ce262bb1d5d7bce8b4e0a0f",
+            "bytes": 2184,
+            "kind": "texture"
+          },
+          {
+            "path": "romfs/textures/texture-51141f129dd2d00b.sprite",
+            "sha256": "ed1bb489f4ac5045caaa8006774ba1b8f65f6f831fc58d9019eba52e43b2ce92",
+            "bytes": 2184,
+            "kind": "texture"
+          },
+          {
+            "path": "romfs/textures/texture-5c4cefeb7f2d6328.sprite",
+            "sha256": "8451e8fa915c428e0f3ca237771f8051d04400b1ac08c5a863cfed44e40e0fd2",
+            "bytes": 4232,
+            "kind": "texture"
+          },
+          {
+            "path": "romfs/textures/texture-76cea859f3bf75cf.sprite",
+            "sha256": "3caeb269d3202eb1cca17dc9aa076141dea380ec922c3c766d6805379d0f81e4",
+            "bytes": 2184,
+            "kind": "texture"
+          },
+          {
+            "path": "romfs/textures/texture-7ef072606e4c877f.sprite",
+            "sha256": "cbf5330e91db96a294a6d389557f353852f38d12c0acb95ec3f5a286a77edab0",
+            "bytes": 2184,
+            "kind": "texture"
+          },
+          {
+            "path": "romfs/textures/texture-95f80c13eae4edf4.sprite",
+            "sha256": "8c0690447ff958b2bb870931406becdcdd672e62d18295011043cfe13773bb9f",
+            "bytes": 2184,
+            "kind": "texture"
+          },
+          {
+            "path": "romfs/textures/texture-a8b09959123d9c8c.sprite",
+            "sha256": "aba6f1cf18359cd22742f67bac7562c458ab7d48fffa402cfc41658aa41a2a3e",
+            "bytes": 2184,
+            "kind": "texture"
+          },
+          {
+            "path": "romfs/textures/texture-d0816d51cda2d806.sprite",
+            "sha256": "d3c508b810009e79283dc911efe4f7f2b0625a8124b83a9539d1068436683f25",
+            "bytes": 2184,
+            "kind": "texture"
+          },
+          {
+            "path": "romfs/textures/texture-df0b810c0830af3d.sprite",
+            "sha256": "1234b4a545ef40e350c3f8277bdf1ccbe0a0f59f7a035913aab1f7cd0bbbb5bc",
+            "bytes": 4232,
+            "kind": "texture"
+          }
+        ],
+        "run": {
+          "log": ".dev/ares/runs/698b43d5f7814b529f33402bdbae4c64/level-loading-sponza_courtyard-ordinary.log",
+          "tested_rom": ".dev/ares/runs/698b43d5f7814b529f33402bdbae4c64/DarkLantern64-sponza_courtyard-t3d.z64",
+          "rom_sha256": "ba138fa7d17e8b46644f8a11ef01723be9fa44f4f8914f09852c65488baaa6a2",
+          "settings_source_sha256": "010e6ec4df82b1750292c4a1e50b1e513f9e2d4b7c604d345be0c1d28b6b140a"
+        },
+        "runtime_source_hashes": {
+          "src/animation.c": "58aa0b71836522082d5a7b13b340d7133736562f9357ceb51d88eb7cfa7d420e",
+          "src/animation.h": "c713072cc18969c4acbc8c8fba0cfe8ea2831eb578a97f38fbc1b1f6f9fda3a9",
+          "src/content_limits.h": "ec4c37638a9ee2e7bc4fb415caa1071d20a1f5b64ee60f54d1f27bcf1183a591",
+          "src/dl_profile.c": "fdc17f9433a99c2e5e8242842e15503132c2caa3207f199234a4369648ddcfa2",
+          "src/dl_profile.h": "14cac33253e708654add600681b7247712d9e8719622fcaea7270c758c55fd66",
+          "src/enemy_types.def": "c7dc61a6e285278279d633a0b4e41be904bc26897e78fb1f5c61b79ccffae1e4",
+          "src/game.c": "83f1cf981a4cddca035a80b96dbf493e239aa6560119d310deb2ea9718d89429",
+          "src/game.h": "baeccaab8a5663c0d24e48266edddc50e84f02687b2388939a3e8d1e67f662c1",
+          "src/launch.c": "aea06d3be767ab74dcea9dd524f4dfc89a0aac9f36f8136ab588f14b14b7e1ed",
+          "src/launch.h": "82711d01a50c3c05fc50289beaaa784b123ccafcb6362ea00dea3ab72b1b0449",
+          "src/lighting_bake.c": "f0dfb2c749e547adc7e25979d3b76bdd6aef8d52f864365d7e6867dc51770cd6",
+          "src/lighting_bake.h": "ac0d29317f42dd9ebea1ca8f13d35d5f967c3fa09a5792907a7ccec47355795d",
+          "src/main.c": "ce6faed71a0d0002ebfcd52fd28826d6076310d5f9d2fcc842bda5ffcc1d396f",
+          "src/render.c": "9eaa6b91fe52167916a920a6c017adf9588b02cfeb7d4564910f4e85a3f7a444",
+          "src/render.h": "4e75f62eb0d7a3a1ed1eff02dbaeeb6e6a8430bb6f4f22f8ce5bf05d4b77d8b8",
+          "src/render_batches.c": "72e25ffa0b72ce2aa6650a3db81a309e0ffcdb8807196efb8040755f2155cbb9",
+          "src/render_batches.h": "8c316c65bc4527d4396db56ea6f851d8359e4b0bc34c74b6a68ab46e7dcc2a7b",
+          "src/render_camera.h": "fe1fa0001829200ad6d6bedc53b4b61904986dc34b68910c5d1b02c7f1154108",
+          "src/render_hud_cache.inc": "7c3ebe9da6acba712731f811e73243b29474cd7f527e6e758be1127f369af1db",
+          "src/render_lighting.c": "cdbc1bd34c20f664aabb128243b6facda3be7420cf31015e6a882de5c6584792",
+          "src/render_lighting.h": "55479d327432df3d7cdf5e6bfb3856e268630800c2d44369c5b2ac1139d2a45f",
+          "src/render_shading.h": "a12a9fb4d1c8008208e755188078420d43271b5c4d1a9ecb95167985a43d314d",
+          "src/render_t3d.inc": "741fb748c5c38abb71ff01105b17b53b374c1bf6a2625ee594ca295d6015fb25",
+          "src/render_texture_packing.c": "487ddd384af8d1bab1673a3efbddc9529afc21da42d4306071e436fe9b4116d0",
+          "src/render_texture_packing.h": "9788346f3a8b17734408d339983b0327fd18eb549c320a3f0c328bda53c72cde",
+          "src/render_transform.c": "e5babbdf290016deb179de97077b34ddd2af705b576dea49aca9bacb4ecc62e2",
+          "src/render_transform.h": "0b9258c728c688184387265d74e7abfe9a6067dcb41c90d815fe3dbd9fabc655",
+          "src/render_visibility.h": "58d4a2fb1f0e1740e13ae3bed38387b0990b0118b2c2ad52ecd8a2582e2ebb59",
+          "src/scale_bench.c": "e6757e000b8fb4ef83d5f8c5b2442152475b8e781bc89b65c75125e02e00c5ec",
+          "src/scale_bench.h": "0febfeb6d49b6cbf5ea0a551a502a4e7c3b34ee4f1d7ca8db74eefa936ea7c7b",
+          "src/static_lighting.c": "68b54ef7baaab6d297b534ae690eecce40924e3304717d4991e1d717db5c2bbc",
+          "src/static_lighting.h": "411a980f5b8f6cf7f3b40734aae184f24c2406c99e685165c82e128e0da8380d"
+        }
+      },
+      "bypass": {
+        "passed": true,
+        "mode": "bypass",
+        "level": "sponza_courtyard",
+        "content_sha256": "951850167ca81b5d7a152225fbafac6c8754f30be5d4b77eedf6955a530d846e",
+        "level_source_sha256": "a75fb0e9415d405a1a004469048c2a7288bbcd49f34ea5db90a95c89f5a60164",
+        "renderer_prepare": {
+          "ticks": {
+            "textures": 331961,
+            "retire": 69513,
+            "geometry": 3211017,
+            "bake": 3314,
+            "bake_verify": 0,
+            "lighting": 82465142,
+            "alternate_lighting": 82281928,
+            "restore": 13597,
+            "reports": 29928,
+            "gpu": 10398891,
+            "hud": 222028,
+            "total": 179027319
+          },
+          "ticks_per_second": 46875000,
+          "milliseconds": {
+            "textures": 7.0818346666666665,
+            "retire": 1.482944,
+            "geometry": 68.501696,
+            "bake": 0.07069866666666667,
+            "bake_verify": 0.0,
+            "lighting": 1759.2563626666667,
+            "alternate_lighting": 1755.3477973333333,
+            "restore": 0.29006933333333335,
+            "reports": 0.638464,
+            "gpu": 221.843008,
+            "hud": 4.736597333333333,
+            "total": 3819.249472
+          },
+          "scope": "renderer_prepare_including_interrupts",
+          "stage_sum_exact": true
+        },
+        "level_reset": {
+          "ticks": 179182681,
+          "ticks_per_second": 46875000,
+          "milliseconds": 3822.5638613333335,
+          "scope": "reset_to_ready_including_interrupts"
+        },
+        "bake": {
+          "status": "disabled",
+          "reason": "build_flag"
+        },
+        "parity": null,
+        "textures": 10,
+        "lighting_asset": {
+          "path": "romfs/lighting/lighting-1c689a6decf513ee2b336d568aadfbcfd7a3133fcbb252d0d088ce8e589c17b5.bin",
+          "signature": "1c689a6decf513ee2b336d568aadfbcfd7a3133fcbb252d0d088ce8e589c17b5",
+          "sha256": "8b625a63f9e03b99a69428ad964115423202c53bb2268fd357460c36d9b1cbe1",
+          "bytes": 51292,
+          "rgb_bytes": 49896,
+          "static_models": 111,
+          "static_triangles": 2772,
+          "states": 2
+        },
+        "geometry": {
+          "models": 114,
+          "meshes": 70,
+          "vertices": 5898,
+          "triangles": 3902
+        },
+        "heap_bytes": 1474800,
+        "ordinary_load_timing": true,
+        "fixture_unconfigured": false,
+        "fixture_zero_textures": false,
+        "log_sha256": "55fe4190a3c8e9713f878564a95042c9bf5bed1df5cfcba7ab67851f995bc08f",
+        "rom_sha256": "12a9d9727f8549684734e64c23aabd1bc1a248ed1362b36e23ca5e1b8a4200e9",
+        "build_signature": "e2ca8f9883cc63ce0eca5280f4233bf99f4722698ddd28a88f2f83a1a2ccb6b3",
+        "static_image_bytes": 768376,
+        "packaged_assets": [
+          {
+            "path": "romfs/lighting/lighting-1c689a6decf513ee2b336d568aadfbcfd7a3133fcbb252d0d088ce8e589c17b5.bin",
+            "sha256": "8b625a63f9e03b99a69428ad964115423202c53bb2268fd357460c36d9b1cbe1",
+            "bytes": 51292,
+            "kind": "lighting"
+          },
+          {
+            "path": "romfs/textures/texture-2c51fc16ded205c8.sprite",
+            "sha256": "4ea34a68abf63791460d0993aae2f93af0e193949722b6691447fe2df5a9d6ba",
+            "bytes": 4232,
+            "kind": "texture"
+          },
+          {
+            "path": "romfs/textures/texture-3fc82cf01226fa2e.sprite",
+            "sha256": "e4b3b080de3cb070ff0c4c196f423fd0aeb66b5e6ce262bb1d5d7bce8b4e0a0f",
+            "bytes": 2184,
+            "kind": "texture"
+          },
+          {
+            "path": "romfs/textures/texture-51141f129dd2d00b.sprite",
+            "sha256": "ed1bb489f4ac5045caaa8006774ba1b8f65f6f831fc58d9019eba52e43b2ce92",
+            "bytes": 2184,
+            "kind": "texture"
+          },
+          {
+            "path": "romfs/textures/texture-5c4cefeb7f2d6328.sprite",
+            "sha256": "8451e8fa915c428e0f3ca237771f8051d04400b1ac08c5a863cfed44e40e0fd2",
+            "bytes": 4232,
+            "kind": "texture"
+          },
+          {
+            "path": "romfs/textures/texture-76cea859f3bf75cf.sprite",
+            "sha256": "3caeb269d3202eb1cca17dc9aa076141dea380ec922c3c766d6805379d0f81e4",
+            "bytes": 2184,
+            "kind": "texture"
+          },
+          {
+            "path": "romfs/textures/texture-7ef072606e4c877f.sprite",
+            "sha256": "cbf5330e91db96a294a6d389557f353852f38d12c0acb95ec3f5a286a77edab0",
+            "bytes": 2184,
+            "kind": "texture"
+          },
+          {
+            "path": "romfs/textures/texture-95f80c13eae4edf4.sprite",
+            "sha256": "8c0690447ff958b2bb870931406becdcdd672e62d18295011043cfe13773bb9f",
+            "bytes": 2184,
+            "kind": "texture"
+          },
+          {
+            "path": "romfs/textures/texture-a8b09959123d9c8c.sprite",
+            "sha256": "aba6f1cf18359cd22742f67bac7562c458ab7d48fffa402cfc41658aa41a2a3e",
+            "bytes": 2184,
+            "kind": "texture"
+          },
+          {
+            "path": "romfs/textures/texture-d0816d51cda2d806.sprite",
+            "sha256": "d3c508b810009e79283dc911efe4f7f2b0625a8124b83a9539d1068436683f25",
+            "bytes": 2184,
+            "kind": "texture"
+          },
+          {
+            "path": "romfs/textures/texture-df0b810c0830af3d.sprite",
+            "sha256": "1234b4a545ef40e350c3f8277bdf1ccbe0a0f59f7a035913aab1f7cd0bbbb5bc",
+            "bytes": 4232,
+            "kind": "texture"
+          }
+        ],
+        "run": {
+          "log": ".dev/ares/runs/c1910cb51a374fb284c1c4e83b45ec36/level-loading-sponza_courtyard-bypass.log",
+          "tested_rom": ".dev/ares/runs/c1910cb51a374fb284c1c4e83b45ec36/DarkLantern64-sponza_courtyard-runtime-lighting-t3d.z64",
+          "rom_sha256": "12a9d9727f8549684734e64c23aabd1bc1a248ed1362b36e23ca5e1b8a4200e9",
+          "settings_source_sha256": "010e6ec4df82b1750292c4a1e50b1e513f9e2d4b7c604d345be0c1d28b6b140a"
+        },
+        "runtime_source_hashes": {
+          "src/animation.c": "58aa0b71836522082d5a7b13b340d7133736562f9357ceb51d88eb7cfa7d420e",
+          "src/animation.h": "c713072cc18969c4acbc8c8fba0cfe8ea2831eb578a97f38fbc1b1f6f9fda3a9",
+          "src/content_limits.h": "ec4c37638a9ee2e7bc4fb415caa1071d20a1f5b64ee60f54d1f27bcf1183a591",
+          "src/dl_profile.c": "fdc17f9433a99c2e5e8242842e15503132c2caa3207f199234a4369648ddcfa2",
+          "src/dl_profile.h": "14cac33253e708654add600681b7247712d9e8719622fcaea7270c758c55fd66",
+          "src/enemy_types.def": "c7dc61a6e285278279d633a0b4e41be904bc26897e78fb1f5c61b79ccffae1e4",
+          "src/game.c": "83f1cf981a4cddca035a80b96dbf493e239aa6560119d310deb2ea9718d89429",
+          "src/game.h": "baeccaab8a5663c0d24e48266edddc50e84f02687b2388939a3e8d1e67f662c1",
+          "src/launch.c": "aea06d3be767ab74dcea9dd524f4dfc89a0aac9f36f8136ab588f14b14b7e1ed",
+          "src/launch.h": "82711d01a50c3c05fc50289beaaa784b123ccafcb6362ea00dea3ab72b1b0449",
+          "src/lighting_bake.c": "f0dfb2c749e547adc7e25979d3b76bdd6aef8d52f864365d7e6867dc51770cd6",
+          "src/lighting_bake.h": "ac0d29317f42dd9ebea1ca8f13d35d5f967c3fa09a5792907a7ccec47355795d",
+          "src/main.c": "ce6faed71a0d0002ebfcd52fd28826d6076310d5f9d2fcc842bda5ffcc1d396f",
+          "src/render.c": "9eaa6b91fe52167916a920a6c017adf9588b02cfeb7d4564910f4e85a3f7a444",
+          "src/render.h": "4e75f62eb0d7a3a1ed1eff02dbaeeb6e6a8430bb6f4f22f8ce5bf05d4b77d8b8",
+          "src/render_batches.c": "72e25ffa0b72ce2aa6650a3db81a309e0ffcdb8807196efb8040755f2155cbb9",
+          "src/render_batches.h": "8c316c65bc4527d4396db56ea6f851d8359e4b0bc34c74b6a68ab46e7dcc2a7b",
+          "src/render_camera.h": "fe1fa0001829200ad6d6bedc53b4b61904986dc34b68910c5d1b02c7f1154108",
+          "src/render_hud_cache.inc": "7c3ebe9da6acba712731f811e73243b29474cd7f527e6e758be1127f369af1db",
+          "src/render_lighting.c": "cdbc1bd34c20f664aabb128243b6facda3be7420cf31015e6a882de5c6584792",
+          "src/render_lighting.h": "55479d327432df3d7cdf5e6bfb3856e268630800c2d44369c5b2ac1139d2a45f",
+          "src/render_shading.h": "a12a9fb4d1c8008208e755188078420d43271b5c4d1a9ecb95167985a43d314d",
+          "src/render_t3d.inc": "741fb748c5c38abb71ff01105b17b53b374c1bf6a2625ee594ca295d6015fb25",
+          "src/render_texture_packing.c": "487ddd384af8d1bab1673a3efbddc9529afc21da42d4306071e436fe9b4116d0",
+          "src/render_texture_packing.h": "9788346f3a8b17734408d339983b0327fd18eb549c320a3f0c328bda53c72cde",
+          "src/render_transform.c": "e5babbdf290016deb179de97077b34ddd2af705b576dea49aca9bacb4ecc62e2",
+          "src/render_transform.h": "0b9258c728c688184387265d74e7abfe9a6067dcb41c90d815fe3dbd9fabc655",
+          "src/render_visibility.h": "58d4a2fb1f0e1740e13ae3bed38387b0990b0118b2c2ad52ecd8a2582e2ebb59",
+          "src/scale_bench.c": "e6757e000b8fb4ef83d5f8c5b2442152475b8e781bc89b65c75125e02e00c5ec",
+          "src/scale_bench.h": "0febfeb6d49b6cbf5ea0a551a502a4e7c3b34ee4f1d7ca8db74eefa936ea7c7b",
+          "src/static_lighting.c": "68b54ef7baaab6d297b534ae690eecce40924e3304717d4991e1d717db5c2bbc",
+          "src/static_lighting.h": "411a980f5b8f6cf7f3b40734aae184f24c2406c99e685165c82e128e0da8380d"
+        }
+      },
+      "verify": {
+        "passed": true,
+        "mode": "verify",
+        "level": "sponza_courtyard",
+        "content_sha256": "951850167ca81b5d7a152225fbafac6c8754f30be5d4b77eedf6955a530d846e",
+        "level_source_sha256": "a75fb0e9415d405a1a004469048c2a7288bbcd49f34ea5db90a95c89f5a60164",
+        "renderer_prepare": {
+          "ticks": {
+            "textures": 315952,
+            "retire": 70575,
+            "geometry": 3336860,
+            "bake": 2453697,
+            "bake_verify": 153068451,
+            "lighting": 1911826,
+            "alternate_lighting": 1090866,
+            "restore": 12894,
+            "reports": 31377,
+            "gpu": 10562913,
+            "hud": 247353,
+            "total": 173102764
+          },
+          "ticks_per_second": 46875000,
+          "milliseconds": {
+            "textures": 6.740309333333333,
+            "retire": 1.5056,
+            "geometry": 71.18634666666667,
+            "bake": 52.345536,
+            "bake_verify": 3265.460288,
+            "lighting": 40.78562133333333,
+            "alternate_lighting": 23.271808,
+            "restore": 0.275072,
+            "reports": 0.669376,
+            "gpu": 225.342144,
+            "hud": 5.276864,
+            "total": 3692.8589653333333
+          },
+          "scope": "renderer_prepare_including_interrupts",
+          "stage_sum_exact": true
+        },
+        "level_reset": {
+          "ticks": 173257371,
+          "ticks_per_second": 46875000,
+          "milliseconds": 3696.157248,
+          "scope": "reset_to_ready_including_interrupts"
+        },
+        "bake": {
+          "status": "loaded",
+          "reason": "ok",
+          "models": "111",
+          "triangles": "2772",
+          "states": "2",
+          "rgb_bytes": "49896",
+          "crc32": "3d0382f3",
+          "path": "rom:/lighting/lighting-1c689a6decf513ee2b336d568aadfbcfd7a3133fcbb252d0d088ce8e589c17b5.bin"
+        },
+        "parity": {
+          "models": "111",
+          "triangles": "2772",
+          "states": "2",
+          "bytes": "133056",
+          "mismatches": "0",
+          "max_channel_delta": "0",
+          "baked_fnv1a": "3e576885",
+          "reference_fnv1a": "3e576885"
+        },
+        "textures": 10,
+        "lighting_asset": {
+          "path": "romfs/lighting/lighting-1c689a6decf513ee2b336d568aadfbcfd7a3133fcbb252d0d088ce8e589c17b5.bin",
+          "signature": "1c689a6decf513ee2b336d568aadfbcfd7a3133fcbb252d0d088ce8e589c17b5",
+          "sha256": "8b625a63f9e03b99a69428ad964115423202c53bb2268fd357460c36d9b1cbe1",
+          "bytes": 51292,
+          "rgb_bytes": 49896,
+          "static_models": 111,
+          "static_triangles": 2772,
+          "states": 2
+        },
+        "geometry": {
+          "models": 114,
+          "meshes": 70,
+          "vertices": 5898,
+          "triangles": 3902
+        },
+        "heap_bytes": 1474800,
+        "ordinary_load_timing": false,
+        "fixture_unconfigured": false,
+        "fixture_zero_textures": false,
+        "log_sha256": "d84f862763f37472862e354db2c4b81a1456998d5ca809f04676371e1de43767",
+        "rom_sha256": "b7bb756c533f6ff71ae2b77c652936a8edca7afdf38beb84bf3d98362b62745d",
+        "build_signature": "3195e47e67b1fc61de13654238318a1cd3a8280850afa18b0ff346e119e878ae",
+        "static_image_bytes": 773592,
+        "packaged_assets": [
+          {
+            "path": "romfs/lighting/lighting-1c689a6decf513ee2b336d568aadfbcfd7a3133fcbb252d0d088ce8e589c17b5.bin",
+            "sha256": "8b625a63f9e03b99a69428ad964115423202c53bb2268fd357460c36d9b1cbe1",
+            "bytes": 51292,
+            "kind": "lighting"
+          },
+          {
+            "path": "romfs/textures/texture-2c51fc16ded205c8.sprite",
+            "sha256": "4ea34a68abf63791460d0993aae2f93af0e193949722b6691447fe2df5a9d6ba",
+            "bytes": 4232,
+            "kind": "texture"
+          },
+          {
+            "path": "romfs/textures/texture-3fc82cf01226fa2e.sprite",
+            "sha256": "e4b3b080de3cb070ff0c4c196f423fd0aeb66b5e6ce262bb1d5d7bce8b4e0a0f",
+            "bytes": 2184,
+            "kind": "texture"
+          },
+          {
+            "path": "romfs/textures/texture-51141f129dd2d00b.sprite",
+            "sha256": "ed1bb489f4ac5045caaa8006774ba1b8f65f6f831fc58d9019eba52e43b2ce92",
+            "bytes": 2184,
+            "kind": "texture"
+          },
+          {
+            "path": "romfs/textures/texture-5c4cefeb7f2d6328.sprite",
+            "sha256": "8451e8fa915c428e0f3ca237771f8051d04400b1ac08c5a863cfed44e40e0fd2",
+            "bytes": 4232,
+            "kind": "texture"
+          },
+          {
+            "path": "romfs/textures/texture-76cea859f3bf75cf.sprite",
+            "sha256": "3caeb269d3202eb1cca17dc9aa076141dea380ec922c3c766d6805379d0f81e4",
+            "bytes": 2184,
+            "kind": "texture"
+          },
+          {
+            "path": "romfs/textures/texture-7ef072606e4c877f.sprite",
+            "sha256": "cbf5330e91db96a294a6d389557f353852f38d12c0acb95ec3f5a286a77edab0",
+            "bytes": 2184,
+            "kind": "texture"
+          },
+          {
+            "path": "romfs/textures/texture-95f80c13eae4edf4.sprite",
+            "sha256": "8c0690447ff958b2bb870931406becdcdd672e62d18295011043cfe13773bb9f",
+            "bytes": 2184,
+            "kind": "texture"
+          },
+          {
+            "path": "romfs/textures/texture-a8b09959123d9c8c.sprite",
+            "sha256": "aba6f1cf18359cd22742f67bac7562c458ab7d48fffa402cfc41658aa41a2a3e",
+            "bytes": 2184,
+            "kind": "texture"
+          },
+          {
+            "path": "romfs/textures/texture-d0816d51cda2d806.sprite",
+            "sha256": "d3c508b810009e79283dc911efe4f7f2b0625a8124b83a9539d1068436683f25",
+            "bytes": 2184,
+            "kind": "texture"
+          },
+          {
+            "path": "romfs/textures/texture-df0b810c0830af3d.sprite",
+            "sha256": "1234b4a545ef40e350c3f8277bdf1ccbe0a0f59f7a035913aab1f7cd0bbbb5bc",
+            "bytes": 4232,
+            "kind": "texture"
+          }
+        ],
+        "run": {
+          "log": ".dev/ares/runs/14277f97422f41f0a719d018345524ee/level-loading-sponza_courtyard-verify.log",
+          "tested_rom": ".dev/ares/runs/14277f97422f41f0a719d018345524ee/DarkLantern64-sponza_courtyard-verify-lighting-t3d.z64",
+          "rom_sha256": "b7bb756c533f6ff71ae2b77c652936a8edca7afdf38beb84bf3d98362b62745d",
+          "settings_source_sha256": "010e6ec4df82b1750292c4a1e50b1e513f9e2d4b7c604d345be0c1d28b6b140a"
+        },
+        "runtime_source_hashes": {
+          "src/animation.c": "58aa0b71836522082d5a7b13b340d7133736562f9357ceb51d88eb7cfa7d420e",
+          "src/animation.h": "c713072cc18969c4acbc8c8fba0cfe8ea2831eb578a97f38fbc1b1f6f9fda3a9",
+          "src/content_limits.h": "ec4c37638a9ee2e7bc4fb415caa1071d20a1f5b64ee60f54d1f27bcf1183a591",
+          "src/dl_profile.c": "fdc17f9433a99c2e5e8242842e15503132c2caa3207f199234a4369648ddcfa2",
+          "src/dl_profile.h": "14cac33253e708654add600681b7247712d9e8719622fcaea7270c758c55fd66",
+          "src/enemy_types.def": "c7dc61a6e285278279d633a0b4e41be904bc26897e78fb1f5c61b79ccffae1e4",
+          "src/game.c": "83f1cf981a4cddca035a80b96dbf493e239aa6560119d310deb2ea9718d89429",
+          "src/game.h": "baeccaab8a5663c0d24e48266edddc50e84f02687b2388939a3e8d1e67f662c1",
+          "src/launch.c": "aea06d3be767ab74dcea9dd524f4dfc89a0aac9f36f8136ab588f14b14b7e1ed",
+          "src/launch.h": "82711d01a50c3c05fc50289beaaa784b123ccafcb6362ea00dea3ab72b1b0449",
+          "src/lighting_bake.c": "f0dfb2c749e547adc7e25979d3b76bdd6aef8d52f864365d7e6867dc51770cd6",
+          "src/lighting_bake.h": "ac0d29317f42dd9ebea1ca8f13d35d5f967c3fa09a5792907a7ccec47355795d",
+          "src/main.c": "ce6faed71a0d0002ebfcd52fd28826d6076310d5f9d2fcc842bda5ffcc1d396f",
+          "src/render.c": "9eaa6b91fe52167916a920a6c017adf9588b02cfeb7d4564910f4e85a3f7a444",
+          "src/render.h": "4e75f62eb0d7a3a1ed1eff02dbaeeb6e6a8430bb6f4f22f8ce5bf05d4b77d8b8",
+          "src/render_batches.c": "72e25ffa0b72ce2aa6650a3db81a309e0ffcdb8807196efb8040755f2155cbb9",
+          "src/render_batches.h": "8c316c65bc4527d4396db56ea6f851d8359e4b0bc34c74b6a68ab46e7dcc2a7b",
+          "src/render_camera.h": "fe1fa0001829200ad6d6bedc53b4b61904986dc34b68910c5d1b02c7f1154108",
+          "src/render_hud_cache.inc": "7c3ebe9da6acba712731f811e73243b29474cd7f527e6e758be1127f369af1db",
+          "src/render_lighting.c": "cdbc1bd34c20f664aabb128243b6facda3be7420cf31015e6a882de5c6584792",
+          "src/render_lighting.h": "55479d327432df3d7cdf5e6bfb3856e268630800c2d44369c5b2ac1139d2a45f",
+          "src/render_shading.h": "a12a9fb4d1c8008208e755188078420d43271b5c4d1a9ecb95167985a43d314d",
+          "src/render_t3d.inc": "741fb748c5c38abb71ff01105b17b53b374c1bf6a2625ee594ca295d6015fb25",
+          "src/render_texture_packing.c": "487ddd384af8d1bab1673a3efbddc9529afc21da42d4306071e436fe9b4116d0",
+          "src/render_texture_packing.h": "9788346f3a8b17734408d339983b0327fd18eb549c320a3f0c328bda53c72cde",
+          "src/render_transform.c": "e5babbdf290016deb179de97077b34ddd2af705b576dea49aca9bacb4ecc62e2",
+          "src/render_transform.h": "0b9258c728c688184387265d74e7abfe9a6067dcb41c90d815fe3dbd9fabc655",
+          "src/render_visibility.h": "58d4a2fb1f0e1740e13ae3bed38387b0990b0118b2c2ad52ecd8a2582e2ebb59",
+          "src/scale_bench.c": "e6757e000b8fb4ef83d5f8c5b2442152475b8e781bc89b65c75125e02e00c5ec",
+          "src/scale_bench.h": "0febfeb6d49b6cbf5ea0a551a502a4e7c3b34ee4f1d7ca8db74eefa936ea7c7b",
+          "src/static_lighting.c": "68b54ef7baaab6d297b534ae690eecce40924e3304717d4991e1d717db5c2bbc",
+          "src/static_lighting.h": "411a980f5b8f6cf7f3b40734aae184f24c2406c99e685165c82e128e0da8380d"
+        }
+      },
+      "comparison": {
+        "renderer_before_ms": 3819.249472,
+        "renderer_after_ms": 427.5444053333333,
+        "saved_ms": 3391.7050666666664,
+        "speedup": 8.932989005018875,
+        "scope": "renderer_prepare_including_interrupts"
+      }
+    },
+    "zero-textures": {
+      "passed": true,
+      "mode": "ordinary",
+      "level": "moonlit_courtyard",
+      "content_sha256": "26fe08cbc524b9103b5bcc366350efb2ce16101d3c48b364e675342aa80f17e4",
+      "level_source_sha256": "750e4ff6f2628bb3919c53be4bdafe691543fcb416985edc053f6540cc41f168",
+      "renderer_prepare": {
+        "ticks": {
+          "textures": 3463,
+          "retire": 69297,
+          "geometry": 1862379,
+          "bake": 1439231,
+          "bake_verify": 0,
+          "lighting": 1073542,
+          "alternate_lighting": 578014,
+          "restore": 9572,
+          "reports": 29489,
+          "gpu": 7696781,
+          "hud": 259815,
+          "total": 13021583
+        },
+        "ticks_per_second": 46875000,
+        "milliseconds": {
+          "textures": 0.07387733333333334,
+          "retire": 1.478336,
+          "geometry": 39.730752,
+          "bake": 30.703594666666667,
+          "bake_verify": 0.0,
+          "lighting": 22.902229333333334,
+          "alternate_lighting": 12.330965333333333,
+          "restore": 0.20420266666666667,
+          "reports": 0.6290986666666667,
+          "gpu": 164.19799466666666,
+          "hud": 5.54272,
+          "total": 277.79377066666666
+        },
+        "scope": "renderer_prepare_including_interrupts",
+        "stage_sum_exact": true
+      },
+      "level_reset": {
+        "ticks": 13159629,
+        "ticks_per_second": 46875000,
+        "milliseconds": 280.738752,
+        "scope": "reset_to_ready_including_interrupts"
+      },
+      "bake": {
+        "status": "loaded",
+        "reason": "ok",
+        "models": "47",
+        "triangles": "1632",
+        "states": "2",
+        "rgb_bytes": "29376",
+        "crc32": "d52ca9e3",
+        "path": "rom:/lighting/lighting-fc311050746f97ae289cd7f67ed333083b8c52975a5a44b644e08d69dcf48b74.bin"
+      },
+      "parity": null,
+      "textures": 0,
+      "lighting_asset": {
+        "path": "romfs/lighting/lighting-fc311050746f97ae289cd7f67ed333083b8c52975a5a44b644e08d69dcf48b74.bin",
+        "signature": "fc311050746f97ae289cd7f67ed333083b8c52975a5a44b644e08d69dcf48b74",
+        "sha256": "138bafeef35838f26b12951cbed80b568ab8af77c49b1b94a5fef7ceae8fff09",
+        "bytes": 30004,
+        "rgb_bytes": 29376,
+        "static_models": 47,
+        "static_triangles": 1632,
+        "states": 2
+      },
+      "geometry": {
+        "models": 49,
+        "meshes": 14,
+        "vertices": 3637,
+        "triangles": 2239
+      },
+      "heap_bytes": 1265072,
+      "ordinary_load_timing": true,
+      "fixture_unconfigured": false,
+      "fixture_zero_textures": true,
+      "fixture_corrupt_crc": false,
+      "log_sha256": "2d20b0a1b03ec1a7cce2afd7b38cf88a47f8aa0014d2c7953daaf95e87541067",
+      "rom_sha256": "58bcb096ebbbf8d0ddf46d00172942cc6ab1c5c518fc72d4503cbb2e50ffee4d",
+      "build_signature": "2f4076adf02e44c23dd8f73003cc15a8f50a9dee6482f37c3e7ae0f7c2c36432",
+      "static_image_bytes": 725424,
+      "packaged_assets": [
+        {
+          "path": "romfs/lighting/lighting-fc311050746f97ae289cd7f67ed333083b8c52975a5a44b644e08d69dcf48b74.bin",
+          "sha256": "138bafeef35838f26b12951cbed80b568ab8af77c49b1b94a5fef7ceae8fff09",
+          "bytes": 30004,
+          "kind": "lighting"
+        }
+      ],
+      "run": {
+        "log": ".dev/ares/runs/0f0b1454b7344055b6a18ac0c8dffcc4/level-loading-moonlit_courtyard-zero-textures.log",
+        "tested_rom": ".dev/ares/runs/0f0b1454b7344055b6a18ac0c8dffcc4/DarkLantern64-moonlit_courtyard-t3d.z64",
+        "rom_sha256": "58bcb096ebbbf8d0ddf46d00172942cc6ab1c5c518fc72d4503cbb2e50ffee4d",
+        "settings_source_sha256": "010e6ec4df82b1750292c4a1e50b1e513f9e2d4b7c604d345be0c1d28b6b140a"
+      },
+      "runtime_source_hashes": {
+        "src/animation.c": "58aa0b71836522082d5a7b13b340d7133736562f9357ceb51d88eb7cfa7d420e",
+        "src/animation.h": "c713072cc18969c4acbc8c8fba0cfe8ea2831eb578a97f38fbc1b1f6f9fda3a9",
+        "src/content_limits.h": "ec4c37638a9ee2e7bc4fb415caa1071d20a1f5b64ee60f54d1f27bcf1183a591",
+        "src/dl_profile.c": "fdc17f9433a99c2e5e8242842e15503132c2caa3207f199234a4369648ddcfa2",
+        "src/dl_profile.h": "14cac33253e708654add600681b7247712d9e8719622fcaea7270c758c55fd66",
+        "src/enemy_types.def": "c7dc61a6e285278279d633a0b4e41be904bc26897e78fb1f5c61b79ccffae1e4",
+        "src/game.c": "83f1cf981a4cddca035a80b96dbf493e239aa6560119d310deb2ea9718d89429",
+        "src/game.h": "baeccaab8a5663c0d24e48266edddc50e84f02687b2388939a3e8d1e67f662c1",
+        "src/launch.c": "aea06d3be767ab74dcea9dd524f4dfc89a0aac9f36f8136ab588f14b14b7e1ed",
+        "src/launch.h": "82711d01a50c3c05fc50289beaaa784b123ccafcb6362ea00dea3ab72b1b0449",
+        "src/lighting_bake.c": "f0dfb2c749e547adc7e25979d3b76bdd6aef8d52f864365d7e6867dc51770cd6",
+        "src/lighting_bake.h": "ac0d29317f42dd9ebea1ca8f13d35d5f967c3fa09a5792907a7ccec47355795d",
+        "src/main.c": "ce6faed71a0d0002ebfcd52fd28826d6076310d5f9d2fcc842bda5ffcc1d396f",
+        "src/render.c": "9eaa6b91fe52167916a920a6c017adf9588b02cfeb7d4564910f4e85a3f7a444",
+        "src/render.h": "4e75f62eb0d7a3a1ed1eff02dbaeeb6e6a8430bb6f4f22f8ce5bf05d4b77d8b8",
+        "src/render_batches.c": "72e25ffa0b72ce2aa6650a3db81a309e0ffcdb8807196efb8040755f2155cbb9",
+        "src/render_batches.h": "8c316c65bc4527d4396db56ea6f851d8359e4b0bc34c74b6a68ab46e7dcc2a7b",
+        "src/render_camera.h": "fe1fa0001829200ad6d6bedc53b4b61904986dc34b68910c5d1b02c7f1154108",
+        "src/render_hud_cache.inc": "7c3ebe9da6acba712731f811e73243b29474cd7f527e6e758be1127f369af1db",
+        "src/render_lighting.c": "cdbc1bd34c20f664aabb128243b6facda3be7420cf31015e6a882de5c6584792",
+        "src/render_lighting.h": "55479d327432df3d7cdf5e6bfb3856e268630800c2d44369c5b2ac1139d2a45f",
+        "src/render_shading.h": "a12a9fb4d1c8008208e755188078420d43271b5c4d1a9ecb95167985a43d314d",
+        "src/render_t3d.inc": "741fb748c5c38abb71ff01105b17b53b374c1bf6a2625ee594ca295d6015fb25",
+        "src/render_texture_packing.c": "487ddd384af8d1bab1673a3efbddc9529afc21da42d4306071e436fe9b4116d0",
+        "src/render_texture_packing.h": "9788346f3a8b17734408d339983b0327fd18eb549c320a3f0c328bda53c72cde",
+        "src/render_transform.c": "e5babbdf290016deb179de97077b34ddd2af705b576dea49aca9bacb4ecc62e2",
+        "src/render_transform.h": "0b9258c728c688184387265d74e7abfe9a6067dcb41c90d815fe3dbd9fabc655",
+        "src/render_visibility.h": "58d4a2fb1f0e1740e13ae3bed38387b0990b0118b2c2ad52ecd8a2582e2ebb59",
+        "src/scale_bench.c": "e6757e000b8fb4ef83d5f8c5b2442152475b8e781bc89b65c75125e02e00c5ec",
+        "src/scale_bench.h": "0febfeb6d49b6cbf5ea0a551a502a4e7c3b34ee4f1d7ca8db74eefa936ea7c7b",
+        "src/static_lighting.c": "68b54ef7baaab6d297b534ae690eecce40924e3304717d4991e1d717db5c2bbc",
+        "src/static_lighting.h": "411a980f5b8f6cf7f3b40734aae184f24c2406c99e685165c82e128e0da8380d"
+      }
+    },
+    "unconfigured": {
+      "passed": true,
+      "mode": "ordinary",
+      "level": "moonlit_courtyard",
+      "content_sha256": "cfba2dca0b75af7bb6eb4c15172f73f5864fd6cdeb27b75322daec9ddef25861",
+      "level_source_sha256": "412ec992cefcfc7dc714aeabd0618cfc50e57b22e268fd30c3346bd86a03ff8e",
+      "renderer_prepare": {
+        "ticks": {
+          "textures": 135341,
+          "retire": 68764,
+          "geometry": 2064170,
+          "bake": 3864,
+          "bake_verify": 0,
+          "lighting": 37934416,
+          "alternate_lighting": 37812794,
+          "restore": 9820,
+          "reports": 35026,
+          "gpu": 8414405,
+          "hud": 246249,
+          "total": 86724849
+        },
+        "ticks_per_second": 46875000,
+        "milliseconds": {
+          "textures": 2.887274666666667,
+          "retire": 1.4669653333333332,
+          "geometry": 44.035626666666666,
+          "bake": 0.082432,
+          "bake_verify": 0.0,
+          "lighting": 809.2675413333334,
+          "alternate_lighting": 806.6729386666667,
+          "restore": 0.20949333333333334,
+          "reports": 0.7472213333333333,
+          "gpu": 179.50730666666666,
+          "hud": 5.253312,
+          "total": 1850.130112
+        },
+        "scope": "renderer_prepare_including_interrupts",
+        "stage_sum_exact": true
+      },
+      "level_reset": {
+        "ticks": 86864827,
+        "ticks_per_second": 46875000,
+        "milliseconds": 1853.1163093333332,
+        "scope": "reset_to_ready_including_interrupts"
+      },
+      "bake": {
+        "status": "absent",
+        "reason": "unconfigured"
+      },
+      "parity": null,
+      "textures": 4,
+      "lighting_asset": {
+        "path": "romfs/lighting/lighting-8d8edddf909d473ab984308d05dde16b391207c1cdc432355f57b75a41796e32.bin",
+        "signature": "8d8edddf909d473ab984308d05dde16b391207c1cdc432355f57b75a41796e32",
+        "sha256": "1e30552abdac29c471395d6e583ac51f503666beb1859b584f41320c61738fe4",
+        "bytes": 30004,
+        "rgb_bytes": 29376,
+        "static_models": 47,
+        "static_triangles": 1632,
+        "states": 2
+      },
+      "geometry": {
+        "models": 49,
+        "meshes": 14,
+        "vertices": 4195,
+        "triangles": 2239
+      },
+      "heap_bytes": 1287016,
+      "ordinary_load_timing": true,
+      "fixture_unconfigured": true,
+      "fixture_zero_textures": false,
+      "fixture_corrupt_crc": false,
+      "log_sha256": "7c3e7dbc2899c11eb43f25ef9319a7938b653ec84bafce2e861e6a3b31c48dee",
+      "rom_sha256": "34125bd290c3895f7070c1074e701af517521f4c86b77731ad4d01c4b64fe28a",
+      "build_signature": "ccb17c91d0376b8dad97e3e01ef736e29074e7f7abedf676cf7935d1d45869fd",
+      "static_image_bytes": 748120,
+      "packaged_assets": [
+        {
+          "path": "romfs/lighting/lighting-8d8edddf909d473ab984308d05dde16b391207c1cdc432355f57b75a41796e32.bin",
+          "sha256": "1e30552abdac29c471395d6e583ac51f503666beb1859b584f41320c61738fe4",
+          "bytes": 30004,
+          "kind": "lighting"
+        },
+        {
+          "path": "romfs/textures/texture-7ef072606e4c877f.sprite",
+          "sha256": "cbf5330e91db96a294a6d389557f353852f38d12c0acb95ec3f5a286a77edab0",
+          "bytes": 2184,
+          "kind": "texture"
+        },
+        {
+          "path": "romfs/textures/texture-95f80c13eae4edf4.sprite",
+          "sha256": "8c0690447ff958b2bb870931406becdcdd672e62d18295011043cfe13773bb9f",
+          "bytes": 2184,
+          "kind": "texture"
+        },
+        {
+          "path": "romfs/textures/texture-a07f17d201b4641d.sprite",
+          "sha256": "6ea249500909084ee07d9318bff72f207e9fe770a235b8c9905371dba5ba75bc",
+          "bytes": 4232,
+          "kind": "texture"
+        },
+        {
+          "path": "romfs/textures/texture-b8c33a7246d7ec3a.sprite",
+          "sha256": "180320fd20c4bc4711022fe8a598a8ee0f0bc51ea7ea4e5586663142f550e449",
+          "bytes": 2184,
+          "kind": "texture"
+        }
+      ],
+      "run": {
+        "log": ".dev/ares/runs/504e5afd58e54efd8680a1344dae84bb/level-loading-moonlit_courtyard-unconfigured.log",
+        "tested_rom": ".dev/ares/runs/504e5afd58e54efd8680a1344dae84bb/DarkLantern64-moonlit_courtyard-t3d.z64",
+        "rom_sha256": "34125bd290c3895f7070c1074e701af517521f4c86b77731ad4d01c4b64fe28a",
+        "settings_source_sha256": "010e6ec4df82b1750292c4a1e50b1e513f9e2d4b7c604d345be0c1d28b6b140a"
+      },
+      "runtime_source_hashes": {
+        "src/animation.c": "58aa0b71836522082d5a7b13b340d7133736562f9357ceb51d88eb7cfa7d420e",
+        "src/animation.h": "c713072cc18969c4acbc8c8fba0cfe8ea2831eb578a97f38fbc1b1f6f9fda3a9",
+        "src/content_limits.h": "ec4c37638a9ee2e7bc4fb415caa1071d20a1f5b64ee60f54d1f27bcf1183a591",
+        "src/dl_profile.c": "fdc17f9433a99c2e5e8242842e15503132c2caa3207f199234a4369648ddcfa2",
+        "src/dl_profile.h": "14cac33253e708654add600681b7247712d9e8719622fcaea7270c758c55fd66",
+        "src/enemy_types.def": "c7dc61a6e285278279d633a0b4e41be904bc26897e78fb1f5c61b79ccffae1e4",
+        "src/game.c": "83f1cf981a4cddca035a80b96dbf493e239aa6560119d310deb2ea9718d89429",
+        "src/game.h": "baeccaab8a5663c0d24e48266edddc50e84f02687b2388939a3e8d1e67f662c1",
+        "src/launch.c": "aea06d3be767ab74dcea9dd524f4dfc89a0aac9f36f8136ab588f14b14b7e1ed",
+        "src/launch.h": "82711d01a50c3c05fc50289beaaa784b123ccafcb6362ea00dea3ab72b1b0449",
+        "src/lighting_bake.c": "f0dfb2c749e547adc7e25979d3b76bdd6aef8d52f864365d7e6867dc51770cd6",
+        "src/lighting_bake.h": "ac0d29317f42dd9ebea1ca8f13d35d5f967c3fa09a5792907a7ccec47355795d",
+        "src/main.c": "ce6faed71a0d0002ebfcd52fd28826d6076310d5f9d2fcc842bda5ffcc1d396f",
+        "src/render.c": "9eaa6b91fe52167916a920a6c017adf9588b02cfeb7d4564910f4e85a3f7a444",
+        "src/render.h": "4e75f62eb0d7a3a1ed1eff02dbaeeb6e6a8430bb6f4f22f8ce5bf05d4b77d8b8",
+        "src/render_batches.c": "72e25ffa0b72ce2aa6650a3db81a309e0ffcdb8807196efb8040755f2155cbb9",
+        "src/render_batches.h": "8c316c65bc4527d4396db56ea6f851d8359e4b0bc34c74b6a68ab46e7dcc2a7b",
+        "src/render_camera.h": "fe1fa0001829200ad6d6bedc53b4b61904986dc34b68910c5d1b02c7f1154108",
+        "src/render_hud_cache.inc": "7c3ebe9da6acba712731f811e73243b29474cd7f527e6e758be1127f369af1db",
+        "src/render_lighting.c": "cdbc1bd34c20f664aabb128243b6facda3be7420cf31015e6a882de5c6584792",
+        "src/render_lighting.h": "55479d327432df3d7cdf5e6bfb3856e268630800c2d44369c5b2ac1139d2a45f",
+        "src/render_shading.h": "a12a9fb4d1c8008208e755188078420d43271b5c4d1a9ecb95167985a43d314d",
+        "src/render_t3d.inc": "741fb748c5c38abb71ff01105b17b53b374c1bf6a2625ee594ca295d6015fb25",
+        "src/render_texture_packing.c": "487ddd384af8d1bab1673a3efbddc9529afc21da42d4306071e436fe9b4116d0",
+        "src/render_texture_packing.h": "9788346f3a8b17734408d339983b0327fd18eb549c320a3f0c328bda53c72cde",
+        "src/render_transform.c": "e5babbdf290016deb179de97077b34ddd2af705b576dea49aca9bacb4ecc62e2",
+        "src/render_transform.h": "0b9258c728c688184387265d74e7abfe9a6067dcb41c90d815fe3dbd9fabc655",
+        "src/render_visibility.h": "58d4a2fb1f0e1740e13ae3bed38387b0990b0118b2c2ad52ecd8a2582e2ebb59",
+        "src/scale_bench.c": "e6757e000b8fb4ef83d5f8c5b2442152475b8e781bc89b65c75125e02e00c5ec",
+        "src/scale_bench.h": "0febfeb6d49b6cbf5ea0a551a502a4e7c3b34ee4f1d7ca8db74eefa936ea7c7b",
+        "src/static_lighting.c": "68b54ef7baaab6d297b534ae690eecce40924e3304717d4991e1d717db5c2bbc",
+        "src/static_lighting.h": "411a980f5b8f6cf7f3b40734aae184f24c2406c99e685165c82e128e0da8380d"
+      }
+    },
+    "corrupt-crc": {
+      "passed": true,
+      "mode": "ordinary",
+      "level": "moonlit_courtyard",
+      "content_sha256": "cfba2dca0b75af7bb6eb4c15172f73f5864fd6cdeb27b75322daec9ddef25861",
+      "level_source_sha256": "412ec992cefcfc7dc714aeabd0618cfc50e57b22e268fd30c3346bd86a03ff8e",
+      "renderer_prepare": {
+        "ticks": {
+          "textures": 133896,
+          "retire": 68864,
+          "geometry": 2068290,
+          "bake": 2644614,
+          "bake_verify": 0,
+          "lighting": 38009713,
+          "alternate_lighting": 37512818,
+          "restore": 9869,
+          "reports": 33628,
+          "gpu": 8441795,
+          "hud": 242302,
+          "total": 89165789
+        },
+        "ticks_per_second": 46875000,
+        "milliseconds": {
+          "textures": 2.856448,
+          "retire": 1.4690986666666668,
+          "geometry": 44.12352,
+          "bake": 56.418432,
+          "bake_verify": 0.0,
+          "lighting": 810.8738773333333,
+          "alternate_lighting": 800.2734506666667,
+          "restore": 0.21053866666666668,
+          "reports": 0.7173973333333333,
+          "gpu": 180.09162666666666,
+          "hud": 5.169109333333333,
+          "total": 1902.2034986666667
+        },
+        "scope": "renderer_prepare_including_interrupts",
+        "stage_sum_exact": true
+      },
+      "level_reset": {
+        "ticks": 89305936,
+        "ticks_per_second": 46875000,
+        "milliseconds": 1905.1933013333332,
+        "scope": "reset_to_ready_including_interrupts"
+      },
+      "bake": {
+        "status": "rejected",
+        "reason": "checksum",
+        "models": "47",
+        "triangles": "1632",
+        "states": "2",
+        "rgb_bytes": "29376",
+        "crc32": "a22b9975",
+        "path": "rom:/lighting/lighting-8d8edddf909d473ab984308d05dde16b391207c1cdc432355f57b75a41796e32.bin"
+      },
+      "parity": null,
+      "textures": 4,
+      "lighting_asset": {
+        "path": "romfs/lighting/lighting-8d8edddf909d473ab984308d05dde16b391207c1cdc432355f57b75a41796e32.bin",
+        "signature": "8d8edddf909d473ab984308d05dde16b391207c1cdc432355f57b75a41796e32",
+        "sha256": "1e30552abdac29c471395d6e583ac51f503666beb1859b584f41320c61738fe4",
+        "bytes": 30004,
+        "rgb_bytes": 29376,
+        "static_models": 47,
+        "static_triangles": 1632,
+        "states": 2
+      },
+      "geometry": {
+        "models": 49,
+        "meshes": 14,
+        "vertices": 4195,
+        "triangles": 2239
+      },
+      "heap_bytes": 1287016,
+      "ordinary_load_timing": true,
+      "fixture_unconfigured": false,
+      "fixture_zero_textures": false,
+      "fixture_corrupt_crc": true,
+      "log_sha256": "87cc8f1d7ab0ec89860e84b67ad27d845e0954051fa226478b403f85b941b064",
+      "rom_sha256": "35b202a516468239e401a15b59ca8a4f81f9f12d885d68c38cef389c6527cbc5",
+      "build_signature": "7f5c15dd51b726bccb33ddb891f92165b34fe5403e68701030ad38511133eba7",
+      "static_image_bytes": 748216,
+      "packaged_assets": [
+        {
+          "path": "romfs/lighting/lighting-8d8edddf909d473ab984308d05dde16b391207c1cdc432355f57b75a41796e32.bin",
+          "sha256": "a5c3036dee80fd1e82b104aba55152f4a19e4ae6a2c0c39a55685c5043ffa66e",
+          "bytes": 30004,
+          "kind": "lighting"
+        },
+        {
+          "path": "romfs/textures/texture-7ef072606e4c877f.sprite",
+          "sha256": "cbf5330e91db96a294a6d389557f353852f38d12c0acb95ec3f5a286a77edab0",
+          "bytes": 2184,
+          "kind": "texture"
+        },
+        {
+          "path": "romfs/textures/texture-95f80c13eae4edf4.sprite",
+          "sha256": "8c0690447ff958b2bb870931406becdcdd672e62d18295011043cfe13773bb9f",
+          "bytes": 2184,
+          "kind": "texture"
+        },
+        {
+          "path": "romfs/textures/texture-a07f17d201b4641d.sprite",
+          "sha256": "6ea249500909084ee07d9318bff72f207e9fe770a235b8c9905371dba5ba75bc",
+          "bytes": 4232,
+          "kind": "texture"
+        },
+        {
+          "path": "romfs/textures/texture-b8c33a7246d7ec3a.sprite",
+          "sha256": "180320fd20c4bc4711022fe8a598a8ee0f0bc51ea7ea4e5586663142f550e449",
+          "bytes": 2184,
+          "kind": "texture"
+        }
+      ],
+      "run": {
+        "log": ".dev/ares/runs/ea0874b132214b2d83db98da0cc8c102/level-loading-moonlit_courtyard-corrupt-crc.log",
+        "tested_rom": ".dev/ares/runs/ea0874b132214b2d83db98da0cc8c102/DarkLantern64-moonlit_courtyard-t3d.z64",
+        "rom_sha256": "35b202a516468239e401a15b59ca8a4f81f9f12d885d68c38cef389c6527cbc5",
+        "settings_source_sha256": "010e6ec4df82b1750292c4a1e50b1e513f9e2d4b7c604d345be0c1d28b6b140a"
+      },
+      "runtime_source_hashes": {
+        "src/animation.c": "58aa0b71836522082d5a7b13b340d7133736562f9357ceb51d88eb7cfa7d420e",
+        "src/animation.h": "c713072cc18969c4acbc8c8fba0cfe8ea2831eb578a97f38fbc1b1f6f9fda3a9",
+        "src/content_limits.h": "ec4c37638a9ee2e7bc4fb415caa1071d20a1f5b64ee60f54d1f27bcf1183a591",
+        "src/dl_profile.c": "fdc17f9433a99c2e5e8242842e15503132c2caa3207f199234a4369648ddcfa2",
+        "src/dl_profile.h": "14cac33253e708654add600681b7247712d9e8719622fcaea7270c758c55fd66",
+        "src/enemy_types.def": "c7dc61a6e285278279d633a0b4e41be904bc26897e78fb1f5c61b79ccffae1e4",
+        "src/game.c": "83f1cf981a4cddca035a80b96dbf493e239aa6560119d310deb2ea9718d89429",
+        "src/game.h": "baeccaab8a5663c0d24e48266edddc50e84f02687b2388939a3e8d1e67f662c1",
+        "src/launch.c": "aea06d3be767ab74dcea9dd524f4dfc89a0aac9f36f8136ab588f14b14b7e1ed",
+        "src/launch.h": "82711d01a50c3c05fc50289beaaa784b123ccafcb6362ea00dea3ab72b1b0449",
+        "src/lighting_bake.c": "f0dfb2c749e547adc7e25979d3b76bdd6aef8d52f864365d7e6867dc51770cd6",
+        "src/lighting_bake.h": "ac0d29317f42dd9ebea1ca8f13d35d5f967c3fa09a5792907a7ccec47355795d",
+        "src/main.c": "ce6faed71a0d0002ebfcd52fd28826d6076310d5f9d2fcc842bda5ffcc1d396f",
+        "src/render.c": "9eaa6b91fe52167916a920a6c017adf9588b02cfeb7d4564910f4e85a3f7a444",
+        "src/render.h": "4e75f62eb0d7a3a1ed1eff02dbaeeb6e6a8430bb6f4f22f8ce5bf05d4b77d8b8",
+        "src/render_batches.c": "72e25ffa0b72ce2aa6650a3db81a309e0ffcdb8807196efb8040755f2155cbb9",
+        "src/render_batches.h": "8c316c65bc4527d4396db56ea6f851d8359e4b0bc34c74b6a68ab46e7dcc2a7b",
+        "src/render_camera.h": "fe1fa0001829200ad6d6bedc53b4b61904986dc34b68910c5d1b02c7f1154108",
+        "src/render_hud_cache.inc": "7c3ebe9da6acba712731f811e73243b29474cd7f527e6e758be1127f369af1db",
+        "src/render_lighting.c": "cdbc1bd34c20f664aabb128243b6facda3be7420cf31015e6a882de5c6584792",
+        "src/render_lighting.h": "55479d327432df3d7cdf5e6bfb3856e268630800c2d44369c5b2ac1139d2a45f",
+        "src/render_shading.h": "a12a9fb4d1c8008208e755188078420d43271b5c4d1a9ecb95167985a43d314d",
+        "src/render_t3d.inc": "741fb748c5c38abb71ff01105b17b53b374c1bf6a2625ee594ca295d6015fb25",
+        "src/render_texture_packing.c": "487ddd384af8d1bab1673a3efbddc9529afc21da42d4306071e436fe9b4116d0",
+        "src/render_texture_packing.h": "9788346f3a8b17734408d339983b0327fd18eb549c320a3f0c328bda53c72cde",
+        "src/render_transform.c": "e5babbdf290016deb179de97077b34ddd2af705b576dea49aca9bacb4ecc62e2",
+        "src/render_transform.h": "0b9258c728c688184387265d74e7abfe9a6067dcb41c90d815fe3dbd9fabc655",
+        "src/render_visibility.h": "58d4a2fb1f0e1740e13ae3bed38387b0990b0118b2c2ad52ecd8a2582e2ebb59",
+        "src/scale_bench.c": "e6757e000b8fb4ef83d5f8c5b2442152475b8e781bc89b65c75125e02e00c5ec",
+        "src/scale_bench.h": "0febfeb6d49b6cbf5ea0a551a502a4e7c3b34ee4f1d7ca8db74eefa936ea7c7b",
+        "src/static_lighting.c": "68b54ef7baaab6d297b534ae690eecce40924e3304717d4991e1d717db5c2bbc",
+        "src/static_lighting.h": "411a980f5b8f6cf7f3b40734aae184f24c2406c99e685165c82e128e0da8380d"
+      }
+    }
+  }
+}

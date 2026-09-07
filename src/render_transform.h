@@ -4,6 +4,21 @@
 #include "animation.h"
 #include "render_camera.h"
 
+typedef struct { DlVec3 position,sine,cosine; bool door_open; } DlRenderPose;
+typedef struct {
+    DlRenderPose pose;
+    DlAnimMatrix world;
+    bool valid;
+} DlRenderPoseCache;
+
+/* Immutable instances retain their exact pose/world matrix until the hinge
+ * state changes. Moving instances refresh every call. Clear the cache before
+ * reusing it for a different level or changing authored transforms/hinges.
+ * Returns true when rebuilt. Camera-dependent transforms are never cached. */
+bool dl_render_pose_cache_update(DlRenderPoseCache *cache,bool dynamic,
+    const DlVec3 *position,const DlVec3 *rotation,const DlVec3 *scale,
+    bool door_open,float hinge_x,float hinge_z);
+
 /* Reuses animation's row-major 3x4 affine format. No trigonometry in these
  * helpers: compute sine/cosine once per instance. Scale must be nonzero and
  * all inputs finite. The hinge is in scaled mesh space, exactly as render.c:

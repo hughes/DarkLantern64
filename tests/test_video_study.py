@@ -10,6 +10,15 @@ from video_study import snapshot
 
 
 class VideoStudyProvenanceTests(unittest.TestCase):
+    def test_lighting_diagnostics_rejected_even_for_a_reused_snapshot(self):
+        for flag in ('lighting_bake_verify', 'disable_lighting_bake'):
+            with self.subTest(flag=flag), tempfile.TemporaryDirectory() as temporary:
+                root=Path(temporary);_,verification=self.fixture(root)
+                data=json.loads(verification.read_text());data['manifest'][flag]=True
+                verification.write_text(json.dumps(data))
+                with self.assertRaisesRegex(ValueError,'lighting bake diagnostics'):
+                    snapshot(root,verification)
+
     def fixture(self, root):
         base = root / "baseline"
         base.mkdir()

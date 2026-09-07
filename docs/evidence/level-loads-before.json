@@ -1,0 +1,190 @@
+{
+  "schema_version": 1,
+  "command": "python tools/smoke_bundle.py",
+  "analysis_command": "python tools/report_level_loads.py --bundle-report build/bundle-smoke.json",
+  "source_log": ".dev/ares/runs/2b6c289920284867a832acab40c02e78/bundle-switching.log",
+  "source_log_sha256": "08874593354ddbf1e7730d5ea60111470ccc8f73f048c35a24d6d2d3dc700230",
+  "rom_sha256": "03e75fb7b315427bf5fe616a3068e835f1f4315a54a4586904cb562f27f5e431",
+  "settings_source_sha256": "010e6ec4df82b1750292c4a1e50b1e513f9e2d4b7c604d345be0c1d28b6b140a",
+  "levels": {
+    "lantern-store": {
+      "starts": 12,
+      "presets": {
+        "default": 6,
+        "loot-crate": 6
+      },
+      "prepare_ms": {
+        "minimum": 165.52,
+        "average": 165.60916666666665,
+        "maximum": 166.01
+      },
+      "night_cache_bytes": [
+        0
+      ],
+      "door_states": [
+        1
+      ],
+      "textures": [
+        2
+      ],
+      "heap_bytes": [
+        1176888
+      ],
+      "geometry": {
+        "models": 25,
+        "meshes": 9,
+        "vertices": 2683,
+        "triangles": 1763
+      }
+    },
+    "moonlit-yard": {
+      "starts": 12,
+      "presets": {
+        "default": 6,
+        "loot-counter": 6
+      },
+      "prepare_ms": {
+        "minimum": 1635.31,
+        "average": 1635.7083333333333,
+        "maximum": 1636.16
+      },
+      "night_cache_bytes": [
+        107472
+      ],
+      "door_states": [
+        2
+      ],
+      "textures": [
+        4
+      ],
+      "heap_bytes": [
+        1287128
+      ],
+      "geometry": {
+        "models": 49,
+        "meshes": 14,
+        "vertices": 4195,
+        "triangles": 2239
+      }
+    },
+    "enemy-workshop": {
+      "starts": 24,
+      "presets": {
+        "default": 6,
+        "store-door-open": 6,
+        "scout-observation": 6,
+        "loot-crate": 6
+      },
+      "prepare_ms": {
+        "minimum": 205.8,
+        "average": 217.97124999999997,
+        "maximum": 222.31
+      },
+      "night_cache_bytes": [
+        0
+      ],
+      "door_states": [
+        1
+      ],
+      "textures": [
+        2
+      ],
+      "heap_bytes": [
+        1338352
+      ],
+      "geometry": {
+        "models": 27,
+        "meshes": 9,
+        "vertices": 4701,
+        "triangles": 2833
+      }
+    },
+    "animation_workshop": {
+      "starts": 18,
+      "presets": {
+        "default": 6,
+        "guard-front": 6,
+        "two-guards": 6
+      },
+      "prepare_ms": {
+        "minimum": 69.44,
+        "average": 69.7616666666667,
+        "maximum": 69.97
+      },
+      "night_cache_bytes": [
+        0
+      ],
+      "door_states": [
+        1
+      ],
+      "textures": [
+        1
+      ],
+      "heap_bytes": [
+        1008152
+      ],
+      "geometry": {
+        "models": 12,
+        "meshes": 2,
+        "vertices": 2098,
+        "triangles": 1190
+      }
+    },
+    "sponza": {
+      "starts": 36,
+      "presets": {
+        "default": 6,
+        "upper-gallery": 6,
+        "east-stairs": 6,
+        "west-stairs": 6,
+        "courtyard": 6,
+        "open-vault": 6
+      },
+      "prepare_ms": {
+        "minimum": 3226.67,
+        "average": 3227.0530555555556,
+        "maximum": 3227.36
+      },
+      "night_cache_bytes": [
+        187296
+      ],
+      "door_states": [
+        2
+      ],
+      "textures": [
+        10
+      ],
+      "heap_bytes": [
+        1474800
+      ],
+      "geometry": {
+        "models": 114,
+        "meshes": 70,
+        "vertices": 5898,
+        "triangles": 3902
+      }
+    }
+  },
+  "marker_counts": {
+    "menu_ready": 1,
+    "geometry_ready": 102,
+    "scene_prepared": 102,
+    "shading_ready": 102,
+    "animation_ready": 102,
+    "rsp_ready": 102,
+    "level_start": 102,
+    "scene_work": 51,
+    "menu_open": 102,
+    "menu_resume": 51,
+    "restart": 51,
+    "menu_test_complete": 1
+  },
+  "marker_journal": "build/level-loads-before-markers.jsonl",
+  "measurement": "Existing scene_prepared CP0 elapsed timer. Includes CPU scene transforms, lighting and texture preparation; ends before gpu_prepare and HUD preparation.",
+  "limitations": [
+    "This timer is not total level-load latency: release/synchronization, remaining RSP preparation, presentation and host emulator loading are outside it.",
+    "menu_open/menu_resume elapsed fields are simulation time and prove pause/resume continuity; they are not load durations or wall-clock timestamps.",
+    "Repeated starts reconstruct both door lighting states. No cache reuse should be inferred from stable memory.",
+    "The switching ROM is a diagnostic workload; these load markers are not ordinary gameplay FPS measurements."
+  ]
+}

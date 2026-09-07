@@ -104,6 +104,11 @@ class GuardPerformanceTests(unittest.TestCase):
             path=root/'build.json';path.write_text(json.dumps(manifest))
             with patch.multiple(verifier,ROOT=root,LEVEL=level):
                 self.assertEqual(verifier.ordinary_manifest(path,rom)['start_preset'],'two-guards')
+                for flag in ('lighting_bake_verify','disable_lighting_bake'):
+                    manifest[flag]=True;path.write_text(json.dumps(manifest))
+                    with self.assertRaisesRegex(ValueError,'ordinary ROM'): verifier.ordinary_manifest(path,rom)
+                    manifest[flag]=False
+                path.write_text(json.dumps(manifest))
                 asset.write_bytes(b'changed guard')
                 with self.assertRaisesRegex(ValueError,'dependency changed'): verifier.ordinary_manifest(path,rom)
                 asset.write_bytes(b'guard');manifest['capture']=True;path.write_text(json.dumps(manifest))

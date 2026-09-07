@@ -1,6 +1,19 @@
 #include "render_transform.h"
 #include <math.h>
 
+bool dl_render_pose_cache_update(DlRenderPoseCache *cache,bool dynamic,
+    const DlVec3 *position,const DlVec3 *rotation,const DlVec3 *scale,
+    bool door_open,float hinge_x,float hinge_z){
+    if(cache->valid&&!dynamic&&cache->pose.door_open==door_open)return false;
+    cache->pose=(DlRenderPose){*position,
+        {sinf(rotation->x),sinf(rotation->y),sinf(rotation->z)},
+        {cosf(rotation->x),cosf(rotation->y),cosf(rotation->z)},door_open};
+    dl_render_instance_matrix(&cache->world,*position,*scale,
+        cache->pose.sine,cache->pose.cosine,door_open,hinge_x,hinge_z);
+    cache->valid=true;
+    return true;
+}
+
 void dl_render_instance_matrix(DlAnimMatrix *out,DlVec3 position,DlVec3 scale,
     DlVec3 sine,DlVec3 cosine,bool door_open,float hinge_x,float hinge_z){
     /* Columns of Rz * Ry * Rx. */

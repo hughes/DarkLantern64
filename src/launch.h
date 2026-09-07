@@ -16,7 +16,7 @@ typedef struct {
     const DlLevelEntry *levels;
     int level_count;
     int initial_level, initial_start; /* -1 start means the ordinary spawn. */
-    bool start_in_menu, has_textures;
+    bool start_in_menu, has_rom_assets;
 } DlBundle;
 
 typedef struct {

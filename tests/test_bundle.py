@@ -162,34 +162,91 @@ class BundleTests(unittest.TestCase):
         first = self.texture_level("first", b"shared")
         second = self.texture_level("second", b"shared")
         third = self.texture_level("third", b"unique", "texture-fedcba9876543210")
-        report = bundle.union_textures([first, second, third], self.output)
+        report = bundle.union_assets([first, second, third], self.output)["textures"]
         self.assertEqual((len(report["textures"]), report["decoded_bytes"], report["maximum_level_decoded_bytes"]), (2, 4096, 2048))
-        report = bundle.union_textures([first], self.output)
+        report = bundle.union_assets([first], self.output)["textures"]
         self.assertEqual(len(list((self.output / "romfs").rglob("*.sprite"))), 1)
         self.assertEqual((self.root / "third" / third["textures"]["textures"][0]["sprite_path"]).read_bytes(), b"unique")
-        bundle.union_textures([], self.output)
+        bundle.union_assets([], self.output)
         self.assertEqual(list((self.output / "romfs").iterdir()), [])
 
     def test_texture_hash_collision_rejected_before_replacing_package(self):
         first = self.texture_level("first", b"first")
         second = self.texture_level("second", b"second")
-        bundle.union_textures([first], self.output)
+        bundle.union_assets([first], self.output)
         with self.assertRaisesRegex(ValueError, "path collision"):
-            bundle.union_textures([first, second], self.output)
+            bundle.union_assets([first, second], self.output)
         self.assertEqual((self.output / first["textures"]["textures"][0]["sprite_path"]).read_bytes(), b"first")
         second["textures"]["textures"][0]["sprite_sha256"] = "0" * 64
         with self.assertRaisesRegex(ValueError, "hash mismatch"):
-            bundle.union_textures([second], self.output)
+            bundle.union_assets([second], self.output)
 
     def test_incompatible_diagnostics_fail_before_cooking(self):
         cases = [{"bundle": ROOT / "content/level_bundle.json", "level": ROOT / "content/first_room.json"},
                  {"bundle": ROOT / "content/level_bundle.json", "capture": True},
                  {"start_preset": "default", "autoplay": True},
-                 {"start_level": "first_room"}, {"menu_test": True}]
+                 {"start_level": "first_room"}, {"menu_test": True},
+                 {"lighting_bake_verify": True, "disable_lighting_bake": True}]
         with patch.object(build, "prepare_bundle", side_effect=AssertionError("Must reject before cook")):
             for kwargs in cases:
                 with self.subTest(kwargs=kwargs), self.assertRaises(ValueError):
                     build.build_rom(self.root / "missing-sdk", **kwargs)
+
+    def lighting_level(self, name, payload, signature="a" * 64):
+        cooked = self.root / name
+        relative = f"romfs/lighting/lighting-{signature}.bin"
+        destination = cooked / relative
+        destination.parent.mkdir(parents=True)
+        destination.write_bytes(payload)
+        return {"cooked_dir": str(cooked), "textures": {"textures": [], "decoded_bytes": 0, "sprite_bytes": 0},
+                "content": {"lighting": {"path": relative, "sha256": hashlib.sha256(payload).hexdigest(),
+                                          "bytes": len(payload)}}}
+
+    def test_lighting_only_package_deduplicates_and_removes_old_bakes(self):
+        first = self.lighting_level("lit-one", b"lighting")
+        second = self.lighting_level("lit-two", b"lighting")
+        package = bundle.union_assets([first, second], self.output)
+        self.assertEqual(package["textures"]["textures"], [])
+        self.assertEqual(len(package["rom_assets"]), 1)
+        self.assertEqual(package["lighting"]["bytes"], 8)
+        # Removing a bake replaces the package exactly, without touching its
+        # source cook. The same rule covers switching a night scene to scalar.
+        bundle.union_assets([], self.output)
+        self.assertEqual(list((self.output / "romfs").iterdir()), [])
+        self.assertTrue((Path(first["cooked_dir"]) / first["content"]["lighting"]["path"]).exists())
+
+    def test_lighting_corruption_and_escape_leave_previous_package_intact(self):
+        first = self.lighting_level("lit-good", b"accepted")
+        second = self.lighting_level("lit-bad", b"different")
+        bundle.union_assets([first], self.output)
+        published = self.output / first["content"]["lighting"]["path"]
+        with self.assertRaisesRegex(ValueError, "path collision"):
+            bundle.union_assets([first, second], self.output)
+        self.assertEqual(published.read_bytes(), b"accepted")
+        second["content"]["lighting"]["sha256"] = "0" * 64
+        with self.assertRaisesRegex(ValueError, "hash or size mismatch"):
+            bundle.union_assets([second], self.output)
+        second["content"]["lighting"]["path"] = "../outside.bin"
+        with self.assertRaisesRegex(ValueError, "Invalid bundle lighting path"):
+            bundle.union_assets([second], self.output)
+        self.assertEqual(published.read_bytes(), b"accepted")
+
+    def test_lighting_only_level_enables_rom_filesystem(self):
+        original_compile = bundle.compile_level
+        def with_lighting(*args, **kwargs):
+            report = original_compile(*args, **kwargs)
+            cooked = Path(args[1])
+            relative = "romfs/lighting/lighting-" + "b" * 64 + ".bin"
+            path = cooked / relative
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_bytes(b"bake")
+            report["lighting"] = {"path": relative, "bytes": 4, "sha256": hashlib.sha256(b"bake").hexdigest()}
+            return report
+        with patch.object(bundle, "compile_level", side_effect=with_lighting):
+            report, _ = self.prepare(menu=True)
+        self.assertEqual(report["textures"]["textures"], [])
+        self.assertEqual(len(report["rom_assets"]), 1)
+        self.assertIn(".has_rom_assets=true", (self.output / "generated/bundle.c").read_text())
 
 
 if __name__ == "__main__":

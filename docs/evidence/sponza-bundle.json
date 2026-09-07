@@ -1,0 +1,243 @@
+{
+  "passed": true,
+  "platform": "Ares",
+  "runs": [
+    {
+      "name": "bundle-idle",
+      "passed": true,
+      "log": ".dev/ares/runs/1ecbba7946af49e4b57c2db90166e3e2/bundle-idle.log",
+      "tested_rom": ".dev/ares/runs/1ecbba7946af49e4b57c2db90166e3e2/DarkLantern64-bundle-level_bundle-menu-t3d.z64",
+      "rom_sha256": "e0fd0009f59273b98686fb9bc54e1653001ca09b5c86de360ba1518897978c8d",
+      "rom_bytes": 573440,
+      "settings": ".dev/ares/runs/1ecbba7946af49e4b57c2db90166e3e2/settings.bml",
+      "settings_source_sha256": "010e6ec4df82b1750292c4a1e50b1e513f9e2d4b7c604d345be0c1d28b6b140a",
+      "profile_report": null,
+      "elapsed_seconds": 5.266,
+      "peak_sampled_heap_bytes": null,
+      "max_reported_cpu_ms": null,
+      "boot": null,
+      "terminal_event": "DL64 profile_end window=1",
+      "log_sha256": "d3f61f5e58a0a84c63deb88b3d98005e2f2b62b554f8f8dcf46f9a4746055b72"
+    },
+    {
+      "name": "bundle-4mb",
+      "passed": true,
+      "log": ".dev/ares/runs/4278e21b45584424be485e028baae422/bundle-4mb.log",
+      "tested_rom": ".dev/ares/runs/4278e21b45584424be485e028baae422/DarkLantern64-bundle-level_bundle-menu-t3d.z64",
+      "rom_sha256": "e0fd0009f59273b98686fb9bc54e1653001ca09b5c86de360ba1518897978c8d",
+      "rom_bytes": 573440,
+      "settings": ".dev/ares/runs/4278e21b45584424be485e028baae422/settings.bml",
+      "settings_source_sha256": "010e6ec4df82b1750292c4a1e50b1e513f9e2d4b7c604d345be0c1d28b6b140a",
+      "profile_report": null,
+      "elapsed_seconds": 4.265,
+      "peak_sampled_heap_bytes": null,
+      "max_reported_cpu_ms": null,
+      "boot": null,
+      "terminal_event": "DL64 boot_failed reason=expansion_pak memory=4194304 required=8388608",
+      "log_sha256": "6a003df14d099a8523ace15ca3db477a9b6ee35b159495a739d750e6557c0eab"
+    },
+    {
+      "name": "bundle-switching",
+      "passed": true,
+      "log": ".dev/ares/runs/0492f30697d04cd5821b299cfd11e3a4/bundle-switching.log",
+      "tested_rom": ".dev/ares/runs/0492f30697d04cd5821b299cfd11e3a4/DarkLantern64-bundle-level_bundle-menu-menu-test-t3d.z64",
+      "rom_sha256": "f0e4d4e97de7b3e344192c5171124c19f8d27ef4c76baf83dc3d0252196908a2",
+      "rom_bytes": 573440,
+      "settings": ".dev/ares/runs/0492f30697d04cd5821b299cfd11e3a4/settings.bml",
+      "settings_source_sha256": "010e6ec4df82b1750292c4a1e50b1e513f9e2d4b7c604d345be0c1d28b6b140a",
+      "profile_report": null,
+      "elapsed_seconds": 51.078,
+      "peak_sampled_heap_bytes": 1474832,
+      "max_reported_cpu_ms": 0.0,
+      "boot": "DL64 boot_ok memory=8388608 scene=\"DarkLantern64 - The Lantern Store\" meshes=9 models=25 colliders=14 version=2 world=3d renderer=rsp-tiny3d depth=hardware",
+      "terminal_event": "DL64 menu_test_complete transitions=102 variants=17 cycles=3",
+      "log_sha256": "7cc93067cb1f278d6028ccd18f6d85261c60b723665e4bd80db9d7026778abdb"
+    },
+    {
+      "name": "bundle-direct",
+      "passed": true,
+      "log": ".dev/ares/runs/c0476756896844429a68e4e364694b9c/bundle-direct.log",
+      "tested_rom": ".dev/ares/runs/c0476756896844429a68e4e364694b9c/DarkLantern64-bundle-level_bundle-start-enemy-workshop-preset-store-door-open-t3d.z64",
+      "rom_sha256": "1518f195071f6c9d933f884ce869a3eaaab71c8911f1a8597c0951a61fb869fc",
+      "rom_bytes": 573440,
+      "settings": ".dev/ares/runs/c0476756896844429a68e4e364694b9c/settings.bml",
+      "settings_source_sha256": "010e6ec4df82b1750292c4a1e50b1e513f9e2d4b7c604d345be0c1d28b6b140a",
+      "profile_report": null,
+      "elapsed_seconds": 4.766,
+      "peak_sampled_heap_bytes": 1338384,
+      "max_reported_cpu_ms": 0.0,
+      "boot": "DL64 boot_ok memory=8388608 scene=\"Enemy Patrol Workshop\" meshes=9 models=27 colliders=14 version=2 world=3d renderer=rsp-tiny3d depth=hardware",
+      "terminal_event": "DL64 frame n=0 t=0.02 ms=16.67 cpu_ms=0.00 heap=1338384/7417792 triangles=0 player=2.50,0.00,0.00 yaw=1.571 pitch=0.000 grounded=1 guard=3.01,0.00,-4.00 light=0.184 alert=0.000 state=PATROL door=1 complete=0 caught=0",
+      "log_sha256": "acce86069a1b59fd7fb585543671f432b5923aa13f5f83d019190920cc209ba6"
+    },
+    {
+      "name": "single-direct-preset",
+      "passed": true,
+      "log": ".dev/ares/runs/28178a75d19f44adb2d6d0bcf288a5a2/single-direct-preset.log",
+      "tested_rom": ".dev/ares/runs/28178a75d19f44adb2d6d0bcf288a5a2/DarkLantern64-enemy_patrols-preset-scout-observation-t3d.z64",
+      "rom_sha256": "81c340402fe367d6e8a468aaab1830c0b486fe120d9d7dc54fbc1b24dd54052f",
+      "rom_bytes": 393216,
+      "settings": ".dev/ares/runs/28178a75d19f44adb2d6d0bcf288a5a2/settings.bml",
+      "settings_source_sha256": "010e6ec4df82b1750292c4a1e50b1e513f9e2d4b7c604d345be0c1d28b6b140a",
+      "profile_report": null,
+      "elapsed_seconds": 4.781,
+      "peak_sampled_heap_bytes": 1338200,
+      "max_reported_cpu_ms": 0.0,
+      "boot": "DL64 boot_ok memory=8388608 scene=\"Enemy Patrol Workshop\" meshes=9 models=27 colliders=14 version=2 world=3d renderer=rsp-tiny3d depth=hardware",
+      "terminal_event": "DL64 frame n=0 t=0.02 ms=16.67 cpu_ms=0.00 heap=1338200/7588272 triangles=0 player=-6.00,0.00,2.70 yaw=3.142 pitch=-0.070 grounded=1 guard=3.01,0.00,-4.00 light=0.080 alert=0.000 state=PATROL door=0 complete=0 caught=0",
+      "log_sha256": "160e34915f7e58930abf3245dbd2d0bdf7fe92839cc340466816b113d9983eb9"
+    }
+  ],
+  "checks": [
+    "Ordinary menu renders without starting a level; 4 MiB boot gate works",
+    "Every bundled default/test start launches and restarts three times",
+    "Position, view, stance, door and clean mission state match authored starts",
+    "Repeated textured/untextured switches reach a stable per-start heap",
+    "Menu resume preserves paused simulation time",
+    "Both bundle and standalone ROMs bypass the menu into a named start"
+  ],
+  "heap_samples": {
+    "lantern-store/default": [
+      1176920,
+      1176920,
+      1176920,
+      1176920,
+      1176920,
+      1176920
+    ],
+    "lantern-store/loot-crate": [
+      1176920,
+      1176920,
+      1176920,
+      1176920,
+      1176920,
+      1176920
+    ],
+    "moonlit-yard/default": [
+      1287160,
+      1287160,
+      1287160,
+      1287160,
+      1287160,
+      1287160
+    ],
+    "moonlit-yard/loot-counter": [
+      1287160,
+      1287160,
+      1287160,
+      1287160,
+      1287160,
+      1287160
+    ],
+    "enemy-workshop/default": [
+      1338384,
+      1338384,
+      1338384,
+      1338384,
+      1338384,
+      1338384
+    ],
+    "enemy-workshop/store-door-open": [
+      1338384,
+      1338384,
+      1338384,
+      1338384,
+      1338384,
+      1338384
+    ],
+    "enemy-workshop/scout-observation": [
+      1338384,
+      1338384,
+      1338384,
+      1338384,
+      1338384,
+      1338384
+    ],
+    "enemy-workshop/loot-crate": [
+      1338384,
+      1338384,
+      1338384,
+      1338384,
+      1338384,
+      1338384
+    ],
+    "animation_workshop/default": [
+      1008192,
+      1008192,
+      1008192,
+      1008192,
+      1008192,
+      1008192
+    ],
+    "animation_workshop/guard-front": [
+      1008192,
+      1008192,
+      1008192,
+      1008192,
+      1008192,
+      1008192
+    ],
+    "animation_workshop/two-guards": [
+      1008192,
+      1008192,
+      1008192,
+      1008192,
+      1008192,
+      1008192
+    ],
+    "sponza/default": [
+      1474832,
+      1474832,
+      1474832,
+      1474832,
+      1474832,
+      1474832
+    ],
+    "sponza/upper-gallery": [
+      1474832,
+      1474832,
+      1474832,
+      1474832,
+      1474832,
+      1474832
+    ],
+    "sponza/east-stairs": [
+      1474832,
+      1474832,
+      1474832,
+      1474832,
+      1474832,
+      1474832
+    ],
+    "sponza/west-stairs": [
+      1474832,
+      1474832,
+      1474832,
+      1474832,
+      1474832,
+      1474832
+    ],
+    "sponza/courtyard": [
+      1474832,
+      1474832,
+      1474832,
+      1474832,
+      1474832,
+      1474832
+    ],
+    "sponza/open-vault": [
+      1474832,
+      1474832,
+      1474832,
+      1474832,
+      1474832,
+      1474832
+    ]
+  },
+  "menu_image": ".dev/ares/runs/0492f30697d04cd5821b299cfd11e3a4/level-select.png",
+  "command": "python tools/smoke_bundle.py",
+  "level_count": 5,
+  "variant_count": 17,
+  "transition_count": 102,
+  "cycles": 3
+}

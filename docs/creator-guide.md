@@ -4,7 +4,7 @@ For artists and level/game designers with the Windows environment already set up
 
 ## 1. Open the editor
 
-Open the **DarkLantern64 repository folder** in VS Code. Choose **Terminal → Run Task → DarkLantern64: Launch editor** and wait for the editor. Use its **Levels** panel to select a level and click **Open**. The panel shows the title and source filename; the preview also uses the actual level name. Keep one project editor open and switch levels inside it. Escape or the window close button asks how to handle any unsaved changes.
+Open the **DarkLantern64 repository folder** in VS Code. Choose **Terminal → Run Task → DarkLantern64: Launch editor** and wait for the editor. Use **Window → Levels** to select a level and click **Open**. The panel shows the title and source filename; the preview also uses the actual level name. Keep one project editor open and switch levels inside it. Escape or the window close button asks how to handle any unsaved changes.
 
 There are two everyday tasks:
 
@@ -25,31 +25,39 @@ Edit the open level's **Level title** and use **Save + Cook** to save it. **Incl
 
 When you switch with unsaved edits, choose **Save and continue**, **Discard and continue**, or **Cancel**. Unsaved audio planning edits are protected too. **Delete** asks for confirmation, removes the level from the project and game menu, and archives its saved source under `.dev/editor/deleted-levels/`. Shared models and textures remain in place. The editor prevents deleting the last project level, or deleting or excluding the last level in the game menu. Keep committed source files as the durable history; deletion archives are local recovery files.
 
+The default workspace shows Objects, Viewport and Inspector. Other panels reopen from **Window**. See [workspace controls](editor-workspace.md).
+
 ## 2. Make a level edit
+
+For blockout and gameplay work, **Window → Blockout & Groups** now supplies primitives, groups,
+snap/drop, undo/redo and reusable encounter copies. **Inspector → Interaction & collision** edits door
+links, loot, objectives and collision proxies. Use **Play** on the menu bar
+to test unsaved changes with the ROM's shared simulation; pause/step to inspect
+behavior and stop to return to authoring. See the [Native Play guide](native-play-implementation.md).
 
 Open **The Lantern Store**, then start with a small experiment:
 
-1. Select **rotated-crate** in **Room Objects**.
-2. In **Object Properties**, change the middle **rotation** value from `28` to `40`. This turns the crate around its vertical axis.
-3. Click **Save + Cook** in **Build & Diagnostics**. Cooking converts your content for the preview and game.
+1. Select **rotated-crate** in **Objects**.
+2. In **Inspector**, change the middle **rotation** value from `28` to `40`. This turns the crate around its vertical axis.
+3. Choose **File → Save + Cook**. Cooking converts your content for the preview and game.
 4. Wait for the saved/refreshed confirmation, then play the change using the next section.
 
-In **Viewport**, **middle-drag** orbits, **Shift + middle-drag** pans, and the **wheel** zooms. Left-click a mesh or choose it in **Entity List** to select its gizmo. Choose **Options → Transform mode → Translate / Rotate / Scale**; **Ctrl+T** cycles modes. Gizmo edits save with the level. **Room Objects** selection controls only the property inspector.
+In **Viewport**, **middle-drag** orbits, **Shift + middle-drag** pans, and the **wheel** zooms. Left-click a mesh or choose it in **Objects** to select its gizmo. Choose **View → Transform mode → Translate / Rotate / Scale**; **Ctrl+T** cycles modes. Gizmo edits save with the level. Objects and viewport selection share the same inspector, bounding box and gizmo.
 
 Positions use metres; **Y is up**. Rotations use degrees; scale values must stay positive. Collision boxes currently support Y rotation only: tilting an object with collision around X or Z fails cooking.
 
-**Sponza After Hours** demonstrates two connected floors. Select it in **Levels**, then use **Play level**; its start presets jump directly to the upper gallery, either stairway, the courtyard or the unlocked vault. The upper gallery is at Y `5.3`. Its floors and stairs have separate collision-only entities in **Room Objects**, so move both the visible model and its proxies when changing architecture. Put guard feet and patrol waypoints at the walking-surface height. See the [Sponza guide](sponza-study.md) for the encounter route and current navigation limits.
+**Sponza After Hours** demonstrates two connected floors. Select it in **Levels**, then use **Play level**; its start presets jump directly to the upper gallery, either stairway, the courtyard or the unlocked vault. The upper gallery is at Y `5.3`. Its floors and stairs have separate collision-only entities in **Objects**, so move both the visible model and its proxies when changing architecture. Put guard feet and patrol waypoints at the walking-surface height. See the [Sponza guide](sponza-study.md) for the encounter route and current navigation limits.
 
-Lights expose radius, intensity (0–16), and color; the control exposes **Linked door**. In the courtyard, **Night environment** controls ambient, moon, sky, fog and exposure. **Material** controls color, emission and existing texture dimensions; changes affect every object using that material. Assign a new source image through the saved JSON or API as described in the [texture guide](texture-pipeline.md). Save + Cook refreshes these changes. Check final lighting in Ares; the desktop preview displays cooked textures but uses LightEngine's renderer.
+Lights expose radius, intensity (0–16), and color; the control exposes **Linked door**. In the courtyard, **Window → Environment** controls ambient, moon, sky, fog and exposure. **Material** controls color, emission and existing texture dimensions; changes affect every object using that material. Assign a new source image through the saved JSON or API as described in the [texture guide](texture-pipeline.md). Save + Cook refreshes these changes. Check final lighting in Ares; the desktop preview displays cooked textures but uses LightEngine's renderer.
 
 Static night lighting is baked automatically during **Save + Cook** and game builds, so opening a level in the game only loads its prepared colors. Editing geometry, materials, lights or the environment regenerates the bake. Guards retain runtime lighting, and both door states are prepared. No additional task or export step is needed; see the [loading notes](level-loading.md).
 
-Use **Save + Cook**, **File → Save scene**, or **Ctrl+S** to save canonical level content. Stock **Add/Import/Duplicate/Delete**, material tools, and native **Play** mode affect the desktop preview; use the project panels for saved game authoring. Check game lighting and collision in Ares.
+Use **File → Save + Cook** or **Ctrl+S** to save canonical level content. Create and Edit actions update that same document. Native Play tests an isolated draft snapshot. Check final game lighting and collision in Ares.
 
 ### Place enemies and author patrols
 
-1. In **Room Objects**, choose **New enemy type**, then click **Add enemy**. **Watchman** and **Scout** use the shared animated guard in every supplied level; the Scout has faster movement and longer perception ranges. Change an existing actor's **Enemy type** in Object Properties.
-2. Edit **position** to place its feet on a floor. New enemies start at an existing actor or waypoint, so move them apart. **Save + Cook** creates the viewport model; select it in **Entity List** to use the normal transform gizmo.
+1. Choose **Create → Enemy**, then set **Enemy type** in Inspector. **Watchman** and **Scout** use the shared animated guard in every supplied level; the Scout has faster movement and longer perception ranges. Change an existing actor's **Enemy type** in Inspector.
+2. Edit **position** to place its feet on a floor. New enemies start at an existing actor or waypoint, so move them apart. **Save + Cook** creates the viewport model; select it in **Objects** to use the normal transform gizmo.
 3. Leave **Behavior** on **Sentry** for a stationary lookout. Set the middle **rotation** value to choose its facing: `0` faces +Z, `90` faces +X. It can investigate and chase, then returns to its post.
 4. For a patrol, click **Create + append waypoint** in the enemy's properties. Click the route entry to edit that waypoint's XYZ position. Reselect the enemy and repeat. With at least two points, choose **Patrol**. The ordered route loops, including the segment from the last point back to the first.
 5. Use **Up**, **Down**, **Remove from route**, or **Append existing waypoint** to edit the route. Save + Cook shows new waypoint markers in the viewport. Walk every segment in Ares; the current AI follows straight segments and does not find detours around walls.
@@ -92,7 +100,7 @@ On an N64 controller, the **stick looks in both axes** (up looks up). **C-Up/Dow
 
 For Blender-made props, use the [Blender asset workflow](blender-assets.md): edit and save the `.blend`, export an asset pack, import it into the level editor, and place reusable prefab instances. The supplied loot pack shares one small atlas across five modeled props. Enemies and waypoints have the controls described above.
 
-For animated characters, start with [the guard animation workflow](guard-animation-prototype.md). Open **Guard Animation Workshop**, select a guard in **Room Objects**, and use **Character animation → Focus guard**. Choose a clip, play or scrub it, experiment with **Blend preview**, and adjust **Attention yaw/pitch**. These controls preview motion without changing saved behavior. The current game uses idle and walking, with the default RSP renderer handling the guard's skeletal deformation. Run, notice and turn remain preview clips.
+For animated characters, start with [the guard animation workflow](guard-animation-prototype.md). Open **Guard Animation Workshop**, select a guard in **Objects**, and use **Window → Animation → Focus guard**. Choose a clip, play or scrub it, experiment with **Blend preview**, and adjust **Attention yaw/pitch**. These controls preview motion without changing saved behavior. The current game uses idle and walking, with the default RSP renderer handling the guard's skeletal deformation. Run, notice and turn remain preview clips.
 
 Edit and save [art/guard.blend](../art/guard.blend), then run `python tools/guard_assets.py` from the repository root. Return to the editor and **Save + Cook**, then **Play level**. The exporter reads the saved Blender file, including its five named Actions and atlas; unsaved Blender edits are not exported.
 
@@ -106,7 +114,7 @@ Save the JSON, run `python tools/compile_level.py content/first_room.json --vali
 
 ## When something goes wrong
 
-- **Missing or misplaced panels:** click **Reset Layout** in Build & Diagnostics.
+- **Missing or misplaced panels:** choose **Window → Restore default workspace**.
 - **Cook/build error:** expand **Last compiler log** or **Last ROM build log**, or read the task terminal. Fix the named object/file and retry. Failed builds can leave an older ROM on disk.
 - **Game looks unchanged:** check the active level, close the previous Ares window, then use **Play level**. If launching from VS Code, confirm **Save + Cook** succeeded first.
 - **Audio planning:** **Audio Memory → Apply + Recalculate** saves a separate memory plan; it does not change game audio. See the [audio planning guide](audio-memory-planning.md).

@@ -66,6 +66,13 @@ int dl_animation_find_clip(const DlAnimationAsset *asset,const char *id);
  * Animation event evaluation is gameplay work, never visibility-dependent. */
 unsigned dl_animation_event_count(const DlAnimClip *clip,float from,float to,uint8_t kind);
 uint32_t dl_animation_scratch_bytes(void);
+typedef struct {
+    int first, second;
+    float first_time, second_time, blend, head_yaw, head_pitch;
+} DlAnimationDecision;
+/* Shared gameplay-driven clip and attention selection; rendering only samples. */
+DlAnimationDecision dl_animation_decide(const DlAnimationAsset *asset,
+    const DlEnemy *enemy, DlVec3 player_eye, float elapsed);
 
 #ifdef __cplusplus
 }

@@ -6,6 +6,8 @@
 #include <filesystem>
 #include <fstream>
 #include <future>
+#include <map>
+#include <functional>
 #include <set>
 #include <sstream>
 #include <stdexcept>
@@ -19,12 +21,28 @@
 #include <util/MatrixUtils.h>
 #include "character_preview.h"
 #include "character_preview_mesh.h"
+#include "play_session.h"
+#include <core/FrameContext.h>
+#include <util/DocumentHistory.h>
+#include <util/TransformTools.h>
+#include <GLFW/glfw3.h>
 
 namespace fs = std::filesystem;
 using Json = nlohmann::json;
 
 namespace
 {
+struct ProjectPlaySystem : ISystem {
+    std::function<void(Scene&)> enter,exit;
+    std::function<void(Scene&,const FrameContext&)> update;
+    std::function<void(bool)> pause;
+    std::function<void(Scene&,DebugRenderer&)> debug;
+    void OnEnterPlay(Scene& scene) override { if(enter)enter(scene); }
+    void OnExitPlay(Scene& scene) override { if(exit)exit(scene); }
+    void Update(Scene& scene,const FrameContext& frame) override { if(update)update(scene,frame); }
+    void OnPause(bool value) override { if(pause)pause(value); }
+    void DrawDebug(Scene& scene,DebugRenderer& renderer) override {if(debug)debug(scene,renderer);}
+};
 struct TextureMemory
 {
     int pixels, palette, tile, tileLimit;
@@ -188,21 +206,14 @@ bool focusProjectTabs = false;
 void ProjectLayout(ImGuiID root)
 {
     focusProjectTabs = true;
-    ImGuiID main = root, right, bottom, audio, inspector, objects, levels;
-    ImGui::DockBuilderSplitNode(main, ImGuiDir_Left, .20f, &levels, &main);
-    ImGui::DockBuilderSplitNode(main, ImGuiDir_Right, .29f, &right, &main);
-    ImGui::DockBuilderSplitNode(main, ImGuiDir_Down, .33f, &bottom, &main);
-    ImGui::DockBuilderSplitNode(bottom, ImGuiDir_Right, .60f, &audio, &bottom);
-    ImGui::DockBuilderSplitNode(right, ImGuiDir_Down, .59f, &inspector, &objects);
-    ImGui::DockBuilderDockWindow("Viewport", main);
-    ImGui::DockBuilderDockWindow("Levels", levels);
-    ImGui::DockBuilderDockWindow("Audio Memory", audio);
-    ImGui::DockBuilderDockWindow("Room Objects", objects);
-    ImGui::DockBuilderDockWindow("Entity List", objects);
-    ImGui::DockBuilderDockWindow("Object Properties", inspector);
-    ImGui::DockBuilderDockWindow("Selected Entity", inspector);
-    for (const char* name : {"Build & Diagnostics", "Imports", "Effects", "Background", "Image Viewer", "Texture Browser", "Material Library"})
-        ImGui::DockBuilderDockWindow(name, bottom);
+    ImGuiID main=root,objects,inspector;
+    ImGui::DockBuilderSplitNode(main,ImGuiDir_Left,.18f,&objects,&main);
+    ImGui::DockBuilderSplitNode(main,ImGuiDir_Right,.28f,&inspector,&main);
+    ImGui::DockBuilderDockWindow("Viewport",main);
+    ImGui::DockBuilderDockWindow("Objects",objects);
+    for(const char* name:{"Inspector","Levels","Blockout & Groups","Assets","Environment","Animation",
+        "Play Inspector","Build & Diagnostics","Audio Memory","Controls","Image Viewer","Texture Browser"})
+        ImGui::DockBuilderDockWindow(name,inspector);
 }
 
 struct JobResult { bool ok = false; std::string message; Json report; Json project; };
@@ -238,7 +249,7 @@ class DemoEditor
     {
         const Json cooked = ProjectCommand({L"cook",L"--level",source_.wstring()});
         AdoptLevel(cooked);
-        engine_.SetEditorLayout(queue_ / "layout-project-v1.ini", ProjectLayout);
+        engine_.SetEditorLayout(queue_ / "layout-project-v2.ini", ProjectLayout);
         engine_.SetSceneOpenHandler([this](const std::string& path) {
             try
             {
@@ -249,7 +260,16 @@ class DemoEditor
             }
             catch (const std::exception& error) { status_=error.what(); }
         });
-        engine_.SetSceneSaveHandler([this] { saveRequested_=true; });
+        auto playSystem=std::make_unique<ProjectPlaySystem>();
+        playSystem->enter=[this](Scene& s){EnterNative(s);};
+        playSystem->exit=[this](Scene& s){ExitNative(s);};
+        playSystem->update=[this](Scene& s,const FrameContext& c){UpdateNative(s,c);};
+        playSystem->pause=[this](bool){if(native_){dl_tick_clear_pending(&native_->clock);native_->injected={};}};
+        playSystem->debug=[this](Scene& s,DebugRenderer& r){DrawSimulationDebug(s,r);};
+        engine_.RegisterPlaySystem("DarkLantern shared simulation",std::move(playSystem));
+        engine_.SetSimulationDebug(true);
+        engine_.SetPlayRequestHandler([this]{nativeStart_=testStart_;nativeRequested_=true;});
+        engine_.SetSceneSaveHandler([this] { if(!engine_.IsPlaying())saveRequested_=true; });
         engine_.SetCloseRequestHandler([this] {
             try
             {
@@ -263,6 +283,10 @@ class DemoEditor
         });
         engine_.Init(root_/"build/project/editor-assets", "DarkLantern64 | Project Editor");
         engine_.SetWindowSize(1440, 960);
+        engine_.SetAuthoringCommandHandler([this](const std::string& op,std::optional<EntityId> id){editorCommands_.emplace_back(op,id);});
+        LoadWorkspace();
+        engine_.SetEditorMenuHandler([this]{DrawWorkspaceMenu();});
+        engine_.SetEditorResourcePanelsVisible(panels_.at("Renderer resources"));
         initialized_=true;
         RegisterLevels();
         engine_.LoadScene(scenePath_);
@@ -274,15 +298,37 @@ class DemoEditor
         while (engine_.IsRunning())
         {
             SyncPreviewTransforms();
+            PollPreparation();
+            if(!ImGui::GetCurrentContext()||!ImGui::IsAnyItemActive())ObserveDocument();
             PollJob();
             PollCommands();
+            auto actions=std::move(uiActions_);uiActions_.clear();
+            for(auto& action:actions)try{action();}catch(const std::exception& e){status_=e.what();ShowPanel("Build & Diagnostics");}
+            auto commands=std::move(editorCommands_);editorCommands_.clear();
+            for(const auto& [op,id]:commands)try {
+                if(engine_.IsPlaying()||Busy())continue;
+                Json args=Json::object();
+                if(id&&previewIds_.contains(*id)){selected_=previewIds_.at(*id);args["ids"]=Json::array({selected_});}
+                if(op=="select"){selection_.clear();if(id)selection_.insert(selected_);else selected_.clear();continue;}
+                if(op=="add_box")AuthorCommand("add_blockout",args);
+                else if(op=="add_light")AuthorCommand("add_game_object",{{"kind","light"}});
+                else AuthorCommand(op=="duplicate"?"duplicate_entities":op=="delete"?"delete_entities":op,args);
+            }catch(const std::exception& e){status_=e.what();}
             if (saveRequested_)
             {
                 saveRequested_=false;
                 if (!Busy() && pendingAction_.empty()) Save(false);
             }
             ProcessAction();
-            if (reloadPreview_) { reloadPreview_ = false; engine_.LoadScene(scenePath_); }
+            if(nativeRequested_) {
+                nativeRequested_=false;
+                try{StartNative(nativeStart_);}catch(const std::exception& e){nativeError_=e.what();status_=e.what();ShowPanel("Play Inspector");}
+            }
+            if (reloadPreview_) { reloadPreview_ = false; ReloadPreviewKeepingCamera(); }
+            if(structureDirty_&&!Busy()&&!engine_.IsPlaying()&&pendingAction_.empty()&&lastPreviewDraft_!=document_.dump()) {
+                lastPreviewDraft_=document_.dump();
+                try{BeginPreparation("preview");}catch(const std::exception& e){status_=e.what();ShowPanel("Build & Diagnostics");}
+            }
             engine_.Update();
             engine_.Render();
             ++frame_;
@@ -299,6 +345,7 @@ class DemoEditor
                 Respond(id, ok, ok ? Json{{"path",output.string()},{"type","LightEngine viewport"}} : Json{{"error","CaptureFramePng failed"}});
             }
         }
+        engine_.ExitPlayMode();
         if (job_.valid()) { job_.wait(); PollJob(); }
     }
 
@@ -347,7 +394,12 @@ class DemoEditor
     bool dirty_ = false, reloadPreview_ = false, structureDirty_ = false;
     int frame_ = 0, captureFrame_ = 0;
 
-    bool Busy() const { return job_.valid(); }
+#include "native_play.inc"
+#include "authoring.inc"
+#include "workspace.inc"
+#include "preparation.inc"
+
+    bool Busy() const { return job_.valid()||preparation_.valid(); }
     static std::string LevelLabel(std::string title)
     {
         const std::string prefix="DarkLantern64 - ";
@@ -371,7 +423,7 @@ class DemoEditor
             const auto path="levels/"+level.at("stem").get<std::string>()+".json";
             levels.emplace_back(path,LevelLabel(level.at("title"))+" ("+level.at("file").get<std::string>()+")");
             engine_.OnLevelLoaded(path,[this](Scene& scene) { BindScene(scene); });
-            engine_.OnUpdate(path,[this](Scene& scene,bool,FrameContext& frame) { UpdateCharacters(scene,frame.dt); });
+            engine_.OnUpdate(path,[this](Scene& scene,bool playing,FrameContext& frame) { if(!playing)UpdateCharacters(scene,frame.dt); });
             engine_.OnImGui(path,[this] { Draw(); });
         }
         engine_.SetRegisteredLevels(std::move(levels));
@@ -387,9 +439,9 @@ class DemoEditor
         AtomicWrite(queue_/"project-state.json",Json{{"last_level",source_.filename().string()}}.dump(2));
         AtomicWrite(queue_/"session.json",Json{{"pid",GetCurrentProcessId()},{"root",root_.string()},
             {"source",source_.string()},{"output",output_.string()},{"scene_path",scenePath_},{"project_editor",true},
-            {"operations",{"inspect","list_levels","open_level","create_level","duplicate_level","delete_level","update_level","play_level","play_menu",
-                "import_asset_pack","add_prop","set_entity","add_enemy","duplicate_enemy","add_waypoint","delete_entity","set_environment","set_material",
-                "set_preview_transform","get_animation","set_animation","focus_character","save","build","capture","get_layout","reset_layout","reload","get_audio_memory","set_audio_config","recalculate_audio","quit"}}}.dump(2));
+            {"operations",{"pick_editor","inspect","list_levels","open_level","create_level","duplicate_level","delete_level","update_level","play_level","play_menu",
+                "drop_selection","save_prefab","place_prefab","add_game_object","set_game_object","undo","redo","add_blockout","select_entities","transform_selection","group_entities","duplicate_entities","delete_entities","refresh_preview","import_asset_pack","add_prop","set_entity","add_enemy","duplicate_enemy","add_waypoint","delete_entity","set_environment","set_material",
+                "set_preview_transform","get_animation","set_animation","focus_character","save","build","capture","get_layout","set_panel","reset_layout","start_play","stop_play","inspect_scene","query_play","set_play_debug","inspect_play","pause_play","step_play","restart_play","set_play_input","get_play_trace","export_replay","replay_play","reload","get_audio_memory","set_audio_config","recalculate_audio","quit"}}}.dump(2));
     }
     void InvalidatePreviewAssets(const Json& cooked)
     {
@@ -404,10 +456,14 @@ class DemoEditor
     {
         const fs::path source=cooked.at("source").get<std::string>();
         const auto snapshot=ReadText(source);
+        if(cooked.contains("source_text")&&cooked.at("source_text")!=snapshot)
+            throw std::runtime_error("Level changed while opening; retry to load the latest version");
         const Json document=Json::parse(snapshot);
         source_=source; sourceSnapshot_=snapshot; document_=document;
+        history_.Reset(document_);selection_.clear();lastPreviewDraft_.clear();
         output_=fs::path(cooked.at("output").get<std::string>());
         scenePath_=cooked.at("scene_path"); report_=cooked.at("report"); catalog_=cooked.at("catalog");
+        loadedPreviewFingerprint_=cooked.value("preview_fingerprint",std::string());
         selected_=document_.at("entities").empty()?"":document_.at("entities")[0].at("id").get<std::string>();
         browserLevel_=source_.filename().string(); testStart_="default";
         prefabs_=Json::array(); selectedPrefab_.clear();
@@ -416,10 +472,7 @@ class DemoEditor
     }
     void OpenLevel(const std::string& file)
     {
-        RefreshLevels();
-        const auto* level=LevelEntry(file);
-        if (!level) throw std::runtime_error("Level is no longer available; refresh the Levels list");
-        const Json cooked=ProjectCommand({L"cook",L"--level",fs::path(file).wstring(),L"--expected-sha256",fs::path(level->at("source_sha256").get<std::string>()).wstring()});
+        const Json cooked=ProjectCommand({L"cook",L"--level",fs::path(file).wstring()});
         InvalidatePreviewAssets(cooked);
         AdoptLevel(cooked);
         RegisterLevels();
@@ -466,6 +519,10 @@ class DemoEditor
         {
             const std::string op=action.at("op");
             Json result;
+            if(op=="open") {
+                if(action.value("discard",false))audioDraft_=audioConfig_;
+                BeginPreparation("open",action.at("file"),request);return;
+            }
             if (action.value("discard",false)) { OpenLevel(source_.filename().string()); audioDraft_=audioConfig_; }
             if (op=="close") { engine_.RequestExit(); result={{"closing",true}}; }
             else if (op=="open") { OpenLevel(action.at("file")); result={{"source",source_.string()},{"scene_path",scenePath_}}; }
@@ -518,12 +575,15 @@ class DemoEditor
     Json Layout() const
     {
         Json windows = Json::array();
-        for (const char* name : {"Levels","Audio Memory","Viewport","Room Objects","Object Properties","Build & Diagnostics",
-                                "Entity List","Selected Entity","Imports","Effects","Background","Image Viewer","Texture Browser","Material Library"})
+        for (const char* name : {"Objects","Inspector","Levels","Blockout & Groups","Assets","Environment","Animation",
+                                "Play Inspector","Build & Diagnostics","Audio Memory","Controls","Viewport","Entity List","Selected Entity","Image Viewer","Texture Browser"})
             if (auto* w = ImGui::FindWindowByName(name))
                 windows.push_back({{"name",name},{"dock_id",w->DockId},{"position",{w->Pos.x,w->Pos.y}},
                                    {"size",{w->Size.x,w->Size.y}},{"active",bool(w->Active)},{"tab_id",w->TabId},{"tab_visible",bool(w->DockTabIsVisible)}});
-        return {{"settings",(queue_/"layout-project-v1.ini").string()},{"windows",windows}};
+        auto viewportSelection=engine_.GetEditorSelection();
+        return {{"settings",(queue_/"layout-project-v2.ini").string()},{"windows",windows},{"panels",panels_},
+            {"viewport_selection",viewportSelection?Json(*viewportSelection):Json(nullptr)},
+            {"menus",{"File","Edit","Create","Window","View","Build","Help"}}};
     }
     void Respond(const std::string& id, bool ok, Json result)
     {
@@ -595,6 +655,7 @@ class DemoEditor
             }
             else { pendingAction_=Json::object(); actionRequestId_.clear(); }
         }
+        if(!result.ok)ShowPanel("Build & Diagnostics");
         Respond(jobId_, result.ok, {{"message",result.message},{"report",result.report}});
         jobId_.clear();
     }
@@ -746,7 +807,13 @@ class DemoEditor
             }
             const bool uniform=instance.dynamicMesh.has_value() || UniformScale(scene.transforms[instance.parent]);
             instance.diagnostic=uniform?"":"Animation preview needs uniform XYZ scale. The bind pose remains visible.";
-            const bool sampled=dl_animation_pose(&asset,instance.clip,instance.time,instance.blendClip,instance.time,
+            bool sampled=false;
+            if(nativePresentation_&&native_) {
+                const DlEnemy* enemy=nullptr;
+                for(int i=0;i<native_->game.enemy_count;++i)if(name==native_->level.enemies[i].id)enemy=&native_->game.enemies[i];
+                const auto d=dl_animation_decide(&asset,enemy,dl_player_eye(&native_->game),native_->game.elapsed);
+                sampled=dl_animation_pose(&asset,d.first,d.first_time,d.second,d.second_time,d.blend,d.head_yaw,d.head_pitch,instance.skin);
+            } else sampled=dl_animation_pose(&asset,instance.clip,instance.time,instance.blendClip,instance.time,
                 instance.blend,glm::radians(instance.headYaw),glm::radians(instance.headPitch),instance.skin);
             if (!sampled) instance.diagnostic="The N64 pose sampler rejected the preview state.";
             if (instance.dynamicMesh && sampled)
@@ -893,6 +960,7 @@ class DemoEditor
     }
     void SyncPreviewTransforms()
     {
+        if(engine_.IsPlaying())return;
         if (!scene_) return;
         for (const auto& [id, sourceId] : previewIds_)
         {
@@ -1451,20 +1519,36 @@ class DemoEditor
             {
                 if (fs::file_size(path) > 65536) throw std::runtime_error("Request exceeds 64 KiB");
                 const Json request = ReadJson(path);
-                fs::remove(path);
                 if (request.at("id") != id) throw std::runtime_error("Request ID mismatch");
                 const double now = std::chrono::duration<double>(std::chrono::system_clock::now().time_since_epoch()).count();
                 if (request.at("expires_at").get<double>() < now) throw std::runtime_error("Request expired without execution");
                 const std::string op = request.at("op");
+                if(preparation_.valid()&&op!="inspect"&&op!="get_layout"&&op!="get_animation"&&op!="get_audio_memory")continue;
+                fs::remove(path);
                 const Json args = request.value("args",Json::object());
-                if (op == "inspect") { Respond(id,true,{{"document",document_},{"source",source_.string()},{"output",output_.string()},{"scene_path",scenePath_},{"catalog",catalog_},{"pending_action",pendingAction_},{"dirty",dirty_},{"busy",Busy()},{"status",status_},{"report",report_},{"enemy_types",EnemyTypes()},{"prefabs",PrefabCatalog()},{"preview_refresh_pending",structureDirty_},{"audio",AudioState()},{"animation",AnimationState()}}); continue; }
+                ObserveDocument();
+                if (op == "inspect") { Respond(id,true,{{"document",document_},{"source",source_.string()},{"output",output_.string()},{"scene_path",scenePath_},{"catalog",catalog_},{"pending_action",pendingAction_},{"dirty",dirty_},{"busy",Busy()},{"status",status_},{"report",report_},{"enemy_types",EnemyTypes()},{"prefabs",PrefabCatalog()},{"frame",frame_},{"preparing",preparationKind_},{"last_preparation",lastPreparation_},{"preview_refresh_pending",structureDirty_},{"audio",AudioState()},{"animation",AnimationState()},{"play",NativeState()},{"selection",selection_},{"history",{{"can_undo",history_.CanUndo()},{"can_redo",history_.CanRedo()}}}}); continue; }
                 if (op == "get_audio_memory") { Respond(id,true,AudioState()); continue; }
                 if (op == "get_animation") { Respond(id,true,AnimationState()); continue; }
                 if (op == "get_layout") { Respond(id,true,Layout()); continue; }
-                if (op == "reset_layout") { engine_.ResetEditorLayout(); Respond(id,true,{{"scheduled",true}}); continue; }
+                if (op == "set_panel") { ShowPanel(args.at("name"),args.value("visible",true)); Respond(id,true,Layout()); continue; }
+                if (op == "reset_layout") { ResetWorkspace(); Respond(id,true,{{"scheduled",true}}); continue; }
+                if (op=="inspect_scene"||op=="query_play"||op=="set_play_debug"||op=="inspect_play"||op=="get_play_trace"||op=="export_replay"||op=="stop_play"||op=="pause_play"||op=="restart_play"||op=="set_play_input"||op=="step_play"||op=="replay_play"||op=="start_play") {
+                    if(Busy())throw std::runtime_error("Editor build is busy");
+                    Respond(id,true,NativeCommand(op,args));continue;
+                }
+                if(engine_.IsPlaying()&&op!="capture"&&op!="quit")throw std::runtime_error("Stop native Play before authoring changes");
                 if (Busy()) throw std::runtime_error("Editor build is busy; inspect remains available");
                 if (!pendingAction_.empty()) throw std::runtime_error("A level action needs attention; inspect remains available");
-                if (op == "quit")
+                if(op=="pick_editor") {
+                    CheckVector(args.at("from"),"from",-10000,10000);CheckVector(args.at("to"),"to",-10000,10000);
+                    const auto from=Vector(args.at("from")),delta=Vector(args.at("to"))-from;
+                    if(glm::length(delta)<.00001f)throw std::runtime_error("Pick ray must have a direction");
+                    const auto hit=engine_.PickEditorEntity(Ray{from,glm::normalize(delta)});
+                    Respond(id,true,{{"entity_id",hit?Json(*hit):Json(nullptr)},
+                        {"source_id",hit&&previewIds_.contains(*hit)?Json(previewIds_.at(*hit)):Json(nullptr)}});
+                }
+                else if (op == "quit")
                 {
                     if (dirty_ || audioDraft_ != audioConfig_) throw std::runtime_error("Unsaved scene or planning changes; save/apply or discard before closing");
                     Respond(id,true,{{"closing",true}}); engine_.RequestExit();
@@ -1487,6 +1571,7 @@ class DemoEditor
                     if (!found) throw std::runtime_error("Unknown test start");
                     testStart_=preset; Save(true,id,op=="play_menu"?"menu":"level");
                 }
+                else if(op=="drop_selection"||op=="save_prefab"||op=="place_prefab"||op=="add_game_object"||op=="set_game_object"||op=="undo"||op=="redo"||op=="add_blockout"||op=="select_entities"||op=="transform_selection"||op=="group_entities"||op=="duplicate_entities"||op=="delete_entities"||op=="refresh_preview")Respond(id,true,AuthorCommand(op,args));
                 else if (op == "set_entity") { SetEntity(args); Respond(id,true,{{"entity",*Entity(args.at("id"))},{"dirty",true},{"validation","pending save"}}); }
                 else if (op == "import_asset_pack") Respond(id,true,ImportAssetPack(args));
                 else if (op == "add_prop") Respond(id,true,AddProp(args));
@@ -1553,11 +1638,12 @@ class DemoEditor
     }
     void DrawLevels()
     {
-        if (ImGui::Begin("Levels"))
+        if (panels_.at("Levels")) {
+        if (BeginPanel("Levels"))
         {
             ImGui::BeginDisabled(Busy() || !pendingAction_.empty());
             if (ImGui::Button("Refresh")) try { RefreshLevels(); } catch (const std::exception& e) { status_=e.what(); }
-            ImGui::TextWrapped("Open a level to edit it. Checked levels appear in the game menu.");
+
             ImGui::BeginChild("Level list",ImVec2(0,230),ImGuiChildFlags_Borders);
             for (const auto& level : catalog_.at("levels"))
             {
@@ -1598,6 +1684,7 @@ class DemoEditor
             ImGui::EndDisabled();
         }
         ImGui::End();
+        }
         if (showNew_) { ImGui::OpenPopup("Create level"); showNew_=false; }
         if (ImGui::BeginPopupModal("Create level",nullptr,ImGuiWindowFlags_AlwaysAutoResize))
         {
@@ -1649,42 +1736,8 @@ class DemoEditor
             ImGui::EndPopup();
         }
     }
-    void DrawObjects()
-    {
-        if (ImGui::Begin("Room Objects"))
-        {
-            ImGui::BeginDisabled(Busy());
-            if (ImGui::BeginCombo("New enemy type",EnemyType(newEnemyType_).at("label").get<std::string>().c_str()))
-            {
-                for (const auto& type : EnemyTypes())
-                    if (ImGui::Selectable(type.at("label").get<std::string>().c_str(),type.at("id")==newEnemyType_))
-                        newEnemyType_=type.at("id");
-                ImGui::EndCombo();
-            }
-            if (ImGui::Button("Add enemy"))
-                try { AddEnemy(Json::object()); }
-                catch (const std::exception& error) { status_ = error.what(); }
-            ImGui::SameLine();
-            if (ImGui::Button("Add waypoint"))
-                try { AddWaypoint(Json::object()); }
-                catch (const std::exception& error) { status_ = error.what(); }
-            if (const auto* selected = Entity(selected_))
-            {
-                const bool enemy = selected->at("kind") == "guard";
-                const bool point = selected->at("kind") == "waypoint";
-                const bool prop = DeletableProp(*selected);
-                if (enemy && ImGui::Button("Duplicate enemy"))
-                    try { DuplicateEnemy({{"id",selected_}}); }
-                    catch (const std::exception& error) { status_ = error.what(); }
-                if (enemy) ImGui::SameLine();
-                if ((enemy || point || prop) && ImGui::Button(enemy ? "Delete enemy" : point ? "Delete waypoint" : "Delete prop"))
-                    try { DeleteEntity({{"id",selected_}}); }
-                    catch (const std::exception& error) { status_ = error.what(); }
-            }
-            ImGui::EndDisabled();
-            if (structureDirty_) ImGui::TextWrapped("Viewport refresh pending: Save + Cook to show added or removed models and waypoint markers.");
-            ImGui::TextWrapped("New enemies use their type's shared visual resource and start at an actor/waypoint position. Move their XYZ placement before playing. Duplicates keep resource links and get independent route points.");
-            if (ImGui::CollapsingHeader("Asset packs / props",ImGuiTreeNodeFlags_DefaultOpen))
+    void DrawAssets() {
+            if (BeginPanel("Assets"))
             {
                 ImGui::BeginDisabled(Busy());
                 ImGui::InputText("Pack URI",assetPackUri_,sizeof(assetPackUri_));
@@ -1708,15 +1761,30 @@ class DemoEditor
                     catch (const std::exception& error) { status_ = error.what(); }
                 ImGui::EndDisabled();
                 ImGui::EndDisabled();
-                ImGui::TextWrapped("Import copies prop definitions into this level. URIs start inside content/. Props have no collision or pickup behavior. Highlight adds a brightness pulse. Save + Cook after placement. Copy-imported prefab lists need importing again after reopening; linked resources refresh automatically when cooked.");
+                ImGui::TextDisabled("Paths are relative to content/.");
             }
-            ImGui::Separator();
-            for (const auto& e:document_["entities"])
-            {
+        ImGui::End();
+    }
+    void DrawObjects() {
+        if(BeginPanel("Objects")) {
+            ImGui::SetNextItemWidth(-1);
+            ImGui::InputTextWithHint("##search","Search objects",objectFilter_,sizeof(objectFilter_));
+            ImGui::TextDisabled("%zu objects | %zu selected",document_["entities"].size(),selection_.size());
+            for(const auto& e:document_["entities"]) {
                 const std::string id=e["id"],kind=e["kind"];
+                if(*objectFilter_&&id.find(objectFilter_)==std::string::npos&&kind.find(objectFilter_)==std::string::npos)continue;
                 ImGui::PushStyleColor(ImGuiCol_Text,MarkerColor(kind));
-                if (ImGui::Selectable((id+"##object").c_str(),id==selected_)) selected_=id;
+                if(ImGui::Selectable((id+"##object").c_str(),selection_.empty()?id==selected_:selection_.contains(id))) {
+                    if(ImGui::GetIO().KeyCtrl&&selection_.contains(id)) {
+                        selection_.erase(id);
+                        if(selected_==id)selected_=selection_.empty()?"":*selection_.begin();
+                    } else {
+                        if(!ImGui::GetIO().KeyCtrl)selection_.clear();
+                        selection_.insert(id);selected_=id;
+                    }
+                }
                 ImGui::PopStyleColor();
+                if(ImGui::IsItemHovered())ImGui::SetTooltip("%s",kind.c_str());
             }
         }
         ImGui::End();
@@ -1753,7 +1821,7 @@ class DemoEditor
             }
             ImGui::EndCombo();
         }
-        ImGui::TextWrapped("Sentries face their authored Y rotation and return to their post after investigating. Patrol requires at least two points. Both behaviors can hear and pursue the player.");
+
         const Json currentType = EnemyType(Entity(id)->value("enemy_type",std::string("watchman")));
         for (const char* key : {"speed","sight_range","hearing_range"})
         {
@@ -1782,7 +1850,7 @@ class DemoEditor
                 UsesTypeVisual(*Entity(id))?"using shared default":"explicit instance visual");
             ImGui::TextWrapped("Resource: %s",DefinitionOrigin(visual.at("id").get<std::string>()).c_str());
         }
-        ImGui::TextWrapped("Changing type updates a matching type visual and keeps authored scale, route and tuning overrides. Save + Cook refreshes shared model, material and animation edits. Use type default to inherit future code tuning.");
+
         ImGui::Separator();
         ImGui::Text("Patrol route (%zu / 32 points)",route.size());
         for (size_t index = 0; index < route.size(); ++index)
@@ -1854,7 +1922,7 @@ class DemoEditor
         if (found==characters_.end()) return;
         auto& instance=found->second;
         const auto& asset=instance.data->asset;
-        if (!ImGui::CollapsingHeader("Character animation",ImGuiTreeNodeFlags_DefaultOpen)) return;
+
         if (ImGui::Button("Focus guard"))
             try { FocusCharacter(id); } catch (const std::exception& error) { status_=error.what(); }
         ImGui::TextDisabled("N64 cooked keys / shared runtime sampler");
@@ -1896,11 +1964,10 @@ class DemoEditor
     }
     void DrawProperties()
     {
-        if (ImGui::Begin("Object Properties"))
+        if (BeginPanel("Inspector"))
         {
-            ImGui::TextWrapped("XYZ transforms and stock viewport gizmos update canonical content. Rotation uses Euler XYZ degrees; up is Y. Save + Cook validates collision and refreshes assets.");
-            DrawEnvironment();
-            ImGui::Separator();
+
+
             if (auto* entity=Entity(selected_))
             {
                 ImGui::TextUnformatted(selected_.c_str());
@@ -1926,10 +1993,8 @@ class DemoEditor
                     if (ImGui::Checkbox("Loot highlight",&highlighted))
                         try { SetEntity({{"id",selected_},{"patch",{{"loot_highlight",highlighted}}}}); }
                         catch (const std::exception& error) { status_=error.what(); }
-                    ImGui::TextWrapped("A gentle brightness pulse helps loot stand out in the game. It adds no light source or pickup behavior. Save + Cook and launch the game to preview it.");
+
                 }
-                if (entity->contains("collider"))
-                    ImGui::TextWrapped("Collision: upright box follows position, yaw and scale. Pitch/roll require a separate upright proxy and are rejected by the current cook.");
                 for (const char* name:{"radius","intensity"})
                     if (entity->contains(name))
                     {
@@ -1948,25 +2013,12 @@ class DemoEditor
                     if (ImGui::ColorEdit3("Light RGB",rgb))
                         try { SetEntity({{"id",selected_},{"patch",{{"color",{rgb[0],rgb[1],rgb[2]}}}}}); }
                         catch (const std::exception& error) { status_=error.what(); }
-                    ImGui::TextWrapped("RGB and intensity illuminate nearby surfaces and affect the night scene's stealth visibility. Save + Cook refreshes the preview.");
+
                 }
                 if (entity->contains("material")) DrawMaterial(entity->at("material").get<std::string>());
-                if (entity->contains("target"))
-                {
-                    const auto target=(*entity)["target"].get<std::string>();
-                    if (ImGui::BeginCombo("Linked door",target.c_str()))
-                    {
-                        for (const auto& candidate:document_["entities"])
-                            if (candidate["kind"]=="door")
-                            {
-                                const auto id=candidate["id"].get<std::string>();
-                                if (ImGui::Selectable(id.c_str(),id==target)) { (*entity)["target"]=id; dirty_=true; }
-                            }
-                        ImGui::EndCombo();
-                    }
-                }
-                DrawCharacter(selected_);
-                if (entity->at("kind") == "guard") DrawEnemy(selected_);
+
+                if (entity->at("kind") == "guard" && ImGui::CollapsingHeader("Behavior",ImGuiTreeNodeFlags_DefaultOpen)) DrawEnemy(selected_);
+                DrawInteractions();
                 ImGui::EndDisabled();
             }
         }
@@ -1974,11 +2026,11 @@ class DemoEditor
     }
     void DrawEnvironment()
     {
-        if (!ImGui::CollapsingHeader("Night environment")) return;
+
         ImGui::BeginDisabled(Busy());
         if (!document_.contains("environment"))
         {
-            ImGui::TextWrapped("This scene uses the original playable's lighting. Add an environment to author colored moonlight, fog and sky.");
+
             if (ImGui::Button("Add night environment")) SetEnvironment(Json::object());
         }
         else
@@ -2037,7 +2089,7 @@ class DemoEditor
         if (ImGui::ColorEdit3("Emission RGB",rgb))
             try { SetMaterial({{"id",id},{"patch",{{"emissive",{rgb[0],rgb[1],rgb[2]}}}}}); }
             catch (const std::exception& error) { status_=error.what(); }
-        ImGui::TextWrapped("Emission keeps a lamp or window visible in shadow. Add a light object to illuminate nearby geometry and affect guard perception.");
+
         if (material->contains("texture"))
         {
             Json texture = material->at("texture");
@@ -2080,7 +2132,7 @@ class DemoEditor
     }
     void DrawBuild()
     {
-        if (ImGui::Begin("Build & Diagnostics"))
+        if (BeginPanel("Build & Diagnostics"))
         {
             ImGui::BeginDisabled(Busy());
             if (ImGui::Button("Save + Cook")) Save(false);
@@ -2101,7 +2153,7 @@ class DemoEditor
             }
             if (ImGui::Button("Build ROM only")) Save(true);
             ImGui::EndDisabled();
-            ImGui::SameLine(); if (ImGui::Button("Reset Layout")) engine_.ResetEditorLayout();
+            ImGui::SameLine(); if (ImGui::Button("Reset Layout")) ResetWorkspace();
             ImGui::SameLine(); ImGui::TextUnformatted(Busy()?"Working...":dirty_?"Unsaved changes":"Saved");
             ImGui::TextWrapped("%s",status_.c_str());
             ImGui::TextWrapped("Level: %s",source_.filename().string().c_str());
@@ -2109,7 +2161,7 @@ class DemoEditor
             {
                 const Json counts = report_.value("counts",Json::object());
                 ImGui::Text("Cook %.2f ms | %d models | %d triangles | %d geometry bytes",report_.value("elapsed_ms",0.0),counts.value("models",0),counts.value("instanced_triangles",0),report_.value("compiled_geometry_bytes",0));
-                ImGui::TextWrapped("Play saves this level before launching Ares. Play game menu bundles the saved levels checked in Levels. Audio Memory is a separate planning estimate.");
+
             }
             if (ImGui::CollapsingHeader("Last compiler log")) ImGui::TextUnformatted(Tail(queue_/"compiler.log").c_str());
             if (ImGui::CollapsingHeader("Last ROM build log")) ImGui::TextUnformatted(Tail(queue_/"rom-build.log").c_str());
@@ -2129,7 +2181,7 @@ class DemoEditor
     }
     void DrawAudio()
     {
-        if (ImGui::Begin("Audio Memory"))
+        if (BeginPanel("Audio Memory"))
         {
             ImGui::TextColored(ImVec4(1,.76f,.3f,1),"PLANNING ONLY - no runtime measurements");
             ImGui::TextWrapped("The 256 KiB starting envelope is illustrative, not an approved project allocation. RAM totals include retained pools, overlap and explicit allowances. ROM storage is separate.");
@@ -2228,15 +2280,36 @@ class DemoEditor
     }
     void Draw()
     {
+        if(panels_.at("Play Inspector"))DrawNative();
+        ImGui::BeginDisabled(engine_.IsPlaying());
         DrawLevels();
         ImGui::BeginDisabled(!pendingAction_.empty());
-        DrawObjects(); DrawProperties(); DrawBuild(); DrawAudio();
-        ImGui::EndDisabled();
+        if(!engine_.IsPlaying()) {
+            if(panels_.at("Objects"))DrawObjects();
+            if(panels_.at("Inspector"))DrawProperties();
+        }
+        if(panels_.at("Blockout & Groups"))DrawAuthoring();
+        if(panels_.at("Assets"))DrawAssets();
+        if(panels_.at("Environment")){if(BeginPanel("Environment"))DrawEnvironment();ImGui::End();}
+        if(panels_.at("Animation")){if(BeginPanel("Animation")){if(characters_.contains(selected_))DrawCharacter(selected_);else ImGui::TextDisabled("Select a character.");}ImGui::End();}
+        if(panels_.at("Build & Diagnostics"))DrawBuild();
+        if(panels_.at("Audio Memory"))DrawAudio();
+        ImGui::EndDisabled();ImGui::EndDisabled();
+        if(panels_.at("Controls")) {
+            if(BeginPanel("Controls")) {
+                ImGui::SeparatorText("Editing");
+                ImGui::TextUnformatted("Ctrl+S  Save + Cook\nCtrl+Z / Ctrl+Y  Undo / Redo\nCtrl+click  Select multiple objects\nWindow  Open tools and diagnostics");
+                ImGui::SeparatorText("Play");
+                ImGui::TextUnformatted("WASD  Move\nMouse / arrows  Look\nZ  Crouch     Space  Jump\nE  Interact   N  Noise\nR  Restart    Escape  Pause / release mouse");
+            }
+            ImGui::End();
+        }
+        FinishWorkspace();
         // Startup warm-up frames can precede custom panel creation. Select our
         // authoring tabs once they exist, only after a default/reset layout.
         if (focusProjectTabs)
         {
-            for (const char* name : {"Levels","Room Objects","Object Properties","Build & Diagnostics","Audio Memory"})
+            for (const char* name : {"Objects","Inspector"})
                 if (auto* window = ImGui::FindWindowByName(name); window && window->DockNode)
                 {
                     window->DockNode->SelectedTabId = window->TabId;

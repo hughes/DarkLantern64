@@ -4,11 +4,11 @@ For a first editing session, follow the [creator quickstart](../docs/creator-gui
 
 Run **DarkLantern64: Launch editor** in VS Code, or `python tools/build.py --editor --run`. One project session manages all canonical levels and remembers the last opened level. Its queue, logs, and layout live in `.dev/editor/project/`. The desktop C++23 application uses the pinned LightEngine checkout in `external/LightEngine`.
 
-**Levels** and **File > Open** list every discovered version-2 level directly inside `content/`. **New level** creates a playable starter room with a switch, door, objective, and spawn; **Duplicate** copies a saved level. Open a level to edit its title, objects, patrols, materials, and lighting. **Include in game menu** controls membership in `content/level_bundle.json`; the browser also lists levels outside that bundle.
+**Levels** and **File > Open level** list every discovered version-2 level directly inside `content/`. **New level** creates a playable starter room with a switch, door, objective, and spawn; **Duplicate** copies a saved level. Open a level to edit its title, objects, patrols, materials, and lighting. **Include in game menu** controls membership in `content/level_bundle.json`; the browser also lists levels outside that bundle.
 
 **Delete** asks for confirmation, removes the source and menu entry, and retains a recovery copy under `.dev/editor/deleted-levels/`. Shared assets remain available. Keep at least one project level and one bundled level. Switching or closing with unsaved changes offers **Save and continue**, **Discard and continue**, and **Cancel**, including audio planning changes.
 
-**Save + Cook**, **File > Save scene**, and **Ctrl+S** save canonical content. **Play level** saves and launches the current level at the selected **Test start**. **Play game menu** saves the current level and builds the saved bundle; **Build ROM only** saves and builds without launching. The separate **Launch game** task builds the saved bundle without requiring the editor.
+**Save + Cook**, **File > Save + Cook**, and **Ctrl+S** save canonical content. **Play level** saves and launches the current level at the selected **Test start**. **Play game menu** saves the current level and builds the saved bundle; **Build ROM only** saves and builds without launching. The separate **Launch game** task builds the saved bundle without requiring the editor.
 
 Generated previews use real level names and distinct asset paths under `build/project/editor-assets/`. Texture paths include pixel hashes so edited images refresh. Runtime outputs retain `build/` for Lantern Store and `build/scenes/<stem>/` for other levels. Shared source models and images stay under `content/`.
 
@@ -18,23 +18,25 @@ For isolated developer checks, the executable also accepts an absolute source pa
 
 ## 3D content
 
-**Room Objects** and **Object Properties** edit the selected canonical version-2 level. The project restores the last opened level on launch. Models are freely positioned in XYZ metres, with Euler XYZ rotation in degrees and positive XYZ scale. The Y axis points up. There is no authoritative tile grid or map brush.
+**Objects** and **Inspector** edit the selected canonical version-2 level. The project restores the last opened level on launch. Models are freely positioned in XYZ metres, with Euler XYZ rotation in degrees and positive XYZ scale. The Y axis points up. There is no authoritative tile grid or map brush.
 
-The **Viewport** displays meshes cooked from the same OBJ source geometry used by the N64 content header. Use LightEngine's **Entity List** tab to select a viewport gizmo. Transform changes from the viewport or **Selected Entity** are copied back to the matching canonical object by its stable identity; Object Properties transform changes update the preview immediately. Stock structural, name, material and lighting edits remain preview-only. Use the project properties for gameplay tuning, and canonical source assets for geometry/material changes.
+The **Viewport** displays meshes cooked from the same OBJ source geometry used by the N64 content header. Selecting an object in **Objects** or the viewport activates its Inspector, bounding box and gizmo. Viewport transforms synchronize back to the canonical object by stable identity. Choose **View → Transform mode** for Translate, Rotate or Scale.
+
+See [the workspace guide](../docs/editor-workspace.md) for the three-panel default, menus and optional tools.
 
 ## Enemies and patrol routes
 
-Use the project-owned **Room Objects** buttons to **Add enemy**, **Duplicate enemy**, **Add waypoint**, or delete a selected enemy/unused waypoint. These operations edit canonical content. New objects appear in the list immediately; **Save + Cook** adds their models and waypoint markers to the viewport. The panel shows when a viewport refresh is pending. The stock LightEngine Add/Duplicate/Delete commands remain preview-only.
+Use **Create → Enemy / Waypoint** to add canonical objects. **Edit** provides duplicate and delete for the selected objects. Structural changes refresh through staged cooking; **File → Save + Cook** saves the validated document.
 
-**Add enemy** starts a sentry at the selected enemy, waypoint, or player-spawn position; otherwise it uses an existing enemy or player spawn. Set its XYZ position in **Object Properties** before playing. It reuses an existing guard's model/material/scale and clears numeric overrides so the selected code-defined type supplies the tuning. If there are no guards, the level must retain the `mesh-guard` and `mat-guard` assets. **Duplicate enemy** copies tuning and clones each distinct route waypoint once, preserving route order and repeated references. The initial copy overlaps its source until moved. Moving its spawn later does not move its route points; the command API can translate both during duplication.
+**Add enemy** starts a sentry at the selected enemy, waypoint, or player-spawn position; otherwise it uses an existing enemy or player spawn. Set its XYZ position in **Inspector** before playing. It reuses an existing guard's model/material/scale and clears numeric overrides so the selected code-defined type supplies the tuning. If there are no guards, the level must retain the `mesh-guard` and `mat-guard` assets. **Duplicate enemy** copies tuning and clones each distinct route waypoint once, preserving route order and repeated references. The initial copy overlaps its source until moved. Moving its spawn later does not move its route points; the command API can translate both during duplication.
 
-Choose **Enemy type** in Object Properties. Watchman and Scout currently share the placeholder 3D model, with separate movement, sight and hearing defaults defined in `src/enemy_types.def`. Changing type preserves explicit per-instance overrides. Each tuning control offers **Use type default**, which removes the override. Adding a type requires a code/catalog update and editor restart to load its fresh catalog.
+Choose **Enemy type** in Inspector. Watchman and Scout currently share the placeholder 3D model, with separate movement, sight and hearing defaults defined in `src/enemy_types.def`. Changing type preserves explicit per-instance overrides. Each tuning control offers **Use type default**, which removes the override. Adding a type requires a code/catalog update and editor restart to load its fresh catalog.
 
 Choose **Sentry** to face the authored Y rotation and return to that post after investigating. Choose **Patrol** to loop an ordered route. Both can hear, investigate, search and chase. To build a route:
 
 1. Select an enemy and leave it in Sentry while placing points.
 2. Use **Create + append waypoint** or **Append existing waypoint**. New points start at the last route point, or at the enemy when the route is empty.
-3. Select the point's name in the route list and edit XYZ. After Save + Cook, use its Entity List gizmo in the viewport.
+3. Select the point's name in the route list and edit XYZ. After Save + Cook, use its viewport gizmo in the viewport.
 4. Select the enemy again. Use **Up**, **Down**, and **Remove from route** to order the points. Enable Patrol after at least two points exist.
 
 Removing enough points to leave fewer than two automatically switches the enemy to Sentry. Route removal keeps the waypoint object; deleting a waypoint still referenced by any enemy is refused. Existing waypoints may be shared: moving one affects every route that uses it. Deleting an enemy leaves its waypoints available for reuse or explicit deletion.
@@ -50,6 +52,18 @@ This panel is a **planning tool**, not a measurement of the running game. It rea
 Choose a context or transition to inspect its RAM components, active channels, retained pools, overlap, allowances and unknown costs. ROM payload and container storage appear separately. Positive allowance remaining does not establish a verified fit.
 
 **Adjust planning assumptions** exposes output rate, frames and count, retained pool provisioning, the optional RAM envelope, runtime/allocator allowances and reserve. With fixed frame counts, output rate changes buffer duration rather than byte allocation. Apply + Recalculate validates and saves the plan; Discard draft restores saved assumptions. Recalculate saved plan is disabled while a draft is unapplied. These actions do not alter the ROM or allocate game audio memory. Asset, voice, effect and scenario definitions are edited in the JSON manifest.
+
+## Native Play and authoring
+
+**Play** on the menu bar runs the same C physics, guard AI, interactions and
+animation decisions as the ROM, from the active unsaved document. Pause, step,
+restart and stop preserve authoring state. **Window → Blockout & Groups** adds blockout primitives,
+group transforms, snapping, drop-to-surface, undo/redo and encounter templates;
+**Inspector → Interaction & collision** edits linked doors, loot, objectives and collision proxies.
+
+See [Native Play and command reference](../docs/native-play-implementation.md)
+for controls, automation arguments, replay verification and platform limits.
+The existing **Play level** action still saves/builds/launches the N64 ROM.
 
 ## Local command interface
 
@@ -109,7 +123,7 @@ The audio patch accepts numeric fields in `output`, `budget`, `buffer_pool`, and
 
 ## Layout and verification
 
-First launch creates a deterministic layout including Levels and Audio Memory. Deliberate layouts persist in `.dev/editor/project/layout-project-v1.ini`; Reset Layout restores defaults. Earlier layouts remain separate.
+First launch shows Objects, Viewport and Inspector. Open other tools from Window, and use Window → Restore default workspace to recover defaults. Docking persists in `.dev/editor/project/layout-project-v2.ini`, visibility in `workspace-v2.json`. Earlier preferences remain separate. `get_layout` exposes these preferences and the engine viewport selection; `set_panel` opens/closes a named panel. Run `python tools/verify_workspace.py` for isolated workspace and selection regression checks.
 
 Compiler tests cover version-2 validation, enemy type defaults, multiple actors and route references, collision placement, asset boundaries, dependency hashing, staged asset resolution, incremental cooking and XYZ changes reaching both targets. Run `python tools/verify_enemy_editor.py` after building the scene editor to create a private three-enemy test fixture, exercise the real file-command interface, then archive its JSON under the session queue’s evidence/ directory and remove the owned source, including on failure. The optional `--level content/<unused-name>.json` chooses a new filename; the verifier refuses to overwrite existing content and closes only its own editor process. Earlier live checks also cover transform synchronization, audio assumptions and preservation of invalid or externally changed plans. Restart checks verify both project tabs and deliberately saved stock tabs; Reset restores the project tabs through the next restart. These checks are distinct from native N64/M64 runtime validation.
 

@@ -1,9 +1,21 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
 
 cc_library(
+    name = "play_session",
+    hdrs = ["play_session.h"],
+    deps = ["@dl64_animation//:animation", "@nlohmann_json//:json"],
+)
+
+cc_binary(
+    name = "play_runner",
+    srcs = ["play_runner.cpp"],
+    deps = [":play_session"],
+)
+
+cc_library(
     name = "character_preview",
     hdrs = ["character_preview.h"],
-    deps = ["@dl64_animation//:animation", "@nlohmann_json//:json"],
+    deps = [":play_session", "@dl64_animation//:animation", "@nlohmann_json//:json"],
 )
 
 cc_library(
@@ -28,14 +40,14 @@ cc_test(
 
 cc_binary(
     name = "darklantern64_project_editor",
-    srcs = ["main.cpp"],
+    srcs = ["main.cpp", "native_play.inc", "authoring.inc", "workspace.inc", "preparation.inc"],
     copts = select({"@platforms//os:windows": ["/wd4005"], "//conditions:default": []}),
     deps = [":character_preview", ":character_preview_mesh", "@lightengine//:lightengine"],
 )
 
 cc_binary(
     name = "darklantern64_editor",
-    srcs = ["main.cpp"],
+    srcs = ["main.cpp", "native_play.inc", "authoring.inc", "workspace.inc", "preparation.inc"],
     copts = select({"@platforms//os:windows": ["/wd4005"], "//conditions:default": []}),
     deps = [":character_preview", ":character_preview_mesh", "@lightengine//:lightengine"],
 )
@@ -44,7 +56,7 @@ cc_binary(
 # remains open on Windows, where a running executable cannot be replaced.
 cc_binary(
     name = "darklantern64_scene_editor",
-    srcs = ["main.cpp"],
+    srcs = ["main.cpp", "native_play.inc", "authoring.inc", "workspace.inc", "preparation.inc"],
     copts = select({"@platforms//os:windows": ["/wd4005"], "//conditions:default": []}),
     deps = [":character_preview", ":character_preview_mesh", "@lightengine//:lightengine"],
 )

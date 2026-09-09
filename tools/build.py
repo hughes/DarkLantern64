@@ -17,9 +17,11 @@ import uuid
 try:
     from compile_level import compile_level
     from compile_bundle import prepare_bundle, read_manifest, selection
+    from input_replay import load as load_input_replay, header as input_replay_header
 except ModuleNotFoundError:
     from tools.compile_level import compile_level
     from tools.compile_bundle import prepare_bundle, read_manifest, selection
+    from tools.input_replay import load as load_input_replay, header as input_replay_header
 
 ROOT = Path(__file__).resolve().parents[1]
 BUILD = ROOT / "build"
@@ -54,8 +56,14 @@ def scene_paths(level=None):
 def build_rom(sdk, autoplay=False, debug_overlay=False, level=None, capture=False,
               scale_bench=False, disable_model_cull=False, *, bundle=None,
               start_level=None, start_preset=None, menu_test=False, renderer="t3d",
-              lighting_bake_verify=False, disable_lighting_bake=False):
+              lighting_bake_verify=False, disable_lighting_bake=False, input_replay=None):
     start = time.perf_counter()
+    replay = None
+    if input_replay is not None:
+        if bundle is not None or autoplay or capture or scale_bench or menu_test:
+            raise ValueError("Recorded input replay requires an isolated single-level build")
+        replay=load_input_replay(input_replay)
+        start_preset=replay.get("start_preset","default")
     if renderer not in ("cpu", "t3d"):
         raise ValueError("Renderer must be cpu or t3d")
     if lighting_bake_verify and disable_lighting_bake:
@@ -84,6 +92,7 @@ def build_rom(sdk, autoplay=False, debug_overlay=False, level=None, capture=Fals
     if autoplay and not default_scene:
         raise ValueError("The input replay is authored for first_room.json; use a manual or capture build for other scenes")
     name = "DarkLantern64-autoplay" if autoplay else "DarkLantern64"
+    if replay is not None: name += "-input-replay"
     if debug_overlay:
         name += "-debug"
     if bundle is not None:
@@ -164,6 +173,14 @@ def build_rom(sdk, autoplay=False, debug_overlay=False, level=None, capture=Fals
     if disable_lighting_bake:
         common += ["-DDL_DISABLE_LIGHTING_BAKE=1"]
     extra_headers = []
+    if replay is not None:
+        package=json.loads((Path(catalog["levels"][0]["cooked_dir"])/"generated/play.json").read_bytes())
+        if replay.get("fingerprint")!=package["fingerprint"]:
+            raise ValueError("Replay/content fingerprint mismatch; cook and record again")
+        replay_header=work/"input_replay.h"
+        replay_header.write_text(input_replay_header(replay))
+        extra_headers.extend([replay_header,Path(input_replay),ROOT/"tools/input_replay.py"])
+        common += ["-DDL_INPUT_REPLAY=1"]
     if capture:
         common += ["-DDL_CAPTURE=1"]
         data = json.loads(level.read_text())
@@ -183,7 +200,7 @@ def build_rom(sdk, autoplay=False, debug_overlay=False, level=None, capture=Fals
         capture_header.write_text("static const struct { DlVec3 position; float yaw,pitch; bool door_open; float animation_time; const char *animation_clip; float head_yaw,head_pitch; } dl_capture_views[]={" +
                                   ",".join(rows) + "};\n#define DL_CAPTURE_VIEW_COUNT " + str(len(rows)) + "\n")
         extra_headers.append(capture_header)
-    sources = [ROOT / "src" / f for f in ("game.c", "main.c", "dl_profile.c", "launch.c", "animation.c",
+    sources = [ROOT / "src" / f for f in ("game.c", "tick.c", "main.c", "dl_profile.c", "launch.c", "animation.c",
                                          "render_lighting.c", "render_batches.c", "render_transform.c", "render_texture_packing.c",
                                          "static_lighting.c", "lighting_bake.c")]
     sources += generated_sources
@@ -301,11 +318,15 @@ def run_tests():
     if not Path(compiler).exists():
         raise RuntimeError("Host GCC required for portable simulation tests (MSYS2 UCRT64 supported).")
     env = dict(os.environ, PATH=str(Path(compiler).parent) + os.pathsep + os.environ.get("PATH", ""))
-    for name in ("test_game", "test_first_room"):
+    for name in ("test_game", "test_first_room", "test_interactions"):
         output = BUILD / (name + ".exe")
         run([compiler, "-std=c17", "-O2", "-Wall", "-Wextra", "-Werror", "-Isrc", "-Ibuild/generated",
              "src/game.c", f"tests/{name}.c", "-lm", "-o", output], env=env)
         run([output], env=env)
+    output = BUILD / "test_tick.exe"
+    run([compiler, "-std=c17", "-O2", "-Wall", "-Wextra", "-Werror", "-Isrc",
+         "src/tick.c", "tests/test_tick.c", "-lm", "-o", output], env=env)
+    run([output], env=env)
     output = BUILD / "test_animation.exe"
     run([compiler, "-std=c17", "-O2", "-Wall", "-Wextra", "-Werror", "-Isrc",
          "src/animation.c", "tests/test_animation.c", "-lm", "-o", output], env=env)
@@ -379,6 +400,7 @@ def main():
     parser.add_argument("--sdk", type=Path, default=Path(os.environ.get("N64_INST", "C:/n64-toolchain")))
     parser.add_argument("--run", action="store_true")
     parser.add_argument("--autoplay", action="store_true")
+    parser.add_argument("--input-replay",type=Path,help="Replay native tick commands in a diagnostic ROM")
     parser.add_argument("--debug-overlay", action="store_true", help="Start with the timing overlay visible")
     parser.add_argument("--renderer", choices=("cpu", "t3d"), default="t3d",
                         help="Developer renderer selection; Tiny3D writes separate ROM/build outputs")
@@ -408,7 +430,7 @@ def main():
                             args.scale_bench, args.disable_model_cull, bundle=args.bundle,
                             start_level=args.start_level, start_preset=args.start_preset, menu_test=args.menu_test,
                             renderer=args.renderer, lighting_bake_verify=args.verify_lighting_bake,
-                            disable_lighting_bake=args.disable_lighting_bake)
+                            disable_lighting_bake=args.disable_lighting_bake,input_replay=args.input_replay)
             if args.run:
                 ares = os.environ.get("ARES_EXE", str(Path(os.environ.get("LOCALAPPDATA", "")) / "ares/ares.exe"))
                 if not Path(ares).is_file():

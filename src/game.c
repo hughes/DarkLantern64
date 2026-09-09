@@ -32,7 +32,38 @@ static int collider_count(const DlGame *g) {
     int count = g->level->collider_count;
     return count < 0 ? 0 : count > MAX_COLLIDERS ? MAX_COLLIDERS : count;
 }
-static bool active(const DlGame *g, const DlCollider *box) { return !(box->door && g->door_open); }
+static int first_door(const DlGame *g) {
+    for(int i=0;g->level->objects&&i<g->level->object_count&&i<DL_MAX_OBJECTS;++i)
+        if(g->level->objects[i].kind==DL_OBJECT_DOOR)return i;
+    return -1;
+}
+bool dl_game_object_open(const DlGame *g,int object) {
+    if(object<0||object>=DL_MAX_OBJECTS)return false;
+    return object==first_door(g)?g->door_open:(g->open_objects&(UINT64_C(1)<<object))!=0;
+}
+static bool active(const DlGame *g, const DlCollider *box) {
+    if(!box->door)return true;
+    if(!g->level->collider_objects)return !g->door_open;
+    return !dl_game_object_open(g,g->level->collider_objects[box-g->level->colliders]);
+}
+static int model_object(const DlGame *g,const DlModelInstance *model) {
+    for(int i=0;g->level->objects&&i<g->level->object_count&&i<DL_MAX_OBJECTS;++i)
+        if(model->id&&strcmp(model->id,g->level->objects[i].id)==0)return i;
+    return -1;
+}
+bool dl_game_model_open(const DlGame *g,const DlModelInstance *model) {
+    if(model->role!=DL_MODEL_DOOR)return false;
+    int object=model_object(g,model);
+    return object<0?g->door_open:dl_game_object_open(g,object);
+}
+bool dl_game_model_visible(const DlGame *g,const DlModelInstance *model) {
+    if(model->role!=DL_MODEL_LOOT&&model->role!=DL_MODEL_OBJECTIVE)return true;
+    int object=model_object(g,model);
+    if(object>=0&&model->role==DL_MODEL_LOOT)return !(g->collected_objects&(UINT64_C(1)<<object));
+    if(object>=0&&model->role==DL_MODEL_OBJECTIVE)return !(g->completed_objectives&(UINT64_C(1)<<object));
+    return !(model->role==DL_MODEL_OBJECTIVE&&g->complete);
+}
+uint32_t dl_game_lighting_revision(const DlGame *g){return g->object_revision*2+(g->door_open?1:0);}
 static void rotation(const DlCollider *box, float *c, float *s) {
     *c = box->yaw == 0 ? 1.0f : cosf(box->yaw);
     *s = box->yaw == 0 ? 0.0f : sinf(box->yaw);
@@ -288,7 +319,16 @@ static void move_guard(DlGame *g, DlEnemy *enemy, DlVec3 target, float speed, fl
     move_horizontal(g, &enemy->position, dx / distance * step, dz / distance * step,
                     GUARD_RADIUS, STAND_HEIGHT, supported(g, enemy->position, GUARD_RADIUS));
 }
+static void record_event(DlGame *g,DlEvent kind,DlVec3 p,float strength,int actor,int detail) {
+    if(g->event_count>=DL_EVENT_CAPACITY){++g->event_overflow;return;}
+    g->events[g->event_count++]=(DlWorldEvent){kind,p,g->elapsed,strength,(int16_t)actor,(int16_t)detail,-1};
+}
+static void record_transition(DlGame *g,int actor,DlGuardState before,DlGuardState after) {
+    unsigned count=g->event_count;record_event(g,DL_EVENT_GUARD_STATE,g->enemies[actor].position,0,actor,after);
+    if(g->event_count>count)g->events[count].previous=(int16_t)before;
+}
 static void emit_sound(DlGame *g, DlEvent event, DlVec3 p, float strength) {
+    record_event(g,event,p,strength,-1,0);
     g->event = event; ++g->sound_serial; g->last_sound = p; g->sound_age = 0;
     for (int i = 0; i < g->enemy_count; ++i) g->enemies[i].heard_sound = false;
     if (strength <= 0 || g->complete || g->caught) return;
@@ -301,6 +341,7 @@ static void emit_sound(DlGame *g, DlEvent event, DlVec3 p, float strength) {
         if (distance_between(ear, p) <= range) {
             enemy->heard_sound = true;
             if (enemy->state != DL_CHASE) {
+                if(enemy->state!=DL_INVESTIGATE)record_transition(g,i,enemy->state,DL_INVESTIGATE);
                 enemy->state = DL_INVESTIGATE; enemy->investigate_target = p;
                 float floor = support_below(g, p, GUARD_RADIUS, p.y);
                 if (isfinite(floor)) enemy->investigate_target.y = floor;
@@ -330,6 +371,7 @@ static void init_enemy(DlEnemy *enemy, const DlEnemyDef *definition) {
 }
 static void update_guard(DlGame *g, int index, float dt) {
     const DlEnemyDef *definition = &g->level->enemies[index];
+    DlGuardState before=g->enemies[index].state;
     DlEnemy *enemy = &g->enemies[index];
     DlVec3 previous_position = enemy->position;
     DlVec3 eye = guard_eye(enemy), target = dl_player_eye(g);
@@ -338,8 +380,9 @@ static void update_guard(DlGame *g, int index, float dt) {
     float facing = distance > 0.001f ? (dx * sinf(enemy->yaw) + dz * cosf(enemy->yaw)) / distance : 1;
     float exposure = distance < 1.15f ? fmaxf(g->visibility, 0.60f) : g->visibility;
     float signal = range > 0 ? exposure * (1 - 0.65f * distance / range) : 0;
-    enemy->sees_player = range > 0 && distance <= range && facing >= 0.573576f &&
-        signal >= 0.10f && dl_line_of_sight(g, eye, target);
+    enemy->sight_signal=signal;enemy->player_distance=distance;enemy->in_viewcone=facing>=0.573576f;
+    enemy->unoccluded=range>0&&distance<=range&&enemy->in_viewcone&&signal>=.10f&&dl_line_of_sight(g,eye,target);
+    enemy->sees_player=enemy->unoccluded;
     if (enemy->sees_player) {
         enemy->awareness = fminf(1, enemy->awareness + dt * signal * 1.8f);
         enemy->investigate_target = g->player; enemy->search_timer = 6;
@@ -382,11 +425,25 @@ static void update_guard(DlGame *g, int index, float dt) {
     }
     move_vertical(g, &enemy->position, &enemy->vertical_velocity, GUARD_RADIUS, STAND_HEIGHT, dt);
     float travel = horizontal_distance(enemy->position, previous_position);
+    float previous_distance=enemy->animation_distance;
     enemy->animation_distance += travel;
+    const DlFootContacts *contacts=g->level->foot_contacts?&g->level->foot_contacts[index]:NULL;
+    if(travel>0&&contacts&&contacts->stride>0&&contacts->count>0) {
+        float from=previous_distance/contacts->stride,to=enemy->animation_distance/contacts->stride;
+        for(int i=0;i<contacts->count&&i<8;++i) {
+            float phase=contacts->phases[i]/65535.f;
+            unsigned crossings=(unsigned)fmaxf(0,floorf(to-phase)-floorf(from-phase));
+            unsigned available=DL_EVENT_CAPACITY-g->event_count;
+            if(crossings>available){g->event_overflow+=crossings-available;crossings=available;}
+            while(crossings--)record_event(g,DL_EVENT_GUARD_CONTACT,enemy->position,.12f,index,i);
+        }
+    } else if(travel>0&&floorf(enemy->animation_distance/.72f)>floorf(previous_distance/.72f))
+        record_event(g,DL_EVENT_GUARD_CONTACT,enemy->position,.12f,index,0);
     float target_speed = dt > 0 ? travel / dt : 0;
     enemy->animation_speed += (target_speed - enemy->animation_speed) * fminf(1, dt * 12);
     /* A bad route must not repeatedly reset everyone else's progress. */
     if (enemy->position.y < -20) init_enemy(enemy, definition);
+    if(enemy->state!=before)record_transition(g,index,before,enemy->state);
 }
 #ifdef DL_SCALE_BENCH
 void dl_game_benchmark_guard_step(DlGame *g, float dt) {
@@ -416,16 +473,19 @@ bool dl_game_start(DlGame *g, const DlLevel *level, int preset_index) {
         g->player = preset->position;
         g->yaw = wrap_yaw(preset->yaw); g->pitch = preset->pitch;
         g->door_open = preset->door_open; g->crouched = preset->crouched;
+        if(preset->door_open)for(int i=0;level->objects&&i<level->object_count&&i<DL_MAX_OBJECTS;++i)
+            if(level->objects[i].kind==DL_OBJECT_DOOR)g->open_objects|=UINT64_C(1)<<i;
         g->grounded = supported(g, g->player, PLAYER_RADIUS);
         g->visibility = dl_visibility(g, dl_player_eye(g)) * (g->crouched ? .55f : 1);
     }
     return true;
 }
-static bool door_occupied(const DlGame *g) {
+static bool door_occupied_object(const DlGame *g,int object) {
     float height = g->crouched ? CROUCH_HEIGHT : STAND_HEIGHT;
     for (int i = 0; i < collider_count(g); ++i) {
         const DlCollider *box = &g->level->colliders[i];
         if (!box->door) continue;
+        if(object>=0&&g->level->collider_objects&&g->level->collider_objects[i]!=object)continue;
         if (vertical_overlap(box, g->player, height) && horizontal_overlap(box, g->player, PLAYER_RADIUS)) return true;
         for (int enemy = 0; enemy < g->enemy_count; ++enemy)
             if (vertical_overlap(box, g->enemies[enemy].position, STAND_HEIGHT) &&
@@ -433,23 +493,64 @@ static bool door_occupied(const DlGame *g) {
     }
     return false;
 }
+static void complete_objectives(DlGame *g) {
+    uint64_t required=0;
+    for(int i=0;i<g->level->object_count&&i<DL_MAX_OBJECTS;++i)
+        if(g->level->objects[i].kind==DL_OBJECT_OBJECTIVE)required|=UINT64_C(1)<<i;
+    if(required&&(g->completed_objectives&required)==required)g->complete=true;
+}
+static void use_objects(DlGame *g,bool zones) {
+    DlVec3 eye=dl_player_eye(g);
+    int chosen=-1;float nearest=INFINITY;
+    for(int i=0;i<g->level->object_count&&i<DL_MAX_OBJECTS;++i) {
+        const DlObjectDef *o=&g->level->objects[i];uint64_t bit=UINT64_C(1)<<i;
+        if(o->kind==DL_OBJECT_DOOR||o->zone!=zones)continue;
+        if(o->kind==DL_OBJECT_LOOT&&(g->collected_objects&bit))continue;
+        if(o->kind==DL_OBJECT_OBJECTIVE&&((g->completed_objectives&bit)||g->loot_value<o->required_loot))continue;
+        float distance=distance_between(zones?g->player:eye,o->position);
+        DlVec3 target=o->position;if(zones)target.y+=.1f; /* floor-authored zone origins */
+        if(distance<=o->radius&&distance<nearest&&dl_line_of_sight(g,eye,target)){nearest=distance;chosen=i;}
+    }
+    if(chosen<0)return;
+    const DlObjectDef *o=&g->level->objects[chosen];uint64_t bit=UINT64_C(1)<<chosen;
+    if(o->kind==DL_OBJECT_CONTROL) {
+        // Preflight all linked doors so a blocked closing door cannot partially
+        // activate a multi-target control.
+        for(int i=0;i<g->level->object_count&&i<DL_MAX_OBJECTS;++i)
+            if((o->targets&(UINT64_C(1)<<i))&&dl_game_object_open(g,i)&&door_occupied_object(g,i))return;
+        for(int i=0;i<g->level->object_count&&i<DL_MAX_OBJECTS;++i)if(o->targets&(UINT64_C(1)<<i)) {
+            bool opened=!dl_game_object_open(g,i);
+            if(opened)g->open_objects|=UINT64_C(1)<<i;else g->open_objects&=~(UINT64_C(1)<<i);
+            if(i==first_door(g))g->door_open=opened;
+        }
+        ++g->object_revision;emit_sound(g,DL_EVENT_DOOR,o->position,.65f);
+    } else if(o->kind==DL_OBJECT_LOOT) {
+        g->collected_objects|=bit;g->loot_value+=o->value;
+        emit_sound(g,DL_EVENT_OBJECTIVE,o->position,0);
+    } else if(o->kind==DL_OBJECT_OBJECTIVE) {
+        g->completed_objectives|=bit;complete_objectives(g);emit_sound(g,DL_EVENT_OBJECTIVE,o->position,0);
+    }
+}
 static void use_nearby(DlGame *g) {
+    if(g->level->objects){use_objects(g,false);return;}
     DlVec3 eye = dl_player_eye(g);
     if (distance_between(eye, g->level->objective) <= 1.5f && dl_line_of_sight(g, eye, g->level->objective)) {
         g->complete = true; emit_sound(g, DL_EVENT_OBJECTIVE, g->level->objective, 0);
     } else if (distance_between(eye, g->level->control) <= 1.5f && dl_line_of_sight(g, eye, g->level->control)) {
-        if (g->door_open && door_occupied(g)) return;
+        if (g->door_open && door_occupied_object(g,-1)) return;
         g->door_open = !g->door_open; emit_sound(g, DL_EVENT_DOOR, g->level->control, 0.65f);
     }
 }
 void dl_game_update(DlGame *g, const DlInput *input, float dt) {
     if (!g || !g->level || !input) return;
+    g->event_count=0;
     if (input->restart) { dl_game_init(g, g->level); return; }
     if (!isfinite(dt) || dt <= 0 || g->complete || g->caught) return;
     dt = fminf(dt, 0.25f);
     if (input->crouch) g->crouched = true;
     else if (dl_position_clear(g, g->player, PLAYER_RADIUS, STAND_HEIGHT)) g->crouched = false;
     if (input->use) use_nearby(g);
+    if(g->level->objects)use_objects(g,true);
     if (g->complete) return;
     if (input->noise) emit_sound(g, DL_EVENT_NOISE, dl_player_eye(g), 1);
     if (input->jump && g->grounded) { g->vertical_velocity = 4.6f; g->grounded = false; }

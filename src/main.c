@@ -9,6 +9,11 @@
 #include "launch.h"
 #include "dl_profile.h"
 #include "animation.h"
+#include "tick.h"
+#ifdef DL_INPUT_REPLAY
+#include "input_replay.h"
+static int replay_start_preset=-1;
+#endif
 #ifdef DL_SCALE_BENCH
 #include "scale_bench.h"
 #endif
@@ -26,7 +31,6 @@ typedef struct {
 static Voice voices[VOICE_COUNT];
 static uint32_t random_state = 0x64d4a7u;
 static int sample_rate;
-static const DlAnimClip *guard_step_clips[DL_MAX_ENEMIES];
 
 /* The callback runs under an AI interrupt: bounded integer synthesis only,
  * with no allocation, logging, game access or floating-point instructions. */
@@ -97,22 +101,32 @@ static void world_sound(const DlGame *game, DlVec3 source, float hz,
     sound(hz, seconds, volume, noise, pan);
 }
 
-static void event_sound(const DlGame *game) {
-    switch (game->event) {
+static void event_sound(const DlGame *game,const DlWorldEvent *event) {
+    switch (event->kind) {
     case DL_EVENT_STEP: sound(75, 0.10f, game->crouched ? 700 : 2300, 185, 0); break;
     case DL_EVENT_NOISE: sound(130, 0.32f, 6500, 220, 0); break;
     case DL_EVENT_DOOR:
-        world_sound(game, game->last_sound, 185, 0.60f, 4200, 75);
-        world_sound(game, game->last_sound, 65, 0.30f, 4500, 205);
+        world_sound(game, event->position, 185, 0.60f, 4200, 75);
+        world_sound(game, event->position, 65, 0.30f, 4500, 205);
         break;
     case DL_EVENT_DETECTED:
-        world_sound(game, game->last_sound, 330, 0.55f, 6200, 5);
-        world_sound(game, game->last_sound, 248, 0.55f, 4800, 5);
+        world_sound(game, event->position, 330, 0.55f, 6200, 5);
+        world_sound(game, event->position, 248, 0.55f, 4800, 5);
         break;
     case DL_EVENT_OBJECTIVE:
         sound(523, 1.0f, 3300, 0, -25);
         sound(659, 1.2f, 2400, 0, 25);
         sound(784, 1.4f, 1800, 0, 0);
+        break;
+    case DL_EVENT_GUARD_CONTACT: {
+        DlVec3 source=event->position;source.y+=.1f;
+        world_sound(game,source,62,.12f,2300,165);break;
+    }
+    case DL_EVENT_GUARD_STATE:
+        if(event->detail==DL_INVESTIGATE) {
+            DlVec3 source=event->position;source.y+=1.5f;
+            world_sound(game,source,172,.23f,2900,15);
+        }
         break;
     default: break;
     }
@@ -209,25 +223,13 @@ static void require_expansion_pak(int memory) {
     while (1) { wait_ms(100); }
 }
 
-static void start_level(DlGame *game, const DlLauncher *launcher, DlRenderStats *stats,
-                        float *guard_step, DlVec3 *previous_guard) {
+static void start_level(DlGame *game, const DlLauncher *launcher, DlRenderStats *stats) {
     uint32_t load_start = TICKS_READ();
     clear_sounds();
     dl_render_release_scene();
     const DlLevel *level = dl_launcher_active_level(launcher);
     assertf(dl_game_start(game, level, launcher->active_start), "Invalid level start preset");
     dl_render_prepare_scene(game);
-    memset(guard_step, 0, sizeof(float) * DL_MAX_ENEMIES);
-    memset(guard_step_clips, 0, sizeof(guard_step_clips));
-    for(int model=0;model<level->model_count;++model){
-        const DlModelInstance *instance=&level->models[model];
-        if(instance->role!=DL_MODEL_GUARD||instance->enemy_index<0||instance->enemy_index>=game->enemy_count)continue;
-        const DlAnimationAsset *asset=level->meshes[instance->mesh].animation;
-        int clip=dl_animation_find_clip(asset,"walk");
-        if(clip>=0&&asset->clips[clip].stride_length>0&&asset->clips[clip].event_count)
-            guard_step_clips[instance->enemy_index]=&asset->clips[clip];
-    }
-    for (int i = 0; i < game->enemy_count; ++i) previous_guard[i] = game->enemies[i].position;
     stats->frames = 0; stats->frame_ms = 16.67f; stats->cpu_ms = 0;
     heap_stats_t heap;
     sys_get_heap_stats(&heap);
@@ -295,6 +297,42 @@ static DlLaunchInput menu_test_input(const DlLauncher *launcher, DlInput *input)
 }
 #endif
 
+static void gameplay_tick(void *context, const DlInput *input, uint64_t tick) {
+    (void)tick; DlGame *game=context;
+#ifdef DL_INPUT_REPLAY
+    float before=game->elapsed;
+    if(input->restart)dl_game_start(game,game->level,replay_start_preset);
+    else dl_game_update(game,input,DL_TICK_SECONDS);
+    if(game->elapsed<before&&!input->restart)dl_game_start(game,game->level,replay_start_preset);
+#else
+    dl_game_update(game,input,DL_TICK_SECONDS);
+#endif
+    for(unsigned i=0;i<game->event_count;++i)event_sound(game,&game->events[i]);
+    for(unsigned i=0;i<game->event_count;++i)if(game->events[i].kind==DL_EVENT_GUARD_STATE) {
+        const DlWorldEvent *event=&game->events[i];const DlEnemy *enemy=&game->enemies[event->actor];
+        debugf("DL64 guard_state from=%s to=%s t=%.2f sees=%d hears=%d alert=%.3f id=%s index=%d\n",
+        dl_guard_state_name((DlGuardState)event->previous),dl_guard_state_name((DlGuardState)event->detail),event->time,enemy->sees_player,enemy->heard_sound,
+        enemy->awareness,game->level->enemies[event->actor].id,event->actor);
+    }
+#ifdef DL_INPUT_REPLAY
+    debugf("DL64 replay_tick {\"tick\":%llu,\"player\":[%.7f,%.7f,%.7f],\"yaw\":%.7f,\"pitch\":%.7f,\"visibility\":%.7f,\"door_open\":%d,\"complete\":%d,\"caught\":%d,\"loot_value\":%lu,\"enemies\":[",
+        (unsigned long long)(tick+1),game->player.x,game->player.y,game->player.z,game->yaw,game->pitch,game->visibility,
+        game->door_open,game->complete,game->caught,(unsigned long)game->loot_value);
+    for(int i=0;i<game->enemy_count;++i){const DlEnemy *e=&game->enemies[i];
+        debugf("%s{\"position\":[%.7f,%.7f,%.7f],\"state\":\"%s\",\"awareness\":%.7f,\"patrol_index\":%d,\"sees_player\":%d,\"heard_sound\":%d}",
+            i?",":"",e->position.x,e->position.y,e->position.z,dl_guard_state_name(e->state),e->awareness,e->patrol_index,e->sees_player,e->heard_sound);}
+    debugf("],\"objects\":[");
+    for(int i=0;i<game->level->object_count;++i){uint64_t bit=UINT64_C(1)<<i;
+        debugf("%s{\"open\":%d,\"collected\":%d,\"completed\":%d}",i?",":"",dl_game_object_open(game,i),
+            (game->collected_objects&bit)!=0,(game->completed_objectives&bit)!=0);}
+    debugf("],\"events\":[");
+    for(unsigned i=0;i<game->event_count;++i){const DlWorldEvent *e=&game->events[i];
+        debugf("%s{\"kind\":%d,\"position\":[%.7f,%.7f,%.7f],\"time\":%.7f,\"strength\":%.7f,\"actor\":%d,\"detail\":%d,\"previous\":%d}",
+            i?",":"",e->kind,e->position.x,e->position.y,e->position.z,e->time,e->strength,e->actor,e->detail,e->previous);}
+    debugf("],\"grounded\":%d,\"crouched\":%d}\n",game->grounded,game->crouched);
+#endif
+}
+
 int main(void) {
     debug_init_emulog();
     int memory = get_memory_size();
@@ -326,8 +364,7 @@ int main(void) {
     DlLauncher launcher;
     assertf(dl_launcher_init(&launcher,&dl_bundle),"Invalid level bundle");
     DlGame game = {0};
-    float guard_step[DL_MAX_ENEMIES] = {0};
-    DlVec3 previous_guard[DL_MAX_ENEMIES] = {0};
+    DlTickClock clock = {0};
     DlRenderStats stats = { .memory_bytes = memory, .frame_ms = 16.67f };
 #ifdef DL_AUTOPLAY
     /* Start hidden profiling runs with the ordinary gameplay HUD. */
@@ -337,7 +374,10 @@ int main(void) {
 #ifdef DL_DEBUG_OVERLAY
     stats.debug = true;
 #endif
-    if (launcher.has_active) start_level(&game,&launcher,&stats,guard_step,previous_guard);
+    if (launcher.has_active) start_level(&game,&launcher,&stats);
+#ifdef DL_INPUT_REPLAY
+    replay_start_preset=launcher.active_start;
+#endif
     debugf("DL64 controls stick=look dpad=look c_up_down=move c_left_right=strafe l=jump z=crouch a=use b=noise r=restart start=debug z_start=level_menu\n");
     debugf("DL64 menu_ready levels=%d initial=%s mode=%s\n",dl_bundle.level_count,
         dl_bundle.levels[launcher.selected_level].id,launcher.menu_open?"menu":"direct");
@@ -355,11 +395,14 @@ int main(void) {
         stats.frame_ms += (elapsed * 1000.0f - stats.frame_ms) * 0.06f;
         /* The core subdivides collision movement; this cap prevents focus
          * loss or emulator debugger pauses from jumping the simulation. */
-        float dt = elapsed > 0.05f ? 0.05f : elapsed;
+        float dt = elapsed;
         DlProfileMark mark = dl_profile_mark();
         bool next_debug = stats.debug;
         DlLaunchInput menu;
         DlInput input = read_input(&next_debug,&launcher,&menu);
+#ifdef DL_INPUT_REPLAY
+        input=(DlInput){0};menu=(DlLaunchInput){0};
+#endif
 #ifdef DL_MENU_TEST
         menu = menu_test_input(&launcher,&input);
 #endif
@@ -372,7 +415,8 @@ int main(void) {
         if (action == DL_LAUNCH_LEVEL || (!launcher.menu_open && input.restart)) {
             bool restart = input.restart;
             dl_profile_frame_end();
-            start_level(&game,&launcher,&stats,guard_step,previous_guard);
+            clock=(DlTickClock){0};
+            start_level(&game,&launcher,&stats);
             if (restart) debugf("DL64 restart t=%.2f player=%.2f,%.2f,%.2f\n",
                 game.elapsed,game.player.x,game.player.y,game.player.z);
             dl_profile_reset();
@@ -383,6 +427,7 @@ int main(void) {
             continue;
         }
         if (action == DL_LAUNCH_MENU_OPENED || action == DL_LAUNCH_RESUME) {
+            dl_tick_clear_pending(&clock);
             if (action == DL_LAUNCH_MENU_OPENED) clear_sounds();
             debugf("DL64 menu action=%s active=%s t=%.2f\n",
                 action==DL_LAUNCH_MENU_OPENED?"open":"resume",
@@ -422,17 +467,28 @@ int main(void) {
         if(stats.frames<DL_CAPTURE_VIEW_COUNT*30&&stats.frames%30==29)
             dl_render_request_capture((int)view+1);
 #endif
-        DlGuardState old_state[DL_MAX_ENEMIES];
-        for(int i=0;i<game.enemy_count;++i)old_state[i]=game.enemies[i].state;
         uint32_t old_sound = game.sound_serial;
         float old_elapsed = game.elapsed;
         mark = dl_profile_mark();
-        dl_game_update(&game, &input, dt);
+#ifdef DL_INPUT_REPLAY
+        if(clock.tick<DL_REPLAY_TICKS) {
+            dl_tick_step(&clock,dl_replay_inputs[clock.tick],gameplay_tick,&game);
+            if(clock.tick==DL_REPLAY_TICKS)debugf("DL64 input_replay_done ticks=%llu\n",(unsigned long long)clock.tick);
+        } else game.event_count=0;
+        (void)dt;(void)old_elapsed;
+#else
+        dl_tick_advance(&clock, dt, input, gameplay_tick, &game);
+#endif
         dl_profile_record(DL_PROFILE_GAMEPLAY, mark);
         /* Falling out of bounds resets the same selected test start as R. */
-        if (game.elapsed < old_elapsed) {
+        if (game.elapsed < old_elapsed
+#ifdef DL_INPUT_REPLAY
+            && false
+#endif
+        ) {
             dl_profile_frame_end();
-            start_level(&game,&launcher,&stats,guard_step,previous_guard);
+            clock=(DlTickClock){0};
+            start_level(&game,&launcher,&stats);
             debugf("DL64 restart t=%.2f player=%.2f,%.2f,%.2f\n",
                 game.elapsed,game.player.x,game.player.y,game.player.z);
             dl_profile_reset();
@@ -444,41 +500,6 @@ int main(void) {
         }
         mark = dl_profile_mark();
         bool new_event = game.sound_serial != old_sound;
-        if (new_event) event_sound(&game);
-        for(int i=0;i<game.enemy_count;++i){
-            const DlEnemy *enemy=&game.enemies[i];
-            float dx=enemy->position.x-previous_guard[i].x,dy=enemy->position.y-previous_guard[i].y;
-            float dz=enemy->position.z-previous_guard[i].z;
-            float accumulated_step=guard_step[i]+sqrtf(dx*dx+dy*dy+dz*dz);
-            previous_guard[i]=enemy->position;
-            bool foot_contact=accumulated_step>0.72f,animated_contacts=false;
-            const DlAnimClip *walk=guard_step_clips[i];
-            if(walk){
-                float to=enemy->animation_distance/walk->stride_length*walk->duration;
-                /* Markers follow real travel even while the guard is culled.
-                 * This existing sound path remains presentation-only: friendly
-                 * guard sounds do not trigger today's player-noise AI hook. */
-                foot_contact=dl_animation_event_count(walk,guard_step[i],to,DL_ANIM_FOOT_LEFT)>0||
-                    dl_animation_event_count(walk,guard_step[i],to,DL_ANIM_FOOT_RIGHT)>0;
-                guard_step[i]=to;
-                animated_contacts=true;
-            }
-            if(!animated_contacts)guard_step[i]=accumulated_step;
-            if(foot_contact){
-                if(!animated_contacts)guard_step[i]=0;
-                DlVec3 source=enemy->position;source.y+=0.10f;
-                world_sound(&game,source,62,0.12f,2300,165);
-            }
-            if(old_state[i]!=enemy->state){
-                debugf("DL64 guard_state from=%s to=%s t=%.2f sees=%d hears=%d alert=%.3f id=%s index=%d\n",
-                    dl_guard_state_name(old_state[i]),dl_guard_state_name(enemy->state),game.elapsed,
-                    enemy->sees_player,enemy->heard_sound,enemy->awareness,game.level->enemies[i].id,i);
-                if(enemy->state==DL_INVESTIGATE){
-                    DlVec3 source=enemy->position;source.y+=1.50f;
-                    world_sound(&game,source,172,0.23f,2900,15);
-                }
-            }
-        }
         if (new_event && game.event != DL_EVENT_NONE && game.event != DL_EVENT_STEP)
             debugf("DL64 event kind=%d t=%.2f door=%d complete=%d caught=%d sound=%lu\n",
                 game.event, game.elapsed, game.door_open, game.complete, game.caught, (unsigned long)game.sound_serial);

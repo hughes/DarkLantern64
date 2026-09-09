@@ -67,7 +67,8 @@ static VertexColors *smooth_colors;
 static int smooth_vertex_count;
 static int vertex_count,triangle_count,submitted_triangles;
 static const DlLevel *cached_level;
-static bool cached_door;
+static uint32_t cached_door;
+static bool multiple_doors;
 static surface_t depth_buffer;
 static sprite_t *textures[64];
 static const DlLevel *texture_level;
@@ -170,34 +171,18 @@ static ModelPose update_model_pose(const DlGame *g,int index){
     const DlModelInstance *model=&g->level->models[index];
     DlVec3 position,rotation;model_placement(g,index,&position,&rotation);
     ModelPose pose={position,{sinf(rotation.x),sinf(rotation.y),sinf(rotation.z)},
-        {cosf(rotation.x),cosf(rotation.y),cosf(rotation.z)},model->role==DL_MODEL_DOOR&&g->door_open};
+        {cosf(rotation.x),cosf(rotation.y),cosf(rotation.z)},dl_game_model_open(g,model)};
     models[index].bounds_center=transform_scaled_point(models[index].scaled_center,&models[index],&pose);
     return pose;
 }
 static void sample_model_animation(const DlGame *g,int index){
     const DlModelInstance *model=&g->level->models[index];
     const DlAnimationAsset *asset=g->level->meshes[model->mesh].animation;
-    const ModelCache *cache=&models[index];
     const DlEnemy *enemy=model_enemy(g,model);
-    int first=cache->idle_clip,second=cache->walk_clip;
-    float first_time=g->elapsed,second_time=0,blend=0,head_yaw=0,head_pitch=0;
-    if(enemy){
-        if(second>=0){
-            const DlAnimClip *walk=&asset->clips[second];
-            float stride=walk->stride_length>0.01f?walk->stride_length:1.44f;
-            second_time=enemy->animation_distance/stride*walk->duration;
-            blend=clampf(enemy->animation_speed/0.4f,0,1);
-            if(first<0)first=second;
-        }
-        if(enemy->sees_player||enemy->state==DL_INVESTIGATE||enemy->state==DL_CHASE){
-            DlVec3 target=enemy->sees_player?dl_player_eye(g):enemy->investigate_target;
-            if(!enemy->sees_player)target.y+=1.5f;
-            DlVec3 eye=enemy->position;eye.y+=1.6f;
-            DlVec3 delta=sub(target,eye);
-            head_yaw=remainderf(atan2f(delta.x,delta.z)-enemy->yaw,6.283185307f);
-            head_pitch=-atan2f(delta.y,sqrtf(delta.x*delta.x+delta.z*delta.z));
-        }
-    }
+    DlAnimationDecision decision=dl_animation_decide(asset,enemy,dl_player_eye(g),g->elapsed);
+    int first=decision.first,second=decision.second;
+    float first_time=decision.first_time,second_time=decision.second_time,blend=decision.blend;
+    float head_yaw=decision.head_yaw,head_pitch=decision.head_pitch;
 #ifdef DL_CAPTURE
     if(animation_preview_clip&&*animation_preview_clip){
         first=dl_animation_find_clip(asset,animation_preview_clip);
@@ -448,6 +433,8 @@ static uint32_t scene_load_lap(uint32_t *previous){
     *previous=now;return elapsed;
 }
 static void build_cache(const DlGame *g){
+    int doors=0;for(int i=0;i<g->level->object_count;++i)if(g->level->objects[i].kind==DL_OBJECT_DOOR)++doors;
+    multiple_doors=doors>1;
     /* Loading is user-visible elapsed time, including audio/VI interrupts.
      * Raw tick stages avoid rounded milliseconds and cover RSP/HUD setup too;
      * the older scene_prepared record intentionally keeps its original scope. */
@@ -563,7 +550,7 @@ static void build_cache(const DlGame *g){
         }
         restore_ticks=scene_load_lap(&load_mark);
     }
-    cached_level=g->level;cached_door=g->door_open;
+    cached_level=g->level;cached_door=dl_game_lighting_revision(g);
     debugf("DL64 geometry_ready models=%d meshes=%d vertices=%d triangles=%d depth=hardware transform=xyz-euler dynamic_lighting=two-body-probes objective_lighting=emissive\n",
         g->level->model_count,g->level->mesh_count,vertex_count,triangle_count);
     debugf("DL64 scene_prepared ms=%.2f night_cache_bytes=%d door_states=%d textures=%d\n",
@@ -708,7 +695,7 @@ static void geometry(const DlGame *g){
     if(cached_level!=g->level){
         mark=dl_profile_mark();build_cache(g);dl_profile_record(DL_PROFILE_CACHE,mark);
     }
-    bool lighting_changed=cached_door!=g->door_open;
+    bool lighting_changed=cached_door!=dl_game_lighting_revision(g);
     ++animation_frames;
     unsigned animated=0,full=0,drawn=0,overlays=0;
     mark=dl_profile_mark();
@@ -722,11 +709,11 @@ static void geometry(const DlGame *g){
             pose=update_model_pose(g,i);
         }
 #ifdef DL_DISABLE_MODEL_CULL
-        models[i].visible=!(role==DL_MODEL_OBJECTIVE&&g->complete);
+        models[i].visible=dl_game_model_visible(g,&g->level->models[i]);
 #else
         DlVec3 rel=sub(models[i].bounds_center,camera.eye);
         DlVec3 center={dot(rel,camera.right),dot(rel,camera.up),dot(rel,camera.forward)};
-        models[i].visible=!(role==DL_MODEL_OBJECTIVE&&g->complete)&&
+        models[i].visible=dl_game_model_visible(g,&g->level->models[i])&&
             dl_render_sphere_visible(&frustum,center,models[i].bounds_radius);
 #endif
         if(models[i].visible)++visible_models;
@@ -745,14 +732,14 @@ static void geometry(const DlGame *g){
         DlModelRole role=g->level->models[i].role;
         bool dynamic=role==DL_MODEL_GUARD||role==DL_MODEL_OBJECTIVE||g->level->meshes[g->level->models[i].mesh].animation;
         if((dynamic&&models[i].visible)||(!dynamic&&lighting_changed)){
-            bool illuminate=dynamic||!g->level->environment.enabled;
+            bool illuminate=dynamic||!g->level->environment.enabled||multiple_doors;
             if(illuminate||role==DL_MODEL_DOOR){
                 light_model(g,i,illuminate);
             }
         }
     }
     dl_profile_record(DL_PROFILE_LIGHTING,mark);
-    cached_door=g->door_open;
+    cached_door=dl_game_lighting_revision(g);
     mark=dl_profile_mark();
     for(int m=0;m<g->level->model_count;++m){
         if(!models[m].visible)continue;

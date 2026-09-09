@@ -49,7 +49,7 @@ import time
 import uuid
 
 ROOT = Path(__file__).resolve().parents[1]
-OPERATIONS = ("inspect", "list_levels", "open_level", "create_level", "duplicate_level", "delete_level", "update_level", "play_level", "play_menu", "import_asset_pack", "add_prop", "set_entity", "add_enemy", "duplicate_enemy", "add_waypoint", "delete_entity",
+OPERATIONS = ("pick_editor", "set_panel", "drop_selection", "save_prefab", "place_prefab", "inspect_scene", "query_play", "set_play_debug", "add_game_object", "set_game_object", "undo", "redo", "add_blockout", "select_entities", "transform_selection", "group_entities", "duplicate_entities", "delete_entities", "refresh_preview", "start_play", "stop_play", "inspect_play", "pause_play", "step_play", "restart_play", "set_play_input", "get_play_trace", "export_replay", "replay_play", "inspect", "list_levels", "open_level", "create_level", "duplicate_level", "delete_level", "update_level", "play_level", "play_menu", "import_asset_pack", "add_prop", "set_entity", "add_enemy", "duplicate_enemy", "add_waypoint", "delete_entity",
               "set_environment", "set_material", "set_preview_transform", "get_animation", "set_animation", "focus_character", "save", "build", "capture",
               "get_layout", "reset_layout", "reload", "get_audio_memory", "set_audio_config",
               "recalculate_audio", "quit")

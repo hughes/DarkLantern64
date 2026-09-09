@@ -9,8 +9,8 @@ We can design missions with substantially more content than appears on screen at
 | Resource | Current software contract | What it does not establish |
 | --- | --- | --- |
 | Guard | 0–16 guards with individual patrol/sentry behavior and awareness states | A measured maximum number of guards at the target frame rate |
-| Loot | One interactive objective/relic plus decorative imported models | A general inventory or many-item pickup system |
-| Doors | Exactly one door and one linked control | Independent states for multiple doors |
+| Loot/objectives | One-shot pickups, loot values, required-loot objectives and completion zones | An inventory/equipment system |
+| Doors/controls | Independent door states and multi-target controls; 64 interactive objects total | A measured worst-case interaction/lighting budget |
 | Lights | 1–16 authored point lights; optional directional moon | Sixteen overlapping moving lights at a guaranteed frame rate |
 | Models | At most 128 instances | A platform-wide object limit |
 | Geometry | At most 4,096 instanced vertices and 4,096 instanced triangles | That all of this geometry is affordable in every view |

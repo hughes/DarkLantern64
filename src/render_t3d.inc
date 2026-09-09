@@ -49,7 +49,7 @@ static void gpu_update_pose(const DlGame *g,int index,bool dynamic){
     if(dynamic){model_placement(g,index,&moving_position,&moving_rotation);position=&moving_position;rotation=&moving_rotation;}
     ModelCache *cache=&models[index];
     if(dl_render_pose_cache_update(transform,dynamic,position,rotation,&instance->scale,
-        instance->role==DL_MODEL_DOOR&&g->door_open,cache->hinge_x,cache->hinge_z))
+        dl_game_model_open(g,instance),cache->hinge_x,cache->hinge_z))
         cache->bounds_center=transform_scaled_point(cache->scaled_center,cache,&transform->pose);
 }
 static void gpu_release(void){
@@ -236,7 +236,7 @@ static void gpu_update_colors(const DlGame *g,int index,unsigned frame,bool grou
         }
         data_cache_hit_writeback(packed,batches->vertex_count/2*sizeof(T3DVertPacked));
     }
-    model->color_state[frame]=g->door_open;
+    model->color_state[frame]=(int)dl_game_lighting_revision(g);
     model->color_fog[frame]=fog;
     gpu_color_ticks+=animation_elapsed_ticks(mark);
 }
@@ -247,7 +247,7 @@ static void geometry_gpu(const DlGame *g){
     if(gpu_fences[frame])rspq_syncpoint_wait(gpu_fences[frame]);
     dl_profile_record(DL_PROFILE_DISPLAY_WAIT,mark);
     Camera camera=make_camera(g);DlCameraBasis basis={camera.right,camera.up,camera.forward};
-    bool lighting_changed=cached_door!=g->door_open;
+    bool lighting_changed=cached_door!=dl_game_lighting_revision(g);
     ++animation_frames;visible_models=transformed_vertices=0;submitted_triangles=texture_uploads=0;
     ++gpu_lighting_frames;
     unsigned animated=0,drawn=0,full=0,overlays=0;int bound_texture=-2;
@@ -273,9 +273,9 @@ static void geometry_gpu(const DlGame *g){
         DlVec3 rel=sub(cache->bounds_center,camera.eye);
         DlVec3 center={dot(rel,camera.right),dot(rel,camera.up),dot(rel,camera.forward)};
 #ifdef DL_DISABLE_MODEL_CULL
-        cache->visible=!(instance->role==DL_MODEL_OBJECTIVE&&g->complete);
+        cache->visible=dl_game_model_visible(g,instance);
 #else
-        cache->visible=!(instance->role==DL_MODEL_OBJECTIVE&&g->complete)&&dl_render_sphere_visible(&frustum,center,cache->bounds_radius);
+        cache->visible=dl_game_model_visible(g,instance)&&dl_render_sphere_visible(&frustum,center,cache->bounds_radius);
 #endif
         bool grouped=mesh->animation&&mesh->normals&&instance->role==DL_MODEL_GUARD;
         if(cache->visible){
@@ -309,12 +309,12 @@ static void geometry_gpu(const DlGame *g){
         dl_profile_record(DL_PROFILE_TRANSFORMS,mark);
         mark=dl_profile_mark();
         if(!grouped&&((dynamic&&cache->visible)||(!dynamic&&lighting_changed)))
-            light_model(g,i,dynamic||!g->level->environment.enabled);
+            light_model(g,i,dynamic||!g->level->environment.enabled||multiple_doors);
         if(!cache->visible){dl_profile_record(DL_PROFILE_LIGHTING,mark);continue;}
         if(grouped)gpu_actor_colors(g,i,pose);
         float highlight=instance->loot_highlight?dl_loot_highlight_lift(g->elapsed,sqrtf(dot(rel,rel)),(float)i*0.73f):0;
         bool fog=center.z+cache->bounds_radius>(g->level->environment.enabled?g->level->environment.fog_near:8);
-        if(dynamic||instance->loot_highlight||fog||model->color_fog[frame]||model->color_state[frame]!=(int)g->door_open)
+        if(dynamic||instance->loot_highlight||fog||model->color_fog[frame]||model->color_state[frame]!=(int)dl_game_lighting_revision(g))
             gpu_update_colors(g,i,frame,grouped,highlight,fog,&camera);
         dl_profile_record(DL_PROFILE_LIGHTING,mark);
         mark=dl_profile_mark();
@@ -336,7 +336,7 @@ static void geometry_gpu(const DlGame *g){
         if(mesh->animation&&instance->role==DL_MODEL_GUARD)++drawn;
         dl_profile_record(DL_PROFILE_TRIANGLES,mark);
     }
-    cached_door=g->door_open;
+    cached_door=dl_game_lighting_revision(g);
     mark=dl_profile_mark();t3d_tri_sync();gpu_fences[frame]=rspq_syncpoint_new();
     rdpq_set_scissor(0,0,SCREEN_W,SCREEN_H);rdpq_set_mode_fill(rgb(0,0,0));
     dl_profile_record(DL_PROFILE_TRIANGLES,mark);

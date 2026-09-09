@@ -3,6 +3,29 @@
 #include <math.h>
 #include <string.h>
 
+DlAnimationDecision dl_animation_decide(const DlAnimationAsset *asset,
+    const DlEnemy *enemy, DlVec3 player_eye, float elapsed) {
+    DlAnimationDecision d={0};
+    d.first=dl_animation_find_clip(asset,"idle");
+    d.second=dl_animation_find_clip(asset,"walk");d.first_time=elapsed;
+    if(!enemy)return d;
+    if(d.second>=0) {
+        const DlAnimClip *walk=&asset->clips[d.second];
+        float stride=walk->stride_length>0.01f?walk->stride_length:1.44f;
+        d.second_time=enemy->animation_distance/stride*walk->duration;
+        d.blend=fminf(1,fmaxf(0,enemy->animation_speed/0.4f));
+        if(d.first<0)d.first=d.second;
+    }
+    if(enemy->sees_player||enemy->state==DL_INVESTIGATE||enemy->state==DL_CHASE) {
+        DlVec3 target=enemy->sees_player?player_eye:enemy->investigate_target;
+        if(!enemy->sees_player)target.y+=1.5f;
+        DlVec3 delta={target.x-enemy->position.x,target.y-enemy->position.y-1.6f,target.z-enemy->position.z};
+        d.head_yaw=remainderf(atan2f(delta.x,delta.z)-enemy->yaw,6.283185307f);
+        d.head_pitch=-atan2f(delta.y,sqrtf(delta.x*delta.x+delta.z*delta.z));
+    }
+    return d;
+}
+
 static float clampf(float v,float a,float b){return v<a?a:v>b?b:v;}
 static DlVec3 add(DlVec3 a,DlVec3 b){return (DlVec3){a.x+b.x,a.y+b.y,a.z+b.z};}
 static DlVec3 scale(DlVec3 a,float b){return (DlVec3){a.x*b,a.y*b,a.z*b};}

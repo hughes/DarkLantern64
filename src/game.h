@@ -35,7 +35,7 @@ typedef struct {
 } DlMesh;
 
 typedef enum { DL_MODEL_STATIC, DL_MODEL_GUARD, DL_MODEL_DOOR,
-               DL_MODEL_CONTROL, DL_MODEL_OBJECTIVE } DlModelRole;
+               DL_MODEL_CONTROL, DL_MODEL_OBJECTIVE, DL_MODEL_LOOT } DlModelRole;
 typedef struct {
     const char *id;
     uint16_t mesh;
@@ -85,6 +85,19 @@ typedef struct {
     bool door_open, crouched;
 } DlStartPreset;
 
+#define DL_MAX_OBJECTS 64
+typedef enum { DL_OBJECT_DOOR, DL_OBJECT_CONTROL, DL_OBJECT_LOOT, DL_OBJECT_OBJECTIVE } DlObjectKind;
+typedef struct {
+    const char *id;
+    DlObjectKind kind;
+    DlVec3 position;
+    uint64_t targets; /* control -> door indices in this definition array */
+    uint32_t value, required_loot;
+    float radius; /* interaction distance; objective zones use their radius */
+    bool zone;
+} DlObjectDef;
+typedef struct { float stride; uint16_t phases[8]; uint8_t count; } DlFootContacts;
+
 typedef struct {
     uint32_t version;
     const char *title;
@@ -107,6 +120,10 @@ typedef struct {
     const DlStartPreset *test_starts;
     int test_start_count;
     const char *baked_lighting; /* optional rom:/lighting/lighting-<recipe SHA256>.bin */
+    const DlObjectDef *objects;
+    int object_count;
+    const int16_t *collider_objects; /* collider -> door object index, -1 static */
+    const DlFootContacts *foot_contacts; /* optional, one track per enemy */
 } DlLevel;
 
 typedef enum { DL_PATROL, DL_INVESTIGATE, DL_SEARCH, DL_CHASE } DlGuardState;
@@ -119,9 +136,19 @@ typedef struct {
     float search_timer;
     bool sees_player, heard_sound;
     float animation_distance, animation_speed; /* actual horizontal travel; presentation only */
+    float sight_signal, player_distance;
+    bool in_viewcone, unoccluded;
 } DlEnemy;
 typedef enum { DL_EVENT_NONE, DL_EVENT_STEP, DL_EVENT_NOISE, DL_EVENT_DOOR,
-               DL_EVENT_DETECTED, DL_EVENT_OBJECTIVE } DlEvent;
+               DL_EVENT_DETECTED, DL_EVENT_OBJECTIVE, DL_EVENT_GUARD_CONTACT,
+               DL_EVENT_GUARD_STATE } DlEvent;
+#define DL_EVENT_CAPACITY 64
+typedef struct {
+    DlEvent kind;
+    DlVec3 position;
+    float time, strength;
+    int16_t actor, detail, previous;
+} DlWorldEvent;
 
 typedef struct {
     float forward, strafe, turn, look;
@@ -140,6 +167,11 @@ typedef struct {
     float footstep_timer, sound_age, elapsed;
     uint32_t sound_serial;
     DlEvent event;
+    uint64_t open_objects, collected_objects, completed_objectives;
+    uint32_t loot_value, object_revision;
+    DlWorldEvent events[DL_EVENT_CAPACITY];
+    uint16_t event_count;
+    uint32_t event_overflow;
 } DlGame;
 
 void dl_game_init(DlGame *game, const DlLevel *level);
@@ -151,6 +183,10 @@ DlVec3 dl_player_eye(const DlGame *game);
 bool dl_position_clear(const DlGame *game, DlVec3 feet, float radius, float height);
 bool dl_line_of_sight(const DlGame *game, DlVec3 a, DlVec3 b);
 float dl_visibility(const DlGame *game, DlVec3 position);
+bool dl_game_object_open(const DlGame *game, int object);
+bool dl_game_model_visible(const DlGame *game, const DlModelInstance *model);
+bool dl_game_model_open(const DlGame *game, const DlModelInstance *model);
+uint32_t dl_game_lighting_revision(const DlGame *game);
 /* Linear RGB irradiance: low ambient + occluded moon/point Lambert diffuse.
  * Callers offset surface positions out of their own collision proxy. */
 DlVec3 dl_surface_light(const DlGame *game, DlVec3 position, DlVec3 normal);

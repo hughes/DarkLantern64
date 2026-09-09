@@ -14,8 +14,8 @@ new_local_repository(
 load("@rules_cc//cc:defs.bzl", "cc_library")
 cc_library(
     name = "animation",
-    srcs = ["src/animation.c"],
-    hdrs = ["src/animation.h", "src/game.h", "src/enemy_types.def"],
+    srcs = ["src/animation.c", "src/game.c", "src/tick.c"],
+    hdrs = ["src/animation.h", "src/game.h", "src/enemy_types.def", "src/tick.h"],
     includes = ["src"],
     visibility = ["//visibility:public"],
 )

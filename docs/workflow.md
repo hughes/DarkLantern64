@@ -40,6 +40,11 @@ New projects receive a deterministic dock layout. User rearrangements persist in
 
 ## Make iteration observable
 
+The [native Play workflow](native-play-implementation.md) now provides shared
+ROM simulation in the editor, fixed-tick replay, runtime inspection and collision/
+sight overlays. It also documents canonical history, blockout, encounter copies
+and linked interaction authoring. Jolt is an optional engine target.
+
 The current tools and the next feedback improvements are:
 
 - A build report shows which assets changed, compilation time, ROM size, and estimated resident costs; runtime telemetry checks those estimates.

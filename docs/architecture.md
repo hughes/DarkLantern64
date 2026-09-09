@@ -6,6 +6,11 @@ The [hardware guide](n64-hardware-guide.md) documents the platform facts and pro
 
 ## Responsibilities
 
+The [native Play implementation](native-play-implementation.md) adds a desktop
+consumer of the portable C gameplay, tick and animation sources. LightEngine owns
+generic system lifecycle and authoring extension points; DarkLantern owns game
+rules, content limits and the runtime adapter. Jolt is an optional dependency.
+
 | Part | Responsibility |
 | --- | --- |
 | LightEngine extensions | Scene authoring, object inspectors, relationship editing, previews, validation feedback. |

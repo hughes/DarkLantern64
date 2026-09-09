@@ -37,8 +37,8 @@ except ModuleNotFoundError:
     from tools.asset_pack import resolve_asset_packs
 
 ROOT = Path(__file__).resolve().parents[1]
-KINDS = {"static", "spawn", "guard", "waypoint", "door", "control", "objective", "light"}
-ROLES = {"guard":"DL_MODEL_GUARD", "door":"DL_MODEL_DOOR", "control":"DL_MODEL_CONTROL", "objective":"DL_MODEL_OBJECTIVE"}
+KINDS = {"static", "spawn", "guard", "waypoint", "door", "control", "objective", "light", "loot"}
+ROLES = {"guard":"DL_MODEL_GUARD", "door":"DL_MODEL_DOOR", "control":"DL_MODEL_CONTROL", "objective":"DL_MODEL_OBJECTIVE", "loot":"DL_MODEL_LOOT"}
 ENEMY_TYPES_PATH = ROOT/"src/enemy_types.def"
 CONTENT_LIMITS_PATH = ROOT/"src/content_limits.h"
 LIMITS = {name: int(re.search(r"^#define " + macro + r" (\d+)$", CONTENT_LIMITS_PATH.read_text(), re.MULTILINE)[1])
@@ -331,6 +331,15 @@ def validate(data, source_dir=None):
         return ident
     for asset in assets:
         ident=unique(asset,"asset")
+        if asset.get("type") == "primitive":
+            require(asset.get("shape") == "box", f"{ident}.shape: supported primitive is box")
+            try:
+                from blockout import box_mesh
+            except ModuleNotFoundError:
+                from tools.blockout import box_mesh
+            meshes[ident]=box_mesh()
+            dependencies.append(("code:tools/blockout.py", Path(__file__).with_name("blockout.py")))
+            continue
         uri=asset.get("uri")
         character = asset.get("type") == "character"
         require(asset.get("type", "mesh") in ("mesh", "character"), f"{ident}.type: expected mesh or character")
@@ -378,7 +387,7 @@ def validate(data, source_dir=None):
             require(e.get("material") in material_map,f"{eid}.material: unknown material reference")
             for v in meshes[e["model"]]["vertices"]:
                 vector(transform_point(v,t),eid+".world_vertex")
-        if kind in ("guard","door","control","objective"):
+        if kind in ("guard","door","control","loot") or (kind=="objective" and not e.get("zone",False)):
             require("model" in e,f"{eid}: rendered {kind} requires a model")
         if kind == "static":
             require("model" in e or "collider" in e,
@@ -387,7 +396,7 @@ def validate(data, source_dir=None):
                     f"{eid}: a collision-only proxy has no material")
         if "loot_highlight" in e:
             require(type(e["loot_highlight"]) is bool, f"{eid}.loot_highlight: expected a boolean")
-            require(kind == "static" and "model" in e,
+            require(kind in ("static","loot") and "model" in e,
                     f"{eid}.loot_highlight: only rendered static models support this presentation hint")
         if "collider" in e:
             proxy=e["collider"]
@@ -414,12 +423,29 @@ def validate(data, source_dir=None):
             number(e.get("sight_range", defaults["sight_range"]),eid+".sight_range",.1,128)
             number(e.get("hearing_range", defaults["hearing_range"]),eid+".hearing_range",.1,128)
         by_id[eid]=e; kinds[kind].append(e)
-    for kind in ("spawn","door","control","objective"):
+    for kind in ("spawn",):
         require(len(kinds[kind])==1,f"entities: exactly one {kind} required")
     require(len(kinds["guard"]) <= MAX_ENEMIES, f"entities: maximum {MAX_ENEMIES} enemies (guard objects); reduce enemy placements")
     require(1<=len(kinds["light"])<=16,"entities: expected 1-16 lights")
-    control,door=(kinds[k][0] for k in ("control","door"))
-    require(control.get("target")==door["id"],f"{control['id']}.target: invalid door reference")
+    objects = [e for e in entities if e["kind"] in ("door","control","loot","objective")]
+    require(len(objects)<=64,"interactive objects: maximum 64")
+    object_indices={e["id"]:i for i,e in enumerate(objects)}
+    object_rows=[]
+    for e in objects:
+        ident=e["id"];kind=e["kind"]
+        refs=e.get("targets",[e["target"]] if "target" in e else []) if kind=="control" else []
+        require(isinstance(refs,list) and len(refs)<=64,f"{ident}.targets: expected up to 64 door IDs")
+        mask=0
+        for ref in refs:
+            require(isinstance(ref,str) and ref in by_id and by_id[ref]["kind"]=="door",f"{ident}.target: invalid door reference")
+            mask|=1<<object_indices[ref]
+        require(kind!="control" or mask,f"{ident}: control needs at least one door target")
+        value=e.get("value",1 if kind=="loot" else 0);required=e.get("required_loot",0)
+        require(type(value) is int and 0<=value<=1000000,f"{ident}.value: expected 0..1000000")
+        require(type(required) is int and 0<=required<=64000000,f"{ident}.required_loot: expected 0..64000000")
+        radius=e.get("interaction_radius",1.5);number(radius,f"{ident}.interaction_radius",.05,128)
+        zone=e.get("zone",False);require(type(zone) is bool and (not zone or kind=="objective"),f"{ident}.zone: only objectives may be zones")
+        object_rows.append(dict(id=ident,kind=kind,position=e["transform"]["position"],targets=mask,value=value,required_loot=required,radius=radius,zone=zone))
     enemies = []
     for guard in kinds["guard"]:
         behavior = guard.get("behavior", "patrol")
@@ -433,11 +459,18 @@ def validate(data, source_dir=None):
         enemies.append({"id":guard["id"], "enemy_type":defaults["id"], "symbol":defaults["symbol"], "behavior":behavior,
                         "patrol_ids":list(patrol), "enemy_index":len(enemies),
                         **{key:float(guard.get(key, defaults[key])) for key in ("speed", "sight_range", "hearing_range")}})
+    contacts=[]
+    for enemy in enemies:
+        character=characters.get(by_id[enemy["id"]]["model"])
+        walk=next((clip for clip in character["clips"] if clip["id"]=="walk"),None) if character else None
+        phases=[event["phase"] for event in walk["events"]] if walk else []
+        require(len(phases)<=8,enemy["id"]+": maximum 8 walk contact markers")
+        contacts.append({"stride":walk["stride_length"] if walk else 0,"phases":phases})
     models=[e for e in entities if "model" in e]
     for enemy in enemies:
         enemy["model_index"] = next(i for i, e in enumerate(models) if e["id"] == enemy["id"])
     for model in {e["model"] for e in models if "texture" in material_map[e["material"]]}:
-        if model not in characters:
+        if model not in characters and model in mesh_paths:
             meshes[model] = read_obj(mesh_paths[model], textured=True)
     boxes=[collider(e) for e in entities if "collider" in e]
     require(1<=len(boxes)<=256,"colliders: expected 1-256 boxes")
@@ -465,7 +498,7 @@ def validate(data, source_dir=None):
     return {"by_id":by_id,"kinds":kinds,"meshes":meshes,"materials":material_map,"models":models,"colliders":boxes,"dependencies":dependencies,
             "textures":textures,"texture_artifacts":texture_artifacts,"texture_indices":texture_indices,
             "enemy_types":enemy_types,"enemies":enemies,"test_starts":test_starts,"characters":characters,
-            "resolved_document":data,"resolved_catalog":resolved_catalog}
+            "resolved_document":data,"resolved_catalog":resolved_catalog,"objects":object_rows,"object_indices":object_indices,"foot_contacts":contacts}
 
 
 def atomic_write(path, data):
@@ -554,16 +587,65 @@ def header(data, state):
                          f".position={vec(start['position'])}, .yaw={f(math.radians(start['yaw']))}, .pitch={f(math.radians(start['pitch']))}, "+
                          f".door_open={str(start['door_open']).lower()}, .crouched={str(start['crouched']).lower()}"+"},")
         lines.append("};")
+    lines.append("static const int16_t dl_collider_objects[] = {"+",".join(str(state["object_indices"].get(box["id"],-1)) for box in state["colliders"])+"};")
+    if state["objects"]:
+        lines.append("static const DlObjectDef dl_objects[] = {")
+        for row in state["objects"]:
+            lines.append("    {"+json.dumps(row["id"])+", DL_OBJECT_"+row["kind"].upper()+", "+vec(row["position"])+", UINT64_C("+str(row["targets"])+"), "+str(row["value"])+", "+str(row["required_loot"])+", "+f(row["radius"])+", "+str(row["zone"]).lower()+"},")
+        lines.append("};")
+    if not state["objects"]: lines.append("static const DlObjectDef dl_objects[1] = {{0}};")
+    if state["foot_contacts"]:
+        lines.append("static const DlFootContacts dl_contacts[] = {"+",".join("{"+f(row["stride"])+",{"+(",".join(map(str,row["phases"])) or "0")+"},"+str(len(row["phases"]))+"}" for row in state["foot_contacts"])+"};")
     env=data.get("environment")
     environment="{.enabled=false}"
     if env is not None:
         direction=env["moon_direction"]; length=math.sqrt(sum(v*v for v in direction))
         env=dict(env,moon_direction=[v/length for v in direction])
         environment="{.enabled=true, "+", ".join("."+key+"="+(vec(value) if isinstance(value,list) else f(value)) for key,value in env.items() if key in ("ambient","moon_direction","moon_color","moon_intensity","fog_color","fog_near","fog_far","sky_top","sky_bottom","exposure"))+"}"
-    lines.append("static const DlLevel dl_demo_level = {\n    "+f".version=2, .title={json.dumps(data['title'])}, .colliders=dl_demo_colliders, .collider_count={len(state['colliders'])},\n    .meshes=dl_demo_meshes, .mesh_count={len(mesh_ids)}, .models=dl_demo_models, .model_count={len(state['models'])},\n    .spawn={vec(spawn['transform']['position'])}, .spawn_yaw={f(math.radians(spawn['transform']['rotation'][1]))},\n    .enemies="+("dl_demo_enemies" if state["enemies"] else "NULL")+f", .enemy_count={len(state['enemies'])}, .control={vec(kinds['control'][0]['transform']['position'])}, .objective={vec(kinds['objective'][0]['transform']['position'])},\n    .lights=dl_demo_lights, .light_count={len(kinds['light'])},\n    .environment={environment}, .textures="+("dl_demo_textures" if state["textures"] else "NULL")+f", .texture_count={len(state['textures'])},\n    .test_starts="+("dl_demo_test_starts" if state["test_starts"] else "NULL")+f", .test_start_count={len(state['test_starts'])}\n"+"};\n#endif\n")
+    lines.append("static const DlLevel dl_demo_level = {\n    "+f".version=2, .title={json.dumps(data['title'])}, .colliders=dl_demo_colliders, .collider_count={len(state['colliders'])},\n    .meshes=dl_demo_meshes, .mesh_count={len(mesh_ids)}, .models=dl_demo_models, .model_count={len(state['models'])},\n    .spawn={vec(spawn['transform']['position'])}, .spawn_yaw={f(math.radians(spawn['transform']['rotation'][1]))},\n    .enemies="+("dl_demo_enemies" if state["enemies"] else "NULL")+f", .enemy_count={len(state['enemies'])}, .control={vec(kinds['control'][0]['transform']['position'] if kinds['control'] else [0,0,0])}, .objective={vec(kinds['objective'][0]['transform']['position'] if kinds['objective'] else [0,0,0])},\n    .lights=dl_demo_lights, .light_count={len(kinds['light'])},\n    .environment={environment}, .textures="+("dl_demo_textures" if state["textures"] else "NULL")+f", .texture_count={len(state['textures'])},\n    .test_starts="+("dl_demo_test_starts" if state["test_starts"] else "NULL")+f", .test_start_count={len(state['test_starts'])}\n"+"};\n#endif\n")
+    lines[-1]=lines[-1].replace("\n};\n#endif", ", .objects="+"dl_objects"+", .object_count="+str(len(state["objects"]))+", .collider_objects=dl_collider_objects, .foot_contacts="+("dl_contacts" if state["foot_contacts"] else "NULL")+"\n};\n#endif")
     if state.get("baked_lighting"):
         lines[-1] = lines[-1].replace("\n};\n#endif", ", .baked_lighting=" + json.dumps(state["baked_lighting"]) + "\n};\n#endif")
     return "\n".join(lines)
+
+
+def play_package(data, state):
+    """Pointer-free desktop simulation view of the same validated ROM inputs."""
+    data = state["resolved_document"]
+    kinds, by_id = state["kinds"], state["by_id"]
+    environment = dict(data.get("environment", {}))
+    if environment:
+        direction = environment["moon_direction"]
+        length = math.sqrt(sum(v*v for v in direction))
+        environment["moon_direction"] = [v/length for v in direction]
+    enemies = []
+    for enemy in state["enemies"]:
+        transform = by_id[enemy["id"]]["transform"]
+        enemies.append(dict(enemy, spawn=transform["position"], yaw=math.radians(transform["rotation"][1]),
+                            patrol=[by_id[ref]["transform"]["position"] for ref in enemy["patrol_ids"]]))
+    starts = [dict(start, yaw=math.radians(start["yaw"]), pitch=math.radians(start["pitch"]))
+              for start in state["test_starts"]]
+    hinges = {}
+    for door in kinds["door"]:
+        vertices = state["meshes"][door["model"]]["vertices"]
+        scale = door["transform"]["scale"]
+        hinges[door["id"]] = [min(v[0] for v in vertices)*scale[0],
+                              (min(v[2] for v in vertices)+max(v[2] for v in vertices))*.5*scale[2]]
+    result = {"format": "darklantern-play", "version": 1, "title": data["title"],
+              "colliders": state["colliders"], "enemies": enemies,
+              "spawn": kinds["spawn"][0]["transform"]["position"],
+              "spawn_yaw": math.radians(kinds["spawn"][0]["transform"]["rotation"][1]),
+              "control": kinds["control"][0]["transform"]["position"] if kinds["control"] else [0,0,0],
+              "objective": kinds["objective"][0]["transform"]["position"] if kinds["objective"] else [0,0,0],
+              "lights": [dict(position=e["transform"]["position"], radius=e["radius"], intensity=e["intensity"],
+                              color=e.get("color", [1,.75,.4])) for e in kinds["light"]],
+              "environment": environment, "test_starts": starts, "door_hinges": hinges,
+              "entities": data["entities"], "objects": state["objects"], "foot_contacts": state["foot_contacts"], "collider_objects": [state["object_indices"].get(box["id"],-1) for box in state["colliders"]]}
+    digest = hashlib.sha256(json.dumps(result, sort_keys=True, separators=(",", ":")).encode())
+    for uri, path in sorted(state["dependencies"]):
+        digest.update(uri.encode()); digest.update(b"\0"); digest.update(path.read_bytes())
+    result["fingerprint"] = digest.hexdigest()
+    return result
 
 
 def mesh_gltf(mesh):
@@ -638,7 +720,7 @@ def compile_level(source=ROOT/"content/first_room.json",output=ROOT/"build",asse
     digest=hashlib.sha256(raw)
     for uri,path in state["dependencies"]: digest.update(uri.encode()); digest.update(b"\0"); digest.update(path.read_bytes())
     lighting, lighting_payload = None, None
-    if data.get("environment") is not None and any(
+    if data.get("environment") is not None and len(state["kinds"]["door"])<=1 and any(
             e["kind"] not in ("guard", "objective") and e["model"] not in state["characters"]
             for e in state["models"]):
         # The worker needs complete character definitions even when the ROM
@@ -647,7 +729,8 @@ def compile_level(source=ROOT/"content/first_room.json",output=ROOT/"build",asse
         standalone = dict(state, shared_characters=False)
         lighting, lighting_payload = prepare_lighting(header(data, standalone))
         state["baked_lighting"] = "rom:/" + lighting["path"][len("romfs/"):]
-    artifacts={output/"generated/demo_level.h":header(data,state),output/"editor-assets/levels/first_room.json":json.dumps(preview_scene(data,state),indent=2)+"\n"}
+    artifacts={output/"generated/demo_level.h":header(data,state),output/"editor-assets/levels/first_room.json":json.dumps(preview_scene(data,state),indent=2)+"\n",
+               output/"generated/play.json":json.dumps(play_package(data,state),indent=2)+"\n"}
     if lighting is not None:
         artifacts[output/lighting["path"]] = lighting_payload
     artifacts[output/"generated/lighting_report.json"] = json.dumps(lighting, indent=2)+"\n"

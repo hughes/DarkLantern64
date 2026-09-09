@@ -22,6 +22,42 @@ class CompileLevelTests(unittest.TestCase):
     def entity(self, ident, data=None):
         return next(e for e in (data or self.level)["entities"] if e["id"] == ident)
 
+    def test_multiple_doors_have_independent_indices_and_link_masks(self):
+        door = copy.deepcopy(next(e for e in self.level["entities"] if e["kind"]=="door"))
+        door["id"]="second-door";door["transform"]["position"]=[12,1,12]
+        self.level["entities"].append(door)
+        control=next(e for e in self.level["entities"] if e["kind"]=="control")
+        original=control.pop("target");control["targets"]=[original,door["id"]]
+        state=compiler.validate(self.level)
+        mask=sum(1<<state["object_indices"][id] for id in control["targets"])
+        self.assertEqual(next(o for o in state["objects"] if o["id"]==control["id"])["targets"],mask)
+        package=compiler.play_package(self.level,state)
+        self.assertEqual(len(package["door_hinges"]),2)
+        self.assertIn(state["object_indices"][door["id"]],package["collider_objects"])
+
+    def test_primitive_mesh_cooks_and_empty_interactions_do_not_restore_legacy_objects(self):
+        self.level["entities"]=[e for e in self.level["entities"] if e["kind"] not in ("door","control","objective","loot")]
+        self.level["assets"].append({"id":"unit-box","type":"primitive","shape":"box"})
+        row=copy.deepcopy(next(e for e in self.level["entities"] if e["kind"]=="static" and "model" in e))
+        row.update(id="primitive",model="unit-box");row.pop("collider",None)
+        row["transform"]={"position":[0,4,0],"rotation":[0,0,0],"scale":[1,1,1]}
+        self.level["entities"].append(row)
+        state=compiler.validate(self.level)
+        self.assertEqual(len(state["meshes"]["unit-box"]["indices"]),36)
+        self.assertEqual(compiler.play_package(self.level,state)["objects"],[])
+        with tempfile.TemporaryDirectory() as td:
+            source=Path(td)/"level.json";source.write_text(json.dumps(self.level))
+            compiler.compile_level(source,Path(td)/"out",ROOT/"content")
+            header=(Path(td)/"out/generated/demo_level.h").read_text()
+            self.assertIn(".object_count=0",header)
+            self.assertIn(".objects=dl_objects",header)
+
+    def test_interaction_properties_reject_mistyped_values(self):
+        for field,value in (("zone","true"),("required_loot",True),("value",-1),("interaction_radius",float("nan"))):
+            data=copy.deepcopy(self.level)
+            next(e for e in data["entities"] if e["kind"]=="objective")[field]=value
+            with self.subTest(field=field),self.assertRaises(compiler.ContentError):compiler.validate(data)
+
     def test_duplicate_identity_rejected(self):
         self.level["entities"][-1]["id"] = self.level["entities"][0]["id"]
         with self.assertRaisesRegex(compiler.ContentError, "duplicate ID"):
@@ -198,7 +234,7 @@ class CompileLevelTests(unittest.TestCase):
             source, output = Path(td)/"source.json", Path(td)/"out"
             source.write_text(json.dumps(self.level))
             first = compiler.compile_level(source, output, ROOT/"content")
-            self.assertEqual(len(first["changed_artifacts"]), len(self.level["assets"])+3)
+            self.assertEqual(len(first["changed_artifacts"]), len(self.level["assets"])+4)
             self.assertIsNone(json.loads((output/"generated/lighting_report.json").read_text()))
             generated = output/"generated/demo_level.h"
             stamp = generated.stat().st_mtime_ns

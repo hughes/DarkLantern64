@@ -1,0 +1,153 @@
+{
+  "title": "Lanterns Below",
+  "status": "original exploration asset; not shipped in game",
+  "duration_seconds": 48.0,
+  "channels": 8,
+  "instruments": 7,
+  "numpy_version": "1.26.0",
+  "source_sha256": "6243fe71725028a1f621a8dc098fe7ab34224e82c134c84f3766035e6d6f7f0e",
+  "samples": [
+    {
+      "name": "01_low_viol",
+      "frames": 16384,
+      "rate": 16726,
+      "pcm_bytes": 32768,
+      "loop": true,
+      "xm_relative_note": 12,
+      "xm_finetune": 2,
+      "envelope": [
+        [
+          0,
+          0
+        ],
+        [
+          12,
+          50
+        ],
+        [
+          96,
+          45
+        ],
+        [
+          152,
+          36
+        ],
+        [
+          191,
+          0
+        ]
+      ]
+    },
+    {
+      "name": "02_veiled_strings",
+      "frames": 16384,
+      "rate": 16726,
+      "pcm_bytes": 32768,
+      "loop": true,
+      "xm_relative_note": 12,
+      "xm_finetune": 2,
+      "envelope": [
+        [
+          0,
+          0
+        ],
+        [
+          20,
+          48
+        ],
+        [
+          88,
+          42
+        ],
+        [
+          142,
+          30
+        ],
+        [
+          191,
+          0
+        ]
+      ]
+    },
+    {
+      "name": "03_felt_wire",
+      "frames": 25089,
+      "rate": 16726,
+      "pcm_bytes": 50178,
+      "loop": false,
+      "xm_relative_note": 12,
+      "xm_finetune": 0,
+      "envelope": [
+        [
+          0,
+          64
+        ],
+        [
+          12,
+          32
+        ],
+        [
+          24,
+          0
+        ]
+      ]
+    },
+    {
+      "name": "04_watch_bell",
+      "frames": 53523,
+      "rate": 16726,
+      "pcm_bytes": 107046,
+      "loop": false,
+      "xm_relative_note": 12,
+      "xm_finetune": 0,
+      "envelope": []
+    },
+    {
+      "name": "05_frame_drum",
+      "frames": 11708,
+      "rate": 16726,
+      "pcm_bytes": 23416,
+      "loop": false,
+      "xm_relative_note": 12,
+      "xm_finetune": 0,
+      "envelope": []
+    },
+    {
+      "name": "06_brushed_iron",
+      "frames": 7526,
+      "rate": 16726,
+      "pcm_bytes": 15052,
+      "loop": false,
+      "xm_relative_note": 12,
+      "xm_finetune": 0,
+      "envelope": []
+    },
+    {
+      "name": "07_cold_air",
+      "frames": 16384,
+      "rate": 16726,
+      "pcm_bytes": 32768,
+      "loop": true,
+      "xm_relative_note": 12,
+      "xm_finetune": 0,
+      "envelope": [
+        [
+          0,
+          0
+        ],
+        [
+          12,
+          44
+        ],
+        [
+          40,
+          26
+        ],
+        [
+          88,
+          0
+        ]
+      ]
+    }
+  ]
+}

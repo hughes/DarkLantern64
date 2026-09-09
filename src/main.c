@@ -10,6 +10,7 @@
 #include "dl_profile.h"
 #include "animation.h"
 #include "tick.h"
+#include "dl_music.h"
 #ifdef DL_INPUT_REPLAY
 #include "input_replay.h"
 static int replay_start_preset=-1;
@@ -21,7 +22,7 @@ static int replay_start_preset=-1;
 #include "capture_views.h"
 #endif
 
-enum { SAMPLE_RATE = 22050, VOICE_COUNT = 4, REQUIRED_MEMORY = 8 * 1024 * 1024 };
+enum { SAMPLE_RATE = 32000, VOICE_COUNT = 4, REQUIRED_MEMORY = 8 * 1024 * 1024 };
 
 typedef struct {
     uint32_t phase, increment;
@@ -36,8 +37,9 @@ static int sample_rate;
  * with no allocation, logging, game access or floating-point instructions. */
 static void audio_callback(short *buffer, size_t samples) {
     uint32_t start = TICKS_READ();
+    const int16_t *music = dl_music_consume(samples);
     for (size_t i = 0; i < samples; ++i) {
-        int left = 0, right = 0;
+        int left = music ? music[i * 2] : 0, right = music ? music[i * 2 + 1] : 0;
         random_state ^= random_state << 13;
         random_state ^= random_state >> 17;
         random_state ^= random_state << 5;
@@ -225,11 +227,13 @@ static void require_expansion_pak(int memory) {
 
 static void start_level(DlGame *game, const DlLauncher *launcher, DlRenderStats *stats) {
     uint32_t load_start = TICKS_READ();
+    dl_music_stop();
     clear_sounds();
     dl_render_release_scene();
     const DlLevel *level = dl_launcher_active_level(launcher);
     assertf(dl_game_start(game, level, launcher->active_start), "Invalid level start preset");
     dl_render_prepare_scene(game);
+    dl_music_start(&dl_level_music[launcher->active_level]);
     stats->frames = 0; stats->frame_ms = 16.67f; stats->cpu_ms = 0;
     heap_stats_t heap;
     sys_get_heap_stats(&heap);
@@ -359,6 +363,7 @@ int main(void) {
     while(1)wait_ms(100);
 #endif
     if(dl_bundle.has_rom_assets)assertf(dfs_init(DFS_DEFAULT_LOCATION)==DFS_ESUCCESS,"ROM asset filesystem unavailable");
+    dl_music_init();
     dl_render_init();
 
     DlLauncher launcher;
@@ -388,6 +393,7 @@ int main(void) {
     uint32_t previous = TICKS_READ(), next_report = previous;
     while (1) {
         dl_profile_frame_begin(stats.debug);
+        dl_music_service();
         uint32_t frame_start = TICKS_READ();
         float elapsed = (float)(uint32_t)(frame_start - previous) / TICKS_PER_SECOND;
         previous = frame_start;
@@ -429,6 +435,7 @@ int main(void) {
         if (action == DL_LAUNCH_MENU_OPENED || action == DL_LAUNCH_RESUME) {
             dl_tick_clear_pending(&clock);
             if (action == DL_LAUNCH_MENU_OPENED) clear_sounds();
+            dl_music_pause(action == DL_LAUNCH_MENU_OPENED);
             debugf("DL64 menu action=%s active=%s t=%.2f\n",
                 action==DL_LAUNCH_MENU_OPENED?"open":"resume",
                 launcher.has_active?dl_bundle.levels[launcher.active_level].id:"none",game.elapsed);
@@ -505,6 +512,7 @@ int main(void) {
                 game.event, game.elapsed, game.door_open, game.complete, game.caught, (unsigned long)game.sound_serial);
         dl_profile_record(DL_PROFILE_AUDIO_EVENTS, mark);
         if ((int32_t)(frame_start - next_report) >= 0) {
+            dl_music_report();
             heap_stats_t heap;
             sys_get_heap_stats(&heap);
             stats.heap_used = heap.used;

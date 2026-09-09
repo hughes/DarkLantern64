@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "tracks": {
+    "lanterns_below": {
+      "source": "art/music/lanterns_below/lanterns_below.xm",
+      "gain": 0.55
+    }
+  },
+  "levels": {
+    "sponza_courtyard": "lanterns_below"
+  }
+}

@@ -12,9 +12,11 @@ import tempfile
 try:
     from compile_level import compile_level, identifier, require, validate, atomic_write, character_c
     from cook_textures import cook_sprites, texture_memory_summary
+    from cook_music import cook_music
 except ModuleNotFoundError:
     from tools.compile_level import compile_level, identifier, require, validate, atomic_write, character_c
     from tools.cook_textures import cook_sprites, texture_memory_summary
+    from tools.cook_music import cook_music
 
 ROOT = Path(__file__).resolve().parents[1]
 MAX_LEVELS = 8
@@ -78,7 +80,7 @@ def selection(entries, start_level=None, start_preset=None, *, menu=False):
     return level_index, start_index, bool(menu and start_level is None)
 
 
-def union_assets(levels, output):
+def union_assets(levels, output, music=None):
     """Replace only the bundle's package directory with an exact, checked union.
 
     Source level cooks remain untouched. Removed sprites and lighting bakes
@@ -116,6 +118,17 @@ def union_assets(levels, output):
             if relative in artifacts:
                 require(artifacts[relative] == payload, f"Bundle lighting path collision: {relative}")
             artifacts[relative], lighting_records[relative] = payload, lighting
+    music = music or {"assets": []}
+    music_paths = set()
+    for record in music["assets"]:
+        relative = record["path"]
+        require(re.fullmatch(r"romfs/music/[A-Za-z][A-Za-z0-9_-]*\.xm64", relative), "Invalid music package path")
+        payload = Path(record["cooked_path"]).read_bytes()
+        require(len(payload) == record["bytes"] and hashlib.sha256(payload).hexdigest() == record["sha256"],
+                "Music cache hash or size mismatch")
+        require(relative not in artifacts, "Music package collision")
+        artifacts[relative] = payload
+        music_paths.add(relative)
     with tempfile.TemporaryDirectory(prefix="package-", dir=output) as temporary:
         stage = Path(temporary) / "romfs"
         stage.mkdir()
@@ -143,7 +156,7 @@ def union_assets(levels, output):
             "maximum_level_sprite_bytes": max((level["textures"]["sprite_bytes"] for level in levels), default=0)}
     lighting = [lighting_records[key] for key in sorted(lighting_records)]
     assets = [{"path": key, "sha256": hashlib.sha256(payload).hexdigest(), "bytes": len(payload),
-               "kind": "lighting" if key in lighting_records else "texture"}
+               "kind": "music" if key in music_paths else "lighting" if key in lighting_records else "texture"}
               for key, payload in sorted(artifacts.items())]
     return {"textures": texture_report, "rom_assets": assets,
             "lighting": {"assets": lighting, "bytes": sum(record["bytes"] for record in lighting),
@@ -188,10 +201,12 @@ def prepare_bundle(entries, title, output, sdk, *, start_level=None, start_prese
         atomic_write(unit, '#include <stddef.h>\n#include "animation.h"\n'+
                      "\n".join(character_c(c, shared=True) for c in shared_characters.values())+"\n")
         units.append(unit)
-    package = union_assets(levels, output)
+    music = cook_music(levels, output, sdk)
+    package = union_assets(levels, output, music)
+    package["music"] = music
     textures = package["textures"]
     header = generated / "bundle.h"
-    atomic_write(header, '#ifndef DL_GENERATED_BUNDLE_H\n#define DL_GENERATED_BUNDLE_H\n#include "launch.h"\nextern const DlBundle dl_bundle;\n#endif\n')
+    atomic_write(header, '#ifndef DL_GENERATED_BUNDLE_H\n#define DL_GENERATED_BUNDLE_H\n#include "launch.h"\n#include "dl_music.h"\nextern const DlBundle dl_bundle;\nextern const DlMusicCue dl_level_music[];\n#endif\n')
     declarations = "\n".join(f"extern const DlLevel *dl_get_level_{i}(void);" for i in range(len(levels)))
     rows = ",\n".join("    {" + json.dumps(level["id"]) + "," + json.dumps(level["content"]["title"]) +
                         f",dl_get_level_{i}" + "}" for i, level in enumerate(levels))
@@ -199,6 +214,9 @@ def prepare_bundle(entries, title, output, sdk, *, start_level=None, start_prese
                   'const DlBundle dl_bundle = {\n' + f'    .title={json.dumps(title)}, .levels=dl_bundle_levels, .level_count={len(levels)},\n' +
                   f'    .initial_level={initial_level}, .initial_start={initial_start}, .start_in_menu={str(start_in_menu).lower()},\n' +
                   f'    .has_rom_assets={str(bool(package["rom_assets"])).lower()}\n' + '};\n')
+    cue_rows = [('{'+json.dumps(cue["id"])+','+json.dumps(cue["path"])+f',{float(cue["gain"]):.6f}f'+'}')
+                if cue else '{0,0,0}' for cue in music["cues"]]
+    descriptor += 'const DlMusicCue dl_level_music[] = {\n    ' + ',\n    '.join(cue_rows) + '\n};\n'
     unit = generated / "bundle.c"
     atomic_write(unit, descriptor)
     units.append(unit)

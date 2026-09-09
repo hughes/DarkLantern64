@@ -1,0 +1,811 @@
+{
+  "title": "Lanterns Below",
+  "author": "Original DarkLantern64 study",
+  "bpm": 80,
+  "ticks_per_row": 6,
+  "rows": 256,
+  "channels": 8,
+  "channel_pans": [
+    112,
+    62,
+    190,
+    94,
+    176,
+    152,
+    120,
+    170
+  ],
+  "events": [
+    {
+      "row": 0,
+      "channel": 0,
+      "note": "D2",
+      "instrument": 1,
+      "volume": 50
+    },
+    {
+      "row": 0,
+      "channel": 1,
+      "note": "A3",
+      "instrument": 2,
+      "volume": 33
+    },
+    {
+      "row": 0,
+      "channel": 5,
+      "note": "D5",
+      "instrument": 4,
+      "volume": 27
+    },
+    {
+      "row": 2,
+      "channel": 6,
+      "note": "C3",
+      "instrument": 5,
+      "volume": 40
+    },
+    {
+      "row": 4,
+      "channel": 3,
+      "note": "D4",
+      "instrument": 3,
+      "volume": 44
+    },
+    {
+      "row": 7,
+      "channel": 4,
+      "note": "D4",
+      "instrument": 3,
+      "volume": 12
+    },
+    {
+      "row": 8,
+      "channel": 7,
+      "note": "C4",
+      "instrument": 7,
+      "volume": 16
+    },
+    {
+      "row": 11,
+      "channel": 3,
+      "note": "A4",
+      "instrument": 3,
+      "volume": 33
+    },
+    {
+      "row": 14,
+      "channel": 4,
+      "note": "A4",
+      "instrument": 3,
+      "volume": 12
+    },
+    {
+      "row": 18,
+      "channel": 6,
+      "note": "G3",
+      "instrument": 5,
+      "volume": 24
+    },
+    {
+      "row": 20,
+      "channel": 3,
+      "note": "F4",
+      "instrument": 3,
+      "volume": 38
+    },
+    {
+      "row": 23,
+      "channel": 4,
+      "note": "F4",
+      "instrument": 3,
+      "volume": 12
+    },
+    {
+      "row": 24,
+      "channel": 7,
+      "note": "C5",
+      "instrument": 6,
+      "volume": 21
+    },
+    {
+      "row": 27,
+      "channel": 3,
+      "note": "E4",
+      "instrument": 3,
+      "volume": 28
+    },
+    {
+      "row": 30,
+      "channel": 4,
+      "note": "E4",
+      "instrument": 3,
+      "volume": 12
+    },
+    {
+      "row": 32,
+      "channel": 0,
+      "note": "D2",
+      "instrument": 1,
+      "volume": 50
+    },
+    {
+      "row": 32,
+      "channel": 1,
+      "note": "F3",
+      "instrument": 2,
+      "volume": 33
+    },
+    {
+      "row": 32,
+      "channel": 2,
+      "note": "E4",
+      "instrument": 2,
+      "volume": 23
+    },
+    {
+      "row": 34,
+      "channel": 6,
+      "note": "C3",
+      "instrument": 5,
+      "volume": 40
+    },
+    {
+      "row": 38,
+      "channel": 3,
+      "note": "D4",
+      "instrument": 3,
+      "volume": 44
+    },
+    {
+      "row": 40,
+      "channel": 7,
+      "note": "C4",
+      "instrument": 7,
+      "volume": 16
+    },
+    {
+      "row": 41,
+      "channel": 4,
+      "note": "D4",
+      "instrument": 3,
+      "volume": 12
+    },
+    {
+      "row": 47,
+      "channel": 3,
+      "note": "Eb4",
+      "instrument": 3,
+      "volume": 33
+    },
+    {
+      "row": 50,
+      "channel": 4,
+      "note": "Eb4",
+      "instrument": 3,
+      "volume": 12
+    },
+    {
+      "row": 50,
+      "channel": 6,
+      "note": "G3",
+      "instrument": 5,
+      "volume": 24
+    },
+    {
+      "row": 55,
+      "channel": 3,
+      "note": "A3",
+      "instrument": 3,
+      "volume": 38
+    },
+    {
+      "row": 56,
+      "channel": 7,
+      "note": "C5",
+      "instrument": 6,
+      "volume": 21
+    },
+    {
+      "row": 58,
+      "channel": 4,
+      "note": "A3",
+      "instrument": 3,
+      "volume": 12
+    },
+    {
+      "row": 60,
+      "channel": 5,
+      "note": "A4",
+      "instrument": 4,
+      "volume": 27
+    },
+    {
+      "row": 64,
+      "channel": 0,
+      "note": "Bb1",
+      "instrument": 1,
+      "volume": 50
+    },
+    {
+      "row": 64,
+      "channel": 1,
+      "note": "F3",
+      "instrument": 2,
+      "volume": 33
+    },
+    {
+      "row": 64,
+      "channel": 2,
+      "note": "D4",
+      "instrument": 2,
+      "volume": 23
+    },
+    {
+      "row": 66,
+      "channel": 6,
+      "note": "C3",
+      "instrument": 5,
+      "volume": 40
+    },
+    {
+      "row": 68,
+      "channel": 3,
+      "note": "Bb3",
+      "instrument": 3,
+      "volume": 44
+    },
+    {
+      "row": 71,
+      "channel": 4,
+      "note": "Bb3",
+      "instrument": 3,
+      "volume": 12
+    },
+    {
+      "row": 72,
+      "channel": 7,
+      "note": "C4",
+      "instrument": 7,
+      "volume": 16
+    },
+    {
+      "row": 76,
+      "channel": 3,
+      "note": "F4",
+      "instrument": 3,
+      "volume": 33
+    },
+    {
+      "row": 79,
+      "channel": 4,
+      "note": "F4",
+      "instrument": 3,
+      "volume": 12
+    },
+    {
+      "row": 82,
+      "channel": 6,
+      "note": "G3",
+      "instrument": 5,
+      "volume": 24
+    },
+    {
+      "row": 86,
+      "channel": 3,
+      "note": "D4",
+      "instrument": 3,
+      "volume": 38
+    },
+    {
+      "row": 88,
+      "channel": 7,
+      "note": "C5",
+      "instrument": 6,
+      "volume": 21
+    },
+    {
+      "row": 89,
+      "channel": 4,
+      "note": "D4",
+      "instrument": 3,
+      "volume": 12
+    },
+    {
+      "row": 92,
+      "channel": 3,
+      "note": "A3",
+      "instrument": 3,
+      "volume": 28
+    },
+    {
+      "row": 95,
+      "channel": 4,
+      "note": "A3",
+      "instrument": 3,
+      "volume": 12
+    },
+    {
+      "row": 96,
+      "channel": 0,
+      "note": "C2",
+      "instrument": 1,
+      "volume": 50
+    },
+    {
+      "row": 96,
+      "channel": 1,
+      "note": "G3",
+      "instrument": 2,
+      "volume": 33
+    },
+    {
+      "row": 98,
+      "channel": 6,
+      "note": "C3",
+      "instrument": 5,
+      "volume": 40
+    },
+    {
+      "row": 103,
+      "channel": 3,
+      "note": "C4",
+      "instrument": 3,
+      "volume": 44
+    },
+    {
+      "row": 104,
+      "channel": 7,
+      "note": "C4",
+      "instrument": 7,
+      "volume": 16
+    },
+    {
+      "row": 106,
+      "channel": 4,
+      "note": "C4",
+      "instrument": 3,
+      "volume": 12
+    },
+    {
+      "row": 110,
+      "channel": 3,
+      "note": "G4",
+      "instrument": 3,
+      "volume": 33
+    },
+    {
+      "row": 113,
+      "channel": 4,
+      "note": "G4",
+      "instrument": 3,
+      "volume": 12
+    },
+    {
+      "row": 114,
+      "channel": 6,
+      "note": "G3",
+      "instrument": 5,
+      "volume": 24
+    },
+    {
+      "row": 119,
+      "channel": 3,
+      "note": "Eb4",
+      "instrument": 3,
+      "volume": 38
+    },
+    {
+      "row": 120,
+      "channel": 7,
+      "note": "C5",
+      "instrument": 6,
+      "volume": 21
+    },
+    {
+      "row": 122,
+      "channel": 4,
+      "note": "Eb4",
+      "instrument": 3,
+      "volume": 12
+    },
+    {
+      "row": 128,
+      "channel": 0,
+      "note": "D2",
+      "instrument": 1,
+      "volume": 50
+    },
+    {
+      "row": 128,
+      "channel": 1,
+      "note": "A3",
+      "instrument": 2,
+      "volume": 33
+    },
+    {
+      "row": 128,
+      "channel": 2,
+      "note": "F4",
+      "instrument": 2,
+      "volume": 23
+    },
+    {
+      "row": 128,
+      "channel": 5,
+      "note": "D5",
+      "instrument": 4,
+      "volume": 27
+    },
+    {
+      "row": 130,
+      "channel": 6,
+      "note": "C3",
+      "instrument": 5,
+      "volume": 40
+    },
+    {
+      "row": 132,
+      "channel": 3,
+      "note": "D4",
+      "instrument": 3,
+      "volume": 44
+    },
+    {
+      "row": 135,
+      "channel": 4,
+      "note": "D4",
+      "instrument": 3,
+      "volume": 12
+    },
+    {
+      "row": 136,
+      "channel": 7,
+      "note": "C4",
+      "instrument": 7,
+      "volume": 16
+    },
+    {
+      "row": 139,
+      "channel": 3,
+      "note": "A4",
+      "instrument": 3,
+      "volume": 33
+    },
+    {
+      "row": 142,
+      "channel": 4,
+      "note": "A4",
+      "instrument": 3,
+      "volume": 12
+    },
+    {
+      "row": 146,
+      "channel": 6,
+      "note": "G3",
+      "instrument": 5,
+      "volume": 24
+    },
+    {
+      "row": 147,
+      "channel": 3,
+      "note": "F4",
+      "instrument": 3,
+      "volume": 38
+    },
+    {
+      "row": 150,
+      "channel": 4,
+      "note": "F4",
+      "instrument": 3,
+      "volume": 12
+    },
+    {
+      "row": 152,
+      "channel": 7,
+      "note": "C5",
+      "instrument": 6,
+      "volume": 21
+    },
+    {
+      "row": 154,
+      "channel": 3,
+      "note": "E4",
+      "instrument": 3,
+      "volume": 28
+    },
+    {
+      "row": 157,
+      "channel": 4,
+      "note": "E4",
+      "instrument": 3,
+      "volume": 12
+    },
+    {
+      "row": 160,
+      "channel": 0,
+      "note": "F2",
+      "instrument": 1,
+      "volume": 50
+    },
+    {
+      "row": 160,
+      "channel": 1,
+      "note": "C4",
+      "instrument": 2,
+      "volume": 33
+    },
+    {
+      "row": 160,
+      "channel": 2,
+      "note": "A4",
+      "instrument": 2,
+      "volume": 23
+    },
+    {
+      "row": 162,
+      "channel": 6,
+      "note": "C3",
+      "instrument": 5,
+      "volume": 40
+    },
+    {
+      "row": 164,
+      "channel": 3,
+      "note": "F4",
+      "instrument": 3,
+      "volume": 44
+    },
+    {
+      "row": 167,
+      "channel": 4,
+      "note": "F4",
+      "instrument": 3,
+      "volume": 12
+    },
+    {
+      "row": 168,
+      "channel": 7,
+      "note": "C4",
+      "instrument": 7,
+      "volume": 16
+    },
+    {
+      "row": 172,
+      "channel": 3,
+      "note": "C5",
+      "instrument": 3,
+      "volume": 33
+    },
+    {
+      "row": 175,
+      "channel": 4,
+      "note": "C5",
+      "instrument": 3,
+      "volume": 12
+    },
+    {
+      "row": 178,
+      "channel": 6,
+      "note": "G3",
+      "instrument": 5,
+      "volume": 24
+    },
+    {
+      "row": 180,
+      "channel": 3,
+      "note": "A4",
+      "instrument": 3,
+      "volume": 38
+    },
+    {
+      "row": 183,
+      "channel": 4,
+      "note": "A4",
+      "instrument": 3,
+      "volume": 12
+    },
+    {
+      "row": 184,
+      "channel": 7,
+      "note": "C5",
+      "instrument": 6,
+      "volume": 21
+    },
+    {
+      "row": 187,
+      "channel": 3,
+      "note": "G4",
+      "instrument": 3,
+      "volume": 28
+    },
+    {
+      "row": 188,
+      "channel": 5,
+      "note": "F5",
+      "instrument": 4,
+      "volume": 27
+    },
+    {
+      "row": 190,
+      "channel": 4,
+      "note": "G4",
+      "instrument": 3,
+      "volume": 12
+    },
+    {
+      "row": 192,
+      "channel": 0,
+      "note": "Eb2",
+      "instrument": 1,
+      "volume": 44
+    },
+    {
+      "row": 192,
+      "channel": 1,
+      "note": "Bb3",
+      "instrument": 2,
+      "volume": 33
+    },
+    {
+      "row": 192,
+      "channel": 2,
+      "note": "G4",
+      "instrument": 2,
+      "volume": 23
+    },
+    {
+      "row": 194,
+      "channel": 6,
+      "note": "C3",
+      "instrument": 5,
+      "volume": 40
+    },
+    {
+      "row": 196,
+      "channel": 3,
+      "note": "Eb4",
+      "instrument": 3,
+      "volume": 44
+    },
+    {
+      "row": 199,
+      "channel": 4,
+      "note": "Eb4",
+      "instrument": 3,
+      "volume": 12
+    },
+    {
+      "row": 200,
+      "channel": 7,
+      "note": "C4",
+      "instrument": 7,
+      "volume": 16
+    },
+    {
+      "row": 204,
+      "channel": 3,
+      "note": "Bb4",
+      "instrument": 3,
+      "volume": 33
+    },
+    {
+      "row": 207,
+      "channel": 4,
+      "note": "Bb4",
+      "instrument": 3,
+      "volume": 12
+    },
+    {
+      "row": 210,
+      "channel": 6,
+      "note": "G3",
+      "instrument": 5,
+      "volume": 24
+    },
+    {
+      "row": 212,
+      "channel": 3,
+      "note": "G4",
+      "instrument": 3,
+      "volume": 38
+    },
+    {
+      "row": 215,
+      "channel": 4,
+      "note": "G4",
+      "instrument": 3,
+      "volume": 12
+    },
+    {
+      "row": 216,
+      "channel": 7,
+      "note": "C5",
+      "instrument": 6,
+      "volume": 21
+    },
+    {
+      "row": 218,
+      "channel": 3,
+      "note": "F4",
+      "instrument": 3,
+      "volume": 28
+    },
+    {
+      "row": 221,
+      "channel": 4,
+      "note": "F4",
+      "instrument": 3,
+      "volume": 12
+    },
+    {
+      "row": 224,
+      "channel": 0,
+      "note": "A1",
+      "instrument": 1,
+      "volume": 44
+    },
+    {
+      "row": 224,
+      "channel": 1,
+      "note": "E3",
+      "instrument": 2,
+      "volume": 33
+    },
+    {
+      "row": 224,
+      "channel": 5,
+      "note": "E5",
+      "instrument": 4,
+      "volume": 27
+    },
+    {
+      "row": 226,
+      "channel": 6,
+      "note": "C3",
+      "instrument": 5,
+      "volume": 40
+    },
+    {
+      "row": 227,
+      "channel": 3,
+      "note": "E4",
+      "instrument": 3,
+      "volume": 44
+    },
+    {
+      "row": 230,
+      "channel": 4,
+      "note": "E4",
+      "instrument": 3,
+      "volume": 12
+    },
+    {
+      "row": 234,
+      "channel": 3,
+      "note": "C#4",
+      "instrument": 3,
+      "volume": 33
+    },
+    {
+      "row": 237,
+      "channel": 4,
+      "note": "C#4",
+      "instrument": 3,
+      "volume": 12
+    },
+    {
+      "row": 241,
+      "channel": 3,
+      "note": "A3",
+      "instrument": 3,
+      "volume": 38
+    },
+    {
+      "row": 244,
+      "channel": 4,
+      "note": "A3",
+      "instrument": 3,
+      "volume": 12
+    }
+  ]
+}

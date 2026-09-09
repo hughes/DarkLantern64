@@ -200,7 +200,7 @@ def build_rom(sdk, autoplay=False, debug_overlay=False, level=None, capture=Fals
         capture_header.write_text("static const struct { DlVec3 position; float yaw,pitch; bool door_open; float animation_time; const char *animation_clip; float head_yaw,head_pitch; } dl_capture_views[]={" +
                                   ",".join(rows) + "};\n#define DL_CAPTURE_VIEW_COUNT " + str(len(rows)) + "\n")
         extra_headers.append(capture_header)
-    sources = [ROOT / "src" / f for f in ("game.c", "tick.c", "main.c", "dl_profile.c", "launch.c", "animation.c",
+    sources = [ROOT / "src" / f for f in ("game.c", "tick.c", "main.c", "dl_profile.c", "dl_music.c", "launch.c", "animation.c",
                                          "render_lighting.c", "render_batches.c", "render_transform.c", "render_texture_packing.c",
                                          "static_lighting.c", "lighting_bake.c")]
     sources += generated_sources
@@ -216,10 +216,11 @@ def build_rom(sdk, autoplay=False, debug_overlay=False, level=None, capture=Fals
         headers += [Path(entry["source"]), entry_output / "generated/demo_level.h",
                     entry_output / "generated/texture_runtime_report.json"]
     headers += [bundle_output / asset["path"] for asset in catalog["rom_assets"]]
+    headers += [Path(path) for path in catalog["music"]["inputs"]]
     if bundle is not None:
         headers.append(bundle)
     headers += [ROOT / "tools" / name for name in ("compile_bundle.py", "compile_level.py", "cook_textures.py", "cook_lighting.py",
-                                                  "bake_lighting.c", "character_assets.py", "asset_pack.py")]
+                                                  "bake_lighting.c", "character_assets.py", "asset_pack.py", "cook_music.py")]
     sdk_inputs = [lib / n for n in ("libdragon.a", "libdragonsys.a", "n64.ld")]
     sdk_inputs += sorted((sdk / "mips64-elf/include").rglob("*.h"))
     compiler_version = run([tools["mips64-elf-gcc"], "--version"], env=env, capture=True).stdout.splitlines()[0]

@@ -1,0 +1,99 @@
+{
+  "title": "Lanterns Below",
+  "status": "host verified; see separate console evidence",
+  "duration_seconds": 48.0,
+  "channels": 8,
+  "instruments": 7,
+  "converter_sha256": "185cc683e80158b7ef3287099c265a49433bf841991a30a5ff364525047516ce",
+  "host_core_sha256": {
+    "play.c": "b7a4bc86c1e81a3e273c47f1341ff7336755ae13d18d2a64c818eff84092501e",
+    "context.c": "b52704f455ce2dec3235cd56971336e98c6822ad3417c9c318845ded30ac4fd7",
+    "load.c": "f0a168697b885e58c7eaa2ed5ba2948e2fd07ae7fd48c37418641462d7df987d",
+    "xm.h": "508d1f1fa728f7185aad5833215abcc985eda42d253e2e5c830a882a901c2a76",
+    "xm_internal.h": "c99f7fbf0fa0aa3b81d19753f5957f2fd43246fcb3fc908643d3c8fb622b086c"
+  },
+  "renderer_source_sha256": "76d3214653f86fa8ad0e0ce84ee788757c4b15a0178bec528afc8ed1ce65aed7",
+  "compiler": "gcc (x86_64-posix-seh-rev0, Built by MinGW-Builds project) 13.2.0",
+  "conversion_log": "Converting: C:/Users/hughe/dev/DarkLantern64/art/music/lanterns_below/lanterns_below.xm => C:/Users/hughe/dev/DarkLantern64/build/music-study/lanterns-below//lanterns_below.xm64\n  * ROM size: 290 KiB (samples:287)\n  * RAM size: 22 KiB (ctx:5, patterns:2, samples:14)\n  * Samples RAM per channel: [440, 1304, 1920, 2536, 2536, 3000, 896, 2264]",
+  "converter_channel_buffers_bytes": [
+    440,
+    1304,
+    1920,
+    2536,
+    2536,
+    3000,
+    896,
+    2264
+  ],
+  "converter_total_channel_buffers_bytes": 14896,
+  "host_render_checks": {
+    "source_cooked_exact": true,
+    "block_partition_exact": true,
+    "two_loops_exact": true,
+    "loop_boundary_jump": [
+      0.0,
+      0.0
+    ],
+    "finite": true,
+    "clipped_samples": 0,
+    "peak": 0.2411731481552124,
+    "rms_dbfs": -25.739667415618896
+  },
+  "renderer_results": {
+    "source": {
+      "frames": 3072001,
+      "rate": 32000,
+      "peak": 0.241173148,
+      "loops": 2,
+      "channels": 8,
+      "instruments": 7
+    },
+    "cooked": {
+      "frames": 3072001,
+      "rate": 32000,
+      "peak": 0.241173148,
+      "loops": 2,
+      "channels": 8,
+      "instruments": 7
+    },
+    "partition": {
+      "frames": 3072001,
+      "rate": 32000,
+      "peak": 0.241173148,
+      "loops": 2,
+      "channels": 8,
+      "instruments": 7
+    }
+  },
+  "caveat": "Host libxm loads samples resident and uses its CPU mixer. These checks do not establish RSP PCM parity, target heap peaks, or game performance.",
+  "artifacts": {
+    "xm": {
+      "path": "art/music/lanterns_below/lanterns_below.xm",
+      "bytes": 306729,
+      "sha256": "6243fe71725028a1f621a8dc098fe7ab34224e82c134c84f3766035e6d6f7f0e"
+    },
+    "xm64": {
+      "path": "build/music-study/lanterns-below/lanterns_below.xm64",
+      "bytes": 297194,
+      "sha256": "a17d107467100b950e8db70c9fe9530cce5a1f2d6d36450b23a887e6afa95691"
+    },
+    "wav": {
+      "path": "build/music-study/lanterns-below/lanterns_below.wav",
+      "bytes": 6144044,
+      "sha256": "d26100337a91d3db64fa2f11654b5ca7b0a3be7e1226e4c59398358e3d26db35"
+    },
+    "wav64": {
+      "path": "build/music-study/lanterns-below/lanterns_below.wav64",
+      "bytes": 1728352,
+      "sha256": "cddbe78fa46f94b74fb3109fb83e59cc3e6d36ecd289b231ca85a50341f5ca2f"
+    }
+  },
+  "rom": {
+    "path": "build/music-study/lanterns-below/lanterns_below.z64",
+    "bytes": 2228224,
+    "sha256": "8226f8d1e8e387ece12463f55743e031c10de9bb187ec1eff7250ade9b1172ab",
+    "player_source_sha256": "e7f3c4a2e264bf99f6a94d4bedfc77c6137366e6809efc3f217f71c5705c4539",
+    "libdragon_sha256": "8aaf823b3640cd3fd8b0bb8967ccda4f39464dafc0d3b0cac13c0ff39e1a7b4f",
+    "linked_size": "text\t   data\t    bss\t    dec\t    hex\tfilename\n 198972\t   9032\t   7232\t 215236\t  348c4\tC:/Users/hughe/dev/DarkLantern64/build/music-study/lanterns-below/rom/player.elf"
+  }
+}

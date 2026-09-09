@@ -14,6 +14,8 @@ Our development approach is to extend **LightEngine** into a productive content 
 
 **Exploring larger interiors?** [Sponza After Hours](docs/sponza-study.md) adds a courtyard, two playable floors, connected stairways and a gallery-to-vault encounter. Choose it in the existing editor or game level menu.
 
+**Music:** Sponza now plays the original 48-second [Lanterns Below](docs/music-study.md) XM64 cue in the ROM, alongside gameplay effects. See [Music](docs/music.md) for editing, build/launch, and the remaining native editor playback work.
+
 **Animating characters?** The [guard animation study](docs/guard-animation-prototype.md) covers the editable Blender guard, five Actions, connected joints, editor playback/head attention and measured N64 costs. Its clips compress to 8.61 KiB. The default renderer now uses Tiny3D on the RSP for model transforms and rigid skeletal deformation.
 
 The two-guard workshop [sustains every native refresh in Ares](docs/guard-renderer-performance.md): 1,800 fresh frames over 30 seconds, with no repeats and a 15.396 ms maximum CPU work sample after the shared-resource, sleeve, depth, Sponza scaling and loading corrections. Original hardware validation remains pending.
@@ -68,6 +70,7 @@ The engine revision is recorded in [dependencies.json](dependencies.json). Proje
 | [N64 hardware guide](docs/n64-hardware-guide.md) | Processors, memory/bandwidth, graphics features, lighting, and seamless spaces. |
 | [Modern N64 graphics](docs/modern-n64-graphics.md) | Native HDR/bloom, material tricks, shadows and game evidence versus emulator enhancements. |
 | [Audio design](docs/audio-design.md) | Output fidelity, acoustics, material cues, positional sound, and AI hearing. |
+| [Music](docs/music.md) | N64 music capabilities, instruments, track budgets, playback choices, and a proposed composition/import workflow. |
 | [Audio memory planning](docs/audio-memory-planning.md) | Scenario estimates, retained buffers, transition peaks, and budget assumptions. |
 | [Game profiling](docs/profiling.md) | Record Ares subsystem timings and compare frame-budget costs. |
 | [Mission scale](docs/scaling-guide.md) | Measured guard, room, loot and light costs; culling and larger-mission architecture. |

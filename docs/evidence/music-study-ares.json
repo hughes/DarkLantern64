@@ -1,0 +1,42 @@
+{
+  "name": "music-study",
+  "passed": true,
+  "log": ".dev\\ares\\runs\\80c6d6fc92f147efb2eb083e083a6890\\music-study.log",
+  "tested_rom": ".dev\\ares\\runs\\80c6d6fc92f147efb2eb083e083a6890\\lanterns_below.z64",
+  "rom_sha256": "8226f8d1e8e387ece12463f55743e031c10de9bb187ec1eff7250ade9b1172ab",
+  "rom_bytes": 2228224,
+  "settings": ".dev\\ares\\runs\\80c6d6fc92f147efb2eb083e083a6890\\settings.bml",
+  "settings_source_sha256": "010e6ec4df82b1750292c4a1e50b1e513f9e2d4b7c604d345be0c1d28b6b140a",
+  "profile_report": null,
+  "elapsed_seconds": 103.219,
+  "peak_sampled_heap_bytes": null,
+  "max_reported_cpu_ms": null,
+  "boot": null,
+  "terminal_event": "DL64 music_study_done heap=786512",
+  "rom_source_sha256": "e7f3c4a2e264bf99f6a94d4bedfc77c6137366e6809efc3f217f71c5705c4539",
+  "emulator_sha256": "e07ea6efda27c5dd60939b78c2e9c1aa25845ecb465f4d2114f615fe6b75507c",
+  "records": [
+    "DL64 music_boot rate=31995 buffer_frames=1272 heap_base=770072",
+    "DL64 music_phase kind=xm64 frames=1600176 blocks=1258 peak=8371 heap_peak=795312",
+    "DL64 music_closed kind=xm64 heap=770504",
+    "DL64 music_phase kind=wav64 frames=1600176 blocks=1258 peak=7916 heap_peak=786880",
+    "DL64 music_study_done heap=786512"
+  ],
+  "phases": [
+    {
+      "kind": "xm64",
+      "frames": 1600176,
+      "blocks": 1258,
+      "peak": 8371,
+      "sampled_heap_peak": 795312
+    },
+    {
+      "kind": "wav64",
+      "frames": 1600176,
+      "blocks": 1258,
+      "peak": 7916,
+      "sampled_heap_peak": 786880
+    }
+  ],
+  "limitations": "Standalone emulator execution only. No game load, underrun instrumentation, PCM parity capture, or original-hardware validation."
+}

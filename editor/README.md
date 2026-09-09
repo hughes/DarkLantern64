@@ -2,6 +2,11 @@
 
 For a first editing session, follow the [creator quickstart](../docs/creator-guide.md). This page is the more detailed editor reference.
 
+Level opening and automatic draft refresh now prepare in the background and
+reuse unchanged cooked assets. Same-level refresh preserves the camera. See
+[iteration performance and picking](../docs/editor-iteration.md) for measured
+timings, cache invalidation, front-face selection and inspection commands.
+
 Run **DarkLantern64: Launch editor** in VS Code, or `python tools/build.py --editor --run`. One project session manages all canonical levels and remembers the last opened level. Its queue, logs, and layout live in `.dev/editor/project/`. The desktop C++23 application uses the pinned LightEngine checkout in `external/LightEngine`.
 
 **Levels** and **File > Open level** list every discovered version-2 level directly inside `content/`. **New level** creates a playable starter room with a switch, door, objective, and spawn; **Duplicate** copies a saved level. Open a level to edit its title, objects, patrols, materials, and lighting. **Include in game menu** controls membership in `content/level_bundle.json`; the browser also lists levels outside that bundle.

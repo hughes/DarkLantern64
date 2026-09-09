@@ -370,6 +370,12 @@ def cook_source(source, *, compare_15hz=True):
 
 
 _CACHE = {}
+_DISK_CACHE = None
+
+
+def configure_editor_cache(directory):
+    global _DISK_CACHE
+    _DISK_CACHE = Path(directory)
 
 
 def load_character(path, *, compare_15hz=True):
@@ -379,10 +385,20 @@ def load_character(path, *, compare_15hz=True):
     digest = hashlib.sha256(raw).hexdigest()
     key = digest, compare_15hz
     if key not in _CACHE:
-        result = cook_source(json.loads(raw), compare_15hz=compare_15hz)
-        result["source_sha256"] = digest
-        result["symbol"] = "dl_character_" + digest[:20]
-        result["report"]["source_sha256"] = digest
+        try:
+            from . import editor_cache
+        except ImportError:
+            import editor_cache
+        disk_key = [digest, compare_15hz, hashlib.sha256(Path(__file__).read_bytes()).hexdigest()]
+        cached = _DISK_CACHE / (digest + ("-comparison" if compare_15hz else "") + ".json") if _DISK_CACHE else None
+        result = editor_cache.read(cached, disk_key) if cached else None
+        if result is None:
+            result = cook_source(json.loads(raw), compare_15hz=compare_15hz)
+            result["source_sha256"] = digest
+            result["symbol"] = "dl_character_" + digest[:20]
+            result["report"]["source_sha256"] = digest
+            if cached:
+                editor_cache.write(cached, disk_key, result)
         _CACHE[key] = result
     return _CACHE[key]
 

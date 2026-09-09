@@ -55,6 +55,47 @@ class ProjectLevelTests(unittest.TestCase):
         return {p.relative_to(self.content).as_posix(): p.read_bytes()
                 for p in self.content.rglob("*") if p.is_file()}
 
+    def test_cook_reuses_outputs_and_invalidates_changed_inputs_or_missing_artifacts(self):
+        first = self.project.cook("first_room.json")
+        with patch.object(project, "compile_level", side_effect=AssertionError("unexpected recook")):
+            warm = project.ProjectLevels(self.root).cook("first_room.json")
+        self.assertTrue(warm["cache_hit"])
+        self.assertEqual(warm["preview_fingerprint"], first["preview_fingerprint"])
+        self.assertEqual(warm["changed_preview_assets"], [])
+        mesh = self.content / "models/block.obj"
+        mesh.write_bytes(mesh.read_bytes()+b"\n# changed dependency\n")
+        self.assertFalse(self.project.cook("first_room.json")["cache_hit"])
+        output = Path(first["asset_root"]) / first["scene_path"]
+        output.unlink()
+        self.assertFalse(self.project.cook("first_room.json")["cache_hit"])
+        self.assertTrue(output.exists())
+        self.one["title"] = "Changed source"
+        self.write("first_room.json", self.one)
+        self.assertFalse(self.project.cook("first_room.json")["cache_hit"])
+
+    def test_staged_cook_does_not_reuse_saved_output_or_change_source(self):
+        first = self.project.cook("first_room.json")
+        before = self.content_bytes()
+        draft = copy.deepcopy(self.one)
+        draft["entities"][0]["transform"]["position"][0] += .1
+        stage = self.root / "draft.json"
+        stage.write_bytes(project.json_bytes(draft))
+        staged = self.project.cook("first_room.json", staged=stage)
+        self.assertFalse(staged["cache_hit"])
+        self.assertNotEqual(first["preview_fingerprint"], staged["preview_fingerprint"])
+        self.assertTrue(self.project.cook("first_room.json", staged=stage)["cache_hit"])
+        restored = self.project.cook("first_room.json")
+        self.assertFalse(restored["cache_hit"])
+        self.assertEqual(first["preview_fingerprint"], restored["preview_fingerprint"])
+        self.assertEqual(before, self.content_bytes())
+
+    def test_invalid_dependency_is_not_hidden_by_validation_cache(self):
+        self.project.catalog()
+        (self.content / "models/block.obj").write_text("broken mesh")
+        self.assertEqual(self.project.catalog()["levels"], [])
+        with self.assertRaises(ValueError):
+            self.project.cook("first_room.json")
+
     def test_discovery_reports_saved_levels_and_ignores_unrelated_documents(self):
         self.write("audio_budget.json", {"version": 1, "title": "Not a scene"})
         self.write("random.json", {"something": 12})
@@ -209,6 +250,8 @@ class ProjectLevelTests(unittest.TestCase):
         real_replace = os.replace
         attempts = []
         def fail_second(source, target):
+            if not Path(target).is_relative_to(self.content):
+                return real_replace(source, target)
             attempts.append(str(target))
             if len(attempts) == 2:
                 raise OSError("simulated disk failure")
@@ -236,6 +279,8 @@ class ProjectLevelTests(unittest.TestCase):
         real_replace = os.replace
         attempts = []
         def fail_after_first(source, target):
+            if not Path(target).is_relative_to(self.content):
+                return real_replace(source, target)
             attempts.append(str(target))
             if len(attempts) > 1:
                 raise OSError("disk unavailable")

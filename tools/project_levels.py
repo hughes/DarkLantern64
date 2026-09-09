@@ -19,13 +19,18 @@ import re
 import shutil
 import tempfile
 import uuid
+import time
 
 try:
     from compile_level import compile_level, validate
     from compile_bundle import MAX_LEVELS, read_manifest
+    import editor_cache
+    from character_assets import configure_editor_cache
 except ModuleNotFoundError:
     from tools.compile_level import compile_level, validate
     from tools.compile_bundle import MAX_LEVELS, read_manifest
+    from tools import editor_cache
+    from tools.character_assets import configure_editor_cache
 
 ROOT = Path(__file__).resolve().parents[1]
 FILENAME = re.compile(r"[A-Za-z][A-Za-z0-9_-]{0,63}\.json")
@@ -90,6 +95,24 @@ class ProjectLevels:
         require(self.content.is_dir(), "Project has no content directory")
         self.manifest = self.safe(self.content / "level_bundle.json")
         self.editor = self.safe(self.root / ".dev/editor")
+        self.cache = self.safe(self.editor / "cache")
+        configure_editor_cache(self.cache / "characters")
+        # Include the cooker and native lighting inputs, not just the level JSON.
+        code_root = Path(__file__).resolve().parents[1]
+        code_files = sorted((code_root / "tools").glob("*.py"))
+        code_files += sorted(p for p in (code_root / "src").rglob("*") if p.suffix in (".c", ".h", ".inc", ".def"))
+        self.code_key = sha256(json_bytes(editor_cache.fingerprint(code_files)))
+
+    def validate_cached(self, path, raw, data):
+        cache = self.safe(self.cache / "validation" / (sha256(str(path).encode()) + ".json"))
+        key = [self.code_key, sha256(raw)]
+        cached = editor_cache.read(cache, key)
+        if cached is not None:
+            return cached["dependencies"]
+        state = validate(data, self.content)
+        dependencies = [str(p.resolve()) for _, p in state["dependencies"]]
+        editor_cache.write(cache, key, {"dependencies": dependencies}, dependencies)
+        return dependencies
 
     def safe(self, path):
         """Reject aliases, junctions and links, including inside generated output."""
@@ -150,7 +173,7 @@ class ProjectLevels:
             require(re.fullmatch(r"[a-fA-F0-9]{64}", expected) is not None, "Expected source SHA-256 must contain 64 hexadecimal characters")
             require(sha256(raw) == expected.lower(), "Level changed on disk; refresh the project before modifying it")
         data = json.loads(raw)
-        validate(data, self.content)
+        self.validate_cached(path, raw, data)
         return raw, data
 
     def bundle_snapshot(self):
@@ -185,7 +208,7 @@ class ProjectLevels:
                 data = json.loads(raw)
                 if not isinstance(data, dict) or type(data.get("version")) is not int or data["version"] != 2:
                     continue
-                validate(data, self.content)
+                self.validate_cached(path, raw, data)
                 levels.append(self.entry(path, raw, data, bundle))
             except (ValueError, OSError, KeyError, TypeError) as error:
                 warnings.append({"file": path.name, "message": str(error)})
@@ -352,6 +375,7 @@ class ProjectLevels:
             return {"ok": True, "level": entry, "backup": backup.as_posix(), "catalog": self.catalog()}
 
     def cook(self, level, expected_sha256=None, staged=None):
+        started = time.perf_counter()
         with self.lock():
             path = self.path(level)
             raw, _ = self.read_level(path, expected_sha256)
@@ -362,6 +386,13 @@ class ProjectLevels:
             candidate_raw, _ = self.read_level(candidate)
             output = self.safe(self.root / "build" if path.stem == "first_room" else self.root / "build/scenes" / path.stem)
             asset_root = self.safe(self.root / "build/project/editor-assets")
+            cache = self.safe(self.cache / "cooked" / path.name)
+            key = [self.code_key, sha256(raw), sha256(candidate_raw), staged is not None]
+            cached = editor_cache.read(cache, key)
+            if cached is not None:
+                cached.update(catalog=self.catalog(), changed_preview_assets=[], cache_hit=True)
+                cached["prepare_ms"] = round((time.perf_counter()-started)*1000, 2)
+                return cached
             staging = self.safe(self.editor / "cooking")
             staging.mkdir(parents=True, exist_ok=True)
             with tempfile.TemporaryDirectory(prefix="cook-", dir=staging) as temporary:
@@ -414,17 +445,24 @@ class ProjectLevels:
                 # Scene descriptor appears only after its referenced files exist.
                 changes[asset_root / scene_path] = json_bytes(namespace(preview))
                 changes = {self.safe(target): payload for target, payload in changes.items()}
+                outputs = list(changes)
+                preview_fingerprint = sha256(json_bytes({str(target.relative_to(asset_root)): sha256(payload)
+                    for target, payload in changes.items() if target.is_relative_to(asset_root)}))
                 changed_preview_assets = [target.as_posix() for target, payload in changes.items()
                                           if target.is_relative_to(asset_root) and target.suffix in (".gltf", ".png")
                                           and (not target.exists() or target.read_bytes() != payload)]
                 changes = {target: payload for target, payload in changes.items()
                            if not target.exists() or target.read_bytes() != payload}
                 self.publish(changes, {path: raw, candidate: candidate_raw})
-            return {"ok": True, "source": path.as_posix(), "source_sha256": sha256(raw),
+            result = {"ok": True, "source": path.as_posix(), "source_sha256": sha256(raw), "source_text": raw.decode("utf-8"),
                     "output": output.as_posix(), "asset_root": asset_root.as_posix(),
                     "scene_path": scene_path, "staged": staged is not None,
                     "changed_preview_assets": changed_preview_assets,
-                    "report": report, "catalog": self.catalog()}
+                    "report": report, "preview_fingerprint": preview_fingerprint}
+            dependencies = self.validate_cached(candidate, candidate_raw, json.loads(candidate_raw))
+            editor_cache.write(cache, key, result, [*dependencies, *outputs])
+            result.update(catalog=self.catalog(), cache_hit=False, prepare_ms=round((time.perf_counter()-started)*1000, 2))
+            return result
 
 
 def boolean(value):

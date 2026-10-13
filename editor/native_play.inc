@@ -39,6 +39,8 @@
     }
     void StartNative(const std::string& preset="default",bool paused=false) {
         if(engine_.IsPlaying()||Busy()||!pendingAction_.empty())throw std::runtime_error("Stop play and finish pending editor work first");
+        if(document_.contains("authoring_profile")&&document_.at("authoring_profile")=="external-scale-study")
+            throw std::runtime_error("This source study is available for editor and Blender inspection. Open its bounded runtime level for Native Play; the full mission needs streaming and runtime capacity work.");
         SyncPreviewTransforms();
         const auto stage=queue_/"native-snapshot.json";
         AtomicWrite(stage,document_.dump(2)+"\n");

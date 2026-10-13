@@ -7,10 +7,10 @@ authored sharp boundaries. Entirely flat meshes retain the compact legacy path.
 bl_info = {
     "name": "DarkLantern64 Asset Pack",
     "author": "DarkLantern64 contributors",
-    "version": (1, 1, 0),
+    "version": (1, 3, 0),
     "blender": (4, 2, 0),
     "location": "File > Export > DarkLantern64 Asset Pack",
-    "description": "Export selected models, UVs and simple materials for the N64 pipeline",
+    "description": "Export assets and stage safe level geometry updates for DarkLantern64",
     "category": "Import-Export",
 }
 
@@ -105,7 +105,32 @@ def _material(material, root, output):
     return result, image
 
 
-def _obj(context, obj, textured):
+class TriangleExportError(ExportError):
+    """An evaluated triangle with enough location data to inspect its face."""
+
+    def __init__(self, obj, mesh, triangle, area):
+        self.problem = dict(object=obj.name, face=triangle.polygon_index,
+                            polygon_vertices=list(mesh.polygons[triangle.polygon_index].vertices),
+                            triangle=triangle.index, vertices=list(triangle.vertices), area_m2=area)
+        super().__init__(f"{obj.name}: face {triangle.polygon_index}, triangle {triangle.index}, "
+                         f"vertices {list(triangle.vertices)} (indices start at 0): "
+                         f"area {area:.6g} m² is degenerate or too small. "
+                         "Use Select problem face in the DarkLantern sidebar.")
+
+
+def _export_triangles(obj, mesh, vertices):
+    """Locate invalid triangles without changing or filtering authored geometry."""
+    for triangle in mesh.loop_triangles:
+        points = [vertices[index] for index in triangle.vertices]
+        a, b = [[points[i][j] - points[0][j] for j in range(3)] for i in (1, 2)]
+        cross = (a[1]*b[2]-a[2]*b[1], a[2]*b[0]-a[0]*b[2], a[0]*b[1]-a[1]*b[0])
+        squared = sum(c*c for c in cross)
+        if squared <= 1e-12:
+            raise TriangleExportError(obj, mesh, triangle, .5 * math.sqrt(squared))
+    return mesh.loop_triangles
+
+
+def _obj(context, obj, textured, *, local_space=False):
     require(obj.mode == "OBJECT", f"{obj.name}: leave Edit Mode before exporting")
     evaluated = obj.evaluated_get(context.evaluated_depsgraph_get())
     mesh = evaluated.to_mesh(preserve_all_data_layers=True, depsgraph=context.evaluated_depsgraph_get())
@@ -119,7 +144,8 @@ def _obj(context, obj, textured):
         require(not textured or uv_layer is not None, f"{obj.name}: textured models require an active UV map")
         # Parent rotation/scale and modifiers are baked. Remove only world
         # translation, so every model retains its own authored origin/pivot.
-        linear = evaluated.matrix_world.to_3x3()
+        from mathutils import Matrix
+        linear = Matrix.Identity(3) if local_space else evaluated.matrix_world.to_3x3()
         determinant = linear.determinant()
         require(math.isfinite(determinant) and abs(determinant) > 1e-12,
                 f"{obj.name}: zero or invalid object scale")
@@ -137,7 +163,7 @@ def _obj(context, obj, textured):
                                     obj.name + " vertex", -1024, 1024))
         require(len(vertices) <= 4096, f"{obj.name}: mesh exceeds 4096 source vertices")
         uvs, uv_indices, normals, normal_indices, faces, seam_vertices = [], {}, [], {}, [], set()
-        for triangle in mesh.loop_triangles:
+        for triangle in _export_triangles(obj, mesh, vertices):
             require(triangle.material_index == 0, f"{obj.name}: found a second material on an evaluated face")
             loops = list(triangle.loops)
             if determinant < 0:
@@ -173,11 +199,6 @@ def _obj(context, obj, textured):
                 else:
                     face.append(str(vertex_index + 1))
                 seam_vertices.add((vertex_index, uv_index, normal_index))
-            points = [vertices[mesh.loops[index].vertex_index] for index in loops]
-            a, b = [[points[i][j] - points[0][j] for j in range(3)] for i in (1, 2)]
-            cross = (a[1]*b[2]-a[2]*b[1], a[2]*b[0]-a[0]*b[2], a[0]*b[1]-a[1]*b[0])
-            require(sum(c*c for c in cross) > 1e-12,
-                    f"{obj.name}: degenerate or too-small triangle; remove it before export")
             faces.append("f " + " ".join(face))
         require(len(seam_vertices) <= 4096,
                 f"{obj.name}: UV/normal seams expand the model past 4096 runtime vertices")
@@ -294,11 +315,14 @@ class DL64_OT_export_pack(bpy.types.Operator, ExportHelper):
     content_root: StringProperty(name="Content Root", subtype="DIR_PATH", default="//../content/")
 
     def execute(self, context):
+        context.scene.pop("dl64_export_problem", None)
         try:
             path = Path(bpy.path.abspath(self.filepath))
             require(path.name == "pack.json", "Name the exported manifest pack.json")
             manifest = export_pack(context, bpy.path.abspath(self.content_root), path.parent)
         except (ExportError, OSError, RuntimeError) as error:
+            if isinstance(error, TriangleExportError):
+                context.scene["dl64_export_problem"] = json.dumps(error.problem)
             self.report({"ERROR"}, str(error))
             return {"CANCELLED"}
         self.report({"INFO"}, f"Exported {len(manifest['assets'])} models; material roughness/metallic are authoring-only")
@@ -312,9 +336,13 @@ def _menu(self, context):
 def register():
     bpy.utils.register_class(DL64_OT_export_pack)
     bpy.types.TOPBAR_MT_file_export.append(_menu)
+    from . import scene_bridge
+    scene_bridge.register()
 
 
 def unregister():
+    from . import scene_bridge
+    scene_bridge.unregister()
     bpy.types.TOPBAR_MT_file_export.remove(_menu)
     bpy.utils.unregister_class(DL64_OT_export_pack)
 

@@ -1,5 +1,8 @@
 # Sponza After Hours
 
+To edit the assembled level's geometry, placement and collision in Blender,
+open `art/sponza-edit.blend` and follow the [safe scene re-import guide](blender-scenes.md).
+
 This level rebuilds the recognizable spaces of Intel's New Sponza reference as
 an N64-sized stealth environment: a narrow open courtyard, a lower arcade, a
 continuous upper gallery, and the tall walls and roof around the sky opening.

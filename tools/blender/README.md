@@ -1,5 +1,9 @@
 # Blender asset-pack exporter
 
+For editing an assembled level, use the [Blender scene bridge](../../docs/blender-scenes.md).
+It adds a **DarkLantern** sidebar with **Export level changes**, followed by
+**Import Blender changes** in the game editor. Sponza is the verified example.
+
 The add-on in `darklantern64_export/` exports selected mesh objects to the same
 OBJ, material JSON and PNG inputs used by the LightEngine preview and N64 cooker.
 It requires Blender 4.2 or newer. Keep the editable `.blend` file as the source;

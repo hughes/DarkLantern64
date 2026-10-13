@@ -153,6 +153,33 @@ class AssetPackTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "exceeds 64 materials"):
             resolve_asset_packs(dict(self.level, asset_packs=["pack.json"]), self.root)
 
+    def test_large_resolved_study_requires_saved_profile_and_host_caller(self):
+        self.level['authoring_profile'] = 'external-scale-study'
+        self.level['assets'] = [{'id': f'study-{i}', 'uri': 'loot.obj'} for i in range(200)]
+        self.level['materials'] = [{'id': f'study-material-{i}', 'color': [1, 1, 1, 1]} for i in range(100)]
+        linked = dict(self.level, asset_packs=['pack.json'])
+        with self.assertRaisesRegex(ValueError, 'authoring-only'):
+            resolve_asset_packs(linked, self.root)
+        expanded, _, _ = resolve_asset_packs(linked, self.root, authoring=True)
+        self.assertEqual(len(expanded['assets']), 201)
+        self.assertEqual(len(expanded['materials']), 101)
+        linked.pop('authoring_profile')
+        with self.assertRaisesRegex(ValueError, 'exceeds 128 assets'):
+            resolve_asset_packs(linked, self.root, authoring=True)
+
+    def test_study_asset_merge_and_placement_keep_runtime_defaults(self):
+        self.level['authoring_profile'] = 'external-scale-study'
+        self.level['assets'] = [{'id': f'study-{i}', 'uri': 'loot.obj'} for i in range(200)]
+        with self.assertRaisesRegex(ValueError, 'authoring-only'):
+            merge_pack(self.level, 'pack.json', self.root)
+        merged, catalog = merge_pack(self.level, 'pack.json', self.root, authoring=True)
+        merged['entities'] = [{'id': f'existing-{i}', 'model': 'mesh-loot'} for i in range(200)]
+        with self.assertRaisesRegex(ValueError, 'authoring-only'):
+            place_prop(merged, catalog, 'loot', 'new-prop', [0, 0, 0])
+        placed = place_prop(merged, catalog, 'loot', 'new-prop', [0, 0, 0], authoring=True)
+        self.assertEqual(len(placed['entities']), 201)
+        self.assertEqual(len(merged['entities']), 200)
+
 
 if __name__ == "__main__":
     unittest.main()

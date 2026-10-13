@@ -356,6 +356,8 @@ class DemoEditor
     Json document_, report_, audioConfig_, audioDraft_, audioReport_;
     Json prefabs_ = Json::array();
     char assetPackUri_[256] = "assets/loot/pack.json";
+    char blenderScenePath_[512] = "";
+    Json blenderImportReport_ = Json::object();
     std::string selectedPrefab_;
     std::string newEnemyType_ = "watchman";
     bool highlightNewProp_ = false;
@@ -440,7 +442,7 @@ class DemoEditor
         AtomicWrite(queue_/"session.json",Json{{"pid",GetCurrentProcessId()},{"root",root_.string()},
             {"source",source_.string()},{"output",output_.string()},{"scene_path",scenePath_},{"project_editor",true},
             {"operations",{"pick_editor","inspect","list_levels","open_level","create_level","duplicate_level","delete_level","update_level","play_level","play_menu",
-                "drop_selection","save_prefab","place_prefab","add_game_object","set_game_object","undo","redo","add_blockout","select_entities","transform_selection","group_entities","duplicate_entities","delete_entities","refresh_preview","import_asset_pack","add_prop","set_entity","add_enemy","duplicate_enemy","add_waypoint","delete_entity","set_environment","set_material",
+                "drop_selection","save_prefab","place_prefab","add_game_object","set_game_object","undo","redo","add_blockout","select_entities","transform_selection","group_entities","duplicate_entities","delete_entities","refresh_preview","import_blender_scene","import_asset_pack","add_prop","set_entity","add_enemy","duplicate_enemy","add_waypoint","delete_entity","set_environment","set_material",
                 "set_preview_transform","get_animation","set_animation","focus_character","save","build","capture","get_layout","set_panel","reset_layout","start_play","stop_play","inspect_scene","query_play","set_play_debug","inspect_play","pause_play","step_play","restart_play","set_play_input","get_play_trace","export_replay","replay_play","reload","get_audio_memory","set_audio_config","recalculate_audio","quit"}}}.dump(2));
     }
     void InvalidatePreviewAssets(const Json& cooked)
@@ -1102,6 +1104,41 @@ class DemoEditor
         dirty_ = structureDirty_ = true;
         status_ = "Object list updated. Set XYZ placement, then Save + Cook to refresh viewport models and markers.";
     }
+    Json ImportBlenderScene(const Json& args)
+    {
+        if(Busy() || engine_.IsPlaying())throw std::runtime_error("Finish Play/preparation before importing Blender changes");
+        if(ReadText(source_)!=sourceSnapshot_)throw std::runtime_error("Level changed on disk; reload before importing Blender changes. Your draft is retained.");
+        fs::path exchange=args.value("path",std::string(blenderScenePath_));
+        if(exchange.empty()) {
+            const auto folder=root_/"build/blender"/source_.stem();
+            std::vector<fs::path> candidates;
+            if(fs::exists(folder))for(const auto& entry:fs::directory_iterator(folder))
+                if(entry.is_directory()&&fs::exists(entry.path()/"scene.json"))candidates.push_back(entry.path()/"scene.json");
+            if(candidates.size()!=1)throw std::runtime_error("Export from Blender first. If several checkouts exist, enter the desired scene.json path in Blender export path.");
+            exchange=candidates.front();
+        }
+        if(exchange.is_relative())exchange=root_/exchange;
+        if(ReadJson(exchange).at("level")!=source_.filename().string())throw std::runtime_error("This Blender export belongs to a different level");
+        const auto stage=queue_/"staging/blender-draft.json";
+        const auto expected=queue_/"staging/blender-expected.json";
+        const auto output=queue_/"staging/blender-result.json";
+        AtomicWrite(stage,document_.dump(2)+"\n");AtomicWrite(expected,sourceSnapshot_);
+        const int code=Run(root_,{L"python",(root_/"tools/blender_scene.py").wstring(),L"import",
+            L"--exchange",exchange.wstring(),L"--staged",stage.wstring(),L"--expected-source",expected.wstring(),
+            L"--report",output.wstring()},queue_/"blender-import.log",120000);
+        if(code)throw std::runtime_error(Tail(queue_/"blender-import.log"));
+        auto result=ReadJson(output);
+        blenderImportReport_=result;blenderImportReport_.erase("document");
+        sourceSnapshot_=ReadText(source_);document_=Json::parse(sourceSnapshot_);
+        history_.Reset(document_);dirty_=false;structureDirty_=true;
+        // Import is a saved checkpoint including shared mesh files. Document-
+        // only undo cannot undo those files; byte backups live under .dev/.
+        const auto retained=result.at("retained_missing").size();
+        status_="Imported Blender changes and saved level. "+std::to_string(retained)+" missing Blender objects retained. Previous files backed up under .dev/editor/blender-backups.";
+        result.erase("document");
+        BeginPreparation("preview");
+        return result;
+    }
     Json ImportAssetPack(const Json& args)
     {
         if (!args.is_object() || args.size() != 1 || !args.contains("uri") || !args.at("uri").is_string())
@@ -1573,6 +1610,7 @@ class DemoEditor
                 }
                 else if(op=="drop_selection"||op=="save_prefab"||op=="place_prefab"||op=="add_game_object"||op=="set_game_object"||op=="undo"||op=="redo"||op=="add_blockout"||op=="select_entities"||op=="transform_selection"||op=="group_entities"||op=="duplicate_entities"||op=="delete_entities"||op=="refresh_preview")Respond(id,true,AuthorCommand(op,args));
                 else if (op == "set_entity") { SetEntity(args); Respond(id,true,{{"entity",*Entity(args.at("id"))},{"dirty",true},{"validation","pending save"}}); }
+                else if (op == "import_blender_scene") Respond(id,true,ImportBlenderScene(args));
                 else if (op == "import_asset_pack") Respond(id,true,ImportAssetPack(args));
                 else if (op == "add_prop") Respond(id,true,AddProp(args));
                 else if (op == "add_enemy") Respond(id,true,AddEnemy(args));
@@ -1741,6 +1779,19 @@ class DemoEditor
             {
                 ImGui::BeginDisabled(Busy());
                 ImGui::InputText("Pack URI",assetPackUri_,sizeof(assetPackUri_));
+                ImGui::InputTextWithHint("Blender export path","Automatic for one exported checkout",blenderScenePath_,sizeof(blenderScenePath_));
+                if(ImGui::Button("Import Blender changes"))
+                    try { ImportBlenderScene(Json::object()); }
+                    catch(const std::exception& error) { status_=error.what(); }
+                ImGui::TextWrapped("Blender import saves this draft and shared geometry, then refreshes the preview. Removed objects are retained; conflicting edits stop the import.");
+                if(blenderImportReport_.value("level",std::string())==source_.filename().string()) {
+                    ImGui::Text("Last import: %zu meshes, %zu placements, %zu new objects.",
+                        blenderImportReport_.at("changed_meshes").size(),blenderImportReport_.at("updated").size(),blenderImportReport_.at("added").size());
+                    if(!blenderImportReport_.at("retained_missing").empty()&&ImGui::TreeNode("Removed in Blender; retained in level")) {
+                        for(const auto& id:blenderImportReport_.at("retained_missing"))ImGui::TextUnformatted(id.get_ref<const std::string&>().c_str());
+                        ImGui::TreePop();
+                    }
+                }
                 if (ImGui::Button("Import asset pack"))
                     try { ImportAssetPack({{"uri",std::string(assetPackUri_)}}); }
                     catch (const std::exception& error) { status_ = error.what(); }

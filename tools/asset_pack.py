@@ -14,8 +14,10 @@ import re
 
 try:
     from cook_textures import texture_memory, validate_palette
+    from content_profile import content_limits
 except ModuleNotFoundError:
     from tools.cook_textures import texture_memory, validate_palette
+    from tools.content_profile import content_limits
 
 ROOT = Path(__file__).resolve().parents[1]
 ID = re.compile(r"[A-Za-z][A-Za-z0-9_-]{0,63}\Z")
@@ -123,7 +125,7 @@ def load_pack(uri, asset_root=ROOT / "content"):
     return pack
 
 
-def resolve_asset_packs(document, asset_root=ROOT / "content"):
+def resolve_asset_packs(document, asset_root=ROOT / "content", *, authoring=False):
     """Return an expanded copy, catalog and manifest dependencies; never edit input.
 
     Linked definitions have one owner. A local or second-pack duplicate is an
@@ -131,6 +133,8 @@ def resolve_asset_packs(document, asset_root=ROOT / "content"):
     Packs cannot link further packs, keeping resolution finite and predictable.
     """
     require(isinstance(document, dict), "Level must be an object")
+    limits = content_limits(document, {'models': 128}, authoring=authoring)
+    group_limits = dict(assets=limits['models'], materials=limits['materials'], entities=limits['entities'])
     uris = document.get("asset_packs", [])
     require(isinstance(uris, list) and len(uris) <= 16, "asset_packs: expected at most 16 pack URIs")
     result = copy.deepcopy(document)
@@ -139,6 +143,7 @@ def resolve_asset_packs(document, asset_root=ROOT / "content"):
     for group in ("assets", "materials", "entities"):
         values = result.get(group)
         require(isinstance(values, list), f"Level {group} must be an array")
+        require(len(values) <= group_limits[group], f"Resolved level exceeds {group_limits[group]} {group}")
         for item in values:
             require(isinstance(item, dict), f"Level {group}: expected an object")
             ident = valid_id(item.get("id"), f"Level {group}")
@@ -160,7 +165,7 @@ def resolve_asset_packs(document, asset_root=ROOT / "content"):
                 used.add(ident)
                 origins[ident] = uri
                 result[group].append(copy.deepcopy(item))
-            limit = 128 if group == "assets" else 64
+            limit = group_limits[group]
             require(len(result[group]) <= limit, f"Resolved level exceeds {limit} {group}")
         for item in pack["prefabs"]:
             ident = item["id"]
@@ -179,7 +184,7 @@ def resolve_asset_packs(document, asset_root=ROOT / "content"):
     return result, catalog, dependencies
 
 
-def merge_pack(document, uri, asset_root=ROOT / "content", prefabs=None):
+def merge_pack(document, uri, asset_root=ROOT / "content", prefabs=None, *, authoring=False):
     """Return (new_document, new_prefab_catalog), preserving inputs on failure.
 
     Identical definitions are idempotent. A conflicting ID always fails; imports
@@ -188,7 +193,8 @@ def merge_pack(document, uri, asset_root=ROOT / "content", prefabs=None):
     pack = load_pack(uri, asset_root)
     result, catalog = copy.deepcopy(document), copy.deepcopy(prefabs or [])
     require(result.get("version") == 2, "Asset packs require a version-2 level")
-    resolved, _, _ = resolve_asset_packs(result, asset_root)
+    limits = content_limits(result, {'models': 128}, authoring=authoring)
+    resolved, _, _ = resolve_asset_packs(result, asset_root, authoring=authoring)
     existing = {}
     for group in ("assets", "materials", "entities"):
         for item in resolved[group]:
@@ -203,7 +209,7 @@ def merge_pack(document, uri, asset_root=ROOT / "content", prefabs=None):
             else:
                 result[group].append(copy.deepcopy(item))
                 existing[ident] = (group, item)
-        limit = 128 if group == "assets" else 64
+        limit = limits['models'] if group == 'assets' else limits['materials']
         require(len(result[group]) <= limit, f"Level exceeds {limit} {group}")
     require(isinstance(catalog, list), "Prefab catalog must be an array")
     by_id = {item["id"]: item for item in catalog}
@@ -219,16 +225,17 @@ def merge_pack(document, uri, asset_root=ROOT / "content", prefabs=None):
     return result, catalog
 
 
-def place_prop(document, prefabs, prefab, ident, position, rotation=None, scale=None, *, loot_highlight=False):
+def place_prop(document, prefabs, prefab, ident, position, rotation=None, scale=None, *, loot_highlight=False, authoring=False):
     """Return a new level with one decorative, non-colliding model instance."""
     template = next((item for item in prefabs if item["id"] == prefab), None)
     require(template is not None, f"Unknown prefab: {prefab}; import its pack first")
     require(type(loot_highlight) is bool, "loot_highlight must be a boolean")
+    limits = content_limits(document, {'models': 128}, authoring=authoring)
     valid_id(ident, "Prop")
     used = {item["id"] for group in ("assets", "materials", "entities") for item in document[group]}
     require(ident not in used, f"Already used object ID: {ident}")
-    require(len(document["entities"]) < 256, "The level limit is 256 objects")
-    require(sum("model" in e for e in document["entities"]) < 128, "The level limit is 128 model instances")
+    require(len(document["entities"]) < limits['entities'], f"The level limit is {limits['entities']} objects")
+    require(sum("model" in e for e in document["entities"]) < limits['models'], f"The level limit is {limits['models']} model instances")
     entity = {"id": ident, "kind": "static", "model": template["model"], "material": template["material"],
               "loot_highlight": loot_highlight,
               "transform": {"position": vector(position, "Position"),
@@ -250,7 +257,7 @@ def main():
     try:
         document = json.loads(args.level.read_text(encoding="utf-8"))
         catalog = json.loads(args.catalog.read_text(encoding="utf-8")) if args.catalog else []
-        document, catalog = merge_pack(document, args.pack, args.asset_root, catalog)
+        document, catalog = merge_pack(document, args.pack, args.asset_root, catalog, authoring=True)
         args.output.parent.mkdir(parents=True, exist_ok=True)
         stage = args.output.with_suffix(args.output.suffix + ".tmp")
         stage.write_text(json.dumps({"document": document, "prefabs": catalog}, indent=2) + "\n", encoding="utf-8")

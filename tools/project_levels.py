@@ -26,11 +26,13 @@ try:
     from compile_bundle import MAX_LEVELS, read_manifest
     import editor_cache
     from character_assets import configure_editor_cache
+    from content_profile import content_limits, is_study, STUDY_LIMITS, STUDY_PLAY_REASON
 except ModuleNotFoundError:
     from tools.compile_level import compile_level, validate
     from tools.compile_bundle import MAX_LEVELS, read_manifest
     from tools import editor_cache
     from tools.character_assets import configure_editor_cache
+    from tools.content_profile import content_limits, is_study, STUDY_LIMITS, STUDY_PLAY_REASON
 
 ROOT = Path(__file__).resolve().parents[1]
 FILENAME = re.compile(r"[A-Za-z][A-Za-z0-9_-]{0,63}\.json")
@@ -104,12 +106,14 @@ class ProjectLevels:
         self.code_key = sha256(json_bytes(editor_cache.fingerprint(code_files)))
 
     def validate_cached(self, path, raw, data):
+        limits = content_limits(data, {}, authoring=True)
+        require(len(raw) <= limits['level_bytes'], f"Level JSON exceeds {limits['level_bytes']//(1024*1024)} MiB")
         cache = self.safe(self.cache / "validation" / (sha256(str(path).encode()) + ".json"))
         key = [self.code_key, sha256(raw)]
         cached = editor_cache.read(cache, key)
         if cached is not None:
             return cached["dependencies"]
-        state = validate(data, self.content)
+        state = validate(data, self.content, authoring=True)
         dependencies = [str(p.resolve()) for _, p in state["dependencies"]]
         editor_cache.write(cache, key, {"dependencies": dependencies}, dependencies)
         return dependencies
@@ -168,7 +172,7 @@ class ProjectLevels:
 
     def read_level(self, path, expected=None):
         raw = self.safe(path).read_bytes()
-        require(len(raw) <= 8 * 1024 * 1024, "Level JSON exceeds 8 MiB")
+        require(len(raw) <= STUDY_LIMITS['level_bytes'], "Level JSON exceeds 128 MiB")
         if expected is not None:
             require(re.fullmatch(r"[a-fA-F0-9]{64}", expected) is not None, "Expected source SHA-256 must contain 64 hexadecimal characters")
             require(sha256(raw) == expected.lower(), "Level changed on disk; refresh the project before modifying it")
@@ -193,6 +197,7 @@ class ProjectLevels:
         return {"file": path.name, "stem": path.stem, "title": data["title"],
                 "source": path.as_posix(), "source_sha256": sha256(raw),
                 "in_bundle": row is not None, "bundle_id": row["id"] if row else None,
+                "authoring_profile": data.get('authoring_profile'), "playable": not is_study(data),
                 "test_starts": copy.deepcopy(data.get("test_starts", []))}
 
     def catalog(self):
@@ -204,7 +209,7 @@ class ProjectLevels:
             try:
                 self.path(path.name)
                 raw = path.read_bytes()
-                require(len(raw) <= 8 * 1024 * 1024, "Level JSON exceeds 8 MiB")
+                require(len(raw) <= STUDY_LIMITS['level_bytes'], "Level JSON exceeds 128 MiB")
                 data = json.loads(raw)
                 if not isinstance(data, dict) or type(data.get("version")) is not int or data["version"] != 2:
                     continue
@@ -289,8 +294,9 @@ class ProjectLevels:
                 require(self.safe(temporary).parent == staging, "Unsafe transaction cleanup path")
                 shutil.rmtree(temporary)
 
-    def membership(self, bundle, path, included):
+    def membership(self, bundle, path, included, data=None):
         require(type(included) is bool, "Bundle membership must be true or false")
+        require(not included or not is_study(data), STUDY_PLAY_REASON)
         result = copy.deepcopy(bundle)
         existing = next((row for row in result["levels"] if row["source"] == path.name), None)
         if included and existing is None:
@@ -322,8 +328,8 @@ class ProjectLevels:
             path = self.path(name, new=True)
             bundle, bundle_raw = self.bundle_snapshot()
             data = starter_level(title)
-            validate(data, self.content)
-            updated = self.membership(bundle, path, in_bundle)
+            validate(data, self.content, authoring=True)
+            updated = self.membership(bundle, path, in_bundle, data)
             self.publish({path: json_bytes(data), self.manifest: json_bytes(updated)},
                          {path: None, self.manifest: bundle_raw})
             return self.result(path)
@@ -335,8 +341,8 @@ class ProjectLevels:
             raw, data = self.read_level(source, expected_sha256)
             bundle, bundle_raw = self.bundle_snapshot()
             data["title"] = title
-            validate(data, self.content)
-            updated = self.membership(bundle, path, in_bundle)
+            validate(data, self.content, authoring=True)
+            updated = self.membership(bundle, path, in_bundle, data)
             self.publish({path: json_bytes(data), self.manifest: json_bytes(updated)},
                          {source: raw, path: None, self.manifest: bundle_raw})
             return self.result(path)
@@ -349,8 +355,8 @@ class ProjectLevels:
             bundle, bundle_raw = self.bundle_snapshot()
             if title is not None:
                 data["title"] = title
-            validate(data, self.content)
-            updated = self.membership(bundle, path, in_bundle) if in_bundle is not None else bundle
+            validate(data, self.content, authoring=True)
+            updated = self.membership(bundle, path, in_bundle, data) if in_bundle is not None else bundle
             self.publish({path: json_bytes(data) if title is not None else raw,
                           self.manifest: json_bytes(updated)}, {path: raw, self.manifest: bundle_raw})
             return self.result(path)
@@ -400,7 +406,7 @@ class ProjectLevels:
                 snapshot = temporary / "source.json"
                 snapshot.write_bytes(candidate_raw)
                 cooked = temporary / "output"
-                report = compile_level(snapshot, cooked, self.content)
+                report = compile_level(snapshot, cooked, self.content, authoring=True)
                 changes = {output / item.relative_to(cooked): item.read_bytes()
                            for item in cooked.rglob("*") if item.is_file()}
                 preview = json.loads((cooked / "editor-assets/levels/first_room.json").read_bytes())

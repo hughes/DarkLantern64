@@ -1,0 +1,35 @@
+{
+  "passed": true,
+  "blender": {
+    "passed": true,
+    "checks": [
+      "idempotent parenting",
+      "fit preserves mesh",
+      "geometry-change warning",
+      "simultaneous overlays",
+      "parent motion/rotation/scale",
+      "default east/west step bounds match level",
+      "generated treads and shell",
+      "unwalkable stair rejection before mutation",
+      "stable step retirement and recreation",
+      "duplicated hierarchy ownership remapping"
+    ]
+  },
+  "host_checks": [
+    "all levels validate",
+    "idempotent reimport",
+    "edited collider retirement rejected atomically",
+    "reduced steps remove old collision",
+    "restored steps reuse stable IDs",
+    "gameplay unchanged",
+    "new checkout restores relationships and shape parameters"
+  ],
+  "live_scene": {
+    "file": "art/sponza-edit.blend",
+    "revision": 5,
+    "linked_colliders": 98,
+    "entities": 239,
+    "gameplay_unchanged": true,
+    "preview_updated": true
+  }
+}

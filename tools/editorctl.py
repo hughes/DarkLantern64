@@ -55,6 +55,9 @@ OPERATIONS = ("pick_editor", "set_panel", "drop_selection", "save_prefab", "plac
               "recalculate_audio", "quit")
 
 
+OPERATIONS += ("import_blender_scene",)
+
+
 def command_queue(root, level=None):
     """Match the editor's selected-level queue without touching another scene."""
     root = Path(root).resolve()

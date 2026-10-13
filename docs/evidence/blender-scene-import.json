@@ -1,0 +1,38 @@
+{
+  "passed": true,
+  "checks": [
+    "Editor imports real mesh, renamed instance placement, and box edits while preserving unsaved guard speed and all gameplay",
+    "Repeat import is byte-identical",
+    "Cooked preview geometry changes; level settings, asset links, music, and test starts survive",
+    "Conflicting geometry and transforms reject atomically",
+    "Stale exports and invalid actor collision fail without changing content",
+    "Blender removal retains the level object and its asset; duplicate Blender IDs reject"
+  ],
+  "imported": {
+    "added": [],
+    "changed_meshes": [
+      "mesh-sponza-parapet-north"
+    ],
+    "editor_deletions_preserved": [],
+    "level": "sponza_courtyard.json",
+    "published": true,
+    "retained_missing": [],
+    "updated": [
+      "sponza-parapet-north",
+      "sponza-collision-east-step-0-0"
+    ],
+    "validated_levels": [
+      "animation_workshop.json",
+      "enemy_patrols.json",
+      "first_room.json",
+      "moonlit_courtyard.json",
+      "sponza_courtyard.json"
+    ]
+  },
+  "unit_tests_passed": 60,
+  "unit_tests_skipped": 1,
+  "editor_build": "darklantern64_project_editor passed",
+  "blender_version": "5.3.0 Alpha",
+  "live_scene": "art/sponza-edit.blend",
+  "scope": "Real Blender and desktop editor verification on disposable project copies; no new N64 hardware test."
+}

@@ -12,6 +12,8 @@ Our development approach is to extend **LightEngine** into a productive content 
 
 **Creating models?** The [Blender asset guide](docs/blender-assets.md) covers the editable loot set, exporter, material budget, prefab placement, and a direct launch at the courtyard's loot counter.
 
+**Editing level geometry in Blender?** The [scene editing guide](docs/blender-scenes.md) covers Sponza's assembled scene, shared meshes, collision boxes, and safe re-import that preserves editor-authored gameplay.
+
 **Exploring larger interiors?** [Sponza After Hours](docs/sponza-study.md) adds a courtyard, two playable floors, connected stairways and a gallery-to-vault encounter. Choose it in the existing editor or game level menu.
 
 **Music:** Sponza now plays the original 48-second [Lanterns Below](docs/music-study.md) XM64 cue in the ROM, alongside gameplay effects. See [Music](docs/music.md) for editing, build/launch, and the remaining native editor playback work.

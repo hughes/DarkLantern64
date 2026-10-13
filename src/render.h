@@ -43,7 +43,7 @@ int dl_render_transformed_vertex_count(void);
  * CPU pose/skinning costs; these are emulator CPU ticks, not RSP/RDP timings.
  * Window totals cover all visible models; maxima are per individual pose. */
 void dl_render_report_animation(void);
-#if defined(DL_CAPTURE) || defined(DL_MENU_TEST) || defined(DL_STREAM_TEST) || defined(DL_BAFFORD_STREAM_TEST)
+#if defined(DL_CAPTURE) || defined(DL_MENU_TEST) || defined(DL_STREAM_TEST) || defined(DL_BAFFORD_STREAM_TEST) || defined(DL_BAFFORD_EXPANDED_TEST)
 void dl_render_request_capture(int id);
 #endif
 #ifdef DL_CAPTURE

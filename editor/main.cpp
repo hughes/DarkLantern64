@@ -325,8 +325,8 @@ class DemoEditor
                 try{StartNative(nativeStart_);}catch(const std::exception& e){nativeError_=e.what();status_=e.what();ShowPanel("Play Inspector");}
             }
             if (reloadPreview_) { reloadPreview_ = false; ReloadPreviewKeepingCamera(); }
-            if(structureDirty_&&!Busy()&&!engine_.IsPlaying()&&pendingAction_.empty()&&lastPreviewDraft_!=document_.dump()) {
-                lastPreviewDraft_=document_.dump();
+            if(structureDirty_&&!Busy()&&!engine_.IsPlaying()&&pendingAction_.empty()&&lastPreviewDraft_!=AuthorSnapshot().dump()) {
+                lastPreviewDraft_=AuthorSnapshot().dump();
                 try{BeginPreparation("preview");}catch(const std::exception& e){status_=e.what();ShowPanel("Build & Diagnostics");}
             }
             engine_.Update();
@@ -443,7 +443,7 @@ class DemoEditor
             {"source",source_.string()},{"output",output_.string()},{"scene_path",scenePath_},{"project_editor",true},
             {"operations",{"pick_editor","inspect","list_levels","open_level","create_level","duplicate_level","delete_level","update_level","play_level","play_menu",
                 "drop_selection","save_prefab","place_prefab","add_game_object","set_game_object","undo","redo","add_blockout","select_entities","transform_selection","group_entities","duplicate_entities","delete_entities","refresh_preview","import_blender_scene","import_asset_pack","add_prop","set_entity","add_enemy","duplicate_enemy","add_waypoint","delete_entity","set_environment","set_material",
-                "set_preview_transform","get_animation","set_animation","focus_character","save","build","capture","get_layout","set_panel","reset_layout","start_play","stop_play","inspect_scene","query_play","set_play_debug","inspect_play","pause_play","step_play","restart_play","set_play_input","get_play_trace","export_replay","replay_play","reload","get_audio_memory","set_audio_config","recalculate_audio","quit"}}}.dump(2));
+                "set_preview_transform","get_animation","set_animation","focus_character","save","build","capture","get_layout","set_panel","reset_layout","get_streaming","assign_region","set_region","set_streaming","fit_region_bounds","start_play","stop_play","inspect_scene","query_play","set_play_debug","inspect_play","pause_play","step_play","restart_play","set_play_input","get_play_trace","export_replay","replay_play","reload","get_audio_memory","set_audio_config","recalculate_audio","quit"}}}.dump(2));
     }
     void InvalidatePreviewAssets(const Json& cooked)
     {
@@ -461,12 +461,28 @@ class DemoEditor
         if(cooked.contains("source_text")&&cooked.at("source_text")!=snapshot)
             throw std::runtime_error("Level changed while opening; retry to load the latest version");
         const Json document=Json::parse(snapshot);
-        source_=source; sourceSnapshot_=snapshot; document_=document;
-        history_.Reset(document_);selection_.clear();lastPreviewDraft_.clear();
-        output_=fs::path(cooked.at("output").get<std::string>());
-        scenePath_=cooked.at("scene_path"); report_=cooked.at("report"); catalog_=cooked.at("catalog");
-        loadedPreviewFingerprint_=cooked.value("preview_fingerprint",std::string());
-        selected_=document_.at("entities").empty()?"":document_.at("entities")[0].at("id").get<std::string>();
+        const std::string sourceSha=cooked.at("source_sha256");
+        Json partition=nullptr;
+        std::string partitionSnapshot,partitionSha;
+        fs::path partitionPath;
+        if(cooked.contains("streaming")&&cooked.at("streaming").is_object()){
+            const auto& info=cooked.at("streaming");partitionPath=info.at("mission_manifest").get<std::string>();
+            partitionSnapshot=ReadText(partitionPath);
+            if(info.at("mission_text")!=partitionSnapshot)throw std::runtime_error("Partition changed while opening; retry to load both latest files");
+            partition=Json::parse(partitionSnapshot);partitionSha=info.at("mission_manifest_sha256");
+        }
+        const fs::path output=cooked.at("output").get<std::string>();
+        const std::string scenePath=cooked.at("scene_path");
+        const Json report=cooked.at("report"),catalog=cooked.at("catalog");
+        const std::string fingerprint=cooked.value("preview_fingerprint",std::string());
+        const std::string selected=document.at("entities").empty()?"":document.at("entities")[0].at("id").get<std::string>();
+        source_=source;sourceSnapshot_=snapshot;document_=document;sourceSavedSha_=sourceSha;
+        streamDraft_=std::move(partition);streamSnapshot_=std::move(partitionSnapshot);
+        streamSavedSha_=std::move(partitionSha);streamPath_=std::move(partitionPath);
+        streamBoundsInputs_.clear();
+        history_.Reset(AuthorSnapshot());selection_.clear();lastPreviewDraft_.clear();
+        output_=output;scenePath_=scenePath;report_=report;catalog_=catalog;
+        loadedPreviewFingerprint_=fingerprint;selected_=selected;
         browserLevel_=source_.filename().string(); testStart_="default";
         prefabs_=Json::array(); selectedPrefab_.clear();
         previewIds_.clear(); previewTransforms_.clear();
@@ -597,20 +613,35 @@ class DemoEditor
         if (Busy()) throw std::runtime_error("Build already running");
         jobId_ = requestId;
         jobSnapshot_ = document_.dump(2) + "\n";
+        jobStreamSnapshot_=streamDraft_.is_null()?"":streamDraft_.dump(2)+"\n";
         status_ = build ? "Validating content, updating preview and building ROM..." : "Validating and cooking content...";
         const auto root = root_, queue = queue_, source = source_;
         const auto snapshot = jobSnapshot_;
         const auto savedSnapshot=sourceSnapshot_, preset=testStart_;
-        job_ = std::async(std::launch::async, [root, queue, source, snapshot, savedSnapshot, preset, build, play]() -> JobResult
+        const auto missionPath=streamPath_;
+        const auto missionSnapshot=jobStreamSnapshot_,savedMissionSnapshot=streamSnapshot_;
+        const auto sourceSha=sourceSavedSha_,missionSha=streamSavedSha_;
+        job_ = std::async(std::launch::async, [root, queue, source, snapshot, savedSnapshot, preset, build, play,
+            missionPath,missionSnapshot,savedMissionSnapshot,sourceSha,missionSha]() -> JobResult
         {
+            Json cooked;bool committed=false;
             try
             {
                 const auto stage = queue / "staging" / source.filename();
                 if (ReadText(source)!=savedSnapshot) throw std::runtime_error("Level changed on disk. Your edits are retained; reload or reconcile the saved file before saving.");
                 AtomicWrite(stage, snapshot);
-                Json cooked=ProjectTool(root,queue,{L"cook",L"--level",source.wstring(),L"--staged",stage.wstring()});
-                if (ReadText(source)!=savedSnapshot) throw std::runtime_error("Level changed during cooking; your edits are retained and the source was not overwritten.");
-                AtomicWrite(source, snapshot);
+                if(!missionSnapshot.empty()){
+                    if(ReadText(missionPath)!=savedMissionSnapshot)throw std::runtime_error("Partition changed on disk. Both drafts are retained; reload or reconcile before saving.");
+                    const auto missionStage=queue/"staging/partition.json";AtomicWrite(missionStage,missionSnapshot);
+                    cooked=ProjectTool(root,queue,{L"save_pair",L"--level",source.wstring(),L"--staged",stage.wstring(),
+                        L"--staged-mission",missionStage.wstring(),L"--expected-sha256",fs::path(sourceSha).wstring(),
+                        L"--expected-mission-sha256",fs::path(missionSha).wstring()});
+                }else{
+                    cooked=ProjectTool(root,queue,{L"cook",L"--level",source.wstring(),L"--staged",stage.wstring()});
+                    if (ReadText(source)!=savedSnapshot) throw std::runtime_error("Level changed during cooking; your edits are retained and the source was not overwritten.");
+                    AtomicWrite(source,snapshot);
+                }
+                committed=true;
                 Json report=cooked.at("report");
                 if (build || !play.empty())
                 {
@@ -632,13 +663,16 @@ class DemoEditor
                 }
                 return {true,!play.empty()?"Saved content and launched the game in Ares.":build?"Saved, cooked, and built ROM.":"Saved content and refreshed the preview.",report,cooked};
             }
-            catch (const std::exception& error) { return {false,error.what(),{}}; }
+            catch (const std::exception& error) {
+                return committed?JobResult{false,error.what(),cooked.at("report"),cooked}:JobResult{false,error.what(),{}};
+            }
         });
     }
     void PollJob()
     {
         if (!job_.valid() || job_.wait_for(std::chrono::seconds(0)) != std::future_status::ready) return;
         auto result = job_.get();
+        if(result.project.is_object())for(const auto& warning:result.project.value("warnings",Json::array()))result.message+="\n"+warning.get<std::string>();
         status_ = result.message;
         if (!result.report.empty())
         {
@@ -646,6 +680,12 @@ class DemoEditor
             dirty_ = document_.dump(2) + "\n" != jobSnapshot_;
             if (!dirty_) structureDirty_ = false;
             sourceSnapshot_=jobSnapshot_;
+            if(!jobStreamSnapshot_.empty()){
+                streamSnapshot_=jobStreamSnapshot_;
+                streamSavedSha_=result.project.at("streaming").at("mission_manifest_sha256");
+                sourceSavedSha_=result.project.at("source_sha256");
+            }
+            UpdateAuthorDirty();
             InvalidatePreviewAssets(result.project);
             try { RefreshLevels(); }
             catch (const std::exception& error)
@@ -1138,7 +1178,8 @@ class DemoEditor
         auto result=ReadJson(output);
         blenderImportReport_=result;blenderImportReport_.erase("document");
         sourceSnapshot_=ReadText(source_);document_=Json::parse(sourceSnapshot_);
-        history_.Reset(document_);dirty_=false;structureDirty_=true;
+        RefreshLevels();if(const auto* entry=LevelEntry(source_.filename().string()))sourceSavedSha_=entry->at("source_sha256");
+        history_.Reset(AuthorSnapshot());UpdateAuthorDirty();structureDirty_=true;
         // Import is a saved checkpoint including shared mesh files. Document-
         // only undo cannot undo those files; byte backups live under .dev/.
         const auto retained=result.at("retained_missing").size();
@@ -1301,6 +1342,7 @@ class DemoEditor
     }
     Json DeleteEntity(const Json& args)
     {
+        ObserveDocument();
         const std::string id = args.at("id");
         const auto* entity = Entity(id);
         if (!entity || (entity->at("kind") != "guard" && entity->at("kind") != "waypoint" && !DeletableProp(*entity)))
@@ -1308,9 +1350,14 @@ class DemoEditor
         for (const auto& candidate : document_.at("entities"))
             for (const auto& ref : candidate.value("patrol",Json::array()))
                 if (ref == id) throw std::runtime_error("Waypoint is used by " + candidate.at("id").get<std::string>() + "; remove it from that route first");
-        auto& entities = document_["entities"];
+        Json candidate=document_,partition=streamDraft_;
+        auto& entities = candidate["entities"];
         entities.erase(std::remove_if(entities.begin(),entities.end(),[&](const Json& item) { return item.at("id") == id; }),entities.end());
-        StructureChanged(entities.empty() ? "" : entities[0].at("id").get<std::string>());
+        PruneRegionHomes(partition,{id});
+        document_=std::move(candidate);streamDraft_=std::move(partition);
+        history_.Commit(AuthorSnapshot(),"delete_entity");
+        const auto& savedEntities=document_.at("entities");
+        StructureChanged(savedEntities.empty() ? "" : savedEntities[0].at("id").get<std::string>());
         return {{"deleted",id},{"dirty",true},{"preview_refresh_pending",true}};
     }
     void CheckEnemy(const Json& entity)
@@ -1576,6 +1623,7 @@ class DemoEditor
                 if (op == "get_audio_memory") { Respond(id,true,AudioState()); continue; }
                 if (op == "get_animation") { Respond(id,true,AnimationState()); continue; }
                 if (op == "get_layout") { Respond(id,true,Layout()); continue; }
+                if (op == "get_streaming") { Respond(id,true,StreamCommand(op,args)); continue; }
                 if (op == "set_panel") { ShowPanel(args.at("name"),args.value("visible",true)); Respond(id,true,Layout()); continue; }
                 if (op == "reset_layout") { ResetWorkspace(); Respond(id,true,{{"scheduled",true}}); continue; }
                 if (op=="inspect_scene"||op=="query_play"||op=="set_play_debug"||op=="inspect_play"||op=="get_play_trace"||op=="export_replay"||op=="stop_play"||op=="pause_play"||op=="restart_play"||op=="set_play_input"||op=="step_play"||op=="replay_play"||op=="start_play") {
@@ -1617,6 +1665,7 @@ class DemoEditor
                     testStart_=preset; Save(true,id,op=="play_menu"?"menu":"level");
                 }
                 else if(op=="drop_selection"||op=="save_prefab"||op=="place_prefab"||op=="add_game_object"||op=="set_game_object"||op=="undo"||op=="redo"||op=="add_blockout"||op=="select_entities"||op=="transform_selection"||op=="group_entities"||op=="duplicate_entities"||op=="delete_entities"||op=="refresh_preview")Respond(id,true,AuthorCommand(op,args));
+                else if(op=="assign_region"||op=="set_region"||op=="set_streaming"||op=="fit_region_bounds")Respond(id,true,StreamCommand(op,args));
                 else if (op == "set_entity") { SetEntity(args); Respond(id,true,{{"entity",*Entity(args.at("id"))},{"dirty",true},{"validation","pending save"}}); }
                 else if (op == "import_blender_scene") Respond(id,true,ImportBlenderScene(args));
                 else if (op == "import_asset_pack") Respond(id,true,ImportAssetPack(args));

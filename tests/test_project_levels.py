@@ -558,6 +558,134 @@ class ProjectLevelTests(unittest.TestCase):
         self.assertTrue((Path(result["asset_root"]) / result["scene_path"]).exists())
         self.assertFalse(result["native_play_supported"])
 
+    def paired_drafts(self):
+        self.stream_fixture()
+        source = self.root / "scene-draft.json"
+        partition = self.root / "partition-draft.json"
+        scene = copy.deepcopy(self.stream_source)
+        scene["title"] = "Paired draft"
+        mission = copy.deepcopy(self.stream_manifest)
+        mission["visibility"] = "all-regions"
+        source.write_bytes(project.json_bytes(scene))
+        partition.write_bytes(project.json_bytes(mission))
+        return source, partition, scene, mission, self.hash("streaming_probe.mission.json")
+
+    def test_stream_paired_preview_and_save_commit_both_files_without_scene_embedding(self):
+        source, partition, scene, mission, mission_sha = self.paired_drafts()
+        before = self.content_bytes()
+        preview = self.project.cook("streaming_probe.json", self.hash("streaming_probe.json"), source,
+                                    staged_mission=partition, expected_mission_sha256=mission_sha)
+        self.assertEqual(self.content_bytes(), before)
+        self.assertEqual(preview["streaming"]["mission_document"], mission)
+        self.assertEqual(preview["streaming"]["visibility"], "all-regions")
+        saved = self.project.save_pair("streaming_probe.json", self.hash("streaming_probe.json"), source, mission_sha, partition)
+        self.assertTrue(saved["saved_pair"])
+        self.assertEqual(json.loads((self.content / "streaming_probe.json").read_bytes()), scene)
+        self.assertEqual(json.loads((self.content / "streaming_probe.mission.json").read_bytes()), mission)
+        self.assertNotIn("partition", scene)
+        self.assertEqual(saved["source_sha256"], self.hash("streaming_probe.json"))
+        self.assertEqual(saved["streaming"]["mission_manifest_sha256"], self.hash("streaming_probe.mission.json"))
+
+    def test_stream_pair_stale_source_and_manifest_leave_both_files_and_preview_unchanged(self):
+        source, partition, _, _, mission_sha = self.paired_drafts()
+        prepared = self.project.cook("streaming_probe.json")
+        preview = Path(prepared["asset_root"]) / prepared["scene_path"]
+        preview_before = preview.read_bytes()
+        original_source_sha = self.hash("streaming_probe.json")
+        self.stream_manifest["visibility"] = "all-regions"
+        self.write("streaming_probe.mission.json", self.stream_manifest)
+        before = self.content_bytes()
+        with self.assertRaisesRegex(ValueError, "partition changed on disk"):
+            self.project.save_pair("streaming_probe.json", original_source_sha, source, mission_sha, partition)
+        self.assertEqual(self.content_bytes(), before)
+        self.assertEqual(preview.read_bytes(), preview_before)
+        current_mission_sha = self.hash("streaming_probe.mission.json")
+        self.stream_source["title"] = "External source"
+        self.write("streaming_probe.json", self.stream_source)
+        before = self.content_bytes()
+        with self.assertRaisesRegex(ValueError, "Level changed on disk"):
+            self.project.save_pair("streaming_probe.json", original_source_sha, source, current_mission_sha, partition)
+        self.assertEqual(self.content_bytes(), before)
+        self.assertEqual(preview.read_bytes(), preview_before)
+
+    def test_stream_pair_publication_failure_rolls_back_source_manifest_and_preview(self):
+        source, partition, _, _, mission_sha = self.paired_drafts()
+        prepared = self.project.cook("streaming_probe.json")
+        preview = Path(prepared["asset_root"]) / prepared["scene_path"]
+        before, preview_before = self.content_bytes(), preview.read_bytes()
+        real_replace = project.os.replace
+        def fail_partition(stage, target):
+            if Path(target) == self.content / "streaming_probe.mission.json":
+                raise OSError("paired manifest replacement failed")
+            return real_replace(stage, target)
+        with patch.object(project.os, "replace", side_effect=fail_partition), self.assertRaisesRegex(OSError, "paired manifest replacement failed"):
+            self.project.save_pair("streaming_probe.json", self.hash("streaming_probe.json"), source, mission_sha, partition)
+        self.assertEqual(self.content_bytes(), before)
+        self.assertEqual(preview.read_bytes(), preview_before)
+
+    def test_stream_pair_post_publication_failures_return_committed_hashes_and_warning(self):
+        source, partition, scene, mission, mission_sha = self.paired_drafts()
+        for operation in ("dependency", "cache", "catalog", "transaction_cleanup"):
+            with self.subTest(operation=operation):
+                self.write("streaming_probe.json", self.stream_source)
+                self.write("streaming_probe.mission.json", self.stream_manifest)
+                source_sha = self.hash("streaming_probe.json")
+                published = False
+                real_publish, real_validate = self.project.publish, self.project.validate_cached
+                real_cleanup, real_cache = project.shutil.rmtree, project.editor_cache.write
+                def publish(*args, **kwargs):
+                    nonlocal published
+                    result = real_publish(*args, **kwargs)
+                    published = True
+                    return result
+                def validate(*args, **kwargs):
+                    if published:
+                        raise OSError("post-publication dependency failure")
+                    return real_validate(*args, **kwargs)
+                def cleanup(path, *args, **kwargs):
+                    if Path(path).name.startswith("publish-"):
+                        raise OSError("post-publication transaction cleanup failure")
+                    return real_cleanup(path, *args, **kwargs)
+                def cache(*args, **kwargs):
+                    if published:
+                        raise OSError("post-publication cache failure")
+                    return real_cache(*args, **kwargs)
+                if operation == "dependency":
+                    failing = patch.object(self.project, "validate_cached", side_effect=validate)
+                elif operation == "cache":
+                    failing = patch.object(project.editor_cache, "write", side_effect=cache)
+                elif operation == "catalog":
+                    failing = patch.object(self.project, "catalog", side_effect=OSError("post-publication catalog failure"))
+                else:
+                    failing = patch.object(project.shutil, "rmtree", side_effect=cleanup)
+                with patch.object(self.project, "publish", side_effect=publish), failing:
+                    saved = self.project.save_pair("streaming_probe.json", source_sha, source, mission_sha, partition)
+                self.assertTrue(saved["ok"])
+                self.assertTrue(saved["saved_pair"])
+                self.assertTrue(any("post-publication" in warning for warning in saved["warnings"]))
+                self.assertEqual(json.loads((self.content / "streaming_probe.json").read_bytes()), scene)
+                self.assertEqual(json.loads((self.content / "streaming_probe.mission.json").read_bytes()), mission)
+                self.assertEqual(saved["source_sha256"], self.hash("streaming_probe.json"))
+                self.assertEqual(saved["streaming"]["mission_manifest_sha256"], self.hash("streaming_probe.mission.json"))
+                # The returned identities must permit the next save without a reload.
+                again = self.project.save_pair("streaming_probe.json", saved["source_sha256"], source,
+                    saved["streaming"]["mission_manifest_sha256"], partition)
+                self.assertTrue(again["saved_pair"])
+
+    def test_stream_invalid_partition_can_be_saved_and_bounds_repair_is_a_draft(self):
+        source, partition, scene, mission, mission_sha = self.paired_drafts()
+        mission["regions"][0]["bounds"][0][0] = -7.99
+        partition.write_bytes(project.json_bytes(mission))
+        before = self.content_bytes()
+        fitted = self.project.fit_region_bounds("streaming_probe.json", mission["regions"][0]["id"], source, partition,
+                                               mission_sha, self.hash("streaming_probe.json"))
+        self.assertEqual(self.content_bytes(), before)
+        self.assertLess(fitted["mission_document"]["regions"][0]["bounds"][0][0], -7.99)
+        saved = self.project.save_pair("streaming_probe.json", self.hash("streaming_probe.json"), source, mission_sha, partition)
+        self.assertFalse(saved["streaming"]["status"]["valid"])
+        self.assertEqual(json.loads((self.content / "streaming_probe.json").read_bytes()), scene)
+        self.assertEqual(json.loads((self.content / "streaming_probe.mission.json").read_bytes()), mission)
+
 
 if __name__ == "__main__":
     unittest.main()

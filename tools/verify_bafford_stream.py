@@ -26,16 +26,53 @@ CHECKPOINTS = ("start", "west_ready", "east_crossed", "east_turnaround",
                "west_crossed", "west_return", "east_return")
 
 
-def decode_log(text, regions=None, require_music=False):
+def verify_resources(row, regions=None, expected_textures=None, bootstrap_models=0):
+    """Bind telemetry to cooked resources, rather than just requiring stable counts."""
+    if regions is not None:
+        integer(bootstrap_models, "bootstrap_models")
+        expected_models = bootstrap_models + sum(len(region["material_ids"]) for region in regions)
+        expected_colliders = sum(region["collider_count"] for region in regions)
+        require(row["models"] == expected_models, "Working model count differs from cooked material groups/bootstrap")
+        require(row["colliders"] == expected_colliders, "Working collider count differs from cooked regions")
+    if expected_textures is not None:
+        integer(expected_textures, "expected_textures", 1)
+        require(row["textures"] == expected_textures, "Working texture count differs from cooked content")
+
+
+def expected_slot_bytes(regions):
+    return 2 * ((max(region["chunk_bytes"] for region in regions) + 15) & ~15)
+
+
+def verify_stream_view(text, regions=None):
+    if regions is None:
+        return None
+    views = [dict(re.findall(r"([a-z_]+)=([0-9]+)", line)) for line in text.splitlines()
+             if line.startswith("DL64 stream_view ")]
+    mask = (1 << len(regions)) - 1
+    resident = [view for view in views if int(view.get("resident_mask", "0")) == mask]
+    require(resident, "Missing fully resident stream view telemetry")
+    expected = dict(triangles=sum(region["triangle_count"] for region in regions),
+                    colliders=sum(region["collider_count"] for region in regions),
+                    loads=2, retired=0, reserved=sum(region["chunk_bytes"] for region in regions),
+                    allocated_slots=expected_slot_bytes(regions))
+    for view in resident:
+        require(all(int(view.get(field, "-1")) == value for field, value in expected.items()),
+                "Fully resident stream view differs from cooked geometry/slots")
+    return {field: int(value) for field, value in resident[-1].items()}
+
+
+def decode_log(text, regions=None, require_music=False, expected_level="bafford-stream",
+               expected_textures=None, bootstrap_models=0):
     require(not any(marker in text for marker in ("RSP CRASH |", "ASSERTION FAILED:", "bafford_stream_test_failed")),
             "ROM reported a runtime failure")
     lines = text.splitlines()
     menu = next((i for i, line in enumerate(lines) if line.startswith("DL64 menu_ready ") and "mode=menu" in line), None)
     starts = [(i, line) for i, line in enumerate(lines) if line.startswith("DL64 level_start ")]
-    require(menu is not None and len(starts) == 1 and menu < starts[0][0] and "id=bafford-stream " in starts[0][1],
+    require(menu is not None and len(starts) == 1 and menu < starts[0][0] and f"id={expected_level} " in starts[0][1],
             "Diagnostic did not select Bafford stream through the ordinary menu")
     rows, terminals, checkpoint_lines, terminal_lines = [], [], [], []
     expected_ids = {region["id"] for region in regions} if regions else {1, 2}
+    working_view = verify_stream_view(text, regions)
     for index, line in enumerate(lines):
         if line.startswith(PREFIX):
             row = json.loads(line[len(PREFIX):])
@@ -50,6 +87,7 @@ def decode_log(text, regions=None, require_music=False):
                     "Player left the bounded diagnostic corridor")
             for field in ("heap_used", "models", "colliders", "textures"):
                 integer(row[field], field, 1)
+            verify_resources(row, regions, expected_textures, bootstrap_models)
             stream = row["stream"]
             require(type(stream["current"]) is int and stream["current"] in expected_ids, "Invalid current region")
             require(isinstance(stream["resident"], list) and len(stream["resident"]) == 2 and
@@ -65,6 +103,7 @@ def decode_log(text, regions=None, require_music=False):
                 lower, upper = region["bounds"]
                 require(all(lower[i] <= point[i] <= upper[i] for i in range(3)), "Player outside current region coverage")
                 require(stream["reserved"] == sum(region["chunk_bytes"] for region in regions), "Wrong decoded chunk reservation")
+                require(stream["allocated"] == expected_slot_bytes(regions), "Slot allocation differs from cooked region maximum")
                 require(stream["readbytes"] == stream["reserved"], "Chunks were not read exactly once")
             rows.append(row)
             checkpoint_lines.append(index)
@@ -111,6 +150,7 @@ def decode_log(text, regions=None, require_music=False):
     return dict(passed=True, functional_passed=True, checkpoints=rows, terminal=terminals[0], route=route,
                 conservative_visibility="Both regions retained; source street has no proven visibility separator",
                 loads=2, retirements=0, allocated_slot_bytes=rows[0]["stream"]["allocated"],
+                working_view=working_view,
                 reserved_chunk_bytes=rows[0]["stream"]["reserved"], steady_heap_samples_bytes=steady,
                 capture_diagnostic=capture, music=music,
                 audio_continuity_passed=music["max_underruns"] == 0 if music else None,
@@ -118,16 +158,20 @@ def decode_log(text, regions=None, require_music=False):
                              "Ordinary input traversal; emulator only, not hardware acceptance")
 
 
-def verify_build(rom, metadata=None):
+def verify_build(rom, metadata=None, expanded=False):
     build = json.loads((metadata or ROOT / "build" / rom.stem / "build.json").read_text(encoding="utf-8"))
     require(build.get("rom_sha256") == hashlib.sha256(rom.read_bytes()).hexdigest(), "ROM differs from its recorded build")
-    require(build.get("bafford_stream_test") is True and build.get("stream_test") is False,
+    diagnostic = "bafford_expanded_test" if expanded else "bafford_stream_test"
+    require(build.get(diagnostic) is True and build.get("stream_test") is False,
             "ROM lacks the separate Bafford stream diagnostic")
     require(not any(build.get(field) for field in ("autoplay", "capture", "menu_test")), "Conflicting diagnostic build")
     catalog = build["level_catalog"]["levels"]
     require(not any(row["id"] == "bafford-entry" for row in catalog),
             "Legacy resident Bafford terrain remains in the diagnostic bundle")
-    entry = next((row for row in catalog if row["id"] == "bafford-stream"), None)
+    candidates = [row for row in catalog if row["id"] in ("bafford-stream", "bafford-expanded")]
+    require(len(candidates) == 1, "Expected one Bafford mission in the diagnostic bundle")
+    entry = candidates[0]
+    require(not expanded or entry["id"] == "bafford-expanded", "Expanded diagnostic selected the old street subset")
     require(entry is not None and entry["content"].get("experimental_stream") is True, "Missing derived stream bundle entry")
     content = entry["content"]
     require(content["bootstrap"]["static_model_count"] == 0 and content["bootstrap"]["collider_count"] == 0,
@@ -138,6 +182,10 @@ def verify_build(rom, metadata=None):
     require(content["mission"]["report"].get("chunk_version") == 2,
             "Derived terrain lacks the UV/normal payload version")
     require(content.get("textures", {}).get("textures"), "Derived terrain lost its packed textures")
+    if expanded:
+        canonical = json.loads(Path(entry["source"]).read_text(encoding="utf-8"))
+        require({3831, 4360, 4366, 4987}.issubset(canonical.get("stream_expansion", {}).get("added_cells", [])),
+                "Expanded source lacks its new annotated cells")
     require(len(regions) == 2 and sum(region["triangle_count"] for region in regions) > 0 and
             sum(region["collider_count"] for region in regions) > 0, "Missing spatial terrain payloads")
     try:
@@ -145,20 +193,22 @@ def verify_build(rom, metadata=None):
     except ModuleNotFoundError:
         from tools.compile_mission import prepare_stream_level
     with tempfile.TemporaryDirectory(prefix="verify-bafford-source-", dir=ROOT / "build") as temporary:
-        current = prepare_stream_level(ROOT / "content/thief_bafford_stream.mission.json", Path(temporary))
+        require(entry.get("mission_manifest"), "Recorded catalog lacks its mission manifest")
+        current = prepare_stream_level(Path(entry["mission_manifest"]), Path(temporary))
     require(content["source_sha256"] == current["source_sha256"], "Derived source/compiler differs from built ROM")
-    return build, content, regions
+    return build, content, regions, entry
 
 
-def main(argv=None):
+def main(argv=None, *, decoder=decode_log, expanded=False):
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--rom", type=Path, help="Use an existing --bafford-stream-test ROM")
+    flag = "--bafford-expanded-test" if expanded else "--bafford-stream-test"
+    parser.add_argument("--rom", type=Path, help="Use an existing " + flag + " ROM")
     parser.add_argument("--log", type=Path, help="Analyze a recorded run with its original ROM snapshot")
     parser.add_argument("--capture", action="store_true", help="Build the separate framebuffer diagnostic")
     parser.add_argument("--sdk", type=Path, default=Path(os.environ.get("N64_INST", "C:/n64-toolchain")))
     parser.add_argument("--ares", type=Path, default=Path(os.environ.get("ARES_EXE", str(Path(os.environ.get("LOCALAPPDATA", "")) / "ares/ares.exe"))))
     parser.add_argument("--timeout", type=float, default=120)
-    parser.add_argument("--output", type=Path, default=ROOT / "build/bafford-stream-verification.json")
+    parser.add_argument("--output", type=Path, default=ROOT / ("build/bafford-expanded-verification.json" if expanded else "build/bafford-stream-verification.json"))
     args = parser.parse_args(argv)
     report = dict(passed=False, platform="Ares emulator", started_at_utc=time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
                   hardware_validation="Original N64 and M64 pending; bounded source street is not the complete mission")
@@ -172,13 +222,20 @@ def main(argv=None):
                 from build import build_rom
             except ModuleNotFoundError:
                 from tools.build import build_rom
-            rom = build_rom(args.sdk.resolve(), bundle=ROOT / "content/level_bundle.json", bafford_stream_test=True,
-                            bafford_stream_test_capture=args.capture)
+            diagnostic = "bafford_expanded_test" if expanded else "bafford_stream_test"
+            rom = build_rom(args.sdk.resolve(), bundle=ROOT / "content/level_bundle.json",
+                            **{diagnostic: True, diagnostic + "_capture": args.capture})
         metadata = args.log.resolve().parent / "verification-build.json" if args.log else None
-        build, content, regions = verify_build(rom, metadata if metadata and metadata.is_file() else None)
+        build, content, regions, entry = verify_build(rom, metadata if metadata and metadata.is_file() else None, expanded)
         report.update(rom=str(rom), rom_sha256=build["rom_sha256"], source_sha256=build["source_sha256"],
                       build_signature=build["signature"], probe_cook_sha256=content["source_sha256"],
                       mission_sha256=content["mission"]["sha256"], mission_bytes=content["mission"]["bytes"], regions=regions)
+        if expanded:
+            canonical = json.loads(Path(entry["source"]).read_text(encoding="utf-8"))
+            expansion = canonical["stream_expansion"]
+            report["source_expansion"] = {key: expansion[key] for key in
+                ("preserved_cells", "added_cells", "added_triangle_counts", "input_sources")}
+            report["test_starts"] = canonical["test_starts"]
         if args.log:
             log = args.log.resolve()
             snapshot = log.parent / rom.name
@@ -193,16 +250,25 @@ def main(argv=None):
             settings = ROOT / ".dev/ares/settings-8mb.bml"
             if not settings.is_file():
                 settings = args.ares.parent / "settings.bml"
-            run = exercise(args.ares, settings, rom, "bafford-stream", COMPLETE, args.timeout, build["rom_sha256"], memory=8)
+            marker = "DL64 bafford_expanded_test_complete" if expanded else COMPLETE
+            run = exercise(args.ares, settings, rom, "bafford-expanded" if expanded else "bafford-stream", marker, args.timeout, build["rom_sha256"], memory=8)
             report["run"] = run
             log = ROOT / run["log"]
             (log.parent / "verification-build.json").write_text(json.dumps(build, indent=2) + "\n", encoding="utf-8")
         raw = log.read_bytes()
         text = raw.decode("utf-8", errors="replace")
         report.update(log=str(log), log_sha256=hashlib.sha256(raw).hexdigest())
-        require(build.get("bafford_stream_test_capture") == (CAPTURE_COMPLETE in text), "Log capture mode differs from recorded build")
+        capture_marker = "DL64 bafford_expanded_capture_complete views=2" if expanded else CAPTURE_COMPLETE
+        capture_key = "bafford_expanded_test_capture" if expanded else "bafford_stream_test_capture"
+        require(build.get(capture_key) == (capture_marker in text), "Log capture mode differs from recorded build")
         music_map = json.loads((ROOT / "content/music.json").read_text(encoding="utf-8"))["levels"]
-        report.update(decode_log(text, regions, require_music="thief_bafford_stream" in music_map))
+        report.update(decoder(text, regions, require_music=Path(entry["source"]).stem in music_map,
+                              expected_level=entry["id"], expected_textures=len(content["textures"]["textures"]),
+                              bootstrap_models=content["bootstrap"]["model_count"]))
+        report["expected_resources"] = dict(models=content["bootstrap"]["model_count"] +
+            sum(len(region["material_ids"]) for region in regions),
+            colliders=sum(region["collider_count"] for region in regions),
+            textures=len(content["textures"]["textures"]))
         if report["capture_diagnostic"]:
             try:
                 from capture_ares import decode_captures
@@ -212,7 +278,8 @@ def main(argv=None):
             frames = decode_captures(text, expected_count=2, expected_dimensions=(320, 240))
             report["captures"] = []
             for ident, (width, height, pixels) in sorted(frames.items()):
-                path = ROOT / "build" / ("bafford-stream-" + ("west" if ident == 1 else "east") + ".png")
+                prefix = "bafford-expanded-" if expanded else "bafford-stream-"
+                path = ROOT / "build" / (prefix + ("west" if ident == 1 else "east") + ".png")
                 Image.frombytes("RGB", (width, height), pixels).save(path)
                 report["captures"].append(dict(id=ident, image=str(path), sha256=hashlib.sha256(path.read_bytes()).hexdigest()))
         code = 0

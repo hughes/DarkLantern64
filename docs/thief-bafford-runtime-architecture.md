@@ -260,10 +260,12 @@ state survive bank changes without reinitializing the game. Inactive guards
 retain state and receive a coarse distance-only sound wake signal; distant
 patrol simulation and acoustic propagation remain unimplemented.
 
-The editor now preserves the manifest through catalog, duplicate, delete and
-menu operations, shows partition and byte diagnostics, and launches the
-streamed bundle. Its authoring viewport shows the full scene. Region controls
-and stream Native Play are still required before this can support routine
+The editor preserves the manifest through catalog, duplicate, delete and menu
+operations, shows partition and byte diagnostics, and launches the streamed
+bundle. Its authoring viewport shows the full scene. The expansion increment
+adds controls for entity home regions, bounds, entry region, visibility and
+neighbors, with paired scene/partition undo and transactional saves. Stream
+Native Play and a complete region lifecycle remain required before routine
 content development; Native Play is explicitly disabled for these missions.
 
 See [playable probe and verification](streaming-probe.md) for the current
@@ -310,3 +312,25 @@ sightlines. Distance-based retirement would hide visible buildings. This
 demonstrates textured chunk loading and traversal, not a reduced working set
 for the full manor. See [Bafford streaming conversion](thief-bafford-streaming.md)
 for reproducible generation, editor handling and measured verification.
+
+## Bounded street expansion
+
+The next branch preserves the edited entry and adds source cells 3831, 4360,
+4366 and 4987. Selection uses captured per-triangle cell/polygon annotations,
+evaluated mesh geometry and source cell planes, rather than taking complete
+material meshes that also span omitted cells. Polygon fans reconstruct new
+rectangular collision proxies. Original edited proxies remain part of the
+input. Exact containment and interval unions reduce redundant boxes only when
+their physical material semantics match; they do not fill gaps or approximate
+sloped surfaces. All source inputs and dependencies are checked again before
+publication.
+
+The resulting two-region scene has 593 triangles, 163 proxies, 23 materials,
+31 draw groups and 16 lights. It stays within the existing source, chunk and
+working-bank budgets. Two named starts expose the bridge and eastern end in
+the menu. The raised crossing is 0.3048 metres above the adjacent street and
+uses the existing jump controls. Both regions still remain resident for open
+sightlines. Source topology establishes provenance and connectivity; a general
+visibility, navigation or collision compiler is still separate work. See the
+[expanded street record](thief-bafford-expanded.md) for route verification,
+package accounting and remaining limits.

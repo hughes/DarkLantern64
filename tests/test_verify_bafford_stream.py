@@ -5,6 +5,12 @@ from tools.verify_bafford_stream import CAPTURE_COMPLETE, COMPLETE, PREFIX, deco
 
 
 class BaffordStreamLogTests(unittest.TestCase):
+    def regions(self):
+        return [dict(id=1, bounds=[[-3.048, -3, 43], [3, 4, 52]], chunk_bytes=2000,
+                     collider_count=20, material_ids=list(range(6)), triangle_count=100),
+                dict(id=2, bounds=[[-8, -3, 43], [-3.048, 4, 52]], chunk_bytes=2000,
+                     collider_count=20, material_ids=list(range(6)), triangle_count=100)]
+
     def rows(self):
         names = ("start", "west_ready", "east_crossed", "east_turnaround", "west_crossed", "west_return", "east_return")
         ticks = (90, 200, 450, 600, 850, 1050, 1450)
@@ -14,11 +20,12 @@ class BaffordStreamLogTests(unittest.TestCase):
                      player=[x, -2.4384, z], grounded=1, collision_clear=1,
                      heap_used=1_000_000, models=12, colliders=40, textures=8,
                      stream=dict(current=2 if x < -3.048 else 1, resident=[1, 2], reserved=4000,
-                                 allocated=4096, completed_loads=2, retired=0, readbytes=4000, stalls=8))
+                                 allocated=4000, completed_loads=2, retired=0, readbytes=4000, stalls=8))
                 for name, tick, (x, z) in zip(names, ticks, positions)]
 
     def log(self, rows=None, terminal=True, music=True, underruns=0, capture=False):
         lines = ["DL64 menu_ready mode=menu levels=8", "DL64 level_start id=bafford-stream preset=default"]
+        lines.append("DL64 stream_view resident_mask=3 triangles=200 colliders=40 loads=2 retired=0 reserved=4000 allocated_slots=4000")
         lines += [PREFIX + json.dumps(row) for row in (rows or self.rows())]
         if music:
             lines.append(f"DL64 music cue=lanterns_below consumed_frames=580032 generated_blocks=460 queued=3 underruns={underruns}")
@@ -29,13 +36,40 @@ class BaffordStreamLogTests(unittest.TestCase):
         return "\n".join(lines)
 
     def test_complete_bounded_input_traversal(self):
-        regions = [dict(id=1, bounds=[[-3.048, -3, 43], [3, 4, 52]], chunk_bytes=2000),
-                   dict(id=2, bounds=[[-8, -3, 43], [-3.048, 4, 52]], chunk_bytes=2000)]
-        result = decode_log(self.log(), regions, require_music=True)
+        result = decode_log(self.log(), self.regions(), require_music=True, expected_textures=8)
         self.assertEqual(result["route"], [2, 1, 2, 1])
         self.assertEqual(result["loads"], 2)
         self.assertEqual(result["retirements"], 0)
         self.assertTrue(result["audio_continuity_passed"])
+
+    def test_uniformly_wrong_resources_rejected_against_cook(self):
+        for field in ("models", "colliders", "textures"):
+            rows = self.rows()
+            for row in rows:
+                row[field] = 1
+            with self.subTest(field=field), self.assertRaisesRegex(ValueError, "count differs"):
+                decode_log(self.log(rows), self.regions(), expected_textures=8)
+        rows = self.rows()
+        for row in rows:
+            row["models"] += 2
+        self.assertTrue(decode_log(self.log(rows), self.regions(), expected_textures=8, bootstrap_models=2)["passed"])
+
+    def test_cooked_triangles_and_exact_slot_capacity_required(self):
+        rows = self.rows()
+        for row in rows:
+            row["stream"]["allocated"] = 1_000_000_000
+        with self.assertRaisesRegex(ValueError, "Slot allocation"):
+            decode_log(self.log(rows), self.regions(), expected_textures=8)
+        for text in (self.log().replace("triangles=200", "triangles=1"),
+                     "\n".join(line for line in self.log().splitlines() if not line.startswith("DL64 stream_view "))):
+            with self.subTest(), self.assertRaisesRegex(ValueError, "stream view"):
+                decode_log(text, self.regions(), expected_textures=8)
+
+    def test_original_route_can_use_expanded_mission(self):
+        text = self.log().replace("id=bafford-stream ", "id=bafford-expanded ")
+        self.assertTrue(decode_log(text, expected_level="bafford-expanded")["passed"])
+        with self.assertRaises(ValueError):
+            decode_log(text)
 
     def test_missing_or_failed_assertions_rejected(self):
         for text in (self.log(terminal=False), self.log().replace("input_only=1", "input_only=0"),

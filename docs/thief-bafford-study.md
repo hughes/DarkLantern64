@@ -55,12 +55,13 @@ a geometry / texture / lighting sanity check, rather than a full stealth mission
 Some edges open into omitted cells, and surfaces without box proxies remain
 nonblocking. Use it for a limited walk around the starting street.
 
-The menu now uses its derived streamed variant as `bafford-stream`; see the
-[streaming conversion](thief-bafford-streaming.md) for generation and current
-verification. The original editable entry remains available for comparison
-and standalone builds.
+The menu uses the expanded streamed variant as `bafford-expanded`; see the
+[street expansion](thief-bafford-expanded.md) for generation and current
+verification, and the earlier [streaming conversion](thief-bafford-streaming.md)
+for the initial entry package. The original editable entry remains available
+for comparison and standalone builds.
 Build the main ROM with `python tools/build.py --bundle content/level_bundle.json --run`
-and choose **Bafford Street Streaming** in the level selector.
+and choose **Bafford Streets Expanded** in the level selector.
 The full source study remains excluded from runtime bundles. On a fresh checkout,
 run the local Thief importer first: the generated level, textures and models
 remain ignored by Git and must be present before building this bundle.

@@ -14,9 +14,12 @@ from the ROM menu; its editor integration is experimental until those gates
 are complete.
 
 The [Bafford streaming conversion](thief-bafford-streaming.md) now derives a
-textured, two-region version of the playable entry. Both street regions remain
-resident conservatively. The full manor study is still protected; its spatial
-compilation and mission-scale runtime are separate delivery work.
+textured, two-region version of the playable entry. The subsequent
+[street expansion](thief-bafford-expanded.md) retains that edited entry and adds
+four connected source cells, including an eastern street and raised crossing.
+Both street regions remain resident conservatively. The full manor study is
+still protected; its spatial compilation and mission-scale runtime are separate
+delivery work.
 
 The conversion proves that the complete architecture, textures, placements and
 source topology can be brought into an editable `.blend` and our editor. It does

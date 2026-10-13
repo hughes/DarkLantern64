@@ -9,6 +9,7 @@
   "levels": {
     "sponza_courtyard": "lanterns_below",
     "streaming_probe": "lanterns_below",
-    "thief_bafford_stream": "lanterns_below"
+    "thief_bafford_stream": "lanterns_below",
+    "thief_bafford_expanded": "lanterns_below"
   }
 }

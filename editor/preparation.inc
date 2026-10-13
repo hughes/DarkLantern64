@@ -25,12 +25,13 @@
     void BeginPreparation(const std::string& kind,const std::string& file={},const std::string& request={}) {
         if(Busy())throw std::runtime_error("Finish the current preparation first");
         preparationKind_=kind;preparationRequest_=request;
-        preparationSnapshot_=document_.dump(2)+"\n";
+        preparationSnapshot_=AuthorSnapshot().dump(2)+"\n";
         preparationStarted_=std::chrono::steady_clock::now();
         std::vector<std::wstring> args{L"cook",L"--level",kind=="open"?fs::path(file).wstring():source_.wstring()};
         if(kind=="preview") {
             const auto stage=queue_/"preview-snapshot.json";
-            AtomicWrite(stage,preparationSnapshot_);args.insert(args.end(),{L"--staged",stage.wstring()});
+            AtomicWrite(stage,document_.dump(2)+"\n");args.insert(args.end(),{L"--staged",stage.wstring()});
+            StagePartition(args,queue_/"preview-partition.json");
         }
         const auto root=root_,queue=queue_;
         preparation_=std::async(std::launch::async,[root,queue,args]{return ProjectTool(root,queue,args);});
@@ -42,7 +43,7 @@
         const auto kind=preparationKind_;preparationKind_.clear();
         try {
             auto cooked=preparation_.get();
-            if(document_.dump(2)+"\n"!=preparationSnapshot_) {
+            if(AuthorSnapshot().dump(2)+"\n"!=preparationSnapshot_) {
                 if(kind=="open")throw std::runtime_error("New edits detected; level switch cancelled to preserve them");
                 return; // A newer draft will schedule its own preparation.
             }

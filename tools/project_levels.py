@@ -22,19 +22,19 @@ import uuid
 import time
 
 try:
-    from compile_level import compile_level, validate
+    from compile_level import compile_level, validate, transform_point
     from compile_bundle import MAX_LEVELS, read_manifest
     import editor_cache
     from character_assets import configure_editor_cache
     from content_profile import content_limits, is_study, STUDY_LIMITS, STUDY_PLAY_REASON
-    from compile_mission import mission_source, cook_mission, validate_stream_bridge
+    from compile_mission import mission_source, cook_mission, validate_stream_bridge, collider_corners
 except ModuleNotFoundError:
-    from tools.compile_level import compile_level, validate
+    from tools.compile_level import compile_level, validate, transform_point
     from tools.compile_bundle import MAX_LEVELS, read_manifest
     from tools import editor_cache
     from tools.character_assets import configure_editor_cache
     from tools.content_profile import content_limits, is_study, STUDY_LIMITS, STUDY_PLAY_REASON
-    from tools.compile_mission import mission_source, cook_mission, validate_stream_bridge
+    from tools.compile_mission import mission_source, cook_mission, validate_stream_bridge, collider_corners
 
 ROOT = Path(__file__).resolve().parents[1]
 FILENAME = re.compile(r"[A-Za-z][A-Za-z0-9_-]{0,63}\.json")
@@ -242,6 +242,7 @@ class ProjectLevels:
         except (ValueError, OSError, KeyError, TypeError) as error:
             status["error"] = str(error)
         return dict(mission_manifest=partition["path"].as_posix(), mission_manifest_sha256=sha256(partition["raw"]),
+                    mission_document=copy.deepcopy(partition["document"]), mission_text=partition["raw"].decode("utf-8"),
                     visibility=partition["document"].get("visibility", "door-distance"),
                     bundle_id=row["id"] if row and "mission" in row else None,
                     native_play_supported=False, native_play_reason=STREAM_NATIVE_REASON,
@@ -282,7 +283,7 @@ class ProjectLevels:
                            "source_sha256": sha256(bundle_raw),
                            "levels": bundle["levels"], "max_levels": MAX_LEVELS}, "warnings": warnings}
 
-    def publish(self, changes, expected):
+    def publish(self, changes, expected, *, cleanup_warnings=None):
         """Replace files individually, restoring every prior byte on an error.
 
         All payloads and rollback copies are prepared before publication. The
@@ -302,6 +303,7 @@ class ProjectLevels:
         staging.mkdir(parents=True, exist_ok=True)
         temporary = self.safe(Path(tempfile.mkdtemp(prefix="publish-", dir=staging)))
         retain_backup = False
+        publication_complete = False
         try:
             staged, backups = {}, {}
             recovery = []
@@ -331,6 +333,7 @@ class ProjectLevels:
                     else:
                         os.replace(staged[path], path)
                     completed.append(path)
+                publication_complete = True
             except BaseException as failure:
                 try:
                     for path in reversed(completed):
@@ -352,7 +355,12 @@ class ProjectLevels:
                 # beneath the checked transaction directory; never remove a
                 # caller-provided or computed scene directory recursively.
                 require(self.safe(temporary).parent == staging, "Unsafe transaction cleanup path")
-                shutil.rmtree(temporary)
+                try:
+                    shutil.rmtree(temporary)
+                except OSError as error:
+                    if not publication_complete or cleanup_warnings is None:
+                        raise
+                    cleanup_warnings.append(f"Authoring saved; transaction cleanup failed: {error}")
 
     def membership(self, bundle, path, included, data=None, mission=None):
         require(type(included) is bool, "Bundle membership must be true or false")
@@ -470,7 +478,46 @@ class ProjectLevels:
             self.publish(changes, expected)
             return {"ok": True, "level": entry, "backup": backup.as_posix(), "catalog": self.catalog()}
 
-    def cook(self, level, expected_sha256=None, staged=None):
+    def save_pair(self, level, expected_sha256, staged, expected_mission_sha256, staged_mission):
+        """Commit stream scene, partition and prepared preview under one CAS/rollback."""
+        return self.cook(level, expected_sha256, staged, staged_mission=staged_mission,
+                         expected_mission_sha256=expected_mission_sha256, publish_pair=True)
+
+    def fit_region_bounds(self, level, region, staged, staged_mission, expected_mission_sha256,
+                          expected_sha256=None):
+        """Return a bounds repair draft; never publish authoring files."""
+        with self.lock():
+            path = self.path(level)
+            self.read_level(path, expected_sha256)
+            partition = self.mission_for(path)
+            require(partition is not None and sha256(partition["raw"]) == expected_mission_sha256,
+                    "Mission partition changed on disk; reload or reconcile before fitting bounds")
+            scene_stage, mission_stage = self.safe(Path(staged).absolute()), self.safe(Path(staged_mission).absolute())
+            require(scene_stage != mission_stage and not scene_stage.is_relative_to(self.content) and
+                    not mission_stage.is_relative_to(self.content), "Bounds repair requires separate staged drafts outside content")
+            _, data = self.read_level(scene_stage)
+            draft = json.loads(mission_stage.read_bytes())
+            require(draft.get("source") == path.name, "Draft partition source differs from this scene")
+            rows = [row for row in draft["regions"] if row["id"] == region]
+            require(len(rows) == 1, "Choose one existing region")
+            state = validate(data, self.content, authoring=True)
+            boxes = {box["id"]: box for box in state["colliders"]}
+            points = []
+            for ident in rows[0]["entities"]:
+                require(ident in state["by_id"], "Region contains an unknown entity: " + ident)
+                entity = state["by_id"][ident]
+                points.append(entity["transform"]["position"])
+                if "model" in entity:
+                    points.extend(transform_point(p, entity["transform"]) for p in state["meshes"][entity["model"]]["vertices"])
+                if ident in boxes:
+                    points.extend(collider_corners(boxes[ident]))
+            require(points, "Assign an object before fitting region bounds")
+            rows[0]["bounds"] = [[min(p[axis] for p in points)-.01 for axis in range(3)],
+                                 [max(p[axis] for p in points)+.01 for axis in range(3)]]
+            return dict(ok=True, mission_document=draft, region=region)
+
+    def cook(self, level, expected_sha256=None, staged=None, *, staged_mission=None,
+             expected_mission_sha256=None, publish_pair=False):
         started = time.perf_counter()
         with self.lock():
             path = self.path(level)
@@ -482,20 +529,45 @@ class ProjectLevels:
             candidate_raw, candidate_data = self.read_level(candidate)
             bundle, bundle_raw = self.bundle_snapshot()
             partition = self.mission_for(path)
+            saved_partition = partition
+            mission_candidate = None
+            if expected_mission_sha256 is not None:
+                require(partition is not None, "Scene has no associated mission partition")
+                require(isinstance(expected_mission_sha256, str) and
+                        re.fullmatch(r"[a-fA-F0-9]{64}", expected_mission_sha256), "Expected mission SHA-256 must contain 64 hexadecimal characters")
+                require(sha256(partition["raw"]) == expected_mission_sha256.lower(),
+                        "Mission partition changed on disk; edits are retained, refresh or reconcile before saving")
+            if staged_mission is not None:
+                require(partition is not None and expected_mission_sha256 is not None,
+                        "A staged mission requires its associated saved manifest SHA-256")
+                mission_candidate = self.safe(Path(staged_mission).absolute())
+                require(mission_candidate != candidate and not mission_candidate.is_relative_to(self.content),
+                        "Staged mission must be a separate file outside content and inside this project")
+                mission_raw = mission_candidate.read_bytes()
+                require(len(mission_raw) <= 1024 * 1024, "Mission manifest exceeds 1 MiB")
+                mission_document = json.loads(mission_raw)
+                require(isinstance(mission_document, dict) and mission_document.get("source") == path.name and
+                        mission_document.get("version") == 1, "Draft mission must retain this canonical source and version")
+                partition = dict(path=partition["path"], raw=mission_raw, document=mission_document)
+            if publish_pair:
+                require(staged is not None and mission_candidate is not None and expected_sha256 is not None,
+                        "Paired save requires both staged files and both saved SHA-256 identities")
             streaming = self.stream_metadata(path, candidate_data, bundle, partition)
             output = self.safe(self.root / "build" if path.stem == "first_room" else self.root / "build/scenes" / path.stem)
             asset_root = self.safe(self.root / "build/project/editor-assets")
             cache = self.safe(self.cache / "cooked" / path.name)
             key = [self.code_key, sha256(raw), sha256(candidate_raw), staged is not None,
-                   sha256(bundle_raw), sha256(partition["raw"]) if partition else None]
-            cached = editor_cache.read(cache, key)
+                   sha256(bundle_raw), sha256(partition["raw"]) if partition else None,
+                   sha256(saved_partition["raw"]) if saved_partition else None, publish_pair]
+            cached = editor_cache.read(cache, key) if not publish_pair else None
             if cached is not None:
                 cached.update(catalog=self.catalog(), changed_preview_assets=[], cache_hit=True)
                 cached["prepare_ms"] = round((time.perf_counter()-started)*1000, 2)
                 return cached
             staging = self.safe(self.editor / "cooking")
             staging.mkdir(parents=True, exist_ok=True)
-            with tempfile.TemporaryDirectory(prefix="cook-", dir=staging) as temporary:
+            warnings = []
+            with tempfile.TemporaryDirectory(prefix="cook-", dir=staging, ignore_cleanup_errors=publish_pair) as temporary:
                 temporary = Path(temporary)
                 snapshot = temporary / "source.json"
                 snapshot.write_bytes(candidate_raw)
@@ -563,8 +635,14 @@ class ProjectLevels:
                                           and (not target.exists() or target.read_bytes() != payload)]
                 changes = {target: payload for target, payload in changes.items()
                            if payload is None or not target.exists() or target.read_bytes() != payload}
-                self.publish(changes, {path: raw, candidate: candidate_raw, self.manifest: bundle_raw,
-                                     **({partition["path"]: partition["raw"]} if partition else {})})
+                expected = {path: raw, candidate: candidate_raw, self.manifest: bundle_raw,
+                            **({saved_partition["path"]: saved_partition["raw"]} if saved_partition else {})}
+                if mission_candidate is not None:
+                    expected[mission_candidate] = partition["raw"]
+                if publish_pair:
+                    changes[path] = candidate_raw
+                    changes[partition["path"]] = partition["raw"]
+                self.publish(changes, expected, cleanup_warnings=warnings if publish_pair else None)
             result = {"ok": True, "source": path.as_posix(), "source_sha256": sha256(raw), "source_text": raw.decode("utf-8"),
                     "output": output.as_posix(), "asset_root": asset_root.as_posix(),
                     "scene_path": scene_path, "staged": staged is not None,
@@ -572,9 +650,24 @@ class ProjectLevels:
                      "report": report, "preview_fingerprint": preview_fingerprint,
                      "runtime_format": "stream-mission-v1" if streaming else "resident-level",
                      "native_play_supported": streaming is None and not is_study(candidate_data), "streaming": streaming}
-            dependencies = self.validate_cached(candidate, candidate_raw, json.loads(candidate_raw))
-            editor_cache.write(cache, key, result, [*dependencies, *outputs, *([partition["path"]] if partition else [])])
-            result.update(catalog=self.catalog(), cache_hit=False, prepare_ms=round((time.perf_counter()-started)*1000, 2))
+            if publish_pair:
+                result.update(source_sha256=sha256(candidate_raw), source_text=candidate_raw.decode("utf-8"), saved_pair=True)
+            try:
+                dependencies = self.validate_cached(candidate, candidate_raw, candidate_data)
+                editor_cache.write(cache, key, result, [*dependencies, *outputs, *([partition["path"]] if partition else [])])
+            except Exception as error:
+                if not publish_pair:
+                    raise
+                warnings.append(f"Authoring saved; preparation cache update failed: {error}")
+            try:
+                result["catalog"] = self.catalog()
+            except Exception as error:
+                if not publish_pair:
+                    raise
+                warnings.append(f"Authoring saved; project catalog refresh failed: {error}")
+            result.update(cache_hit=False, prepare_ms=round((time.perf_counter()-started)*1000, 2))
+            if warnings:
+                result["warnings"] = warnings
             return result
 
 
@@ -589,7 +682,7 @@ def main(argv=None):
     parser.add_argument("--root", type=Path, default=ROOT)
     commands = parser.add_subparsers(dest="command", required=True)
     commands.add_parser("list")
-    for command in ("create", "duplicate", "update", "delete", "cook"):
+    for command in ("create", "duplicate", "update", "delete", "cook", "save_pair", "fit_region_bounds"):
         item = commands.add_parser(command)
         if command != "create":
             item.add_argument("--level", required=True)
@@ -599,8 +692,12 @@ def main(argv=None):
         if command in ("create", "duplicate", "update"):
             item.add_argument("--title", required=command != "update")
             item.add_argument("--in-bundle", type=boolean, default=None if command == "update" else True)
-        if command == "cook":
-            item.add_argument("--staged", type=Path)
+        if command in ("cook", "save_pair", "fit_region_bounds"):
+            item.add_argument("--staged", type=Path, required=command != "cook")
+            item.add_argument("--staged-mission", type=Path, required=command != "cook")
+            item.add_argument("--expected-mission-sha256", required=command != "cook")
+        if command == "fit_region_bounds":
+            item.add_argument("--region", required=True)
     args = vars(parser.parse_args(argv))
     root, command = args.pop("root"), args.pop("command")
     try:

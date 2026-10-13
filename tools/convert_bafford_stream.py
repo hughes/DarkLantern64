@@ -163,7 +163,9 @@ def derive(document, state, source_name, source_sha256, seam=-3.048):
                     group = groups.setdefault((side, entity["material"]), {"triangles": [], "provenance": [], "sources": {}})
                     for part, clipped in enumerate(clip_triangle(triangle, seam, side)):
                         group["triangles"].append(clipped)
-                        group["provenance"].append(dict(source_entity_id=ident, source_model_id=entity["model"], source_triangle=index, part=part))
+                        provenance = dict(source_entity_id=ident, source_model_id=entity["model"], source_triangle=index, part=part)
+                        provenance.update(state.get("triangle_provenance", {}).get((ident, index), {}))
+                        group["provenance"].append(provenance)
                         group["sources"][ident] = copy.deepcopy(entity.get("source", {}))
         if "collider" in entity:
             source_counts["colliders"] += 1

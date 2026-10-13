@@ -24,13 +24,22 @@ scene archives both files, removes its menu entry and retains shared assets.
 Expected source/manifest bytes and the existing rollback mechanism protect
 these operations from partial publication.
 
-The editor's **Streaming** panel shows the manifest, regions, selected object's
-home, bounds/coverage errors, directory bytes, ROM bytes and authored neighbor
-overlap. Adding an object leaves it visibly unassigned until its partition is
-updated. Moving architecture outside its home bounds makes the region cook
+The editor's **Streaming** panel edits selected objects' home assignment, region
+bounds, entry region, visibility policy and neighbor links. **Fit bounds to owned
+objects** evaluates transformed geometry and collision in the current scene
+draft, with a small coverage margin. Numeric fields retain edits until **Apply
+bounds**, so typing does not trigger preparation. **Validate draft** previews scene and
+partition changes together. The panel reports bounds/coverage errors, directory
+bytes, ROM bytes and authored neighbor overlap. Adding an object leaves it
+visibly unassigned until its home is chosen. Moving architecture outside its home bounds makes the region cook
 invalid. Both edits remain visible and editable; an invalid partition must not
 hide the scene from the catalog or prevent an authoring preview. Partition
 changes invalidate the preparation cache independently of scene changes.
+Deleting scene objects removes their home IDs in the same Undo/Redo transaction.
+Malformed external bounds use safe replacement controls or the bounds-fit
+repair; malformed region/home structure stays visible with a repair diagnostic.
+Numeric bounds fields retain typed values until **Apply bounds** commits the
+change, allowing authors to finish editing before preparation begins.
 
 **Run level in Ares** resolves the mapped bundle ID and invokes the mission
 bundle with that start level and selected test start. It cannot silently build
@@ -62,11 +71,24 @@ original `door-distance` probe policy or conservative `all-regions` residency.
 The panel displays this policy. Open Bafford street regions stay loaded together
 until a spatial compiler can prove safe visibility and retirement.
 
-Region authoring controls are still required. Today the panel displays the
-external manual manifest; it does not assign homes or edit bounds. Artists can
-continue ordinary scene editing and receive errors, but region repairs still
-require editing the manifest. The following work is necessary before this is
-an efficient workflow for developing larger levels.
+Scene and partition drafts share Undo/Redo and unsaved-change handling through
+an internal paired history snapshot. The canonical scene JSON does not embed
+the partition. **Save + Cook** compares both saved SHA256 identities, then uses
+the project's checked publication transaction to save the source, manifest and
+prepared preview together. A conflict or replacement failure retains both
+drafts and restores earlier published bytes. A structurally valid authoring
+draft with invalid region coverage can still be saved and repaired in the
+panel; ROM build/play remains blocked until region cooking succeeds.
+Single and bulk entity deletion prune their home IDs in the same paired Undo
+step. Malformed manifest rows and bounds show repair diagnostics while the
+scene remains editable; existing regions with bad bounds support replacement
+or fitting.
+After a successful publication, an ancillary cache/catalog failure reports a
+warning and retains the new saved identities so the next save can proceed.
+
+Region create/rename/delete controls, viewport bounds handles, selection
+overlays and Native Play stream simulation remain future work. The following
+work is necessary before the complete larger-level workflow is accepted.
 
 ## Region authoring as first-class scene editing
 

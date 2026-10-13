@@ -438,7 +438,8 @@ static DlInput bafford_stream_test_input(const DlGame *game,const DlLauncher *la
     static unsigned stage,warmup;DlInput input={0};*menu=(DlLaunchInput){0};++bafford_stream_test_tick;
     if(launcher->menu_open){
         int probe=-1;for(int i=0;i<launcher->bundle->level_count;++i)
-            if(strcmp(launcher->bundle->levels[i].id,"bafford-stream")==0)probe=i;
+            if(strcmp(launcher->bundle->levels[i].id,"bafford-stream")==0||
+               strcmp(launcher->bundle->levels[i].id,"bafford-expanded")==0)probe=i;
         assertf(probe>=0,"Bafford stream entry is missing from diagnostic menu");
         menu->level_delta=probe-launcher->selected_level;menu->accept=true;return input;
     }
@@ -481,6 +482,98 @@ static DlInput bafford_stream_test_input(const DlGame *game,const DlLauncher *la
         debugf("DL64 bafford_capture_complete views=2\n");
 #endif
         debugf("DL64 bafford_stream_test_complete passed=1 input_only=1 coverage=1 feet_stable=1 collision_clear=1 audio_calls=%lu\n",(unsigned long)audio_call_total);
+        ++stage;break;
+    default:break;
+    }
+    return input;
+}
+#endif
+#ifdef DL_BAFFORD_EXPANDED_TEST
+static uint64_t bafford_expanded_tick;
+static void bafford_expanded_checkpoint(const char *name,const DlGame *game,unsigned jumps){
+    const DlWorldStream *world=dl_stream_rom_world();heap_stats_t heap;sys_get_heap_stats(&heap);
+    assertf(world,"Expanded Bafford diagnostic has no mission");
+    debugf("DL64 bafford_expanded {\"checkpoint\":\"%s\",\"tick\":%llu,\"elapsed\":%.4f,\"player\":[%.4f,%.4f,%.4f],\"grounded\":%d,\"vertical_velocity\":%.4f,\"jump_inputs\":%u,\"collision_clear\":%d,\"heap_used\":%d,\"models\":%d,\"colliders\":%d,\"textures\":%d,\"stream\":{\"current\":%lu,\"resident\":[",
+        name,(unsigned long long)bafford_expanded_tick,game->elapsed,
+        game->player.x,game->player.y,game->player.z,game->grounded,game->vertical_velocity,jumps,
+        dl_position_clear(game,game->player,.18f,1.65f),heap.used,
+        game->level->model_count,game->level->collider_count,game->level->texture_count,
+        (unsigned long)dl_stream_rom_current(game));
+    bool first=true;for(size_t i=0;i<world->slot_count;++i)if(world->slots[i].state==DL_STREAM_RESIDENT){
+        debugf("%s%lu",first?"":",",(unsigned long)world->slots[i].region_id);first=false;}
+    debugf("],\"reserved\":%lu,\"allocated\":%lu,\"completed_loads\":%llu,\"retired\":%lu,\"readbytes\":%llu,\"stalls\":%llu}}\n",
+        (unsigned long)world->stats.reserved_bytes,(unsigned long)world->stats.allocated_slot_bytes,
+        (unsigned long long)world->stats.completed_loads,(unsigned long)dl_stream_rom_retired(),
+        (unsigned long long)world->stats.bytes_read,(unsigned long long)world->stats.read_stalls);
+}
+static bool bafford_expanded_move(const DlGame *game,float x,float floor,DlInput *input){
+    float dx=x-game->player.x,dz=48.5f-game->player.z;
+    if(dx*dx+dz*dz<.0121f)return game->grounded&&fabsf(game->player.y-floor)<.015f;
+    float error=atan2f(dx,dz)-game->yaw;
+    while(error>3.14159265f)error-=6.28318531f;
+    while(error< -3.14159265f)error+=6.28318531f;
+    input->turn=fmaxf(-1,fminf(1,-error/(2.3f*DL_TICK_SECONDS)));
+    input->forward=fabsf(error)<.1f?1:0;return false;
+}
+static DlInput bafford_expanded_input(const DlGame *game,const DlLauncher *launcher,DlLaunchInput *menu){
+    static unsigned stage,warmup,jumps;static bool air_seen[2];
+    DlInput input={0};*menu=(DlLaunchInput){0};++bafford_expanded_tick;
+    if(launcher->menu_open){
+        int probe=-1;for(int i=0;i<launcher->bundle->level_count;++i)
+            if(strcmp(launcher->bundle->levels[i].id,"bafford-expanded")==0)probe=i;
+        assertf(probe>=0,"Expanded Bafford entry missing from menu");
+        menu->level_delta=probe-launcher->selected_level;menu->accept=true;return input;
+    }
+    assertf(dl_stream_rom_active()&&!game->caught&&!game->complete,"Expanded Bafford has unexpected mission state");
+    assertf(bafford_expanded_tick<7200,"Expanded Bafford timed out stage=%u",stage);
+    if(!stage){if(++warmup<90)return input;bafford_expanded_checkpoint("start",game,jumps);
+#ifdef DL_BAFFORD_EXPANDED_TEST_CAPTURE
+        dl_render_request_capture(1);
+#endif
+        ++stage;}
+    assertf(dl_stream_rom_current(game)&&game->player.y>=-2.4684f&&game->player.y<=-1.35f&&
+        dl_position_clear(game,game->player,.18f,1.65f),"Expanded street lost coverage/body clearance");
+    if(game->grounded)assertf(fabsf(game->player.y+2.4384f)<.015f||fabsf(game->player.y+2.1336f)<.015f,
+        "Expanded street reached an unexpected floor");
+    const DlWorldStream *world=dl_stream_rom_world();unsigned resident=0;
+    for(size_t i=0;i<world->slot_count;++i)resident+=world->slots[i].state==DL_STREAM_RESIDENT;
+    assertf(resident==2&&world->stats.completed_loads==2&&!dl_stream_rom_retired(),"Expanded open street lost visible regions");
+    switch(stage){
+    case 1:if(bafford_expanded_move(game,-6.522049f,-2.4384f,&input)){bafford_expanded_checkpoint("west_center",game,jumps);++stage;}break;
+    case 2:if(bafford_expanded_move(game,7.8f,-2.4384f,&input)){bafford_expanded_checkpoint("east_approach",game,jumps);++stage;}break;
+    case 3:input.jump=true;++jumps;bafford_expanded_checkpoint("jump_east_takeoff",game,jumps);++stage;break;
+    case 4:
+        if(!air_seen[0]&&!game->grounded&&game->player.x>8.382f&&game->player.y> -2.0336f){
+            air_seen[0]=true;bafford_expanded_checkpoint("jump_east_air",game,jumps);}
+        if(bafford_expanded_move(game,9.8f,-2.1336f,&input)){assertf(air_seen[0],"East bridge ascent skipped physical jump");
+            bafford_expanded_checkpoint("bridge_east_landed",game,jumps);++stage;}break;
+    case 5:if(bafford_expanded_move(game,11.5f,-2.1336f,&input)){bafford_expanded_checkpoint("bridge_east_edge",game,jumps);++stage;}break;
+    case 6:if(bafford_expanded_move(game,15.1f,-2.4384f,&input)){bafford_expanded_checkpoint("east_street",game,jumps);++stage;}break;
+    case 7:
+#ifdef DL_BAFFORD_EXPANDED_TEST_CAPTURE
+        {float error=atan2f(-game->player.x,48.5f-game->player.z)-game->yaw;
+        while(error>3.14159265f)error-=6.28318531f;
+        while(error< -3.14159265f)error+=6.28318531f;
+        if(fabsf(error)>.05f){input.turn=fmaxf(-1,fminf(1,-error/(2.3f*DL_TICK_SECONDS)));break;}
+        dl_render_request_capture(2);}
+#endif
+        ++stage;break;
+    case 8:if(bafford_expanded_move(game,12.3f,-2.4384f,&input)){bafford_expanded_checkpoint("west_approach",game,jumps);++stage;}break;
+    case 9:input.jump=true;++jumps;bafford_expanded_checkpoint("jump_west_takeoff",game,jumps);++stage;break;
+    case 10:
+        if(!air_seen[1]&&!game->grounded&&game->player.x<12.0396f&&game->player.y> -2.0336f){
+            air_seen[1]=true;bafford_expanded_checkpoint("jump_west_air",game,jumps);}
+        if(bafford_expanded_move(game,10.8f,-2.1336f,&input)){assertf(air_seen[1],"West bridge ascent skipped physical jump");
+            bafford_expanded_checkpoint("bridge_west_landed",game,jumps);++stage;}break;
+    case 11:if(bafford_expanded_move(game,8.8f,-2.1336f,&input)){bafford_expanded_checkpoint("bridge_west_edge",game,jumps);++stage;}break;
+    case 12:if(bafford_expanded_move(game,7.8f,-2.4384f,&input)){bafford_expanded_checkpoint("west_street",game,jumps);++stage;}break;
+    case 13:if(bafford_expanded_move(game,-6.522049f,-2.4384f,&input)){bafford_expanded_checkpoint("west_return",game,jumps);++stage;}break;
+    case 14:
+        assertf(jumps==2&&air_seen[0]&&air_seen[1],"Expanded street jump evidence incomplete");
+#ifdef DL_BAFFORD_EXPANDED_TEST_CAPTURE
+        debugf("DL64 bafford_expanded_capture_complete views=2\n");
+#endif
+        debugf("DL64 bafford_expanded_test_complete passed=1 input_only=1 coverage=1 bridge_jumps=2 collision_clear=1 audio_calls=%lu\n",(unsigned long)audio_call_total);
         ++stage;break;
     default:break;
     }
@@ -602,6 +695,10 @@ int main(void) {
 #ifdef DL_BAFFORD_STREAM_TEST
         dt=DL_TICK_SECONDS;
         input=bafford_stream_test_input(&game,&launcher,&menu);
+#endif
+#ifdef DL_BAFFORD_EXPANDED_TEST
+        dt=DL_TICK_SECONDS;
+        input=bafford_expanded_input(&game,&launcher,&menu);
 #endif
 #ifdef DL_INPUT_REPLAY
         input=(DlInput){0};menu=(DlLaunchInput){0};

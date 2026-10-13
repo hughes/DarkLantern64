@@ -1,0 +1,1675 @@
+{
+  "version": 1,
+  "recorded_at_utc": "2026-10-13T04:06:19.319358+00:00",
+  "scope": "Bounded expanded Bafford street; Ares and editor integration, not full manor or original hardware acceptance",
+  "main_merge": {
+    "commit": "5d1a639",
+    "pushed_to": "origin/main"
+  },
+  "expansion_branch": "codex/bafford-expanded-coverage",
+  "normal_menu_rom": {
+    "rom": "build\\DarkLantern64-bundle-level_bundle-menu-t3d.z64",
+    "rom_sha256": "300ff6ba30a10f857a4444585351297215299a814c356b1e65c1272caed7b925",
+    "source_sha256": "3c0fa5bf63374bcb84e30cc1f73d00c41f34240d9d94d0cecb2410c6dc1ed9d4",
+    "signature": "4ef159aea9a02c918e2391ae7f45bd1a20e6f354d50889e2a2c904cc2a279162",
+    "rom_bytes": 1081344
+  },
+  "menu_lifecycle": {
+    "passed": true,
+    "platform": "Ares",
+    "runs": [
+      {
+        "name": "bundle-idle",
+        "passed": true,
+        "log": ".dev\\ares\\runs\\4a6aaba5667540879687bec4db33a260\\bundle-idle.log",
+        "tested_rom": ".dev\\ares\\runs\\4a6aaba5667540879687bec4db33a260\\DarkLantern64-bundle-level_bundle-menu-t3d.z64",
+        "rom_sha256": "300ff6ba30a10f857a4444585351297215299a814c356b1e65c1272caed7b925",
+        "rom_bytes": 1081344,
+        "settings": ".dev\\ares\\runs\\4a6aaba5667540879687bec4db33a260\\settings.bml",
+        "settings_source_sha256": "d3917400079a47105fa6bd7df53e4f530915aa3b4b70e79769f1b389bc2b196a",
+        "profile_report": null,
+        "elapsed_seconds": 4.031,
+        "peak_sampled_heap_bytes": null,
+        "max_reported_cpu_ms": null,
+        "boot": null,
+        "terminal_event": "DL64 profile_end window=1"
+      },
+      {
+        "name": "bundle-4mb",
+        "passed": true,
+        "log": ".dev\\ares\\runs\\01cfd6e3602b485e82b376b82a77e219\\bundle-4mb.log",
+        "tested_rom": ".dev\\ares\\runs\\01cfd6e3602b485e82b376b82a77e219\\DarkLantern64-bundle-level_bundle-menu-t3d.z64",
+        "rom_sha256": "300ff6ba30a10f857a4444585351297215299a814c356b1e65c1272caed7b925",
+        "rom_bytes": 1081344,
+        "settings": ".dev\\ares\\runs\\01cfd6e3602b485e82b376b82a77e219\\settings.bml",
+        "settings_source_sha256": "d3917400079a47105fa6bd7df53e4f530915aa3b4b70e79769f1b389bc2b196a",
+        "profile_report": null,
+        "elapsed_seconds": 3.032,
+        "peak_sampled_heap_bytes": null,
+        "max_reported_cpu_ms": null,
+        "boot": null,
+        "terminal_event": "DL64 boot_failed reason=expansion_pak memory=4194304 required=8388608"
+      },
+      {
+        "name": "bundle-switching",
+        "passed": true,
+        "log": ".dev\\ares\\runs\\bb2c7747730f4f90bb69f56b07fbc47f\\bundle-switching.log",
+        "tested_rom": ".dev\\ares\\runs\\bb2c7747730f4f90bb69f56b07fbc47f\\DarkLantern64-bundle-level_bundle-menu-menu-test-t3d.z64",
+        "rom_sha256": "d69ee3dca665de550390e25812860242f02febe93169f174885b094b2166f0bf",
+        "rom_bytes": 1081344,
+        "settings": ".dev\\ares\\runs\\bb2c7747730f4f90bb69f56b07fbc47f\\settings.bml",
+        "settings_source_sha256": "d3917400079a47105fa6bd7df53e4f530915aa3b4b70e79769f1b389bc2b196a",
+        "profile_report": null,
+        "elapsed_seconds": 113.891,
+        "peak_sampled_heap_bytes": 1487784,
+        "max_reported_cpu_ms": 0.0,
+        "boot": "DL64 boot_ok memory=8388608 scene=\"DarkLantern64 - The Lantern Store\" meshes=9 models=25 colliders=14 version=2 world=3d renderer=rsp-tiny3d depth=hardware",
+        "terminal_event": "DL64 menu_test_complete transitions=138 variants=23 cycles=3"
+      },
+      {
+        "name": "bundle-direct",
+        "passed": true,
+        "log": ".dev\\ares\\runs\\0b50d917f8074de8939cf1779d3011f9\\bundle-direct.log",
+        "tested_rom": ".dev\\ares\\runs\\0b50d917f8074de8939cf1779d3011f9\\DarkLantern64-bundle-level_bundle-start-enemy-workshop-preset-store-door-open-t3d.z64",
+        "rom_sha256": "45ee9f7c64d27d50b59c41142e79d4ae1a2830098b4a55baf9d15087ece48dc5",
+        "rom_bytes": 1081344,
+        "settings": ".dev\\ares\\runs\\0b50d917f8074de8939cf1779d3011f9\\settings.bml",
+        "settings_source_sha256": "d3917400079a47105fa6bd7df53e4f530915aa3b4b70e79769f1b389bc2b196a",
+        "profile_report": null,
+        "elapsed_seconds": 3.781,
+        "peak_sampled_heap_bytes": 1290984,
+        "max_reported_cpu_ms": 0.0,
+        "boot": "DL64 boot_ok memory=8388608 scene=\"Enemy Patrol Workshop\" meshes=9 models=27 colliders=14 version=2 world=3d renderer=rsp-tiny3d depth=hardware",
+        "terminal_event": "DL64 frame n=0 t=0.02 ms=16.67 cpu_ms=0.00 heap=1290984/7330896 triangles=0 player=2.50,0.00,0.00 yaw=1.571 pitch=0.000 grounded=1 guard=3.01,0.00,-4.00 light=0.184 alert=0.000 state=PATROL door=1 complete=0 caught=0"
+      },
+      {
+        "name": "single-direct-preset",
+        "passed": true,
+        "log": ".dev\\ares\\runs\\541164ec53e747e9af625ea9dbe44542\\single-direct-preset.log",
+        "tested_rom": ".dev\\ares\\runs\\541164ec53e747e9af625ea9dbe44542\\DarkLantern64-enemy_patrols-preset-scout-observation-t3d.z64",
+        "rom_sha256": "9200368966b3d2b4ff549a06f8c167e484cd6d13edb9d454f3f560363094817b",
+        "rom_bytes": 475136,
+        "settings": ".dev\\ares\\runs\\541164ec53e747e9af625ea9dbe44542\\settings.bml",
+        "settings_source_sha256": "d3917400079a47105fa6bd7df53e4f530915aa3b4b70e79769f1b389bc2b196a",
+        "profile_report": null,
+        "elapsed_seconds": 3.531,
+        "peak_sampled_heap_bytes": 1290376,
+        "max_reported_cpu_ms": 0.0,
+        "boot": "DL64 boot_ok memory=8388608 scene=\"Enemy Patrol Workshop\" meshes=9 models=27 colliders=14 version=2 world=3d renderer=rsp-tiny3d depth=hardware",
+        "terminal_event": "DL64 frame n=0 t=0.02 ms=16.67 cpu_ms=0.00 heap=1290376/7508848 triangles=0 player=-6.00,0.00,2.70 yaw=3.142 pitch=-0.070 grounded=1 guard=3.01,0.00,-4.00 light=0.080 alert=0.000 state=PATROL door=0 complete=0 caught=0"
+      }
+    ],
+    "checks": [
+      "Ordinary menu renders without starting a level; 4 MiB boot gate works",
+      "Every bundled default/test start launches and restarts three times",
+      "Position, view, stance, door and clean mission state match authored starts",
+      "Repeated textured/untextured launches and restarts each reach an exactly stable per-start heap",
+      "Menu resume preserves paused simulation time",
+      "Both bundle and standalone ROMs bypass the menu into a named start"
+    ],
+    "steady_heap_bytes": {
+      "lantern-store/default": {
+        "launch": 1184936,
+        "restart": 1184936
+      },
+      "lantern-store/loot-crate": {
+        "launch": 1184936,
+        "restart": 1184936
+      },
+      "moonlit-yard/default": {
+        "launch": 1297344,
+        "restart": 1297344
+      },
+      "moonlit-yard/loot-counter": {
+        "launch": 1297344,
+        "restart": 1297344
+      },
+      "enemy-workshop/default": {
+        "launch": 1311752,
+        "restart": 1311752
+      },
+      "enemy-workshop/store-door-open": {
+        "launch": 1311752,
+        "restart": 1311752
+      },
+      "enemy-workshop/scout-observation": {
+        "launch": 1311752,
+        "restart": 1311752
+      },
+      "enemy-workshop/loot-crate": {
+        "launch": 1311752,
+        "restart": 1311752
+      },
+      "animation_workshop/default": {
+        "launch": 998904,
+        "restart": 998904
+      },
+      "animation_workshop/guard-front": {
+        "launch": 998904,
+        "restart": 998904
+      },
+      "animation_workshop/two-guards": {
+        "launch": 998904,
+        "restart": 998904
+      },
+      "sponza/default": {
+        "launch": 1487776,
+        "restart": 1487784
+      },
+      "sponza/upper-gallery": {
+        "launch": 1487784,
+        "restart": 1487784
+      },
+      "sponza/east-stairs": {
+        "launch": 1487784,
+        "restart": 1487784
+      },
+      "sponza/west-stairs": {
+        "launch": 1487784,
+        "restart": 1487784
+      },
+      "sponza/courtyard": {
+        "launch": 1487784,
+        "restart": 1487784
+      },
+      "sponza/open-vault": {
+        "launch": 1487784,
+        "restart": 1487784
+      },
+      "bafford-expanded/default": {
+        "launch": 1311712,
+        "restart": 1311712
+      },
+      "bafford-expanded/east-street": {
+        "launch": 1311712,
+        "restart": 1311712
+      },
+      "bafford-expanded/bridge-west": {
+        "launch": 1311712,
+        "restart": 1311712
+      },
+      "streaming-probe/default": {
+        "launch": 1071936,
+        "restart": 1071936
+      },
+      "streaming-probe/west": {
+        "launch": 1071936,
+        "restart": 1071936
+      },
+      "streaming-probe/east": {
+        "launch": 1094024,
+        "restart": 1094024
+      }
+    },
+    "heap_samples": {
+      "lantern-store/default": [
+        1164168,
+        1164168,
+        1184936,
+        1184936,
+        1184936,
+        1184936
+      ],
+      "lantern-store/loot-crate": [
+        1164168,
+        1164168,
+        1184936,
+        1184936,
+        1184936,
+        1184936
+      ],
+      "moonlit-yard/default": [
+        1276568,
+        1276568,
+        1297344,
+        1297344,
+        1297344,
+        1297344
+      ],
+      "moonlit-yard/loot-counter": [
+        1276568,
+        1276568,
+        1297344,
+        1297344,
+        1297344,
+        1297344
+      ],
+      "enemy-workshop/default": [
+        1290968,
+        1290968,
+        1311752,
+        1311752,
+        1311752,
+        1311752
+      ],
+      "enemy-workshop/store-door-open": [
+        1290968,
+        1290968,
+        1311752,
+        1311752,
+        1311752,
+        1311752
+      ],
+      "enemy-workshop/scout-observation": [
+        1290968,
+        1290968,
+        1311752,
+        1311752,
+        1311752,
+        1311752
+      ],
+      "enemy-workshop/loot-crate": [
+        1290968,
+        1290968,
+        1311752,
+        1311752,
+        1311752,
+        1311752
+      ],
+      "animation_workshop/default": [
+        978112,
+        978112,
+        998904,
+        998904,
+        998904,
+        998904
+      ],
+      "animation_workshop/guard-front": [
+        978112,
+        978112,
+        998904,
+        998904,
+        998904,
+        998904
+      ],
+      "animation_workshop/two-guards": [
+        978112,
+        978112,
+        998904,
+        998904,
+        998904,
+        998904
+      ],
+      "sponza/default": [
+        1487672,
+        1487784,
+        1487776,
+        1487784,
+        1487776,
+        1487784
+      ],
+      "sponza/upper-gallery": [
+        1487784,
+        1487784,
+        1487784,
+        1487784,
+        1487784,
+        1487784
+      ],
+      "sponza/east-stairs": [
+        1487784,
+        1487784,
+        1487784,
+        1487784,
+        1487784,
+        1487784
+      ],
+      "sponza/west-stairs": [
+        1487784,
+        1487784,
+        1487784,
+        1487784,
+        1487784,
+        1487784
+      ],
+      "sponza/courtyard": [
+        1487784,
+        1487784,
+        1487784,
+        1487784,
+        1487784,
+        1487784
+      ],
+      "sponza/open-vault": [
+        1487784,
+        1487784,
+        1487784,
+        1487784,
+        1487784,
+        1487784
+      ],
+      "bafford-expanded/default": [
+        1311712,
+        1311712,
+        1311712,
+        1311712,
+        1311712,
+        1311712
+      ],
+      "bafford-expanded/east-street": [
+        1311712,
+        1311712,
+        1311712,
+        1311712,
+        1311712,
+        1311712
+      ],
+      "bafford-expanded/bridge-west": [
+        1311712,
+        1311712,
+        1311712,
+        1311712,
+        1311712,
+        1311712
+      ],
+      "streaming-probe/default": [
+        1071936,
+        1071936,
+        1071936,
+        1071936,
+        1071936,
+        1071936
+      ],
+      "streaming-probe/west": [
+        1071936,
+        1071936,
+        1071936,
+        1071936,
+        1071936,
+        1071936
+      ],
+      "streaming-probe/east": [
+        1094024,
+        1094024,
+        1094024,
+        1094024,
+        1094024,
+        1094024
+      ]
+    },
+    "menu_image": "C:\\Users\\hughe\\dev\\DarkLantern64\\.dev\\ares\\runs\\bb2c7747730f4f90bb69f56b07fbc47f\\level-select.png",
+    "log_hashes": [
+      {
+        "path": ".dev\\ares\\runs\\4a6aaba5667540879687bec4db33a260\\bundle-idle.log",
+        "sha256": "56658b05fe5a30059cc36942a812bf15fc03ff1960cc9521108b597f9852323f"
+      },
+      {
+        "path": ".dev\\ares\\runs\\01cfd6e3602b485e82b376b82a77e219\\bundle-4mb.log",
+        "sha256": "6a003df14d099a8523ace15ca3db477a9b6ee35b159495a739d750e6557c0eab"
+      },
+      {
+        "path": ".dev\\ares\\runs\\bb2c7747730f4f90bb69f56b07fbc47f\\bundle-switching.log",
+        "sha256": "7999dd30d54640d7a95bc4d5bc8ef52d4a1c14b9e3113f576d60cda5b809bb3d"
+      },
+      {
+        "path": ".dev\\ares\\runs\\0b50d917f8074de8939cf1779d3011f9\\bundle-direct.log",
+        "sha256": "79f221df15847ffa662e7239ebb9bfabaa24e69b355a6144a46792c5080d99ed"
+      },
+      {
+        "path": ".dev\\ares\\runs\\541164ec53e747e9af625ea9dbe44542\\single-direct-preset.log",
+        "sha256": "c88c78a41d1db738e58afa03fe82f4f11fe379071fdc5955c42bbc35ea33ac07"
+      }
+    ]
+  },
+  "original_rooms_regression": {
+    "passed": true,
+    "platform": "Ares emulator",
+    "started_at_utc": "2026-10-13T03:52:52Z",
+    "hardware_validation": "Original N64 and M64 pending; emulator traversal is not full memory/frame acceptance",
+    "rom": "C:\\Users\\hughe\\dev\\DarkLantern64\\build\\DarkLantern64-bundle-level_bundle-menu-stream-test-t3d.z64",
+    "rom_sha256": "45925fc868312b47ae059f687f99edc61cc5c2127a01e845023fff945edda76c",
+    "source_sha256": "3c0fa5bf63374bcb84e30cc1f73d00c41f34240d9d94d0cecb2410c6dc1ed9d4",
+    "run": {
+      "name": "streaming-probe",
+      "passed": true,
+      "log": ".dev\\ares\\runs\\115d6aaa8b8d40688646ec8d8cc02345\\streaming-probe.log",
+      "tested_rom": ".dev\\ares\\runs\\115d6aaa8b8d40688646ec8d8cc02345\\DarkLantern64-bundle-level_bundle-menu-stream-test-t3d.z64",
+      "rom_sha256": "45925fc868312b47ae059f687f99edc61cc5c2127a01e845023fff945edda76c",
+      "rom_bytes": 1081344,
+      "settings": ".dev\\ares\\runs\\115d6aaa8b8d40688646ec8d8cc02345\\settings.bml",
+      "settings_source_sha256": "d3917400079a47105fa6bd7df53e4f530915aa3b4b70e79769f1b389bc2b196a",
+      "profile_report": null,
+      "elapsed_seconds": 21.734,
+      "peak_sampled_heap_bytes": 1124872,
+      "max_reported_cpu_ms": 70.05,
+      "boot": "DL64 boot_ok memory=8388608 scene=\"Streaming Rooms\" meshes=3 models=2 colliders=10 version=2 world=3d renderer=rsp-tiny3d depth=hardware",
+      "terminal_event": "DL64 stream_test_complete passed=1 input_only=1 guard_persisted=1 audio_calls=467"
+    },
+    "log": "C:\\Users\\hughe\\dev\\DarkLantern64\\.dev\\ares\\runs\\115d6aaa8b8d40688646ec8d8cc02345\\streaming-probe.log",
+    "log_sha256": "1a249d3e1f3279b4c38c216eabde810558c66e70d1deb567efa42bb476fd62b0",
+    "music": {
+      "cue": "lanterns_below",
+      "consumed_frames": 581304,
+      "generated_blocks": 461,
+      "max_underruns": 0,
+      "sample_count": 19
+    },
+    "checkpoints": [
+      {
+        "checkpoint": "start",
+        "tick": 2,
+        "player": [
+          -5.0,
+          0.0,
+          0.0
+        ],
+        "door_open": 0,
+        "loot_value": 0,
+        "collected_objects": 0,
+        "guards": [
+          {
+            "position": [
+              6.0,
+              0.0,
+              -2.0
+            ],
+            "awareness": 0.0,
+            "state": "PATROL",
+            "patrol_index": 0
+          }
+        ],
+        "stream": {
+          "current": 2,
+          "resident": [
+            2
+          ],
+          "reserved": 4672,
+          "allocated": 9344,
+          "completed_loads": 1,
+          "retired": 0,
+          "readbytes": 4672,
+          "stalls": 272,
+          "resident_count": 1
+        }
+      },
+      {
+        "checkpoint": "east_gate_open",
+        "tick": 112,
+        "player": [
+          -1.22,
+          0.0,
+          0.0
+        ],
+        "door_open": 1,
+        "loot_value": 0,
+        "collected_objects": 0,
+        "guards": [
+          {
+            "position": [
+              6.0,
+              0.0,
+              -2.0
+            ],
+            "awareness": 0.0,
+            "state": "PATROL",
+            "patrol_index": 0
+          }
+        ],
+        "stream": {
+          "current": 2,
+          "resident": [
+            2,
+            1
+          ],
+          "reserved": 9308,
+          "allocated": 9344,
+          "completed_loads": 2,
+          "retired": 0,
+          "readbytes": 9308,
+          "stalls": 291,
+          "resident_count": 2
+        }
+      },
+      {
+        "checkpoint": "east_closed",
+        "tick": 177,
+        "player": [
+          0.985,
+          0.0,
+          0.0
+        ],
+        "door_open": 0,
+        "loot_value": 0,
+        "collected_objects": 0,
+        "guards": [
+          {
+            "position": [
+              6.0,
+              0.0,
+              -2.0
+            ],
+            "awareness": 0.0,
+            "state": "PATROL",
+            "patrol_index": 0
+          }
+        ],
+        "stream": {
+          "current": 1,
+          "resident": [
+            2,
+            1
+          ],
+          "reserved": 9308,
+          "allocated": 9344,
+          "completed_loads": 2,
+          "retired": 0,
+          "readbytes": 9308,
+          "stalls": 291,
+          "resident_count": 2
+        }
+      },
+      {
+        "checkpoint": "east_closed_loot",
+        "tick": 314,
+        "player": [
+          4.901,
+          0.0,
+          1.9506
+        ],
+        "door_open": 0,
+        "loot_value": 25,
+        "collected_objects": 4,
+        "guards": [
+          {
+            "position": [
+              6.0,
+              0.0,
+              -2.0
+            ],
+            "awareness": 0.0,
+            "state": "PATROL",
+            "patrol_index": 0
+          }
+        ],
+        "stream": {
+          "current": 1,
+          "resident": [
+            1
+          ],
+          "reserved": 4636,
+          "allocated": 9344,
+          "completed_loads": 2,
+          "retired": 1,
+          "readbytes": 9308,
+          "stalls": 291,
+          "resident_count": 1
+        }
+      },
+      {
+        "checkpoint": "west_retired",
+        "tick": 315,
+        "player": [
+          4.901,
+          0.0,
+          1.9506
+        ],
+        "door_open": 0,
+        "loot_value": 25,
+        "collected_objects": 4,
+        "guards": [
+          {
+            "position": [
+              6.0,
+              0.0,
+              -2.0
+            ],
+            "awareness": 0.0,
+            "state": "PATROL",
+            "patrol_index": 0
+          }
+        ],
+        "stream": {
+          "current": 1,
+          "resident": [
+            1
+          ],
+          "reserved": 4636,
+          "allocated": 9344,
+          "completed_loads": 2,
+          "retired": 1,
+          "readbytes": 9308,
+          "stalls": 291,
+          "resident_count": 1
+        }
+      },
+      {
+        "checkpoint": "west_gate_open",
+        "tick": 516,
+        "player": [
+          1.1955,
+          0.0,
+          0.049
+        ],
+        "door_open": 1,
+        "loot_value": 25,
+        "collected_objects": 4,
+        "guards": [
+          {
+            "position": [
+              6.0,
+              0.0,
+              -2.0
+            ],
+            "awareness": 0.0,
+            "state": "PATROL",
+            "patrol_index": 0
+          }
+        ],
+        "stream": {
+          "current": 1,
+          "resident": [
+            2,
+            1
+          ],
+          "reserved": 9308,
+          "allocated": 9344,
+          "completed_loads": 3,
+          "retired": 1,
+          "readbytes": 13980,
+          "stalls": 310,
+          "resident_count": 2
+        }
+      },
+      {
+        "checkpoint": "west_closed",
+        "tick": 591,
+        "player": [
+          -1.009,
+          0.0,
+          0.0019
+        ],
+        "door_open": 0,
+        "loot_value": 25,
+        "collected_objects": 4,
+        "guards": [
+          {
+            "position": [
+              6.0,
+              0.0,
+              -2.0
+            ],
+            "awareness": 0.0,
+            "state": "PATROL",
+            "patrol_index": 0
+          }
+        ],
+        "stream": {
+          "current": 2,
+          "resident": [
+            2,
+            1
+          ],
+          "reserved": 9308,
+          "allocated": 9344,
+          "completed_loads": 3,
+          "retired": 1,
+          "readbytes": 13980,
+          "stalls": 310,
+          "resident_count": 2
+        }
+      },
+      {
+        "checkpoint": "east_retired",
+        "tick": 703,
+        "player": [
+          -4.8939,
+          0.0,
+          0.0
+        ],
+        "door_open": 0,
+        "loot_value": 25,
+        "collected_objects": 4,
+        "guards": [
+          {
+            "position": [
+              6.0,
+              0.0,
+              -2.0
+            ],
+            "awareness": 0.0,
+            "state": "PATROL",
+            "patrol_index": 0
+          }
+        ],
+        "stream": {
+          "current": 2,
+          "resident": [
+            2
+          ],
+          "reserved": 4672,
+          "allocated": 9344,
+          "completed_loads": 3,
+          "retired": 2,
+          "readbytes": 13980,
+          "stalls": 310,
+          "resident_count": 1
+        }
+      },
+      {
+        "checkpoint": "east_reload_gate_open",
+        "tick": 890,
+        "player": [
+          -1.219,
+          0.0,
+          -0.0001
+        ],
+        "door_open": 1,
+        "loot_value": 25,
+        "collected_objects": 4,
+        "guards": [
+          {
+            "position": [
+              6.0,
+              0.0,
+              -2.0
+            ],
+            "awareness": 0.0,
+            "state": "PATROL",
+            "patrol_index": 0
+          }
+        ],
+        "stream": {
+          "current": 2,
+          "resident": [
+            2,
+            1
+          ],
+          "reserved": 9308,
+          "allocated": 9344,
+          "completed_loads": 4,
+          "retired": 2,
+          "readbytes": 18616,
+          "stalls": 329,
+          "resident_count": 2
+        }
+      },
+      {
+        "checkpoint": "east_reload",
+        "tick": 1082,
+        "player": [
+          4.9117,
+          0.0,
+          1.9716
+        ],
+        "door_open": 1,
+        "loot_value": 25,
+        "collected_objects": 4,
+        "guards": [
+          {
+            "position": [
+              6.0,
+              0.0,
+              -2.0
+            ],
+            "awareness": 0.0,
+            "state": "PATROL",
+            "patrol_index": 0
+          }
+        ],
+        "stream": {
+          "current": 1,
+          "resident": [
+            2,
+            1
+          ],
+          "reserved": 9308,
+          "allocated": 9344,
+          "completed_loads": 4,
+          "retired": 2,
+          "readbytes": 18616,
+          "stalls": 329,
+          "resident_count": 2
+        }
+      }
+    ],
+    "terminal": {
+      "passed": "1",
+      "input_only": "1",
+      "guard_persisted": "1",
+      "audio_calls": "467"
+    },
+    "route": [
+      2,
+      1,
+      2,
+      1
+    ],
+    "functional_passed": true,
+    "capture_diagnostic": false,
+    "audio_continuity_passed": true,
+    "timing_scope": "Ordinary input route without framebuffer export; emulator continuity only",
+    "peak_reserved_chunk_bytes": 9308,
+    "allocated_slot_bytes": 9344
+  },
+  "old_flat_route_regression": {
+    "run": {
+      "passed": true,
+      "platform": "Ares emulator",
+      "started_at_utc": "2026-10-13T03:54:32Z",
+      "hardware_validation": "Original N64 and M64 pending; bounded source street is not the complete mission",
+      "rom": "C:\\Users\\hughe\\dev\\DarkLantern64\\build\\DarkLantern64-bundle-level_bundle-menu-bafford-stream-test-t3d.z64",
+      "rom_sha256": "f37dd313044dcdede78aee69ba31ad6b9bacf37a42bbcdf45fd051cd1c187439",
+      "source_sha256": "3c0fa5bf63374bcb84e30cc1f73d00c41f34240d9d94d0cecb2410c6dc1ed9d4",
+      "build_signature": "6aa791887f6a20798351a4663c0156dae9300b5a0ab532916df85f7de449e50e",
+      "probe_cook_sha256": "d21e4f3c869f08c6418b31eddd704d5ec1fc8ba06ac40bd5bc1fdabb174d6036",
+      "mission_sha256": "7c5ede76463ce57b07dd2e37531a868b37b77634b1c5dd33b66c41c14b6df700",
+      "mission_bytes": 57312,
+      "regions": [
+        {
+          "id": 1,
+          "source_id": "east",
+          "bounds": [
+            [
+              -3.0481000000000003,
+              -2.4785000000000004,
+              37.869595499999996
+            ],
+            [
+              15.5849,
+              6.755500000000001,
+              52.425700000000006
+            ]
+          ],
+          "origin": [
+            6.2684,
+            2.1385000000000005,
+            45.147647750000004
+          ],
+          "chunk_version": 2,
+          "triangle_count": 195,
+          "collider_count": 73,
+          "material_ids": [
+            1,
+            2,
+            4,
+            5,
+            6,
+            9,
+            12,
+            14,
+            17,
+            18,
+            20,
+            22
+          ],
+          "entity_count": 95,
+          "chunk_bytes": 18428,
+          "crc32": "e60ba8f1",
+          "file_offset": 3584,
+          "dependencies": [
+            2
+          ]
+        },
+        {
+          "id": 2,
+          "source_id": "west",
+          "bounds": [
+            [
+              -15.6838706,
+              -2.4785000000000004,
+              32.11220734
+            ],
+            [
+              -3.0479,
+              12.6229,
+              51.398900000000005
+            ]
+          ],
+          "origin": [
+            -9.3658853,
+            5.0722,
+            41.75555367
+          ],
+          "chunk_version": 2,
+          "triangle_count": 398,
+          "collider_count": 90,
+          "material_ids": [
+            1,
+            2,
+            3,
+            5,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            23
+          ],
+          "entity_count": 116,
+          "chunk_bytes": 35296,
+          "crc32": "7f195e7f",
+          "file_offset": 22016,
+          "dependencies": [
+            1
+          ]
+        }
+      ],
+      "run": {
+        "name": "bafford-stream",
+        "passed": true,
+        "log": ".dev\\ares\\runs\\9be280b878c94cf6b39fc9e58b7c3e3f\\bafford-stream.log",
+        "tested_rom": ".dev\\ares\\runs\\9be280b878c94cf6b39fc9e58b7c3e3f\\DarkLantern64-bundle-level_bundle-menu-bafford-stream-test-t3d.z64",
+        "rom_sha256": "f37dd313044dcdede78aee69ba31ad6b9bacf37a42bbcdf45fd051cd1c187439",
+        "rom_bytes": 1081344,
+        "settings": ".dev\\ares\\runs\\9be280b878c94cf6b39fc9e58b7c3e3f\\settings.bml",
+        "settings_source_sha256": "d3917400079a47105fa6bd7df53e4f530915aa3b4b70e79769f1b389bc2b196a",
+        "profile_report": null,
+        "elapsed_seconds": 24.985,
+        "peak_sampled_heap_bytes": 1319944,
+        "max_reported_cpu_ms": 14.78,
+        "boot": "DL64 boot_ok memory=8388608 scene=\"Bafford Streets Expanded\" meshes=31 models=31 colliders=163 version=2 world=3d renderer=rsp-tiny3d depth=hardware",
+        "terminal_event": "DL64 bafford_stream_test_complete passed=1 input_only=1 coverage=1 feet_stable=1 collision_clear=1 audio_calls=539"
+      },
+      "log": "C:\\Users\\hughe\\dev\\DarkLantern64\\.dev\\ares\\runs\\9be280b878c94cf6b39fc9e58b7c3e3f\\bafford-stream.log",
+      "log_sha256": "18dddbc0741da351fc28383979e8723aa93c99445a790a32e48ffadd8c775a8d",
+      "functional_passed": true,
+      "checkpoints": [
+        {
+          "checkpoint": "start",
+          "tick": 91,
+          "elapsed": 1.4833,
+          "player": [
+            -6.522,
+            -2.4384,
+            49.8253
+          ],
+          "grounded": 1,
+          "collision_clear": 1,
+          "heap_used": 1319944,
+          "models": 31,
+          "colliders": 163,
+          "textures": 23,
+          "stream": {
+            "current": 2,
+            "resident": [
+              1,
+              2
+            ],
+            "reserved": 53724,
+            "allocated": 70592,
+            "completed_loads": 2,
+            "retired": 0,
+            "readbytes": 53724,
+            "stalls": 4392
+          }
+        },
+        {
+          "checkpoint": "west_ready",
+          "tick": 118,
+          "elapsed": 1.9333,
+          "player": [
+            -6.5209,
+            -2.4384,
+            49.5104
+          ],
+          "grounded": 1,
+          "collision_clear": 1,
+          "heap_used": 1319944,
+          "models": 31,
+          "colliders": 163,
+          "textures": 23,
+          "stream": {
+            "current": 2,
+            "resident": [
+              1,
+              2
+            ],
+            "reserved": 53724,
+            "allocated": 70592,
+            "completed_loads": 2,
+            "retired": 0,
+            "readbytes": 53724,
+            "stalls": 4392
+          }
+        },
+        {
+          "checkpoint": "east_crossed",
+          "tick": 269,
+          "elapsed": 4.45,
+          "player": [
+            -2.6025,
+            -2.4384,
+            49.4027
+          ],
+          "grounded": 1,
+          "collision_clear": 1,
+          "heap_used": 1319944,
+          "models": 31,
+          "colliders": 163,
+          "textures": 23,
+          "stream": {
+            "current": 1,
+            "resident": [
+              1,
+              2
+            ],
+            "reserved": 53724,
+            "allocated": 70592,
+            "completed_loads": 2,
+            "retired": 0,
+            "readbytes": 53724,
+            "stalls": 4392
+          }
+        },
+        {
+          "checkpoint": "east_turnaround",
+          "tick": 404,
+          "elapsed": 6.7,
+          "player": [
+            2.0875,
+            -2.4384,
+            49.4001
+          ],
+          "grounded": 1,
+          "collision_clear": 1,
+          "heap_used": 1319944,
+          "models": 31,
+          "colliders": 163,
+          "textures": 23,
+          "stream": {
+            "current": 1,
+            "resident": [
+              1,
+              2
+            ],
+            "reserved": 53724,
+            "allocated": 70592,
+            "completed_loads": 2,
+            "retired": 0,
+            "readbytes": 53724,
+            "stalls": 4392
+          }
+        },
+        {
+          "checkpoint": "west_crossed",
+          "tick": 646,
+          "elapsed": 10.7333,
+          "player": [
+            -3.5125,
+            -2.4384,
+            49.4
+          ],
+          "grounded": 1,
+          "collision_clear": 1,
+          "heap_used": 1319944,
+          "models": 31,
+          "colliders": 163,
+          "textures": 23,
+          "stream": {
+            "current": 2,
+            "resident": [
+              1,
+              2
+            ],
+            "reserved": 53724,
+            "allocated": 70592,
+            "completed_loads": 2,
+            "retired": 0,
+            "readbytes": 53724,
+            "stalls": 4392
+          }
+        },
+        {
+          "checkpoint": "west_return",
+          "tick": 730,
+          "elapsed": 12.1332,
+          "player": [
+            -6.4175,
+            -2.4384,
+            49.4
+          ],
+          "grounded": 1,
+          "collision_clear": 1,
+          "heap_used": 1319944,
+          "models": 31,
+          "colliders": 163,
+          "textures": 23,
+          "stream": {
+            "current": 2,
+            "resident": [
+              1,
+              2
+            ],
+            "reserved": 53724,
+            "allocated": 70592,
+            "completed_loads": 2,
+            "retired": 0,
+            "readbytes": 53724,
+            "stalls": 4392
+          }
+        },
+        {
+          "checkpoint": "east_return",
+          "tick": 1054,
+          "elapsed": 17.5332,
+          "player": [
+            2.0875,
+            -2.4384,
+            49.4
+          ],
+          "grounded": 1,
+          "collision_clear": 1,
+          "heap_used": 1319944,
+          "models": 31,
+          "colliders": 163,
+          "textures": 23,
+          "stream": {
+            "current": 1,
+            "resident": [
+              1,
+              2
+            ],
+            "reserved": 53724,
+            "allocated": 70592,
+            "completed_loads": 2,
+            "retired": 0,
+            "readbytes": 53724,
+            "stalls": 4392
+          }
+        }
+      ],
+      "terminal": {
+        "passed": "1",
+        "input_only": "1",
+        "coverage": "1",
+        "feet_stable": "1",
+        "collision_clear": "1",
+        "audio_calls": "539"
+      },
+      "route": [
+        2,
+        1,
+        2,
+        1
+      ],
+      "conservative_visibility": "Both regions retained; source street has no proven visibility separator",
+      "loads": 2,
+      "retirements": 0,
+      "allocated_slot_bytes": 70592,
+      "reserved_chunk_bytes": 53724,
+      "steady_heap_samples_bytes": [
+        1319944,
+        1319944,
+        1319944,
+        1319944
+      ],
+      "capture_diagnostic": false,
+      "music": {
+        "cue": "lanterns_below",
+        "consumed_frames": 546960,
+        "generated_blocks": 434,
+        "max_underruns": 0,
+        "sample_count": 18
+      },
+      "audio_continuity_passed": true,
+      "timing_scope": "Ordinary input traversal; emulator only, not hardware acceptance",
+      "expected_resources": {
+        "models": 31,
+        "colliders": 163,
+        "textures": 23
+      }
+    },
+    "strict_frozen_reanalysis": {
+      "passed": true,
+      "platform": "Ares emulator",
+      "started_at_utc": "2026-10-13T03:56:40Z",
+      "hardware_validation": "Original N64 and M64 pending; bounded source street is not the complete mission",
+      "rom": "C:\\Users\\hughe\\dev\\DarkLantern64\\.dev\\ares\\runs\\9be280b878c94cf6b39fc9e58b7c3e3f\\DarkLantern64-bundle-level_bundle-menu-bafford-stream-test-t3d.z64",
+      "rom_sha256": "f37dd313044dcdede78aee69ba31ad6b9bacf37a42bbcdf45fd051cd1c187439",
+      "source_sha256": "3c0fa5bf63374bcb84e30cc1f73d00c41f34240d9d94d0cecb2410c6dc1ed9d4",
+      "build_signature": "6aa791887f6a20798351a4663c0156dae9300b5a0ab532916df85f7de449e50e",
+      "probe_cook_sha256": "d21e4f3c869f08c6418b31eddd704d5ec1fc8ba06ac40bd5bc1fdabb174d6036",
+      "mission_sha256": "7c5ede76463ce57b07dd2e37531a868b37b77634b1c5dd33b66c41c14b6df700",
+      "mission_bytes": 57312,
+      "regions": [
+        {
+          "id": 1,
+          "source_id": "east",
+          "bounds": [
+            [
+              -3.0481000000000003,
+              -2.4785000000000004,
+              37.869595499999996
+            ],
+            [
+              15.5849,
+              6.755500000000001,
+              52.425700000000006
+            ]
+          ],
+          "origin": [
+            6.2684,
+            2.1385000000000005,
+            45.147647750000004
+          ],
+          "chunk_version": 2,
+          "triangle_count": 195,
+          "collider_count": 73,
+          "material_ids": [
+            1,
+            2,
+            4,
+            5,
+            6,
+            9,
+            12,
+            14,
+            17,
+            18,
+            20,
+            22
+          ],
+          "entity_count": 95,
+          "chunk_bytes": 18428,
+          "crc32": "e60ba8f1",
+          "file_offset": 3584,
+          "dependencies": [
+            2
+          ]
+        },
+        {
+          "id": 2,
+          "source_id": "west",
+          "bounds": [
+            [
+              -15.6838706,
+              -2.4785000000000004,
+              32.11220734
+            ],
+            [
+              -3.0479,
+              12.6229,
+              51.398900000000005
+            ]
+          ],
+          "origin": [
+            -9.3658853,
+            5.0722,
+            41.75555367
+          ],
+          "chunk_version": 2,
+          "triangle_count": 398,
+          "collider_count": 90,
+          "material_ids": [
+            1,
+            2,
+            3,
+            5,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            23
+          ],
+          "entity_count": 116,
+          "chunk_bytes": 35296,
+          "crc32": "7f195e7f",
+          "file_offset": 22016,
+          "dependencies": [
+            1
+          ]
+        }
+      ],
+      "log": "C:\\Users\\hughe\\dev\\DarkLantern64\\.dev\\ares\\runs\\9be280b878c94cf6b39fc9e58b7c3e3f\\bafford-stream.log",
+      "log_sha256": "18dddbc0741da351fc28383979e8723aa93c99445a790a32e48ffadd8c775a8d",
+      "functional_passed": true,
+      "checkpoints": [
+        {
+          "checkpoint": "start",
+          "tick": 91,
+          "elapsed": 1.4833,
+          "player": [
+            -6.522,
+            -2.4384,
+            49.8253
+          ],
+          "grounded": 1,
+          "collision_clear": 1,
+          "heap_used": 1319944,
+          "models": 31,
+          "colliders": 163,
+          "textures": 23,
+          "stream": {
+            "current": 2,
+            "resident": [
+              1,
+              2
+            ],
+            "reserved": 53724,
+            "allocated": 70592,
+            "completed_loads": 2,
+            "retired": 0,
+            "readbytes": 53724,
+            "stalls": 4392
+          }
+        },
+        {
+          "checkpoint": "west_ready",
+          "tick": 118,
+          "elapsed": 1.9333,
+          "player": [
+            -6.5209,
+            -2.4384,
+            49.5104
+          ],
+          "grounded": 1,
+          "collision_clear": 1,
+          "heap_used": 1319944,
+          "models": 31,
+          "colliders": 163,
+          "textures": 23,
+          "stream": {
+            "current": 2,
+            "resident": [
+              1,
+              2
+            ],
+            "reserved": 53724,
+            "allocated": 70592,
+            "completed_loads": 2,
+            "retired": 0,
+            "readbytes": 53724,
+            "stalls": 4392
+          }
+        },
+        {
+          "checkpoint": "east_crossed",
+          "tick": 269,
+          "elapsed": 4.45,
+          "player": [
+            -2.6025,
+            -2.4384,
+            49.4027
+          ],
+          "grounded": 1,
+          "collision_clear": 1,
+          "heap_used": 1319944,
+          "models": 31,
+          "colliders": 163,
+          "textures": 23,
+          "stream": {
+            "current": 1,
+            "resident": [
+              1,
+              2
+            ],
+            "reserved": 53724,
+            "allocated": 70592,
+            "completed_loads": 2,
+            "retired": 0,
+            "readbytes": 53724,
+            "stalls": 4392
+          }
+        },
+        {
+          "checkpoint": "east_turnaround",
+          "tick": 404,
+          "elapsed": 6.7,
+          "player": [
+            2.0875,
+            -2.4384,
+            49.4001
+          ],
+          "grounded": 1,
+          "collision_clear": 1,
+          "heap_used": 1319944,
+          "models": 31,
+          "colliders": 163,
+          "textures": 23,
+          "stream": {
+            "current": 1,
+            "resident": [
+              1,
+              2
+            ],
+            "reserved": 53724,
+            "allocated": 70592,
+            "completed_loads": 2,
+            "retired": 0,
+            "readbytes": 53724,
+            "stalls": 4392
+          }
+        },
+        {
+          "checkpoint": "west_crossed",
+          "tick": 646,
+          "elapsed": 10.7333,
+          "player": [
+            -3.5125,
+            -2.4384,
+            49.4
+          ],
+          "grounded": 1,
+          "collision_clear": 1,
+          "heap_used": 1319944,
+          "models": 31,
+          "colliders": 163,
+          "textures": 23,
+          "stream": {
+            "current": 2,
+            "resident": [
+              1,
+              2
+            ],
+            "reserved": 53724,
+            "allocated": 70592,
+            "completed_loads": 2,
+            "retired": 0,
+            "readbytes": 53724,
+            "stalls": 4392
+          }
+        },
+        {
+          "checkpoint": "west_return",
+          "tick": 730,
+          "elapsed": 12.1332,
+          "player": [
+            -6.4175,
+            -2.4384,
+            49.4
+          ],
+          "grounded": 1,
+          "collision_clear": 1,
+          "heap_used": 1319944,
+          "models": 31,
+          "colliders": 163,
+          "textures": 23,
+          "stream": {
+            "current": 2,
+            "resident": [
+              1,
+              2
+            ],
+            "reserved": 53724,
+            "allocated": 70592,
+            "completed_loads": 2,
+            "retired": 0,
+            "readbytes": 53724,
+            "stalls": 4392
+          }
+        },
+        {
+          "checkpoint": "east_return",
+          "tick": 1054,
+          "elapsed": 17.5332,
+          "player": [
+            2.0875,
+            -2.4384,
+            49.4
+          ],
+          "grounded": 1,
+          "collision_clear": 1,
+          "heap_used": 1319944,
+          "models": 31,
+          "colliders": 163,
+          "textures": 23,
+          "stream": {
+            "current": 1,
+            "resident": [
+              1,
+              2
+            ],
+            "reserved": 53724,
+            "allocated": 70592,
+            "completed_loads": 2,
+            "retired": 0,
+            "readbytes": 53724,
+            "stalls": 4392
+          }
+        }
+      ],
+      "terminal": {
+        "passed": "1",
+        "input_only": "1",
+        "coverage": "1",
+        "feet_stable": "1",
+        "collision_clear": "1",
+        "audio_calls": "539"
+      },
+      "route": [
+        2,
+        1,
+        2,
+        1
+      ],
+      "conservative_visibility": "Both regions retained; source street has no proven visibility separator",
+      "loads": 2,
+      "retirements": 0,
+      "allocated_slot_bytes": 70592,
+      "working_view": {
+        "resident_mask": 3,
+        "triangles": 593,
+        "colliders": 163,
+        "active_enemies": 0,
+        "loads": 2,
+        "retired": 0,
+        "reserved": 53724,
+        "allocated_slots": 70592,
+        "adapter_bytes": 278288
+      },
+      "reserved_chunk_bytes": 53724,
+      "steady_heap_samples_bytes": [
+        1319944,
+        1319944,
+        1319944,
+        1319944
+      ],
+      "capture_diagnostic": false,
+      "music": {
+        "cue": "lanterns_below",
+        "consumed_frames": 546960,
+        "generated_blocks": 434,
+        "max_underruns": 0,
+        "sample_count": 18
+      },
+      "audio_continuity_passed": true,
+      "timing_scope": "Ordinary input traversal; emulator only, not hardware acceptance",
+      "expected_resources": {
+        "models": 31,
+        "colliders": 163,
+        "textures": 23
+      }
+    }
+  },
+  "editor": {
+    "build_passed": true,
+    "live": {
+      "ok": true,
+      "checks": [
+        "paired partition Undo/Redo",
+        "source-only Undo preserves partition draft",
+        "delete_entity prunes homes and paired Undo/Redo restores them",
+        "delete_entities prunes homes and paired Undo/Redo restores them",
+        "entry, neighbor, home controls and Undo",
+        "bounds fit is a draft transaction",
+        "live stale partition Save retains both drafts",
+        "paired Save publishes separate files and updates checkpoints",
+        "invalid coverage can be saved with visible ROM validation error",
+        "Streaming panel survives and diagnoses missing_and_malformed_bounds",
+        "Streaming panel survives and diagnoses malformed_rows_and_lists",
+        "Streaming panel survives and diagnoses non_array_regions"
+      ]
+    },
+    "prepared_runtime_format": "stream-mission-v1",
+    "native_play_supported": false,
+    "bundle_id": "bafford-expanded",
+    "source_sha256": "28de709c9d3f199cf21e3651cd234f801b85c19ddc5df27635a28b35cb0e7254",
+    "partition_sha256": "3846d776855b17a5d051eb1a7c9f23acef19e8fb7891ae1b2f734f07e906176e",
+    "partition_status": {
+      "valid": true,
+      "portable_valid": true,
+      "rom_valid": true,
+      "error": "",
+      "directory_bytes": 3576,
+      "package_bytes": 57312,
+      "peak_neighbor_overlap_chunk_bytes": 53724,
+      "unknown_costs": [
+        "renderer caches, packing and textures",
+        "audio",
+        "code and display/depth buffers",
+        "loader slot padding and scratch",
+        "visibility, navigation and richer collision"
+      ]
+    },
+    "source_hashes": {
+      "editor/main.cpp": "b43906dc7010ef14e5096b9684fb8d05f250550ee515fdac765fe185eb6b3495",
+      "editor/authoring.inc": "5f11ec243369d29de28abcb8bb0fb9b3a5c0e38989d8447e1d5178e1e1cb93aa",
+      "editor/preparation.inc": "a53d1485f76ddebcf7c50d7dec7c56b8d8f1a25540b03aa63d8cece71882d76a",
+      "editor/workspace.inc": "7210f1bf37bfcef62ce8d45687d3f6fa9f1d4cccc7eca8f2d469033ea01fcb8a",
+      "tools/project_levels.py": "d5ff912240884f4e04eb76c6e6bd92862aa50c7ab67f45ca7759a40fd7bafa60"
+    }
+  },
+  "tests": {
+    "portable_c": {
+      "passed": true,
+      "log": {
+        "path": "build/bafford-expanded-portable.log",
+        "sha256": "578471d865a6bf0f2e2db3b7c1b16d34ba4817f0b567fb49c20c1e0326bcd6f5"
+      }
+    },
+    "python_discovery": {
+      "tests": 404,
+      "errors": 1,
+      "skipped": 2,
+      "known_failure": "Pre-existing Sponza geometry/collision mismatch: sponza-collision-parapet-north",
+      "log": {
+        "path": "build/bafford-expanded-python-tests.log",
+        "sha256": "4fe6e9321ddc8fb2cce8352ba317c299e84fcc883ce7cc2bc76da008a1462c9f"
+      }
+    },
+    "targeted_passed": {
+      "bundle": 20,
+      "mission": 25,
+      "expansion": 13,
+      "converter": 11,
+      "project_levels": 38,
+      "project_levels_skipped": 1,
+      "bafford_verifiers": 23
+    }
+  },
+  "remaining_scope": [
+    "Original N64/M64 validation",
+    "Full manor gameplay and visibility/collision compilation",
+    "Region creation/rename/deletion and viewport overlays",
+    "Stream Native Play"
+  ]
+}

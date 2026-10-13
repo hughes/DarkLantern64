@@ -1,5 +1,9 @@
 # Bafford street streaming conversion
 
+The current menu uses the subsequent [expanded street](thief-bafford-expanded.md)
+as `bafford-expanded`. This record describes the initial entry conversion;
+its original source and derived assets remain available for comparison.
+
 **Bafford Street Streaming** is a playable conversion of the locally imported
 starting street. It replaces the legacy `bafford-entry` game-menu entry with
 `bafford-stream`. The complete manor remains an authoring study. Original source

@@ -1,0 +1,1297 @@
+{
+  "version": 1,
+  "platform": "Ares emulator",
+  "scope": "Input-driven expanded Bafford east street and raised bridge; complete manor and hardware acceptance remain pending",
+  "derived_scene_sha256": "28de709c9d3f199cf21e3651cd234f801b85c19ddc5df27635a28b35cb0e7254",
+  "partition_manifest_sha256": "3846d776855b17a5d051eb1a7c9f23acef19e8fb7891ae1b2f734f07e906176e",
+  "probe_cook_sha256": "d21e4f3c869f08c6418b31eddd704d5ec1fc8ba06ac40bd5bc1fdabb174d6036",
+  "expansion": {
+    "preserved_cells": [
+      4270,
+      4286,
+      4294,
+      4297,
+      4298,
+      4302,
+      4365,
+      4369,
+      4370,
+      4371,
+      4372,
+      4373,
+      4374,
+      4375,
+      4377,
+      4380,
+      4381,
+      4382,
+      4383,
+      4384,
+      4385,
+      4386,
+      4387,
+      4388,
+      4389,
+      4390,
+      4391,
+      4392,
+      4394,
+      4397,
+      4398,
+      4399,
+      4400,
+      4405,
+      4406,
+      4983,
+      4984
+    ],
+    "added_cells": [
+      3831,
+      4360,
+      4366,
+      4987
+    ],
+    "added_triangle_counts": {
+      "3831": 12,
+      "4360": 14,
+      "4366": 46,
+      "4987": 34
+    },
+    "input_sources": {
+      "content/thief_bafford_entry.json": "cd6777aad2b0ea92cc9efd305d9e10107c777da334caacb183e79dadab403652",
+      "content/thief_bafford.json": "08c4c7e9f0af70da9fb91caf9b8342e638a9411948ad5d60f4c121feb701ea8b",
+      "build/thief-bafford/face-annotations.json": "2ca3559404472f0419242cb6ca07da0934521fad09b8d4eee094c58bd53d5b76",
+      "build/thief-bafford/world-topology.json": "cc02442db7e9fb973e8473ccffb57edc4e7edc55b2a4381fb8f4afea839424dd"
+    }
+  },
+  "conversion": {
+    "report_sha256": "e214c8b30e01ec851a36ebbcde612a0f90776d921000aec4bb17ca18a17b227c",
+    "source_counts": {
+      "triangles": 581,
+      "colliders": 158,
+      "crossing_triangles": 6,
+      "crossing_colliders": 5
+    },
+    "output_counts": {
+      "triangles": 593,
+      "colliders": 163,
+      "entities": 211,
+      "architecture_models": 31,
+      "materials": 23,
+      "lights": 16
+    },
+    "seam_x": -3.048,
+    "bounds_padding": 0.0001
+  },
+  "package": {
+    "sha256": "7c5ede76463ce57b07dd2e37531a868b37b77634b1c5dd33b66c41c14b6df700",
+    "bytes": 57312,
+    "directory_bytes": 3576,
+    "chunk_version": 2,
+    "visibility": "all-regions",
+    "regions": [
+      {
+        "id": 1,
+        "source_id": "east",
+        "bounds": [
+          [
+            -3.0481000000000003,
+            -2.4785000000000004,
+            37.869595499999996
+          ],
+          [
+            15.5849,
+            6.755500000000001,
+            52.425700000000006
+          ]
+        ],
+        "origin": [
+          6.2684,
+          2.1385000000000005,
+          45.147647750000004
+        ],
+        "chunk_version": 2,
+        "triangle_count": 195,
+        "collider_count": 73,
+        "material_ids": [
+          1,
+          2,
+          4,
+          5,
+          6,
+          9,
+          12,
+          14,
+          17,
+          18,
+          20,
+          22
+        ],
+        "entity_count": 95,
+        "chunk_bytes": 18428,
+        "crc32": "e60ba8f1",
+        "file_offset": 3584,
+        "dependencies": [
+          2
+        ]
+      },
+      {
+        "id": 2,
+        "source_id": "west",
+        "bounds": [
+          [
+            -15.6838706,
+            -2.4785000000000004,
+            32.11220734
+          ],
+          [
+            -3.0479,
+            12.6229,
+            51.398900000000005
+          ]
+        ],
+        "origin": [
+          -9.3658853,
+          5.0722,
+          41.75555367
+        ],
+        "chunk_version": 2,
+        "triangle_count": 398,
+        "collider_count": 90,
+        "material_ids": [
+          1,
+          2,
+          3,
+          5,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          23
+        ],
+        "entity_count": 116,
+        "chunk_bytes": 35296,
+        "crc32": "7f195e7f",
+        "file_offset": 22016,
+        "dependencies": [
+          1
+        ]
+      }
+    ]
+  },
+  "bootstrap": {
+    "compiled_geometry_bytes": 0,
+    "mesh_count": 0,
+    "model_count": 0,
+    "collider_count": 0,
+    "static_model_count": 0
+  },
+  "textures": {
+    "count": 23,
+    "decoded_pixel_bytes": 47104,
+    "streaming": false
+  },
+  "verifier": {
+    "tools\\verify_bafford_expanded.py": "ffcdb7a5e173e78cb17b21045885986324d7393b3c19b31a2b1486cc1b75cb01",
+    "tools\\verify_bafford_stream.py": "62513af05c878fc117254f20d89b18bba285510dc5ff6785523482ef40db577e",
+    "tools\\smoke_ares.py": "0525e26201dd5c232019b05c78f122ba9d6f9f3117b69779e621ff2268d0591e"
+  },
+  "parser_tests": {
+    "command": "python -m unittest tests.test_verify_bafford_stream tests.test_verify_bafford_expanded",
+    "passed": 23,
+    "coverage": "Reject uniformly wrong cooked model/collider/texture counts, missing or false fully resident triangle telemetry, inflated fixed-slot allocation, false jumps, missing support/body checks, timing discontinuities, heap growth, residency failures and ordinary music underruns"
+  },
+  "ordinary": {
+    "tested_at_utc": "2026-10-13T03:44:19Z",
+    "functional_passed": true,
+    "audio_continuity_passed": true,
+    "rom_sha256": "8db465550e9adf70ac8293f71cd2b3d642b2f11cfbe24cfb577668fbf2441fa0",
+    "rom_bytes": 1081344,
+    "build_signature": "1b563d177e065282c77c73442fa3c1a089a1cc82dd4f4e3fc4b5ca1fd411d987",
+    "source_sha256": "3c0fa5bf63374bcb84e30cc1f73d00c41f34240d9d94d0cecb2410c6dc1ed9d4",
+    "probe_cook_sha256": "d21e4f3c869f08c6418b31eddd704d5ec1fc8ba06ac40bd5bc1fdabb174d6036",
+    "tested_rom": ".dev/ares/runs/095bb89913554f8888e5ea8de79467bf/DarkLantern64-bundle-level_bundle-menu-bafford-expanded-test-t3d.z64",
+    "build_metadata": ".dev/ares/runs/095bb89913554f8888e5ea8de79467bf/verification-build.json",
+    "build_metadata_sha256": "c8b5c9b463cfffa67f0d3ab2a8e321adf36f235d956ccd0e2cf95ee1d1b3c07e",
+    "log": ".dev/ares/runs/095bb89913554f8888e5ea8de79467bf/bafford-expanded.log",
+    "log_sha256": "41f72ceb1081068b3697b0a9dbb2afa5aadc9bb3858aa6d6bba7e7ddcc42f504",
+    "strict_reanalysis_report": "build/bafford-expanded-ordinary-reanalysis.json",
+    "strict_reanalysis_report_sha256": "7547a64a8d94e6ae026c93e31b2a01e1baffc2f188e6f1375382aa0051b1f5e5",
+    "expected_resources": {
+      "models": 31,
+      "colliders": 163,
+      "textures": 23
+    },
+    "route": [
+      2,
+      1,
+      2
+    ],
+    "final_tick": 1507,
+    "bridge_jumps": 2,
+    "music": {
+      "cue": "lanterns_below",
+      "consumed_frames": 805176,
+      "generated_blocks": 637,
+      "max_underruns": 0,
+      "sample_count": 26
+    },
+    "audio_callbacks": 731,
+    "sampled_heap_peak_bytes": 1319952,
+    "timing_scope": "Ordinary walking/jumping controls; expanded source street, emulator only",
+    "loads": 2,
+    "retirements": 0,
+    "allocated_slot_bytes": 70592,
+    "reserved_chunk_bytes": 53724,
+    "steady_heap_samples_bytes": [
+      1319952,
+      1319952,
+      1319952,
+      1319952,
+      1319952
+    ],
+    "checkpoints": [
+      {
+        "checkpoint": "start",
+        "tick": 91,
+        "elapsed": 1.4833,
+        "player": [
+          -6.522,
+          -2.4384,
+          49.8253
+        ],
+        "grounded": 1,
+        "vertical_velocity": 0.0,
+        "jump_inputs": 0,
+        "collision_clear": 1,
+        "heap_used": 1319952,
+        "models": 31,
+        "colliders": 163,
+        "textures": 23,
+        "stream": {
+          "current": 2,
+          "resident": [
+            1,
+            2
+          ],
+          "reserved": 53724,
+          "allocated": 70592,
+          "completed_loads": 2,
+          "retired": 0,
+          "readbytes": 53724,
+          "stalls": 4353
+        }
+      },
+      {
+        "checkpoint": "west_center",
+        "tick": 144,
+        "elapsed": 2.3667,
+        "player": [
+          -6.5218,
+          -2.4384,
+          48.6003
+        ],
+        "grounded": 1,
+        "vertical_velocity": 0.0,
+        "jump_inputs": 0,
+        "collision_clear": 1,
+        "heap_used": 1319952,
+        "models": 31,
+        "colliders": 163,
+        "textures": 23,
+        "stream": {
+          "current": 2,
+          "resident": [
+            1,
+            2
+          ],
+          "reserved": 53724,
+          "allocated": 70592,
+          "completed_loads": 2,
+          "retired": 0,
+          "readbytes": 53724,
+          "stalls": 4353
+        }
+      },
+      {
+        "checkpoint": "east_approach",
+        "tick": 591,
+        "elapsed": 9.8166,
+        "player": [
+          7.7228,
+          -2.4384,
+          48.5005
+        ],
+        "grounded": 1,
+        "vertical_velocity": 0.0,
+        "jump_inputs": 0,
+        "collision_clear": 1,
+        "heap_used": 1319952,
+        "models": 31,
+        "colliders": 163,
+        "textures": 23,
+        "stream": {
+          "current": 1,
+          "resident": [
+            1,
+            2
+          ],
+          "reserved": 53724,
+          "allocated": 70592,
+          "completed_loads": 2,
+          "retired": 0,
+          "readbytes": 53724,
+          "stalls": 4353
+        }
+      },
+      {
+        "checkpoint": "jump_east_takeoff",
+        "tick": 592,
+        "elapsed": 9.8333,
+        "player": [
+          7.7228,
+          -2.4384,
+          48.5005
+        ],
+        "grounded": 1,
+        "vertical_velocity": 0.0,
+        "jump_inputs": 1,
+        "collision_clear": 1,
+        "heap_used": 1319952,
+        "models": 31,
+        "colliders": 163,
+        "textures": 23,
+        "stream": {
+          "current": 1,
+          "resident": [
+            1,
+            2
+          ],
+          "reserved": 53724,
+          "allocated": 70592,
+          "completed_loads": 2,
+          "retired": 0,
+          "readbytes": 53724,
+          "stalls": 4353
+        }
+      },
+      {
+        "checkpoint": "jump_east_air",
+        "tick": 612,
+        "elapsed": 10.1666,
+        "player": [
+          8.3878,
+          -1.5884,
+          48.5003
+        ],
+        "grounded": 0,
+        "vertical_velocity": 0.6,
+        "jump_inputs": 1,
+        "collision_clear": 1,
+        "heap_used": 1319952,
+        "models": 31,
+        "colliders": 163,
+        "textures": 23,
+        "stream": {
+          "current": 1,
+          "resident": [
+            1,
+            2
+          ],
+          "reserved": 53724,
+          "allocated": 70592,
+          "completed_loads": 2,
+          "retired": 0,
+          "readbytes": 53724,
+          "stalls": 4353
+        }
+      },
+      {
+        "checkpoint": "bridge_east_landed",
+        "tick": 650,
+        "elapsed": 10.7999,
+        "player": [
+          9.7178,
+          -2.1336,
+          48.5
+        ],
+        "grounded": 1,
+        "vertical_velocity": 0.0,
+        "jump_inputs": 1,
+        "collision_clear": 1,
+        "heap_used": 1319952,
+        "models": 31,
+        "colliders": 163,
+        "textures": 23,
+        "stream": {
+          "current": 1,
+          "resident": [
+            1,
+            2
+          ],
+          "reserved": 53724,
+          "allocated": 70592,
+          "completed_loads": 2,
+          "retired": 0,
+          "readbytes": 53724,
+          "stalls": 4353
+        }
+      },
+      {
+        "checkpoint": "bridge_east_edge",
+        "tick": 699,
+        "elapsed": 11.6166,
+        "player": [
+          11.3978,
+          -2.1336,
+          48.5
+        ],
+        "grounded": 1,
+        "vertical_velocity": 0.0,
+        "jump_inputs": 1,
+        "collision_clear": 1,
+        "heap_used": 1319952,
+        "models": 31,
+        "colliders": 163,
+        "textures": 23,
+        "stream": {
+          "current": 1,
+          "resident": [
+            1,
+            2
+          ],
+          "reserved": 53724,
+          "allocated": 70592,
+          "completed_loads": 2,
+          "retired": 0,
+          "readbytes": 53724,
+          "stalls": 4353
+        }
+      },
+      {
+        "checkpoint": "east_street",
+        "tick": 803,
+        "elapsed": 13.3499,
+        "player": [
+          15.0028,
+          -2.4384,
+          48.5
+        ],
+        "grounded": 1,
+        "vertical_velocity": 0.0,
+        "jump_inputs": 1,
+        "collision_clear": 1,
+        "heap_used": 1319952,
+        "models": 31,
+        "colliders": 163,
+        "textures": 23,
+        "stream": {
+          "current": 1,
+          "resident": [
+            1,
+            2
+          ],
+          "reserved": 53724,
+          "allocated": 70592,
+          "completed_loads": 2,
+          "retired": 0,
+          "readbytes": 53724,
+          "stalls": 4353
+        }
+      },
+      {
+        "checkpoint": "west_approach",
+        "tick": 960,
+        "elapsed": 15.9665,
+        "player": [
+          12.3778,
+          -2.4384,
+          48.4999
+        ],
+        "grounded": 1,
+        "vertical_velocity": 0.0,
+        "jump_inputs": 1,
+        "collision_clear": 1,
+        "heap_used": 1319952,
+        "models": 31,
+        "colliders": 163,
+        "textures": 23,
+        "stream": {
+          "current": 1,
+          "resident": [
+            1,
+            2
+          ],
+          "reserved": 53724,
+          "allocated": 70592,
+          "completed_loads": 2,
+          "retired": 0,
+          "readbytes": 53724,
+          "stalls": 4353
+        }
+      },
+      {
+        "checkpoint": "jump_west_takeoff",
+        "tick": 961,
+        "elapsed": 15.9832,
+        "player": [
+          12.3778,
+          -2.4384,
+          48.4999
+        ],
+        "grounded": 1,
+        "vertical_velocity": 0.0,
+        "jump_inputs": 2,
+        "collision_clear": 1,
+        "heap_used": 1319952,
+        "models": 31,
+        "colliders": 163,
+        "textures": 23,
+        "stream": {
+          "current": 1,
+          "resident": [
+            1,
+            2
+          ],
+          "reserved": 53724,
+          "allocated": 70592,
+          "completed_loads": 2,
+          "retired": 0,
+          "readbytes": 53724,
+          "stalls": 4353
+        }
+      },
+      {
+        "checkpoint": "jump_west_air",
+        "tick": 972,
+        "elapsed": 16.1665,
+        "player": [
+          12.0278,
+          -1.8059,
+          48.4999
+        ],
+        "grounded": 0,
+        "vertical_velocity": 2.4,
+        "jump_inputs": 2,
+        "collision_clear": 1,
+        "heap_used": 1319952,
+        "models": 31,
+        "colliders": 163,
+        "textures": 23,
+        "stream": {
+          "current": 1,
+          "resident": [
+            1,
+            2
+          ],
+          "reserved": 53724,
+          "allocated": 70592,
+          "completed_loads": 2,
+          "retired": 0,
+          "readbytes": 53724,
+          "stalls": 4353
+        }
+      },
+      {
+        "checkpoint": "bridge_west_landed",
+        "tick": 1004,
+        "elapsed": 16.6998,
+        "player": [
+          10.9078,
+          -2.1336,
+          48.5
+        ],
+        "grounded": 1,
+        "vertical_velocity": 0.0,
+        "jump_inputs": 2,
+        "collision_clear": 1,
+        "heap_used": 1319952,
+        "models": 31,
+        "colliders": 163,
+        "textures": 23,
+        "stream": {
+          "current": 1,
+          "resident": [
+            1,
+            2
+          ],
+          "reserved": 53724,
+          "allocated": 70592,
+          "completed_loads": 2,
+          "retired": 0,
+          "readbytes": 53724,
+          "stalls": 4353
+        }
+      },
+      {
+        "checkpoint": "bridge_west_edge",
+        "tick": 1063,
+        "elapsed": 17.6831,
+        "player": [
+          8.8779,
+          -2.1336,
+          48.5
+        ],
+        "grounded": 1,
+        "vertical_velocity": 0.0,
+        "jump_inputs": 2,
+        "collision_clear": 1,
+        "heap_used": 1319952,
+        "models": 31,
+        "colliders": 163,
+        "textures": 23,
+        "stream": {
+          "current": 1,
+          "resident": [
+            1,
+            2
+          ],
+          "reserved": 53724,
+          "allocated": 70592,
+          "completed_loads": 2,
+          "retired": 0,
+          "readbytes": 53724,
+          "stalls": 4353
+        }
+      },
+      {
+        "checkpoint": "west_street",
+        "tick": 1097,
+        "elapsed": 18.2498,
+        "player": [
+          7.8979,
+          -2.4384,
+          48.5
+        ],
+        "grounded": 1,
+        "vertical_velocity": 0.0,
+        "jump_inputs": 2,
+        "collision_clear": 1,
+        "heap_used": 1319952,
+        "models": 31,
+        "colliders": 163,
+        "textures": 23,
+        "stream": {
+          "current": 1,
+          "resident": [
+            1,
+            2
+          ],
+          "reserved": 53724,
+          "allocated": 70592,
+          "completed_loads": 2,
+          "retired": 0,
+          "readbytes": 53724,
+          "stalls": 4353
+        }
+      },
+      {
+        "checkpoint": "west_return",
+        "tick": 1507,
+        "elapsed": 25.083,
+        "player": [
+          -6.4171,
+          -2.4384,
+          48.5
+        ],
+        "grounded": 1,
+        "vertical_velocity": 0.0,
+        "jump_inputs": 2,
+        "collision_clear": 1,
+        "heap_used": 1319952,
+        "models": 31,
+        "colliders": 163,
+        "textures": 23,
+        "stream": {
+          "current": 2,
+          "resident": [
+            1,
+            2
+          ],
+          "reserved": 53724,
+          "allocated": 70592,
+          "completed_loads": 2,
+          "retired": 0,
+          "readbytes": 53724,
+          "stalls": 4353
+        }
+      }
+    ],
+    "working_view": {
+      "resident_mask": 3,
+      "triangles": 593,
+      "colliders": 163,
+      "active_enemies": 0,
+      "loads": 2,
+      "retired": 0,
+      "reserved": 53724,
+      "allocated_slots": 70592,
+      "adapter_bytes": 278288
+    }
+  },
+  "capture_diagnostic": {
+    "tested_at_utc": "2026-10-13T03:46:07Z",
+    "functional_passed": true,
+    "audio_continuity_passed": false,
+    "rom_sha256": "c782c2c9870fcbe973c9cac9bf5dff320304e45bb7c0ea75002bbc22b5956929",
+    "rom_bytes": 1081344,
+    "build_signature": "91fbd6e95538a4a6ba0a8e88336412a3d502aa38e3f484f6eb294909baffe00a",
+    "source_sha256": "3c0fa5bf63374bcb84e30cc1f73d00c41f34240d9d94d0cecb2410c6dc1ed9d4",
+    "probe_cook_sha256": "d21e4f3c869f08c6418b31eddd704d5ec1fc8ba06ac40bd5bc1fdabb174d6036",
+    "tested_rom": ".dev/ares/runs/0f7ad4ad01104d3dbbb02f0d9d75b938/DarkLantern64-bundle-level_bundle-menu-bafford-expanded-test-capture-t3d.z64",
+    "build_metadata": ".dev/ares/runs/0f7ad4ad01104d3dbbb02f0d9d75b938/verification-build.json",
+    "build_metadata_sha256": "18768f1cd91ab784c7789f4a706067069c8a81d45ff94961841cde1f2d338f4c",
+    "log": ".dev/ares/runs/0f7ad4ad01104d3dbbb02f0d9d75b938/bafford-expanded.log",
+    "log_sha256": "7c14a7b06f125fd07612d4487b7bc1c1cf51e94422a0daf79252e32ce369fc6d",
+    "strict_reanalysis_report": "build/bafford-expanded-capture-reanalysis.json",
+    "strict_reanalysis_report_sha256": "e0293b9797dbea1c841abc076c3fa5d0fa2439c2d5e123fd9d27bec91e296700",
+    "expected_resources": {
+      "models": 31,
+      "colliders": 163,
+      "textures": 23
+    },
+    "route": [
+      2,
+      1,
+      2
+    ],
+    "final_tick": 1508,
+    "bridge_jumps": 2,
+    "music": {
+      "cue": "lanterns_below",
+      "consumed_frames": 805176,
+      "generated_blocks": 637,
+      "max_underruns": 3,
+      "sample_count": 26
+    },
+    "audio_callbacks": 735,
+    "sampled_heap_peak_bytes": 1319944,
+    "timing_scope": "Framebuffer export diagnostic; excludes ordinary audio/frame acceptance",
+    "loads": 2,
+    "retirements": 0,
+    "allocated_slot_bytes": 70592,
+    "reserved_chunk_bytes": 53724,
+    "steady_heap_samples_bytes": [
+      1319944,
+      1319944,
+      1319944,
+      1319944,
+      1319944
+    ],
+    "checkpoints": [
+      {
+        "checkpoint": "start",
+        "tick": 91,
+        "elapsed": 1.4833,
+        "player": [
+          -6.522,
+          -2.4384,
+          49.8253
+        ],
+        "grounded": 1,
+        "vertical_velocity": 0.0,
+        "jump_inputs": 0,
+        "collision_clear": 1,
+        "heap_used": 1319944,
+        "models": 31,
+        "colliders": 163,
+        "textures": 23,
+        "stream": {
+          "current": 2,
+          "resident": [
+            1,
+            2
+          ],
+          "reserved": 53724,
+          "allocated": 70592,
+          "completed_loads": 2,
+          "retired": 0,
+          "readbytes": 53724,
+          "stalls": 2786
+        }
+      },
+      {
+        "checkpoint": "west_center",
+        "tick": 144,
+        "elapsed": 2.3667,
+        "player": [
+          -6.5218,
+          -2.4384,
+          48.6003
+        ],
+        "grounded": 1,
+        "vertical_velocity": 0.0,
+        "jump_inputs": 0,
+        "collision_clear": 1,
+        "heap_used": 1319944,
+        "models": 31,
+        "colliders": 163,
+        "textures": 23,
+        "stream": {
+          "current": 2,
+          "resident": [
+            1,
+            2
+          ],
+          "reserved": 53724,
+          "allocated": 70592,
+          "completed_loads": 2,
+          "retired": 0,
+          "readbytes": 53724,
+          "stalls": 2786
+        }
+      },
+      {
+        "checkpoint": "east_approach",
+        "tick": 591,
+        "elapsed": 9.8166,
+        "player": [
+          7.7228,
+          -2.4384,
+          48.5005
+        ],
+        "grounded": 1,
+        "vertical_velocity": 0.0,
+        "jump_inputs": 0,
+        "collision_clear": 1,
+        "heap_used": 1319944,
+        "models": 31,
+        "colliders": 163,
+        "textures": 23,
+        "stream": {
+          "current": 1,
+          "resident": [
+            1,
+            2
+          ],
+          "reserved": 53724,
+          "allocated": 70592,
+          "completed_loads": 2,
+          "retired": 0,
+          "readbytes": 53724,
+          "stalls": 2786
+        }
+      },
+      {
+        "checkpoint": "jump_east_takeoff",
+        "tick": 592,
+        "elapsed": 9.8333,
+        "player": [
+          7.7228,
+          -2.4384,
+          48.5005
+        ],
+        "grounded": 1,
+        "vertical_velocity": 0.0,
+        "jump_inputs": 1,
+        "collision_clear": 1,
+        "heap_used": 1319944,
+        "models": 31,
+        "colliders": 163,
+        "textures": 23,
+        "stream": {
+          "current": 1,
+          "resident": [
+            1,
+            2
+          ],
+          "reserved": 53724,
+          "allocated": 70592,
+          "completed_loads": 2,
+          "retired": 0,
+          "readbytes": 53724,
+          "stalls": 2786
+        }
+      },
+      {
+        "checkpoint": "jump_east_air",
+        "tick": 612,
+        "elapsed": 10.1666,
+        "player": [
+          8.3878,
+          -1.5884,
+          48.5003
+        ],
+        "grounded": 0,
+        "vertical_velocity": 0.6,
+        "jump_inputs": 1,
+        "collision_clear": 1,
+        "heap_used": 1319944,
+        "models": 31,
+        "colliders": 163,
+        "textures": 23,
+        "stream": {
+          "current": 1,
+          "resident": [
+            1,
+            2
+          ],
+          "reserved": 53724,
+          "allocated": 70592,
+          "completed_loads": 2,
+          "retired": 0,
+          "readbytes": 53724,
+          "stalls": 2786
+        }
+      },
+      {
+        "checkpoint": "bridge_east_landed",
+        "tick": 650,
+        "elapsed": 10.7999,
+        "player": [
+          9.7178,
+          -2.1336,
+          48.5
+        ],
+        "grounded": 1,
+        "vertical_velocity": 0.0,
+        "jump_inputs": 1,
+        "collision_clear": 1,
+        "heap_used": 1319944,
+        "models": 31,
+        "colliders": 163,
+        "textures": 23,
+        "stream": {
+          "current": 1,
+          "resident": [
+            1,
+            2
+          ],
+          "reserved": 53724,
+          "allocated": 70592,
+          "completed_loads": 2,
+          "retired": 0,
+          "readbytes": 53724,
+          "stalls": 2786
+        }
+      },
+      {
+        "checkpoint": "bridge_east_edge",
+        "tick": 699,
+        "elapsed": 11.6166,
+        "player": [
+          11.3978,
+          -2.1336,
+          48.5
+        ],
+        "grounded": 1,
+        "vertical_velocity": 0.0,
+        "jump_inputs": 1,
+        "collision_clear": 1,
+        "heap_used": 1319944,
+        "models": 31,
+        "colliders": 163,
+        "textures": 23,
+        "stream": {
+          "current": 1,
+          "resident": [
+            1,
+            2
+          ],
+          "reserved": 53724,
+          "allocated": 70592,
+          "completed_loads": 2,
+          "retired": 0,
+          "readbytes": 53724,
+          "stalls": 2786
+        }
+      },
+      {
+        "checkpoint": "east_street",
+        "tick": 803,
+        "elapsed": 13.3499,
+        "player": [
+          15.0028,
+          -2.4384,
+          48.5
+        ],
+        "grounded": 1,
+        "vertical_velocity": 0.0,
+        "jump_inputs": 1,
+        "collision_clear": 1,
+        "heap_used": 1319944,
+        "models": 31,
+        "colliders": 163,
+        "textures": 23,
+        "stream": {
+          "current": 1,
+          "resident": [
+            1,
+            2
+          ],
+          "reserved": 53724,
+          "allocated": 70592,
+          "completed_loads": 2,
+          "retired": 0,
+          "readbytes": 53724,
+          "stalls": 2786
+        }
+      },
+      {
+        "checkpoint": "west_approach",
+        "tick": 961,
+        "elapsed": 15.9832,
+        "player": [
+          12.3778,
+          -2.4384,
+          48.5
+        ],
+        "grounded": 1,
+        "vertical_velocity": 0.0,
+        "jump_inputs": 1,
+        "collision_clear": 1,
+        "heap_used": 1319944,
+        "models": 31,
+        "colliders": 163,
+        "textures": 23,
+        "stream": {
+          "current": 1,
+          "resident": [
+            1,
+            2
+          ],
+          "reserved": 53724,
+          "allocated": 70592,
+          "completed_loads": 2,
+          "retired": 0,
+          "readbytes": 53724,
+          "stalls": 2786
+        }
+      },
+      {
+        "checkpoint": "jump_west_takeoff",
+        "tick": 962,
+        "elapsed": 15.9998,
+        "player": [
+          12.3778,
+          -2.4384,
+          48.5
+        ],
+        "grounded": 1,
+        "vertical_velocity": 0.0,
+        "jump_inputs": 2,
+        "collision_clear": 1,
+        "heap_used": 1319944,
+        "models": 31,
+        "colliders": 163,
+        "textures": 23,
+        "stream": {
+          "current": 1,
+          "resident": [
+            1,
+            2
+          ],
+          "reserved": 53724,
+          "allocated": 70592,
+          "completed_loads": 2,
+          "retired": 0,
+          "readbytes": 53724,
+          "stalls": 2786
+        }
+      },
+      {
+        "checkpoint": "jump_west_air",
+        "tick": 973,
+        "elapsed": 16.1832,
+        "player": [
+          12.0278,
+          -1.8059,
+          48.5
+        ],
+        "grounded": 0,
+        "vertical_velocity": 2.4,
+        "jump_inputs": 2,
+        "collision_clear": 1,
+        "heap_used": 1319944,
+        "models": 31,
+        "colliders": 163,
+        "textures": 23,
+        "stream": {
+          "current": 1,
+          "resident": [
+            1,
+            2
+          ],
+          "reserved": 53724,
+          "allocated": 70592,
+          "completed_loads": 2,
+          "retired": 0,
+          "readbytes": 53724,
+          "stalls": 2786
+        }
+      },
+      {
+        "checkpoint": "bridge_west_landed",
+        "tick": 1005,
+        "elapsed": 16.7165,
+        "player": [
+          10.9078,
+          -2.1336,
+          48.5
+        ],
+        "grounded": 1,
+        "vertical_velocity": 0.0,
+        "jump_inputs": 2,
+        "collision_clear": 1,
+        "heap_used": 1319944,
+        "models": 31,
+        "colliders": 163,
+        "textures": 23,
+        "stream": {
+          "current": 1,
+          "resident": [
+            1,
+            2
+          ],
+          "reserved": 53724,
+          "allocated": 70592,
+          "completed_loads": 2,
+          "retired": 0,
+          "readbytes": 53724,
+          "stalls": 2786
+        }
+      },
+      {
+        "checkpoint": "bridge_west_edge",
+        "tick": 1064,
+        "elapsed": 17.6998,
+        "player": [
+          8.8778,
+          -2.1336,
+          48.5
+        ],
+        "grounded": 1,
+        "vertical_velocity": 0.0,
+        "jump_inputs": 2,
+        "collision_clear": 1,
+        "heap_used": 1319944,
+        "models": 31,
+        "colliders": 163,
+        "textures": 23,
+        "stream": {
+          "current": 1,
+          "resident": [
+            1,
+            2
+          ],
+          "reserved": 53724,
+          "allocated": 70592,
+          "completed_loads": 2,
+          "retired": 0,
+          "readbytes": 53724,
+          "stalls": 2786
+        }
+      },
+      {
+        "checkpoint": "west_street",
+        "tick": 1098,
+        "elapsed": 18.2665,
+        "player": [
+          7.8978,
+          -2.4384,
+          48.5
+        ],
+        "grounded": 1,
+        "vertical_velocity": 0.0,
+        "jump_inputs": 2,
+        "collision_clear": 1,
+        "heap_used": 1319944,
+        "models": 31,
+        "colliders": 163,
+        "textures": 23,
+        "stream": {
+          "current": 1,
+          "resident": [
+            1,
+            2
+          ],
+          "reserved": 53724,
+          "allocated": 70592,
+          "completed_loads": 2,
+          "retired": 0,
+          "readbytes": 53724,
+          "stalls": 2786
+        }
+      },
+      {
+        "checkpoint": "west_return",
+        "tick": 1508,
+        "elapsed": 25.0997,
+        "player": [
+          -6.4171,
+          -2.4384,
+          48.5
+        ],
+        "grounded": 1,
+        "vertical_velocity": 0.0,
+        "jump_inputs": 2,
+        "collision_clear": 1,
+        "heap_used": 1319944,
+        "models": 31,
+        "colliders": 163,
+        "textures": 23,
+        "stream": {
+          "current": 2,
+          "resident": [
+            1,
+            2
+          ],
+          "reserved": 53724,
+          "allocated": 70592,
+          "completed_loads": 2,
+          "retired": 0,
+          "readbytes": 53724,
+          "stalls": 2786
+        }
+      }
+    ],
+    "captures": [
+      {
+        "id": 1,
+        "image": "docs/images/bafford-expanded-west.png",
+        "sha256": "bdf998611fef3aaf68924452e1c9460f5cfaf86d9a98108bf8eb91d2c4e697d0",
+        "dimensions": [
+          320,
+          240
+        ]
+      },
+      {
+        "id": 2,
+        "image": "docs/images/bafford-expanded-east.png",
+        "sha256": "95ffbc49b99aae51e5ff0b8734bea82ea25d38c50f67a0dd7df10119d58aa0d9",
+        "dimensions": [
+          320,
+          240
+        ]
+      }
+    ],
+    "working_view": {
+      "resident_mask": 3,
+      "triangles": 593,
+      "colliders": 163,
+      "active_enemies": 0,
+      "loads": 2,
+      "retired": 0,
+      "reserved": 53724,
+      "allocated_slots": 70592,
+      "adapter_bytes": 278288
+    }
+  },
+  "remaining_scope": [
+    "Original N64 and M64 hardware acceptance",
+    "Full manor, roofs, swimming and ladders",
+    "Collision for omitted sloped/nonrectangular source polygons",
+    "Edited-geometry visibility and safe retirement; both exterior regions remain resident",
+    "Whole-RAM ledger; checkpoints include game/renderer/audio costs and are not a memory reduction claim"
+  ]
+}

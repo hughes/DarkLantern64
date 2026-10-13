@@ -1,4 +1,7 @@
     DocumentHistory<Json> history_;
+    Json streamDraft_=nullptr;
+    std::string streamSnapshot_,streamSavedSha_,sourceSavedSha_,jobStreamSnapshot_;
+    fs::path streamPath_;
     std::vector<std::pair<std::string,std::optional<EntityId>>> editorCommands_;
     std::set<std::string> selection_;
     std::string lastPreviewDraft_;
@@ -6,17 +9,35 @@
     float groupYaw_=90,groupScale_=1;
     char groupName_[65]="group";
     char prefabName_[65]="encounter";
-    void ObserveDocument(){if(!engine_.IsPlaying())history_.Commit(document_);}
+    Json AuthorSnapshot() const{return {{"scene",document_},{"partition",streamDraft_}};}
+    static void PruneRegionHomes(Json& partition,const std::set<std::string>& ids) {
+        if(!partition.is_object()||!partition.contains("regions")||!partition.at("regions").is_array())return;
+        for(auto& region:partition["regions"])if(region.is_object()&&region.contains("entities")&&region.at("entities").is_array()) {
+            auto& homes=region["entities"];
+            homes.erase(std::remove_if(homes.begin(),homes.end(),[&](const Json& id){return id.is_string()&&ids.contains(id.get<std::string>());}),homes.end());
+        }
+    }
+    void UpdateAuthorDirty(){dirty_=document_!=Json::parse(sourceSnapshot_)||
+        (!streamDraft_.is_null()&&(streamSnapshot_.empty()||streamDraft_!=Json::parse(streamSnapshot_)));}
+    void ObserveDocument(){if(!engine_.IsPlaying())history_.Commit(AuthorSnapshot());}
+    void StagePartition(std::vector<std::wstring>& args,const fs::path& stage) const {
+        if(streamDraft_.is_null())return;
+        AtomicWrite(stage,streamDraft_.dump(2)+"\n");
+        args.insert(args.end(),{L"--staged-mission",stage.wstring(),L"--expected-mission-sha256",fs::path(streamSavedSha_).wstring()});
+    }
     void RefreshDraft() {
         if(engine_.IsPlaying()||Busy())throw std::runtime_error("Finish Play/build before refreshing authoring");
         const auto snapshot=document_.dump(2)+"\n";
         const auto stage=queue_/"preview-snapshot.json";AtomicWrite(stage,snapshot);
-        auto cooked=ProjectCommand({L"cook",L"--level",source_.wstring(),L"--staged",stage.wstring()});
+        std::vector<std::wstring> args{L"cook",L"--level",source_.wstring(),L"--staged",stage.wstring()};
+        StagePartition(args,queue_/"preview-partition.json");
+        auto cooked=ProjectCommand(args);
         ApplyPreparedPreview(cooked);
     }
     void RestoreHistory(bool redo) {
-        ObserveDocument();document_=redo?history_.Redo():history_.Undo();
-        dirty_=document_!=Json::parse(sourceSnapshot_);selection_.clear();
+        ObserveDocument();const auto restored=redo?history_.Redo():history_.Undo();
+        document_=restored.at("scene");streamDraft_=restored.at("partition");
+        UpdateAuthorDirty();selection_.clear();
         selected_=document_.at("entities").empty()?"":document_["entities"][0]["id"].get<std::string>();
         structureDirty_=true;lastPreviewDraft_.clear();
     }
@@ -35,7 +56,7 @@
         if(op=="undo"||op=="redo"){RestoreHistory(op=="redo");return {{"dirty",dirty_}};}
         if(op=="refresh_preview"){RefreshDraft();return {{"refreshed",true}};}
         if(op=="select_entities"){selection_=SelectedIds(args);selected_=*selection_.begin();return {{"ids",selection_}};}
-        Json candidate=document_;Json created=Json::array();
+        Json candidate=document_,partition=streamDraft_;Json created=Json::array();
         if(op=="save_prefab") {
             const auto ids=SelectedIds(args);const std::string name=args.value("name",std::string("encounter"));
             if(name.empty()||name.size()>64)throw std::runtime_error("Prefab name must be 1..64 characters");
@@ -195,12 +216,73 @@
                 auto& rows=candidate["entities"];rows.erase(std::remove_if(rows.begin(),rows.end(),[&](const Json& row){return ids.contains(row.at("id"));}),rows.end());
                 if(candidate.contains("groups"))for(auto& group:candidate["groups"])
                     group.erase(std::remove_if(group.begin(),group.end(),[&](const Json& id){return ids.contains(id);}),group.end());
+                PruneRegionHomes(partition,ids);
                 selection_.clear();
+                if(ids.contains(selected_))selected_=rows.empty()?"":rows[0].at("id").get<std::string>();
             } else throw std::runtime_error("Unknown authoring command");
         }
-        document_=std::move(candidate);history_.Commit(document_,op);dirty_=true;structureDirty_=true;
+        document_=std::move(candidate);streamDraft_=std::move(partition);history_.Commit(AuthorSnapshot(),op);dirty_=true;structureDirty_=true;
         if(!created.empty()){selection_.clear();for(const auto& id:created)selection_.insert(id);selected_=created[0];}
         return {{"created",created},{"dirty",true},{"selection",selection_}};
+    }
+    Json StreamCommand(const std::string& op,const Json& args) {
+        if(op=="get_streaming")return {{"draft",streamDraft_},{"saved_sha256",streamSavedSha_},{"dirty",dirty_}};
+        if(streamDraft_.is_null())throw std::runtime_error("This scene has no stream partition");
+        if(engine_.IsPlaying()||Busy())throw std::runtime_error("Finish Play/build before editing regions");
+        ObserveDocument();Json candidate=streamDraft_;
+        auto& regions=candidate.at("regions");
+        if(!regions.is_array())throw std::runtime_error("Partition regions must be an array; repair the manifest structure and reload");
+        auto findRegion=[&](const std::string& id)->Json& {
+            for(auto& row:regions)if(row.is_object()&&row.contains("id")&&row.at("id")==id)return row;
+            throw std::runtime_error("Unknown region: "+id);
+        };
+        if(op=="assign_region") {
+            const std::string home=args.at("region");findRegion(home);
+            const auto ids=SelectedIds(args);
+            for(auto& row:regions){
+                if(!row.is_object()||!row.contains("entities")||!row.at("entities").is_array())throw std::runtime_error("Region home entities must be an array; repair the manifest row and reload");
+                auto& homes=row.at("entities");
+                for(const auto& id:homes)if(!id.is_string())throw std::runtime_error("Region home IDs must be strings; repair the manifest row and reload");
+                homes.erase(std::remove_if(homes.begin(),homes.end(),[&](const Json& id){return ids.contains(id.get<std::string>());}),homes.end());}
+            for(const auto& id:ids)findRegion(home)["entities"].push_back(id);
+        }else if(op=="set_region") {
+            const std::string id=args.at("id");auto& row=findRegion(id);
+            const auto& patch=args.at("patch");
+            for(auto it=patch.begin();it!=patch.end();++it){
+                if(it.key()=="bounds"){
+                    if(!it.value().is_array()||it.value().size()!=2)throw std::runtime_error("Bounds need minimum and maximum XYZ");
+                    for(int a=0;a<3;++a)if(!it.value()[0].is_array()||!it.value()[1].is_array()||
+                        it.value()[0].size()!=3||it.value()[1].size()!=3||!it.value()[0][a].is_number()||!it.value()[1][a].is_number()||
+                        !std::isfinite(it.value()[0][a].get<double>())||!std::isfinite(it.value()[1][a].get<double>())||
+                        it.value()[0][a].get<double>()>=it.value()[1][a].get<double>())throw std::runtime_error("Minimum must be finite and below maximum");
+                }else if(it.key()=="neighbors"){
+                    if(!it.value().is_array())throw std::runtime_error("Neighbors must be a region ID list");
+                    std::set<std::string> seen;
+                    for(const auto& value:it.value()){const auto peer=value.get<std::string>();findRegion(peer);
+                        if(peer==id||!seen.insert(peer).second)throw std::runtime_error("Neighbors must be distinct and non-self");}
+                }else throw std::runtime_error("Only bounds and neighbors can be changed here");
+                row[it.key()]=it.value();
+            }
+        }else if(op=="set_streaming") {
+            const auto& patch=args.at("patch");
+            for(auto it=patch.begin();it!=patch.end();++it){
+                if(it.key()=="entry_region")findRegion(it.value().get<std::string>());
+                else if(it.key()=="visibility"){
+                    if(it.value()!="door-distance"&&it.value()!="all-regions")throw std::runtime_error("Choose door-distance or all-regions visibility");
+                }else throw std::runtime_error("Only entry region and visibility can be changed here");
+                candidate[it.key()]=it.value();
+            }
+        }else if(op=="fit_region_bounds") {
+            const auto sourceStage=queue_/"bounds-scene.json",missionStage=queue_/"bounds-partition.json";
+            AtomicWrite(sourceStage,document_.dump(2)+"\n");AtomicWrite(missionStage,candidate.dump(2)+"\n");
+            auto result=ProjectCommand({L"fit_region_bounds",L"--level",source_.wstring(),L"--region",fs::path(args.at("id").get<std::string>()).wstring(),
+                L"--staged",sourceStage.wstring(),L"--staged-mission",missionStage.wstring(),
+                L"--expected-sha256",fs::path(sourceSavedSha_).wstring(),L"--expected-mission-sha256",fs::path(streamSavedSha_).wstring()});
+            candidate=result.at("mission_document");
+        }else throw std::runtime_error("Unknown region command");
+        streamDraft_=std::move(candidate);history_.Commit(AuthorSnapshot(),op);UpdateAuthorDirty();
+        structureDirty_=true;lastPreviewDraft_.clear();
+        return {{"draft",streamDraft_},{"dirty",dirty_},{"validation","pending preview"}};
     }
     void DrawAuthoring() {
         if(BeginPanel("Blockout & Groups")) {

@@ -57,9 +57,15 @@ def build_rom(sdk, autoplay=False, debug_overlay=False, level=None, capture=Fals
               scale_bench=False, disable_model_cull=False, *, bundle=None,
               start_level=None, start_preset=None, menu_test=False, renderer="t3d",
               lighting_bake_verify=False, disable_lighting_bake=False, input_replay=None, stream_test=False,
-              stream_test_capture=False, bafford_stream_test=False, bafford_stream_test_capture=False):
+              stream_test_capture=False, bafford_stream_test=False, bafford_stream_test_capture=False,
+              bafford_expanded_test=False, bafford_expanded_test_capture=False):
     start = time.perf_counter()
     replay = None
+    if bafford_expanded_test_capture and not bafford_expanded_test:
+        raise ValueError("--bafford-expanded-test-capture requires --bafford-expanded-test")
+    if bafford_expanded_test and (bundle is None or level is not None or start_level is not None or start_preset is not None or
+                                 autoplay or capture or scale_bench or menu_test or input_replay is not None or stream_test or bafford_stream_test):
+        raise ValueError("--bafford-expanded-test requires a bundle menu and runs separately from other diagnostics")
     if bafford_stream_test_capture and not bafford_stream_test:
         raise ValueError("--bafford-stream-test-capture requires --bafford-stream-test")
     if bafford_stream_test and (bundle is None or level is not None or start_level is not None or start_preset is not None or
@@ -129,6 +135,10 @@ def build_rom(sdk, autoplay=False, debug_overlay=False, level=None, capture=Fals
         name += "-bafford-stream-test"
     if bafford_stream_test_capture:
         name += "-capture"
+    if bafford_expanded_test:
+        name += "-bafford-expanded-test"
+    if bafford_expanded_test_capture:
+        name += "-capture"
     if lighting_bake_verify:
         name += "-verify-lighting"
     if disable_lighting_bake:
@@ -195,6 +205,10 @@ def build_rom(sdk, autoplay=False, debug_overlay=False, level=None, capture=Fals
         common += ["-DDL_BAFFORD_STREAM_TEST=1"]
     if bafford_stream_test_capture:
         common += ["-DDL_BAFFORD_STREAM_TEST_CAPTURE=1"]
+    if bafford_expanded_test:
+        common += ["-DDL_BAFFORD_EXPANDED_TEST=1"]
+    if bafford_expanded_test_capture:
+        common += ["-DDL_BAFFORD_EXPANDED_TEST_CAPTURE=1"]
     if lighting_bake_verify:
         common += ["-DDL_VERIFY_LIGHTING_BAKE=1"]
     if disable_lighting_bake:
@@ -325,6 +339,8 @@ def build_rom(sdk, autoplay=False, debug_overlay=False, level=None, capture=Fals
               "stream_test_capture": stream_test_capture,
               "bafford_stream_test": bafford_stream_test,
               "bafford_stream_test_capture": bafford_stream_test_capture,
+              "bafford_expanded_test": bafford_expanded_test,
+              "bafford_expanded_test_capture": bafford_expanded_test_capture,
               "level_catalog": catalog, "textures": texture_report, "lighting": catalog["lighting"], "size_output": size}
     manifest.write_text(json.dumps(report, indent=2) + "\n")
     print(json.dumps({"manifest": str(manifest.relative_to(ROOT)), "rom": report["rom"],
@@ -475,6 +491,8 @@ def main():
     parser.add_argument("--stream-test-capture", action="store_true", help="Export two diagnostic framebuffers during --stream-test; excludes audio/timing acceptance")
     parser.add_argument("--bafford-stream-test", action="store_true", help="Diagnostic input traversal of the streamed Bafford entry")
     parser.add_argument("--bafford-stream-test-capture", action="store_true", help="Separate Bafford framebuffer-export diagnostic")
+    parser.add_argument("--bafford-expanded-test", action="store_true", help="Diagnostic input traversal of the expanded Bafford street")
+    parser.add_argument("--bafford-expanded-test-capture", action="store_true", help="Separate expanded Bafford framebuffer-export diagnostic")
     parser.add_argument("--capture", action="store_true", help="Diagnostic framebuffer export at authored views")
     parser.add_argument("--scale-bench", action="store_true", help="Diagnostic CPU workload sweeps, without rendering")
     parser.add_argument("--disable-model-cull", action="store_true", help="Disable early bounds rejection for controlled A/B measurements")
@@ -498,7 +516,9 @@ def main():
                             disable_lighting_bake=args.disable_lighting_bake,input_replay=args.input_replay,stream_test=args.stream_test,
                             stream_test_capture=args.stream_test_capture,
                             bafford_stream_test=args.bafford_stream_test,
-                            bafford_stream_test_capture=args.bafford_stream_test_capture)
+                            bafford_stream_test_capture=args.bafford_stream_test_capture,
+                            bafford_expanded_test=args.bafford_expanded_test,
+                            bafford_expanded_test_capture=args.bafford_expanded_test_capture)
             if args.run:
                 ares = os.environ.get("ARES_EXE", str(Path(os.environ.get("LOCALAPPDATA", "")) / "ares/ares.exe"))
                 if not Path(ares).is_file():

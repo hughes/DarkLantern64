@@ -10,3 +10,9 @@ __pycache__/
 *.pyc
 *.blend[0-9]
 /imgui.ini
+
+# Local Thief conversion studies are regenerated from the user's installation.
+# Keep the importer and reports in Git, not copied commercial game content.
+/art/thief-bafford*.blend
+/content/thief_bafford*.json
+/content/assets/thief_bafford/

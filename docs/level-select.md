@@ -1,8 +1,13 @@
 # Level select and test starts
 
-A bundle puts several saved levels in one N64 ROM. It can open a level-select screen or boot directly into a chosen level and named test start. The included bundle contains **The Lantern Store**, **Moonlit Delivery Yard**, and **Enemy Patrol Workshop**.
+A bundle puts several saved levels in one N64 ROM. It can open a level-select screen or boot directly into a chosen level and named test start. The included bundle contains **The Lantern Store**, **Moonlit Delivery Yard**, **Enemy Patrol Workshop**, **Guard Animation Workshop**, **Sponza After Hours**, and the local **Bafford entry probe**.
 
-![The level-select screen captured from the N64 renderer in Ares](images/level-select.png)
+The [Bafford probe](thief-bafford-study.md) requires assets generated from the
+local Thief Gold installation. A fresh checkout must run `python tools/import_thief.py`
+before building this bundle. The complete Bafford authoring study is excluded
+from the game menu; its runtime work is described in the [full-mission plan](thief-bafford-runtime-plan.md).
+
+![The six-level selector, including the Bafford entry probe, captured from the N64 renderer in Ares](images/level-select-bafford.png)
 
 ## Build and launch
 
@@ -11,7 +16,7 @@ In the editor, use **Play game menu** to save and cook the open level, build the
 From VS Code, **DarkLantern64: Launch game** builds the saved bundle and opens its selector. **Save + Cook first** when using this task; it reads files on disk. Level selection lives in the editor and game menu, so there are no separate tasks for each level or test start.
 
 ```powershell
-# All three levels, starting at the selector
+# All included levels, starting at the selector
 python tools/build.py --bundle content/level_bundle.json --run
 
 # Same bundle, immediately enter the yard
@@ -101,9 +106,18 @@ Only the active level has loaded texture sprites and lighting caches. Fresh laun
 
 - An ordinary menu renders without starting a level, and the 4 MiB startup gate works.
 - Every bundled default/preset launches, resumes and restarts across three cycles.
-- Repeated texture/cache swaps reach a stable heap size for the same start.
+- Repeated texture/cache swaps reach exactly stable heap sizes for the same
+  start and lifecycle path, comparing fresh launches and restarts separately
+  after the first warmup cycle. The raw samples are retained in the report.
 - Bundle and standalone builds can bypass the menu into a named start.
 
 It saves hashes, logs, per-start heap samples and the actual N64 menu framebuffer under `build/bundle-smoke.json`. These specialist checks are listed in [developer tools](developer-tools.md). The diagnostic menu script is compiled only with `--menu-test`; normal ROMs use controller input. Existing capture, mission replay and scale diagnostics remain standalone level builds. Original N64 and M64 checks are still pending.
+
+The [2026-10-12 six-level verification](evidence/thief-bafford-menu.json)
+passes the ordinary menu and Expansion Pak gate, 108 launches/restarts across
+18 default/preset variants, resume preservation and direct starts. The Bafford
+probe's six starts each used 972,184 heap bytes. The ordinary main ROM is
+999,424 bytes (about 0.95 MiB); its static image is 1,005,712 bytes. These are
+storage and startup figures, not a full-mission performance result.
 
 The [2026-09-05 verification record](level-select-results.json) passed 85 Python tests, 26 gameplay groups, launcher/profiler/culling checks, and the original Ares mission replay. The bundled diagnostic exercised 30 fresh starts/restarts and 15 resumes. Heap usage after preparation was stable across all repetitions: 614,120 bytes for the store/workshop and 668,760 bytes for the textured yard. These heap values exclude the static image, stacks and other non-heap memory. The ordinary three-level ROM is 327,680 bytes; its static image is 572,592 bytes, including 24,156 bytes of compiled geometry arrays.

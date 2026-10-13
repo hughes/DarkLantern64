@@ -1,0 +1,126 @@
+{
+  "date": "2026-10-12",
+  "mission": "Lord Bafford's Manor",
+  "source_sha256": "8139c67b6f806485c19e88264500b1048adb60341416559e98e9583e6a306815",
+  "raw_world_counts": {
+    "cells": 4991,
+    "solid_triangles": 75266,
+    "bsp_nodes": 16381,
+    "portals": 26056
+  },
+  "converted": {
+    "full": {
+      "level": "content/thief_bafford.json",
+      "cells": 4984,
+      "surfaces": 26080,
+      "triangles": 51268,
+      "architecture_models": 1400,
+      "colliders": 16605,
+      "entities": 18414,
+      "instanced_vertices": 123074,
+      "instanced_triangles": 64457,
+      "lights": 365,
+      "guards": 19,
+      "loot": 23,
+      "collision_omissions": {
+        "sloped": 5553,
+        "nonrectangular_or_too_thin": 3922
+      },
+      "adaptations": [
+        "Guard origins are projected to containing horizontal floors for DarkLantern feet positions; source positions/facing/patrols are retained. All adapted guards use sentries.",
+        "Source light brightness / 125 maps to intensity; unbounded source radii use an 8 m probe radius; animated lights are static snapshots."
+      ],
+      "blender": {
+        "blend": "art/thief-bafford.blend",
+        "exchange": "build/blender/thief_bafford/scene-26615785761a488f86c5b093580139ec/scene.json",
+        "revision": 1,
+        "imported": true,
+        "changed_meshes": 0
+      }
+    },
+    "entry": {
+      "level": "content/thief_bafford_entry.json",
+      "cells": 37,
+      "surfaces": 241,
+      "triangles": 475,
+      "architecture_models": 47,
+      "colliders": 155,
+      "entities": 219,
+      "instanced_vertices": 957,
+      "instanced_triangles": 475,
+      "lights": 16,
+      "guards": 0,
+      "loot": 0,
+      "collision_omissions": {
+        "nonrectangular_or_too_thin": 43,
+        "sloped": 43
+      },
+      "adaptations": [
+        "Guard origins are projected to containing horizontal floors for DarkLantern feet positions; source positions/facing/patrols are retained. All adapted guards use sentries.",
+        "Source light brightness / 125 maps to intensity; unbounded source radii use an 8 m probe radius; animated lights are static snapshots."
+      ],
+      "blender": {
+        "blend": "art/thief-bafford-entry.blend",
+        "exchange": "build/blender/thief_bafford_entry/scene-ca9cb19f02f14671919c5d0925f6e6fc/scene.json",
+        "revision": 1,
+        "imported": true,
+        "changed_meshes": 0
+      }
+    }
+  },
+  "source_object_counts": {
+    "difficulty": "Expert",
+    "positioned_objects": 1378,
+    "guards": 19,
+    "loot": 23,
+    "objectives": 1,
+    "loot_value": 1429,
+    "lights": 259,
+    "enabled_lights": 259,
+    "patrol_nodes": 54,
+    "unsupported_actors": 9,
+    "inventory_loot": 1,
+    "compiled_lights": 365,
+    "matched_static_lights": 174,
+    "matched_animated_lights": 84
+  },
+  "missing_textures": [],
+  "host_preview": {
+    "passed": true,
+    "counts": {
+      "entities": 18414,
+      "meshes": 1406,
+      "models": 1443,
+      "colliders": 16605,
+      "instanced_vertices": 123074,
+      "instanced_triangles": 64457,
+      "lights": 365,
+      "enemies": 19,
+      "test_starts": 0,
+      "patrol_points": 0
+    },
+    "compiled_geometry_bytes": 2735204,
+    "playable": false
+  },
+  "runtime_entry": {
+    "rom": "build\\DarkLantern64-thief_bafford_entry-t3d.z64",
+    "sha256": "5d094bdf8515c6ee46328243ea20662f7feeaabf9476d08f6a8ad56d8118bcce",
+    "bytes": 507904,
+    "renderer": "t3d",
+    "capture_passed": true,
+    "capture_rom_sha256": "6f5f8c92c65baadc771f4f7b17b362d674fd3373b8910c43fea6b46d2418ff53",
+    "capture_image": "build/thief-bafford/entry-rdp.png"
+  },
+  "validation": {
+    "source_and_profile_tests": 57,
+    "editor_build_passed": true,
+    "blender_roundtrip_passed": true
+  },
+  "limitations": [
+    "Full mission is a host-only authoring study; N64 seamless streaming is not implemented.",
+    "Water/swimming, ladders, floor trapdoors, door models/scripts, props, special AI and mission scripts are omitted.",
+    "Only rectangular axis-aligned world faces get exact thin box proxies; slopes and nonrectangular faces need mesh collision.",
+    "Source surface sound tags are preserved; current runtime footsteps use the existing single sound.",
+    "Guard and loot visuals use DarkLantern assets; guard patrols and source lighting attenuation are approximations."
+  ]
+}

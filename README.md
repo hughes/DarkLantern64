@@ -16,6 +16,10 @@ Our development approach is to extend **LightEngine** into a productive content 
 
 **Exploring larger interiors?** [Sponza After Hours](docs/sponza-study.md) adds a courtyard, two playable floors, connected stairways and a gallery-to-vault encounter. Choose it in the existing editor or game level menu.
 
+**Testing original mission scale?** The [Bafford conversion study](docs/thief-bafford-study.md) imports the first Thief campaign mission from a local installation into an editable Blender source and the DarkLantern editor. Its full architecture is a host study; a separate entry-area probe builds and boots on the N64 runtime.
+
+The entry probe is included in the main ROM's level selector after local asset generation. The [full-mission runtime plan](docs/thief-bafford-runtime-plan.md) explains the remaining work, memory costs and verification milestones.
+
 **Music:** Sponza now plays the original 48-second [Lanterns Below](docs/music-study.md) XM64 cue in the ROM, alongside gameplay effects. See [Music](docs/music.md) for editing, build/launch, and the remaining native editor playback work.
 
 **Animating characters?** The [guard animation study](docs/guard-animation-prototype.md) covers the editable Blender guard, five Actions, connected joints, editor playback/head attention and measured N64 costs. Its clips compress to 8.61 KiB. The default renderer now uses Tiny3D on the RSP for model transforms and rigid skeletal deformation.

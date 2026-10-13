@@ -37,6 +37,20 @@ def check_start(row, data, preset):
     assert int(row["enemies"]) == sum(e["kind"] == "guard" for e in data["entities"])
 
 
+def heap_stability(heaps, label):
+    """Require exact repeatability of each lifecycle path after one warmup.
+
+    Samples alternate fresh launch / restart for three complete cycles. The
+    two paths can reuse allocator blocks differently, so compare equal phases,
+    rather than accepting a tolerance or averaging away growth.
+    """
+    assert len(heaps) == 6, f"Expected three launch/restart pairs for {label}, got {len(heaps)}"
+    phases = {"launch": heaps[2::2], "restart": heaps[3::2]}
+    for phase, values in phases.items():
+        assert max(values) == min(values), f"Heap did not stabilize for {label} ({phase}): {heaps}"
+    return {phase: values[0] for phase, values in phases.items()}
+
+
 def main():
     sdk = Path(os.environ.get("N64_INST", "C:/n64-toolchain"))
     exe = Path(os.environ.get("ARES_EXE", str(Path(os.environ["LOCALAPPDATA"]) / "ares/ares.exe")))
@@ -72,9 +86,8 @@ def main():
             assert key in expected, f"Unexpected start {key}"
             check_start(row, data[key[0]], key[1])
             expected[key].append(int(row["heap"].split("/")[0]))
-        for key, heaps in expected.items():
-            assert len(heaps) == 6, f"Expected three launch/restart pairs for {key}, got {len(heaps)}"
-            assert max(heaps[2:]) == min(heaps[2:]), f"Heap did not stabilize for {key}: {heaps}"
+        report["steady_heap_bytes"] = {f"{key[0]}/{key[1]}": heap_stability(heaps, key)
+                                       for key, heaps in expected.items()}
         opens = [fields(line) for line in log.splitlines() if line.startswith("DL64 menu_open ")]
         resumes = [fields(line) for line in log.splitlines() if line.startswith("DL64 menu_resume ")]
         assert len(resumes) == len(expected) * 3, "Every variant must exercise resume"
@@ -85,7 +98,7 @@ def main():
         report["heap_samples"] = {f"{key[0]}/{key[1]}": values for key, values in expected.items()}
         report["checks"] += ["Every bundled default/test start launches and restarts three times",
                              "Position, view, stance, door and clean mission state match authored starts",
-                             "Repeated textured/untextured switches reach a stable per-start heap",
+                             "Repeated textured/untextured launches and restarts each reach an exactly stable per-start heap",
                              "Menu resume preserves paused simulation time"]
         frame = decode_captures(log, expected_count=1, expected_dimensions=(320, 240))[1]
         from PIL import Image

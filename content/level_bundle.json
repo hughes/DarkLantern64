@@ -21,6 +21,10 @@
     {
       "id": "sponza",
       "source": "sponza_courtyard.json"
+    },
+    {
+      "id": "bafford-entry",
+      "source": "thief_bafford_entry.json"
     }
   ]
 }

@@ -207,6 +207,9 @@ class BundleTests(unittest.TestCase):
                  {"bundle": ROOT / "content/level_bundle.json", "bafford_stream_test": True, "start_level": "bafford-stream"},
                  {"bafford_expanded_test_capture": True}, {"bafford_expanded_test": True},
                  {"bundle": ROOT / "content/level_bundle.json", "bafford_expanded_test": True, "bafford_stream_test": True},
+                 {"bafford_district_test_capture": True}, {"bafford_district_test": True},
+                 {"bundle": ROOT / "content/level_bundle.json", "bafford_district_test": True, "bafford_expanded_test": True},
+                 {"bundle": ROOT / "content/level_bundle.json", "bafford_district_test": True, "start_level": "bafford-district"},
                  {"lighting_bake_verify": True, "disable_lighting_bake": True}]
         with patch.object(build, "prepare_bundle", side_effect=AssertionError("Must reject before cook")):
             for kwargs in cases:
@@ -304,6 +307,16 @@ class BundleTests(unittest.TestCase):
         self.write_level("streaming_probe.json", source)
         with self.assertRaisesRegex(ValueError, "authoring-only source study"):
             self.read()
+
+    def test_stream_source_profile_requires_mission_bundle_entry(self):
+        source, _ = self.stream_fixture()
+        source['authoring_profile'] = 'streamed-mission'
+        self.write_level('streaming_probe.json', source)
+        _, entries = self.read()
+        self.assertIn('mission', entries[0])
+        self.prepare(menu=True)
+        with self.assertRaisesRegex(ValueError, 'mission partition'):
+            bundle.validate(source, self.content)
 
     def test_stream_bundle_packages_binary_and_reports_bootstrap_residency(self):
         self.stream_fixture(mixed=True)

@@ -10,7 +10,7 @@
 #define CROUCH_HEIGHT 0.95f
 #define STEP_HEIGHT 0.28f
 #define EPSILON 0.0001f
-#define MAX_COLLIDERS 256
+#define MAX_COLLIDERS 400
 
 static float clampf(float v, float lo, float hi) { return v < lo ? lo : v > hi ? hi : v; }
 static float horizontal_distance(DlVec3 a, DlVec3 b) {
@@ -87,6 +87,59 @@ static bool vertical_overlap(const DlCollider *box, DlVec3 feet, float height) {
     return feet.y + height > box->center.y - box->half_size.y + EPSILON &&
            feet.y < box->center.y + box->half_size.y - EPSILON;
 }
+static int floor_count(const DlGame *g) {
+    return g->level->floors && g->level->floor_count > 0 ?
+        (g->level->floor_count < DL_MAX_FLOORS ? g->level->floor_count : DL_MAX_FLOORS) : 0;
+}
+/* Barycentric coordinates on the XZ projection, with an exact interpolated
+ * plane height. Vertical/degenerate and malformed native data supplies nothing. */
+static bool floor_coordinates(const DlFloorTriangle *floor, DlVec3 point,
+                              float *height, float *u, float *v) {
+    for (int i = 0; i < 3; ++i) if (!finite_position(floor->vertices[i])) return false;
+    DlVec3 a = floor->vertices[0], b = floor->vertices[1], c = floor->vertices[2];
+    float bx = b.x - a.x, bz = b.z - a.z, cx = c.x - a.x, cz = c.z - a.z;
+    float by = b.y - a.y, cy = c.y - a.y, det = bx * cz - bz * cx;
+    if (!isfinite(det) || fabsf(det) <= 0.00000001f || !isfinite(by) || !isfinite(cy)) return false;
+    float gradient_x = (by * cz - bz * cy) / det, gradient_z = (bx * cy - by * cx) / det;
+    if (!isfinite(gradient_x) || !isfinite(gradient_z) ||
+        gradient_x * gradient_x + gradient_z * gradient_z > 1.000001f) return false;
+    float x = point.x - a.x, z = point.z - a.z;
+    float first = (x * cz - z * cx) / det, second = (bx * z - bz * x) / det;
+    float y = a.y + first * by + second * cy;
+    if (!isfinite(first) || !isfinite(second) || !isfinite(y)) return false;
+    *height = y; *u = first; *v = second;
+    return true;
+}
+static bool floor_height(const DlFloorTriangle *floor, DlVec3 point, float *height) {
+    /* Most bank floors are far from an actor; reject their XZ bounds before
+     * plane divisions. Shared-edge ulps still reach barycentric containment. */
+    float min_x = floor->vertices[0].x, max_x = min_x, min_z = floor->vertices[0].z, max_z = min_z;
+    for (int i = 1; i < 3; ++i) {
+        DlVec3 v = floor->vertices[i];
+        if (v.x < min_x) min_x = v.x;
+        if (v.x > max_x) max_x = v.x;
+        if (v.z < min_z) min_z = v.z;
+        if (v.z > max_z) max_z = v.z;
+    }
+    float margin_x = 4 * FLT_EPSILON * (fabsf(point.x) + fabsf(min_x) + fabsf(max_x) + 1);
+    float margin_z = 4 * FLT_EPSILON * (fabsf(point.z) + fabsf(min_z) + fabsf(max_z) + 1);
+    if (point.x < min_x - margin_x || point.x > max_x + margin_x ||
+        point.z < min_z - margin_z || point.z > max_z + margin_z) return false;
+    float u, v;
+    if (!floor_coordinates(floor, point, height, &u, &v)) return false;
+    /* Only a few arithmetic ulps at shared edges; no footprint expansion tied
+     * to actor radius, bounds hull, proxy thickness or a stair approximation. */
+    float margin = 4 * FLT_EPSILON;
+    return u >= -margin && v >= -margin && u + v <= 1 + margin;
+}
+static float floor_below(const DlGame *g, DlVec3 feet, float maximum_y) {
+    float highest = -INFINITY;
+    for (int i = 0; i < floor_count(g); ++i) {
+        float y;
+        if (floor_height(&g->level->floors[i], feet, &y) && y <= maximum_y + EPSILON && y > highest) highest = y;
+    }
+    return highest;
+}
 bool dl_position_clear(const DlGame *g, DlVec3 feet, float radius, float height) {
     if (!g || !g->level || !finite_position(feet) || !isfinite(radius) ||
         !isfinite(height) || radius <= 0 || height <= 0) return false;
@@ -94,6 +147,11 @@ bool dl_position_clear(const DlGame *g, DlVec3 feet, float radius, float height)
         const DlCollider *box = &g->level->colliders[i];
         if (active(g, box) && vertical_overlap(box, feet, height) &&
             horizontal_overlap(box, feet, radius)) return false;
+    }
+    for (int i = 0; i < floor_count(g); ++i) {
+        float y;
+        if (floor_height(&g->level->floors[i], feet, &y) && feet.y < y - EPSILON &&
+            feet.y + height > y + EPSILON) return false;
     }
     return true;
 }
@@ -149,6 +207,39 @@ static bool line_of_sight_without_door(const DlGame *g, DlVec3 a, DlVec3 b, int 
         if (object >= 0 && box->door && g->level->collider_objects &&
             g->level->collider_objects[i] == object) continue;
         if (active(g, box) && ray_hits_box(box, a, b)) return false;
+    }
+    for (int i = 0; i < floor_count(g); ++i) {
+        const DlFloorTriangle *floor = &g->level->floors[i];
+        float lo = floor->vertices[0].y, hi = lo;
+        for (int j = 1; j < 3; ++j) {
+            if (floor->vertices[j].y < lo) lo = floor->vertices[j].y;
+            if (floor->vertices[j].y > hi) hi = floor->vertices[j].y;
+        }
+        if (a.y > hi && b.y > hi) continue;
+        if (a.y < lo && b.y < lo) continue;
+        float ay, by, au, av, bu, bv;
+        if (!floor_coordinates(floor, a, &ay, &au, &av) ||
+            !floor_coordinates(floor, b, &by, &bu, &bv)) continue;
+        float pa = a.y - ay, pb = b.y - by;
+        if (!isfinite(pa) || !isfinite(pb) || (pa > 0 && pb > 0) || (pa < 0 && pb < 0)) continue;
+        float delta = pa - pb;
+        if (delta != 0) {
+            float t = pa / delta;
+            DlVec3 contact = {a.x + t * (b.x - a.x), a.y + t * (b.y - a.y), a.z + t * (b.z - a.z)};
+            float y;
+            if (t >= 0 && t <= 1 && floor_height(floor, contact, &y)) return false;
+        } else {
+            /* Clip a coplanar ray against the three barycentric half spaces. */
+            float entry = 0, exit = 1;
+            float from[3] = {au, av, 1 - au - av}, to[3] = {bu, bv, 1 - bu - bv};
+            for (int axis = 0; axis < 3 && entry <= exit; ++axis) {
+                float d = to[axis] - from[axis];
+                if (d == 0) { if (from[axis] < 0) entry = 2; }
+                else if (d > 0) entry = fmaxf(entry, -from[axis] / d);
+                else exit = fminf(exit, -from[axis] / d);
+            }
+            if (entry <= exit) return false;
+        }
     }
     return true;
 }
@@ -240,7 +331,7 @@ float dl_visibility(const DlGame *g, DlVec3 p) {
     return clampf(amount, 0, 1);
 }
 static float support_below(const DlGame *g, DlVec3 feet, float radius, float maximum_y) {
-    float highest = -INFINITY;
+    float highest = floor_below(g, feet, maximum_y);
     for (int i = 0; i < collider_count(g); ++i) {
         const DlCollider *box = &g->level->colliders[i];
         float top = box->center.y + box->half_size.y;
@@ -286,6 +377,18 @@ static void depenetrate(const DlGame *g, DlVec3 *feet, float radius, float heigh
 static float move_horizontal(const DlGame *g, DlVec3 *feet, float dx, float dz,
                              float radius, float height, bool can_step) {
     DlVec3 before = *feet, candidate = {feet->x + dx, feet->y, feet->z + dz};
+    float prior_floor = floor_below(g, before, before.y + EPSILON);
+    float next_floor = floor_below(g, candidate, before.y + STEP_HEIGHT);
+    if (can_step && (isfinite(next_floor) || (isfinite(prior_floor) && fabsf(prior_floor - before.y) < .015f))) {
+        float floor = support_below(g, candidate, radius, before.y + STEP_HEIGHT);
+        DlVec3 projected = {candidate.x, floor, candidate.z}, raised_start = {before.x, floor, before.z};
+        if (isfinite(floor) && floor >= before.y - STEP_HEIGHT &&
+            dl_position_clear(g, projected, radius, height) &&
+            (floor <= before.y || dl_position_clear(g, raised_start, radius, height))) {
+            *feet = projected;
+            return horizontal_distance(before, *feet);
+        }
+    }
     if (dl_position_clear(g, candidate, radius, height)) *feet = candidate;
     else {
         float top = support_below(g, candidate, radius, feet->y + STEP_HEIGHT);
@@ -313,6 +416,14 @@ static bool move_vertical(const DlGame *g, DlVec3 *feet, float *velocity,
         if (!(floor_crossing || ceiling_crossing) || !horizontal_overlap(box, *feet, radius)) continue;
         if (floor_crossing) { next = top; grounded = true; }
         else { next = bottom - height; ceiling = true; }
+    }
+    for (int i = 0; i < floor_count(g); ++i) {
+        float y;
+        if (!floor_height(&g->level->floors[i], *feet, &y)) continue;
+        if (*velocity <= 0 && previous >= y - EPSILON && next <= y) { next = y; grounded = true; }
+        else if (*velocity > 0 && previous + height <= y + EPSILON && next + height >= y) {
+            next = y - height; ceiling = true;
+        }
     }
     if (grounded || ceiling) *velocity = 0;
     feet->y = next;

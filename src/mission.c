@@ -146,11 +146,11 @@ DlMissionStatus dl_mission_chunk_open(const void *data,size_t bytes,DlMissionChu
     if(bytes<DL_MISSION_CHUNK_HEADER_BYTES)return DL_MISSION_TRUNCATED;
     const uint8_t *p=data;
     uint16_t version=be16(p+4);
-    if(memcmp(p,"DLR1",4)||(version!=1&&version!=2)||
+    if(memcmp(p,"DLR1",4)||(version!=1&&version!=2&&version!=3)||
         be16(p+6)!=DL_MISSION_CHUNK_HEADER_BYTES)return DL_MISSION_HEADER;
     if(bytes>UINT32_MAX||be32(p+8)!=bytes||be32(p+28))return DL_MISSION_LAYOUT;
     uint32_t count=be32(p+12);
-    if(!count||count>DL_MISSION_MAX_SECTIONS)return DL_MISSION_LAYOUT;
+    if(!count||count>(version==3?DL_MISSION_MAX_SECTIONS:3))return DL_MISSION_LAYOUT;
     size_t payload_min=DL_MISSION_CHUNK_HEADER_BYTES+(size_t)count*DL_MISSION_SECTION_BYTES;
     if(bytes<payload_min)return DL_MISSION_TRUNCATED;
     DlMissionChunk result={.data=p,.bytes=bytes,.origin=vector(p+16),.version=version,.section_count=count};
@@ -159,14 +159,15 @@ DlMissionStatus dl_mission_chunk_open(const void *data,size_t bytes,DlMissionChu
     for(uint32_t i=0;i<count;++i){
         const uint8_t *row=p+DL_MISSION_CHUNK_HEADER_BYTES+(size_t)i*DL_MISSION_SECTION_BYTES;
         unsigned kind=be16(row);
-        if(kind<=previous_kind||kind>DL_MISSION_SECTION_ENTITIES||be16(row+2)||be32(row+20))
+        if(kind<=previous_kind||kind>(version==3?DL_MISSION_SECTION_FLOORS:DL_MISSION_SECTION_ENTITIES)||be16(row+2)||be32(row+20))
             return DL_MISSION_LAYOUT;
         previous_kind=kind;
         DlMissionSection *section=&result.sections[i];
         *section=(DlMissionSection){(DlMissionSectionKind)kind,be32(row+4),be32(row+8),be32(row+12),be32(row+16)};
         uint32_t stride=kind==DL_MISSION_SECTION_TRIANGLES?
-            (version==2?DL_MISSION_TRIANGLE_V2_BYTES:DL_MISSION_TRIANGLE_BYTES):
-            kind==DL_MISSION_SECTION_COLLIDERS?DL_MISSION_COLLIDER_BYTES:4;
+            (version>=2?DL_MISSION_TRIANGLE_V2_BYTES:DL_MISSION_TRIANGLE_BYTES):
+            kind==DL_MISSION_SECTION_COLLIDERS?DL_MISSION_COLLIDER_BYTES:
+            kind==DL_MISSION_SECTION_FLOORS?DL_MISSION_FLOOR_BYTES:4;
         if(section->record_bytes!=stride||section->bytes%stride||section->count!=section->bytes/stride||
             section->offset%16||section->offset<payload_min||!range(bytes,section->offset,section->bytes))
             return DL_MISSION_LAYOUT;
@@ -182,7 +183,7 @@ DlMissionStatus dl_mission_chunk_open(const void *data,size_t bytes,DlMissionChu
 DlMissionStatus dl_mission_section(const DlMissionChunk *chunk,DlMissionSectionKind kind,DlMissionSection *section){
     if(!chunk||!chunk->data||!section)return DL_MISSION_ARGUMENT;
     if(chunk->section_count>DL_MISSION_MAX_SECTIONS)return DL_MISSION_LAYOUT;
-    if(kind<DL_MISSION_SECTION_TRIANGLES||kind>DL_MISSION_SECTION_ENTITIES)return DL_MISSION_ARGUMENT;
+    if(kind<DL_MISSION_SECTION_TRIANGLES||kind>DL_MISSION_SECTION_FLOORS)return DL_MISSION_ARGUMENT;
     for(uint32_t i=0;i<chunk->section_count;++i)if(chunk->sections[i].kind==kind){
         *section=chunk->sections[i];return DL_MISSION_OK;
     }
@@ -194,8 +195,9 @@ static DlMissionStatus record(const DlMissionChunk *chunk,DlMissionSectionKind k
     if(status!=DL_MISSION_OK)return status;
     if(index>=section.count)return DL_MISSION_REFERENCE;
     uint32_t stride=kind==DL_MISSION_SECTION_TRIANGLES?
-        (chunk->version==2?DL_MISSION_TRIANGLE_V2_BYTES:DL_MISSION_TRIANGLE_BYTES):
-        kind==DL_MISSION_SECTION_COLLIDERS?DL_MISSION_COLLIDER_BYTES:4;
+        (chunk->version>=2?DL_MISSION_TRIANGLE_V2_BYTES:DL_MISSION_TRIANGLE_BYTES):
+        kind==DL_MISSION_SECTION_COLLIDERS?DL_MISSION_COLLIDER_BYTES:
+        kind==DL_MISSION_SECTION_FLOORS?DL_MISSION_FLOOR_BYTES:4;
     if(section.record_bytes!=stride||!range(chunk->bytes,section.offset,section.bytes)||
         (size_t)index>=section.bytes/section.record_bytes)return DL_MISSION_LAYOUT;
     *data=chunk->data+section.offset+(size_t)index*section.record_bytes;
@@ -210,7 +212,7 @@ DlMissionStatus dl_mission_triangle(const DlMissionChunk *chunk,uint32_t index,D
     if(!finite_vector(result.positions[0])||!finite_vector(result.positions[1])||
         !finite_vector(result.positions[2]))return DL_MISSION_VALUE;
     if(!result.material_id||!result.surface_id)return DL_MISSION_REFERENCE;
-    if(chunk->version==2){
+    if(chunk->version>=2){
         result.attribute_flags=p[77];
         if(result.attribute_flags&~(DL_MISSION_TRIANGLE_UV|DL_MISSION_TRIANGLE_NORMAL)||p[78]||p[79])
             return DL_MISSION_LAYOUT;
@@ -247,4 +249,24 @@ DlMissionStatus dl_mission_entity_id(const DlMissionChunk *chunk,const DlMission
     if(status!=DL_MISSION_OK)return status;
     if(entity.home_region_id!=region_id)return DL_MISSION_REFERENCE;
     *entity_id=id;return DL_MISSION_OK;
+}
+
+DlMissionStatus dl_mission_floor(const DlMissionChunk *chunk,uint32_t index,DlMissionFloorTriangle *floor){
+    if(!floor)return DL_MISSION_ARGUMENT;
+    if(!chunk||chunk->version!=3)return DL_MISSION_ARGUMENT;
+    const uint8_t *p;DlMissionStatus status=record(chunk,DL_MISSION_SECTION_FLOORS,index,&p);
+    if(status!=DL_MISSION_OK)return status;
+    DlMissionFloorTriangle result={.vertices={vector(p),vector(p+12),vector(p+24)}};
+    for(unsigned i=0;i<3;++i)if(!finite_vector(result.vertices[i]))return DL_MISSION_VALUE;
+    /* Double intermediates keep malformed finite f32 records from overflowing
+     * during the footprint/grade check. Native world queries apply this same
+     * walkable-floor contract after the chunk origin is added. */
+    DlMissionVec3 a=result.vertices[0],b=result.vertices[1],c=result.vertices[2];
+    double bx=(double)b.x-a.x,bz=(double)b.z-a.z,by=(double)b.y-a.y;
+    double cx=(double)c.x-a.x,cz=(double)c.z-a.z,cy=(double)c.y-a.y;
+    double determinant=bx*cz-bz*cx;
+    if(!isfinite(determinant)||fabs(determinant)<=1e-8)return DL_MISSION_VALUE;
+    double gx=(by*cz-bz*cy)/determinant,gz=(bx*cy-by*cx)/determinant;
+    if(!isfinite(gx)||!isfinite(gz)||gx*gx+gz*gz>1.000001)return DL_MISSION_VALUE;
+    *floor=result;return DL_MISSION_OK;
 }

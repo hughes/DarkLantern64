@@ -27,7 +27,23 @@ public:
             throw std::runtime_error("Unsupported desktop play package");
         for(const auto& row:package.at("colliders"))
             boxes.push_back({V(row.at("center")),V(row.at("half_size")),row.at("yaw"),row.at("door")});
-        if(boxes.empty()||boxes.size()>256||package.at("enemies").size()>DL_MAX_ENEMIES)
+        if(package.contains("floors")&&!package.at("floors").is_array())throw std::runtime_error("Floors must be an array");
+        if(package.contains("floors"))for(const auto& row:package.at("floors")) {
+            const auto& points=row.at("vertices");
+            if(!points.is_array()||points.size()!=3)throw std::runtime_error("Floor requires three XYZ vertices");
+            DlFloorTriangle floor{{V(points[0]),V(points[1]),V(points[2])}};
+            const auto a=floor.vertices[0],b=floor.vertices[1],c=floor.vertices[2];
+            const float bx=b.x-a.x,bz=b.z-a.z,cx=c.x-a.x,cz=c.z-a.z,by=b.y-a.y,cy=c.y-a.y;
+            const float determinant=bx*cz-bz*cx;
+            if(!std::isfinite(determinant)||std::abs(determinant)<=1e-8f)
+                throw std::runtime_error("Degenerate or vertical floor footprint");
+            const float gx=(by*cz-bz*cy)/determinant,gz=(bx*cy-by*cx)/determinant;
+            if(!std::isfinite(gx)||!std::isfinite(gz)||gx*gx+gz*gz>1.000001f)
+                throw std::runtime_error("Floor grade exceeds supported 45 degrees");
+            floors.push_back(floor);
+        }
+        if((boxes.empty()&&floors.empty())||boxes.size()+floors.size()>320||floors.size()>DL_MAX_FLOORS||
+            package.at("enemies").size()>DL_MAX_ENEMIES)
             throw std::runtime_error("Play package exceeds ROM simulation capacity");
         for(const auto& row:package.at("lights"))
             lights.push_back({V(row.at("position")),row.at("radius"),row.at("intensity"),V(row.at("color"))});
@@ -62,6 +78,7 @@ public:
         if(start!="default"&&preset<0)throw std::runtime_error("Unknown native play test start");
         level.version=2;level.title=package.at("title").get_ref<const std::string&>().c_str();
         level.colliders=boxes.data();level.collider_count=(int)boxes.size();
+        level.floors=floors.data();level.floor_count=(int)floors.size();
         level.enemies=enemies.data();level.enemy_count=(int)enemies.size();
         level.lights=lights.data();level.light_count=(int)lights.size();
         level.test_starts=starts.data();level.test_start_count=(int)starts.size();
@@ -182,6 +199,7 @@ public:
     }
 private:
     std::vector<DlCollider> boxes;
+    std::vector<DlFloorTriangle> floors;
     std::vector<DlLight> lights;
     std::vector<DlEnemyDef> enemies;
     std::vector<std::vector<DlVec3>> routes;

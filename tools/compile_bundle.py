@@ -73,7 +73,7 @@ def read_manifest(path, content_root=None):
         if streaming:
             manifest, scene = mission_source(resolved, content_root)
             # Streaming cannot grant the protected host study a Play profile.
-            content_limits(json.loads(scene.read_text(encoding="utf-8")), {}, authoring=False)
+            content_limits(json.loads(scene.read_text(encoding="utf-8")), {}, authoring=False, streaming=True)
             entries.append({"id": ident, "source": scene, "mission": resolved})
         else:
             entries.append({"id": ident, "source": resolved})

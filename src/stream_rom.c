@@ -6,7 +6,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-enum { SLOT_COUNT=2, READ_SLICE=256, DMA_BYTES=272, MAX_DIRECTORY=65536, MAX_CHUNK=65536 };
+enum { SLOT_COUNT=5, READ_SLICE=256, DMA_BYTES=272, MAX_DIRECTORY=65536, MAX_CHUNK=65536 };
 typedef struct {
     DlMission mission;
     DlWorldStream world;
@@ -15,7 +15,9 @@ typedef struct {
     uint8_t *directory, *dma;
     uint32_t rom, file_bytes, io_offset, io_bytes, io_prefix;
     bool io_pending, io_abandoned, queued_use;
-    uint32_t view_regions, retired;
+    uint32_t view_regions, retired, wanted_regions,queued_transition;
+    DlStreamPolicyState policy_state;
+    int queued_object;
     size_t platform_allocated;
 } StreamRom;
 static StreamRom *active;
@@ -66,7 +68,7 @@ void dl_stream_rom_close(void){
      * boundary. PI may still own the independent read staging buffer. */
     completion(active);
     if(active->io_pending)dma_wait();
-    for(int i=0;i<SLOT_COUNT;++i)free(active->slots[i].buffer);
+    for(size_t i=0;i<active->world.slot_count;++i)free(active->slots[i].buffer);
     free(active->dma);free(active->directory);free(active);active=NULL;
 }
 bool dl_stream_rom_active(void){return active!=NULL;}
@@ -74,11 +76,13 @@ bool dl_stream_rom_music_ready(void){return !active||!active->io_pending||!pi_bu
 const DlWorldStream *dl_stream_rom_world(void){return active?&active->world:NULL;}
 uint32_t dl_stream_rom_retired(void){return active?active->retired:0;}
 uint32_t dl_stream_rom_current(const DlGame *g){
-    return active?dl_stream_scene_region_at(&active->scene,g->player):0;
+    return active?(active->scene.bootstrap->stream->policy==DL_STREAM_POLICY_AUTHORED?
+        active->policy_state.current_region:dl_stream_scene_region_at(&active->scene,g->player)):0;
 }
+static uint32_t all_regions(const StreamRom *s){return s->mission.region_count==32?UINT32_MAX:(UINT32_C(1)<<s->mission.region_count)-1u;}
 static uint32_t resident_mask(const StreamRom *s){
     uint32_t mask=0;
-    for(int i=0;i<SLOT_COUNT;++i)if(s->slots[i].state==DL_STREAM_RESIDENT)mask|=UINT32_C(1)<<(s->slots[i].region_id-1);
+    for(size_t i=0;i<s->world.slot_count;++i)if(s->slots[i].state==DL_STREAM_RESIDENT)mask|=UINT32_C(1)<<(s->slots[i].region_id-1);
     return mask;
 }
 static bool doors_open(const DlGame *game){
@@ -92,11 +96,25 @@ static float bounds_distance(DlVec3 point,const DlMissionRegion *region){
     return sqrtf(x*x+z*z);
 }
 static uint32_t wanted_mask(StreamRom *s,const DlGame *game){
+    if(s->scene.bootstrap->stream->policy==DL_STREAM_POLICY_AUTHORED){
+        uint32_t wanted=dl_stream_scene_policy_update(&s->scene,game->player,resident_mask(s),&s->policy_state);
+        assertf(wanted,"Stream start outside activation bounds");
+        if(s->queued_use&&s->queued_transition){
+            const DlStreamTransition *gate=&s->scene.bootstrap->stream->transitions[s->queued_transition-1];
+            const DlObjectDef *object=&game->level->objects[s->queued_object];DlVec3 eye=dl_player_eye(game);
+            float x=eye.x-object->position.x,y=eye.y-object->position.y,z=eye.z-object->position.z;
+            if(gate->from_region==s->policy_state.current_region&&!dl_game_object_open(game,s->queued_object)&&x*x+y*y+z*z<=object->radius*object->radius){
+                s->policy_state.pending_transition=s->queued_transition;
+                wanted=dl_stream_scene_working_mask(&s->scene,s->policy_state.current_region)|dl_stream_scene_working_mask(&s->scene,gate->to_region);
+            }else{s->queued_use=false;s->queued_object=-1;s->queued_transition=0;}
+        }
+        return wanted;
+    }
     /* Open exterior coverage has no proven occlusion cut. Keep all authored
      * regions rather than retiring visible architecture. Outside the partial
      * import's bounds, retain coverage and allow the existing fall recovery. */
     if(s->scene.bootstrap->stream->keep_neighbors_resident)
-        return (UINT32_C(1)<<s->mission.region_count)-1u;
+        return all_regions(s);
     uint32_t current=dl_stream_scene_region_at(&s->scene,game->player);
     assertf(current,"Player outside streaming probe bounds");
     uint32_t wanted=UINT32_C(1)<<(current-1);
@@ -118,7 +136,9 @@ static uint32_t wanted_mask(StreamRom *s,const DlGame *game){
     return wanted;
 }
 static void request_wanted(StreamRom *s,uint32_t wanted){
-    for(int i=0;i<SLOT_COUNT;++i){
+    unsigned count=0;for(uint32_t bits=wanted;bits;bits&=bits-1)++count;
+    assertf(count<=s->world.slot_count,"Authored demand exceeds bounded region slots");
+    for(size_t i=0;i<s->world.slot_count;++i){
         DlRegionSlot *slot=&s->slots[i];
         if(slot->state==DL_STREAM_FREE)continue;
         assertf(slot->state!=DL_STREAM_FAILED,"Region %lu failed: %s/%s",(unsigned long)slot->region_id,
@@ -145,6 +165,9 @@ static void refresh(StreamRom *s,DlGame *game,bool renderer_ready){
     game->level=dl_stream_scene_level(&s->scene);
     dl_game_set_active_enemies(game,dl_stream_scene_enemy_mask(&s->scene,game));
     s->view_regions=resident_mask(s);
+    /* Region DMA owns only staging, but renderer DFS asset loads also use PI.
+     * Preserve the completed staging result for the next bounded pump. */
+    if(s->io_pending&&pi_busy())dma_wait();
     if(renderer_ready)dl_render_prepare_scene(game);
     debugf("DL64 stream_view resident_mask=%lu triangles=%d colliders=%d active_enemies=%u loads=%llu retired=%lu reserved=%lu allocated_slots=%lu adapter_bytes=%lu\n",
         (unsigned long)s->view_regions,s->scene.banks[s->scene.active_bank].triangle_count,
@@ -156,12 +179,14 @@ static void refresh(StreamRom *s,DlGame *game,bool renderer_ready){
 void dl_stream_rom_start(DlGame *game,const DlLevel *bootstrap,int preset){
     assertf(!active&&bootstrap&&bootstrap->stream,"Invalid stream mission start");
     const DlStreamDefinition *definition=bootstrap->stream;
-    /* The current console demonstration is deliberately a two-region proof,
-     * with an authored opaque gate as its conservative visibility policy. */
-    assertf(definition->region_count==2&&definition->directory_bytes<=MAX_DIRECTORY&&
+    /* Chunk slots grow only to the cooked worst reachable set; scene geometry
+     * and collision banks retain the same capacities across larger missions. */
+    assertf(definition->region_count&&definition->region_count<=DL_STREAM_SCENE_MAX_REGIONS&&
+        (definition->policy==DL_STREAM_POLICY_AUTHORED||definition->region_count==2)&&definition->directory_bytes<=MAX_DIRECTORY&&
         definition->max_region_bytes<=MAX_CHUNK,"Streaming demo exceeds its bounded adapter contract");
     active=calloc(1,sizeof *active);assertf(active,"Cannot allocate stream scene adapter");
-    StreamRom *s=active;
+    StreamRom *s=active;s->queued_object=-1;
+    dl_stream_scene_policy_reset(&s->policy_state);
     assertf(strncmp(definition->package_path,"rom:/",5)==0,"Invalid mission package path");
     const char *path=definition->package_path+4;
     /* This SDK's dfs_rom_addr returns a KSEG1-mapped address despite the header
@@ -179,17 +204,19 @@ void dl_stream_rom_start(DlGame *game,const DlLevel *bootstrap,int preset){
         "Mission directory validation failed");
     assertf(s->mission.region_count==definition->region_count,"Mission region count mismatch");
     size_t capacity=(definition->max_region_bytes+15u)&~(size_t)15;
-    for(int i=0;i<SLOT_COUNT;++i){s->slots[i].buffer=memalign(16,capacity);s->slots[i].capacity=capacity;assertf(s->slots[i].buffer,"Cannot allocate region slot");}
-    s->platform_allocated=sizeof *s+definition->directory_bytes+DMA_BYTES+SLOT_COUNT*capacity;
-    assertf(dl_world_stream_init(&s->world,&s->mission,s->slots,SLOT_COUNT,read_region,s)==DL_STREAM_OK,"Cannot initialize streaming pool");
+    uint32_t slot_count=definition->max_resident_regions?definition->max_resident_regions:2;
+    assertf(slot_count&&slot_count<=SLOT_COUNT,"Invalid bounded slot count");
+    for(uint32_t i=0;i<slot_count;++i){s->slots[i].buffer=memalign(16,capacity);s->slots[i].capacity=capacity;assertf(s->slots[i].buffer,"Cannot allocate region slot");}
+    s->platform_allocated=sizeof *s+definition->directory_bytes+DMA_BYTES+slot_count*capacity;
+    assertf(dl_world_stream_init(&s->world,&s->mission,s->slots,slot_count,read_region,s)==DL_STREAM_OK,"Cannot initialize streaming pool");
     assertf(dl_stream_scene_init(&s->scene,bootstrap,&s->mission)==DL_STREAM_SCENE_OK,"Invalid streaming bootstrap");
     assertf(dl_game_start(game,bootstrap,preset),"Invalid stream test start");
-    uint32_t wanted=wanted_mask(s,game);request_wanted(s,wanted);
+    uint32_t wanted=wanted_mask(s,game);s->wanted_regions=wanted;request_wanted(s,wanted);
     uint32_t started=TICKS_READ();
     while((resident_mask(s)&wanted)!=wanted){
         dl_world_stream_pump(&s->world,READ_SLICE);
         assertf((uint32_t)(TICKS_READ()-started)<TICKS_PER_SECOND*5u,"Initial stream load timed out");
-        for(int i=0;i<SLOT_COUNT;++i)assertf(s->slots[i].state!=DL_STREAM_FAILED,
+        for(size_t i=0;i<s->world.slot_count;++i)assertf(s->slots[i].state!=DL_STREAM_FAILED,
             "Initial stream load failed region=%lu status=%s/%s read=%lu crc=%08lx expected=%08lx header=%02x%02x%02x%02x",
             (unsigned long)s->slots[i].region_id,dl_world_stream_status_name(s->slots[i].failure),
             dl_mission_status_name(s->slots[i].validation_failure),(unsigned long)s->slots[i].bytes_read,
@@ -201,13 +228,13 @@ void dl_stream_rom_start(DlGame *game,const DlLevel *bootstrap,int preset){
 void dl_stream_rom_service(DlGame *game,DlRenderStats *stats){
     stats->streaming=active!=NULL;
     if(!active)return;
-    StreamRom *s=active;completion(s);uint32_t wanted=wanted_mask(s,game);
+    StreamRom *s=active;completion(s);uint32_t wanted=wanted_mask(s,game);s->wanted_regions=wanted;
     request_wanted(s,wanted);dl_world_stream_pump(&s->world,READ_SLICE);
     uint32_t resident=resident_mask(s);
     if(resident!=s->view_regions)refresh(s,game,true);
     dl_game_set_active_enemies(game,dl_stream_scene_enemy_mask(&s->scene,game));
-    stats->stream_current=dl_stream_scene_region_at(&s->scene,game->player);
-    stats->stream_regions=0;for(int i=0;i<SLOT_COUNT;++i)stats->stream_regions+=s->slots[i].state==DL_STREAM_RESIDENT;
+    stats->stream_current=dl_stream_rom_current(game);
+    stats->stream_regions=0;for(size_t i=0;i<s->world.slot_count;++i)stats->stream_regions+=s->slots[i].state==DL_STREAM_RESIDENT;
     stats->stream_loading=(resident&wanted)!=wanted;
     stats->stream_reserved_bytes=(uint32_t)s->world.stats.reserved_bytes;
     stats->stream_allocated_bytes=(uint32_t)s->world.stats.allocated_slot_bytes;
@@ -215,23 +242,35 @@ void dl_stream_rom_service(DlGame *game,DlRenderStats *stats){
 }
 void dl_stream_rom_filter_input(const DlGame *game,DlInput *input){
     if(!active)return;
-    StreamRom *s=active;bool near_closed=false;
+    StreamRom *s=active;bool near_closed=false;int near_object=-1;float nearest=INFINITY;
+    uint32_t resident=resident_mask(s);
+    if(s->scene.bootstrap->stream->policy==DL_STREAM_POLICY_AUTHORED&&dl_stream_scene_gate_waiting(&s->scene,game->player,resident)){
+        input->forward=0;input->strafe=0;input->jump=false;
+    }
     DlVec3 eye=dl_player_eye(game);
     for(int i=0;i<game->level->object_count;++i){
         const DlObjectDef *object=&game->level->objects[i];
         float x=eye.x-object->position.x,y=eye.y-object->position.y,z=eye.z-object->position.z;
-        if(object->kind==DL_OBJECT_DOOR&&!dl_game_object_open(game,i)&&x*x+y*y+z*z<=object->radius*object->radius)
-            near_closed=true;
+        float distance=x*x+y*y+z*z;
+        if(object->kind==DL_OBJECT_DOOR&&!dl_game_object_open(game,i)&&distance<=object->radius*object->radius&&distance<nearest)
+            {near_closed=true;near_object=i;nearest=distance;}
     }
-    uint32_t all=(UINT32_C(1)<<s->mission.region_count)-1u;
-    if(near_closed&&(resident_mask(s)&all)!=all){
-        s->queued_use|=input->use;input->use=false;
-    }else if(s->queued_use){input->use=near_closed;s->queued_use=false;}
+    uint32_t transition=0,needed=all_regions(s);
+    if(s->scene.bootstrap->stream->policy==DL_STREAM_POLICY_AUTHORED){
+        needed=near_object>=0?dl_stream_scene_door_target(&s->scene,s->policy_state.current_region,
+            s->scene.bootstrap->stream->object_entity_ids[near_object],&transition):0;
+        if(s->queued_use&&(s->queued_object!=near_object||!transition||transition!=s->queued_transition)){
+            s->queued_use=false;s->queued_object=-1;s->queued_transition=0;
+        }
+    }
+    if(near_closed&&(resident&needed)!=needed){
+        if(input->use){s->queued_use=true;s->queued_object=near_object;s->queued_transition=transition;}input->use=false;
+    }else if(s->queued_use){input->use=near_closed&&near_object==s->queued_object;s->queued_use=false;s->queued_object=-1;s->queued_transition=0;}
 }
 void dl_stream_rom_submitted(void){
     if(!active)return;
     uint64_t serial=dl_render_stream_submitted();
-    for(int i=0;i<SLOT_COUNT;++i){
+    for(size_t i=0;i<active->world.slot_count;++i){
         DlRegionSlot *slot=&active->slots[i];if(slot->state!=DL_STREAM_RESIDENT)continue;
         DlRegionHandle h={(uint32_t)i,slot->generation};const DlMissionChunk *chunk;
         assertf(dl_world_stream_borrow(&active->world,h,&chunk)==DL_STREAM_OK,"Cannot pin submitted region");

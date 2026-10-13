@@ -5,7 +5,7 @@
 #include "render.h"
 #include "world_stream.h"
 
-/* N64 platform adapter for the experimental two-region working-set bridge. */
+/* N64 platform adapter for bounded authored working sets and legacy probes. */
 void dl_stream_rom_close(void);
 void dl_stream_rom_start(DlGame *game, const DlLevel *bootstrap, int preset);
 void dl_stream_rom_service(DlGame *game, DlRenderStats *stats);

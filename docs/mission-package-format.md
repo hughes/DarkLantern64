@@ -1,4 +1,4 @@
-# Mission directory v1 and region chunks v1/v2
+# Mission directory v1 and region chunks v1/v2/v3
 
 Status: first implementation contract, 2026-10-12. This is an experimental
 portable streaming foundation, not acceptance of the complete Bafford mission.
@@ -68,10 +68,10 @@ dependency set.
 | Header offset | Type | Meaning |
 | --- | --- | --- |
 | 0 | char[4] | `DLR1` |
-| 4 | u16 | Chunk version, 1 or 2 |
+| 4 | u16 | Chunk version, 1, 2 or 3 |
 | 6 | u16 | Header bytes, 32 |
 | 8 | u32 | Exact chunk bytes |
-| 12 | u32 | Section count, 1..3 |
+| 12 | u32 | Section count, 1..3 (v1/v2), 1..4 (v3) |
 | 16 | f32[3] | World origin, metres |
 | 28 | u32 | Reserved, zero |
 
@@ -81,12 +81,12 @@ descriptors or each other, and their length is count times record bytes.
 
 | Section offset | Type | Meaning |
 | --- | --- | --- |
-| 0 | u16 | Kind: static triangles 1, upright colliders 2, entity IDs 3 |
+| 0 | u16 | Kind: static triangles 1, upright colliders 2, entity IDs 3, floor triangles 4 (v3) |
 | 2 | u16 | Reserved, zero |
 | 4 | u32 | Chunk-relative payload offset |
 | 8 | u32 | Payload bytes |
 | 12 | u32 | Record count |
-| 16 | u32 | Record bytes: triangles 44 (v1) or 80 (v2), colliders 32, entity IDs 4 |
+| 16 | u32 | Record bytes: triangles 44 (v1) or 80 (v2/v3), colliders 32, entity IDs 4, floors 36 |
 | 20 | u32 | Reserved, zero |
 
 Version-1 triangle records contain three region-local XYZ positions (9 floats), a
@@ -114,7 +114,7 @@ its meshes retain optional UV and normal arrays. Material bootstraps use
 `texture_id=0` for untextured material and otherwise a one-based index into the
 bootstrap's ordinary `DlTexture` table. Texture pixels remain hash-addressed
 sprites packaged by the existing texture cooker. The directory layout remains
-v1 for both chunk versions. Tiny3D packing, baked colors, batch commands and
+v1 for all chunk versions. Tiny3D packing, baked colors, batch commands and
 texture pixels are not serialized into these triangle records. The debug
 report maps material and surface IDs to canonical source IDs.
 
@@ -122,8 +122,24 @@ Collider records contain region-local center (3 floats), positive half size
 (3 floats), yaw in radians (float), and associated entity ID (u32), totalling
 32 bytes. Entity ID zero means no association; other IDs must resolve through
 the mission directory. Door association is resolved through the entity kind. This
-initial representation retains the existing upright boxes; triangle sweeps and
-BVHs are a later compiler/runtime increment.
+representation retains upright boxes for walls and obstacles.
+
+Version 3 adds floor records: three region-local XYZ vertices (nine finite
+binary32 floats, 36 bytes). The projected XZ triangle must have nonzero area
+and its squared height gradient must be at most 1.000001 (45 degrees plus
+float rounding tolerance). Gameplay evaluates height only inside the exact
+triangle, including slopes, jump landings and overhead crossings. A floor
+does not fill its rectangular bounds or create an opaque volume beneath it.
+The cook transforms local authored `floor.vertices` into world space before
+subtracting the chunk origin. It checks the binary32 local records and the
+binary32 world vertices reconstructed by adding the encoded origin. The scene
+adapter checks the reconstructed footprint and grade before publishing a bank,
+because translation rounding can invalidate a usable local plane. Version 3
+otherwise retains v2 triangle attributes.
+
+Target preflight rounds every footprint/gradient arithmetic operation to
+binary32, matching the C gameplay and adapter query. Checking only rounded
+vertices with host double intermediates can miss cancellation in thin floors.
 
 Entity-ID sections contain the region's home entities exactly once. Region
 installation binds these IDs to mission-owned state and never initializes the
@@ -133,7 +149,7 @@ mission. Consumers validate record values and ID references before use.
 
 The portable loader reserves one caller-provided slot buffer before reading.
 V1 has no decoder allocation. Its work budget limits bytes read and CRC'd per
-pump; structural chunk validation has at most three section descriptors.
+pump; structural chunk validation has at most four section descriptors.
 Zero-byte reads mean temporarily unavailable; an explicit read error aborts
 the load. Data is inaccessible until the full chunk and its CRC/layout pass.
 

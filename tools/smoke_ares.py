@@ -29,7 +29,10 @@ def verify_build(rom, *, autoplay, source_sha256):
 
 def isolate_settings(settings, directory, memory):
     """Never rewrite the active user's profile or listen to their controller."""
-    from prepare_ares import node_indices, set_value
+    try:
+        from prepare_ares import node_indices, set_value
+    except ModuleNotFoundError:
+        from tools.prepare_ares import node_indices, set_value
     raw = settings.read_bytes()
     lines = raw.decode("utf-8-sig").splitlines()
     for path, index in node_indices(lines).items():

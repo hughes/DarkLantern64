@@ -31,12 +31,12 @@ try:
     from cook_textures import prepare_texture, validate_texture, texture_memory_summary
     from cook_lighting import prepare_lighting
     from asset_pack import resolve_asset_packs
-    from content_profile import content_limits, is_study, STUDY_PLAY_REASON
+    from content_profile import content_limits, is_study, is_streamed, STUDY_PLAY_REASON, STREAM_PLAY_REASON
 except ModuleNotFoundError:
     from tools.cook_textures import prepare_texture, validate_texture, texture_memory_summary
     from tools.cook_lighting import prepare_lighting
     from tools.asset_pack import resolve_asset_packs
-    from tools.content_profile import content_limits, is_study, STUDY_PLAY_REASON
+    from tools.content_profile import content_limits, is_study, is_streamed, STUDY_PLAY_REASON, STREAM_PLAY_REASON
 
 ROOT = Path(__file__).resolve().parents[1]
 KINDS = {"static", "spawn", "guard", "waypoint", "door", "control", "objective", "light", "loot"}
@@ -236,13 +236,68 @@ def collider(entity):
             "yaw":math.radians(t["rotation"][1]), "door":entity["kind"]=="door"}
 
 
+def floor_float32(value):
+    """Round one target arithmetic result, including overflow, as a C float."""
+    try:
+        return struct.unpack('>f', struct.pack('>f', value))[0]
+    except OverflowError:
+        return math.copysign(math.inf, value)
+
+
+def validate_floor_vertices(points, label, *, target_float=False):
+    # Rounding only the input vertices is insufficient for a thin footprint:
+    # the target's products/subtractions can cancel differently from doubles.
+    cast = floor_float32 if target_float else float
+    a, b, c = [[cast(value) for value in point] for point in points]
+    bx, bz, by = cast(b[0]-a[0]), cast(b[2]-a[2]), cast(b[1]-a[1])
+    cx, cz, cy = cast(c[0]-a[0]), cast(c[2]-a[2]), cast(c[1]-a[1])
+    determinant = cast(cast(bx*cz)-cast(bz*cx))
+    require(math.isfinite(determinant) and abs(determinant) > cast(1e-8), label+': degenerate or vertical floor footprint')
+    gx = cast(cast(cast(by*cz)-cast(bz*cy))/determinant)
+    gz = cast(cast(cast(bx*cy)-cast(by*cx))/determinant)
+    grade = cast(cast(gx*gx)+cast(gz*gz))
+    require(math.isfinite(gx) and math.isfinite(gz) and grade <= cast(1.000001),
+            label+': floor grade exceeds supported 45 degrees')
+
+
+def floor_triangle(entity):
+    """Evaluate one exact triangular floor; its footprint is never a hull box."""
+    label = entity['id'] + '.floor'
+    local = entity['floor']
+    require(isinstance(local, dict) and set(local) == {'vertices'}, label+': expected vertices only')
+    vertices = local['vertices']
+    require(isinstance(vertices, list) and len(vertices) == 3, label+': expected three XYZ vertices')
+    for point in vertices:
+        vector(point, label+'.vertex')
+    points = [transform_point(point, entity['transform']) for point in vertices]
+    for point in points:
+        vector(point, label+'.world_vertex')
+    validate_floor_vertices(points, label)
+    # Resident C arrays and Native Play packets use binary32 world positions.
+    # Reject a plane that loses usable support at that precision before Save.
+    target = [[struct.unpack('>f', struct.pack('>f', v))[0] for v in point] for point in points]
+    validate_floor_vertices(target, label+' at target float precision', target_float=True)
+    return {'id': entity['id'], 'vertices': points}
+
+
+def floor_height(position, floor):
+    a, b, c = floor['vertices']
+    bx,bz,cx,cz = b[0]-a[0],b[2]-a[2],c[0]-a[0],c[2]-a[2]
+    px,pz = position[0]-a[0],position[2]-a[2]
+    determinant = bx*cz-bz*cx
+    u,v = (px*cz-pz*cx)/determinant,(bx*pz-bz*px)/determinant
+    if u < -1e-6 or v < -1e-6 or u+v > 1.000001:
+        return None
+    return a[1]+u*(b[1]-a[1])+v*(c[1]-a[1])
+
+
 def local_xz(point, box):
     x,z = point[0]-box["center"][0],point[2]-box["center"][2]
     c,s = math.cos(box["yaw"]),math.sin(box["yaw"])
     return c*x-s*z,s*x+c*z
 
 
-def validate_actor_placement(position, boxes, label, radius=.18, height=1.65, door_open=False):
+def validate_actor_placement(position, boxes, label, radius=.18, height=1.65, door_open=False, floors=()):
     supported = False
     for box in boxes:
         if door_open and box["door"]: continue
@@ -251,10 +306,18 @@ def validate_actor_placement(position, boxes, label, radius=.18, height=1.65, do
         require(not(near and position[1]+height>cy-hy+.001 and position[1]<cy+hy-.001),
                 f"{label}: actor placement intersects collider {box['id']}")
         if abs(x)<=hx and abs(z)<=hz and 0<=position[1]-(cy+hy)<.29: supported=True
+    for floor in floors:
+        plane = floor_height(position, floor)
+        if plane is None:
+            continue
+        require(not(position[1] < plane-.001 and position[1]+height > plane+.001),
+                f"{label}: actor placement intersects floor {floor['id']}")
+        if -.001 <= position[1]-plane < .29:
+            supported=True
     require(supported,f"{label}: actor needs a supporting surface within step height")
 
 
-def validate_test_starts(data, boxes, *, validate_placement=True):
+def validate_test_starts(data, boxes, *, validate_placement=True, floors=()):
     starts = data.get("test_starts", [])
     require(isinstance(starts, list) and len(starts) <= MAX_TEST_STARTS,
             f"test_starts: expected 0-{MAX_TEST_STARTS} authored starts")
@@ -277,26 +340,26 @@ def validate_test_starts(data, boxes, *, validate_placement=True):
             require(type(start.get(field, False)) is bool, label+"."+field+": expected a boolean")
         door_open, crouched = start.get("door_open", False), start.get("crouched", False)
         if validate_placement:
-            validate_actor_placement(position, boxes, label+" ("+ident+")", height=.95 if crouched else 1.65, door_open=door_open)
+            validate_actor_placement(position, boxes, label+" ("+ident+")", height=.95 if crouched else 1.65, door_open=door_open, floors=floors)
         result.append({"id":ident, "label":display, "position":position, "yaw":yaw, "pitch":pitch,
                        "door_open":door_open, "crouched":crouched})
     return result
 
 
-def validate(data, source_dir=None, *, authoring=False):
+def validate(data, source_dir=None, *, authoring=False, streaming=False):
     source_dir = Path(source_dir or ROOT/"content").resolve()
     enemy_types = read_enemy_types()
     enemy_type_map = {t["id"]:t for t in enemy_types}
     require(isinstance(data,dict) and type(data.get("version")) is int and data["version"]==2,
             "version: expected 2 (3D model scene)")
     try:
-        limits = content_limits(data, LIMITS, authoring=authoring)
+        limits = content_limits(data, LIMITS, authoring=authoring, streaming=streaming)
     except ValueError as error:
         raise ContentError(str(error)) from error
     study = is_study(data)
     require("grid" not in data, "grid: version 2 has no authoritative tile grid")
     try:
-        data, resolved_catalog, pack_dependencies = resolve_asset_packs(data, source_dir, authoring=authoring)
+        data, resolved_catalog, pack_dependencies = resolve_asset_packs(data, source_dir, authoring=authoring, streaming=streaming)
     except ValueError as error:
         raise ContentError(str(error)) from error
     defaults_by_type = {}
@@ -400,7 +463,7 @@ def validate(data, source_dir=None, *, authoring=False):
         if kind in ("guard","door","control","loot") or (kind=="objective" and not e.get("zone",False)):
             require("model" in e,f"{eid}: rendered {kind} requires a model")
         if kind == "static":
-            require("model" in e or "collider" in e,
+            require("model" in e or "collider" in e or "floor" in e,
                     f"{eid}: static object requires a model or collision proxy")
             require("model" in e or "material" not in e,
                     f"{eid}: a collision-only proxy has no material")
@@ -416,6 +479,10 @@ def validate(data, source_dir=None, *, authoring=False):
             require(abs(t["rotation"][0])<.0001 and abs(t["rotation"][2])<.0001,
                     f"{eid}.collider: box collision supports upright yaw; use separate upright proxies for tilted models")
             require(kind in ("static","door"),f"{eid}: interactive markers and actors must not have opaque static colliders")
+        if "floor" in e:
+            require(kind == 'static', f"{eid}: floor triangles belong to static objects")
+            require('collider' not in e, f"{eid}: use separate entities for floor triangles and opaque boxes")
+            floor_triangle(e)
         if kind=="door": require("collider" in e,f"{eid}: door requires collision proxy")
         if kind=="light":
             number(e.get("radius"),eid+".radius",.1,128)
@@ -483,8 +550,13 @@ def validate(data, source_dir=None, *, authoring=False):
         if model not in characters and model in mesh_paths:
             meshes[model] = read_obj(mesh_paths[model], textured=True)
     boxes=[collider(e) for e in entities if "collider" in e]
-    require((0 if study else 1)<=len(boxes)<=limits['colliders'],
-            f"colliders: expected {0 if study else 1}-{limits['colliders']} boxes")
+    floors=[floor_triangle(e) for e in entities if "floor" in e]
+    minimum_boxes = 0 if study or floors else 1
+    require(minimum_boxes<=len(boxes)<=limits['colliders'],
+            f"colliders: expected {minimum_boxes}-{limits['colliders']} boxes")
+    require(len(floors)<=limits['floors'], f"floors: maximum {limits['floors']} triangular surfaces")
+    if not (study or is_streamed(data)):
+        require(len(boxes)+len(floors)<=256, 'collision: maximum 256 combined boxes and floor triangles')
     require(len(models)<=limits["models"],f"models: maximum {limits['models']} instances")
     require(sum(len(meshes[e["model"]]["vertices"]) for e in models)<=limits["scene_vertices"],
             f"models: maximum {limits['scene_vertices']} instanced vertices")
@@ -492,8 +564,8 @@ def validate(data, source_dir=None, *, authoring=False):
             f"models: maximum {limits['scene_triangles']} instanced triangles")
     if not study:
         for e in kinds["spawn"]+kinds["guard"]+kinds["waypoint"]:
-            validate_actor_placement(e["transform"]["position"], boxes, e["id"], radius=.18 if e["kind"]=="spawn" else .17)
-    test_starts = validate_test_starts(data, boxes, validate_placement=not study)
+            validate_actor_placement(e["transform"]["position"], boxes, e["id"], radius=.18 if e["kind"]=="spawn" else .17, floors=floors)
+    test_starts = validate_test_starts(data, boxes, validate_placement=not study, floors=floors)
     # Prepare all pixels before publishing any generated file, so invalid image
     # input preserves the previous complete content build.
     for material in materials:
@@ -507,11 +579,11 @@ def validate(data, source_dir=None, *, authoring=False):
         texture_indices[material["id"]] = existing
     dependencies.append(("code:src/enemy_types.def", ENEMY_TYPES_PATH))
     dependencies.append(("code:src/content_limits.h", CONTENT_LIMITS_PATH))
-    return {"by_id":by_id,"kinds":kinds,"meshes":meshes,"materials":material_map,"models":models,"colliders":boxes,"dependencies":dependencies,
+    return {"by_id":by_id,"kinds":kinds,"meshes":meshes,"materials":material_map,"models":models,"colliders":boxes,"floors":floors,"dependencies":dependencies,
             "textures":textures,"texture_artifacts":texture_artifacts,"texture_indices":texture_indices,
             "enemy_types":enemy_types,"enemies":enemies,"test_starts":test_starts,"characters":characters,
             "resolved_document":data,"resolved_catalog":resolved_catalog,"objects":object_rows,"object_indices":object_indices,"foot_contacts":contacts,
-            "limits":limits, "authoring_only":study}
+            "limits":limits, "authoring_only":study, "streamed_source":is_streamed(data)}
 
 
 def atomic_write(path, data):
@@ -533,6 +605,7 @@ def vec(values): return "{"+", ".join(f(v) for v in values)+"}"
 
 def header(data, state):
     require(not state.get('authoring_only'), STUDY_PLAY_REASON)
+    require(not state.get('streamed_source'), STREAM_PLAY_REASON)
     lines=['/* Generated 3D content. Edit canonical sources, not this file. */','#ifndef DL_DEMO_LEVEL_GENERATED_H','#define DL_DEMO_LEVEL_GENERATED_H','#include <stddef.h>','#include "game.h"']
     mesh_ids=list(state["meshes"])
     if state["characters"]:
@@ -579,6 +652,9 @@ def header(data, state):
     for box in state["colliders"]:
         lines.append("    {"+f"{vec(box['center'])}, {vec(box['half_size'])}, {f(box['yaw'])}, "+("true" if box["door"] else "false")+"},")
     lines.append("};")
+    if state.get('floors'):
+        lines.append('static const DlFloorTriangle dl_demo_floors[] = {' + ','.join(
+            '{.vertices={' + ','.join(vec(point) for point in floor['vertices']) + '}}' for floor in state['floors']) + '};')
     kinds,by_id=state["kinds"],state["by_id"]
     spawn=kinds["spawn"][0]
     for enemy in state["enemies"]:
@@ -616,7 +692,7 @@ def header(data, state):
         direction=env["moon_direction"]; length=math.sqrt(sum(v*v for v in direction))
         env=dict(env,moon_direction=[v/length for v in direction])
         environment="{.enabled=true, "+", ".join("."+key+"="+(vec(value) if isinstance(value,list) else f(value)) for key,value in env.items() if key in ("ambient","moon_direction","moon_color","moon_intensity","fog_color","fog_near","fog_far","sky_top","sky_bottom","exposure"))+"}"
-    lines.append("static const DlLevel dl_demo_level = {\n    "+f".version=2, .title={json.dumps(data['title'])}, .colliders=dl_demo_colliders, .collider_count={len(state['colliders'])},\n    .meshes=dl_demo_meshes, .mesh_count={len(mesh_ids)}, .models=dl_demo_models, .model_count={len(state['models'])},\n    .spawn={vec(spawn['transform']['position'])}, .spawn_yaw={f(math.radians(spawn['transform']['rotation'][1]))},\n    .enemies="+("dl_demo_enemies" if state["enemies"] else "NULL")+f", .enemy_count={len(state['enemies'])}, .control={vec(kinds['control'][0]['transform']['position'] if kinds['control'] else [0,0,0])}, .objective={vec(kinds['objective'][0]['transform']['position'] if kinds['objective'] else [0,0,0])},\n    .lights=dl_demo_lights, .light_count={len(kinds['light'])},\n    .environment={environment}, .textures="+("dl_demo_textures" if state["textures"] else "NULL")+f", .texture_count={len(state['textures'])},\n    .test_starts="+("dl_demo_test_starts" if state["test_starts"] else "NULL")+f", .test_start_count={len(state['test_starts'])}\n"+"};\n#endif\n")
+    lines.append("static const DlLevel dl_demo_level = {\n    "+f".version=2, .title={json.dumps(data['title'])}, .colliders=dl_demo_colliders, .collider_count={len(state['colliders'])},\n    .meshes=dl_demo_meshes, .mesh_count={len(mesh_ids)}, .models=dl_demo_models, .model_count={len(state['models'])},\n    .spawn={vec(spawn['transform']['position'])}, .spawn_yaw={f(math.radians(spawn['transform']['rotation'][1]))},\n    .enemies="+("dl_demo_enemies" if state["enemies"] else "NULL")+f", .enemy_count={len(state['enemies'])}, .control={vec(kinds['control'][0]['transform']['position'] if kinds['control'] else [0,0,0])}, .objective={vec(kinds['objective'][0]['transform']['position'] if kinds['objective'] else [0,0,0])},\n    .lights=dl_demo_lights, .light_count={len(kinds['light'])},\n    .environment={environment}, .textures="+("dl_demo_textures" if state["textures"] else "NULL")+f", .texture_count={len(state['textures'])},\n    .test_starts="+("dl_demo_test_starts" if state["test_starts"] else "NULL")+f", .test_start_count={len(state['test_starts'])}, .floors="+('dl_demo_floors' if state.get('floors') else 'NULL')+f", .floor_count={len(state.get('floors',[]))}\n"+"};\n#endif\n")
     lines[-1]=lines[-1].replace("\n};\n#endif", ", .objects="+"dl_objects"+", .object_count="+str(len(state["objects"]))+", .collider_objects=dl_collider_objects, .foot_contacts="+("dl_contacts" if state["foot_contacts"] else "NULL")+"\n};\n#endif")
     if state.get("baked_lighting"):
         lines[-1] = lines[-1].replace("\n};\n#endif", ", .baked_lighting=" + json.dumps(state["baked_lighting"]) + "\n};\n#endif")
@@ -626,6 +702,7 @@ def header(data, state):
 def play_package(data, state):
     """Pointer-free desktop simulation view of the same validated ROM inputs."""
     require(not state.get('authoring_only'), STUDY_PLAY_REASON)
+    require(not state.get('streamed_source'), STREAM_PLAY_REASON)
     data = state["resolved_document"]
     kinds, by_id = state["kinds"], state["by_id"]
     environment = dict(data.get("environment", {}))
@@ -647,7 +724,7 @@ def play_package(data, state):
         hinges[door["id"]] = [min(v[0] for v in vertices)*scale[0],
                               (min(v[2] for v in vertices)+max(v[2] for v in vertices))*.5*scale[2]]
     result = {"format": "darklantern-play", "version": 1, "title": data["title"],
-              "colliders": state["colliders"], "enemies": enemies,
+              "colliders": state["colliders"], "floors": state.get('floors',[]), "enemies": enemies,
               "spawn": kinds["spawn"][0]["transform"]["position"],
               "spawn_yaw": math.radians(kinds["spawn"][0]["transform"]["rotation"][1]),
               "control": kinds["control"][0]["transform"]["position"] if kinds["control"] else [0,0,0],
@@ -721,7 +798,7 @@ def preview_scene(data,state):
     entities.append({"name":"Editor moon" if environment else "Editor fill","transform":{"position":[0,0,0],"rotation":quaternion(moon_rotation),"scale":[1,1,1]},"light":{"type":"directional","color":moon_color,"castShadows":bool(environment),"cascadeCount":1,"shadowDistance":30,"shadowDepth":50}})
     return {"entities":entities,"materials":materials,"effects":[],
             "metadata":{"darklantern":{"asset_packs":data.get("asset_packs",[]),"resolved_catalog":state["resolved_catalog"],
-                "authoring_profile":data.get('authoring_profile'), "playable":not state.get('authoring_only', False)}}}
+                "authoring_profile":data.get('authoring_profile'), "playable":not (state.get('authoring_only', False) or state.get('streamed_source', False))}}}
 
 
 def compile_level(source=ROOT/"content/first_room.json",output=ROOT/"build",asset_root=None, *, shared_characters=None, authoring=False):
@@ -736,7 +813,7 @@ def compile_level(source=ROOT/"content/first_room.json",output=ROOT/"build",asse
     digest=hashlib.sha256(raw)
     for uri,path in state["dependencies"]: digest.update(uri.encode()); digest.update(b"\0"); digest.update(path.read_bytes())
     lighting, lighting_payload = None, None
-    if not state['authoring_only'] and data.get("environment") is not None and len(state["kinds"]["door"])<=1 and any(
+    if not (state['authoring_only'] or state['streamed_source']) and data.get("environment") is not None and len(state["kinds"]["door"])<=1 and any(
             e["kind"] not in ("guard", "objective") and e["model"] not in state["characters"]
             for e in state["models"]):
         # The worker needs complete character definitions even when the ROM
@@ -749,6 +826,9 @@ def compile_level(source=ROOT/"content/first_room.json",output=ROOT/"build",asse
     if state['authoring_only']:
         artifacts[output/'generated/play.json'] = json.dumps(dict(format='darklantern-authoring-study', version=1,
             playable=False, authoring_profile=data['authoring_profile'], reason=STUDY_PLAY_REASON), indent=2)+'\n'
+    elif state['streamed_source']:
+        artifacts[output/'generated/play.json'] = json.dumps(dict(format='darklantern-stream-source', version=1,
+            playable=False, authoring_profile=data['authoring_profile'], reason=STREAM_PLAY_REASON), indent=2)+'\n'
     else:
         artifacts[output/'generated/demo_level.h'] = header(data,state)
         artifacts[output/'generated/play.json'] = json.dumps(play_package(data,state),indent=2)+'\n'
@@ -791,6 +871,11 @@ def compile_level(source=ROOT/"content/first_room.json",output=ROOT/"build",asse
             preview["joint_meshes"].append({"joint": joint, "uri": uri})
         artifacts[output/f"editor-assets/characters/{ident}.json"] = json.dumps(preview, separators=(",", ":"))+"\n"
     changed=[str(path.relative_to(output)) for path,text in artifacts.items() if atomic_write(path,text)]
+    if state['streamed_source']:
+        stale_header = output / 'generated/demo_level.h'
+        if stale_header.exists():
+            stale_header.unlink()
+            changed.append('generated/demo_level.h')
     vertices=sum(len(state["meshes"][e["model"]]["vertices"]) for e in state["models"])
     triangles=sum(len(state["meshes"][e["model"]]["indices"])//3 for e in state["models"])
     # Two local aliases of one character share the emitted source-hash arrays.
@@ -805,19 +890,22 @@ def compile_level(source=ROOT/"content/first_room.json",output=ROOT/"build",asse
         "version":2, "source_sha256":digest.hexdigest(), "title":data["title"], "lighting":lighting,
         "resolved_catalog":state["resolved_catalog"], "limits":dict(state['limits']),
         "authoring_only":state['authoring_only'], "authoring_profile":data.get('authoring_profile'),
-        "playable":not state['authoring_only'],
+        "playable":not (state['authoring_only'] or state['streamed_source']),
         "dependencies":[{"uri":uri,"sha256":hashlib.sha256(path.read_bytes()).hexdigest()} for uri,path in state["dependencies"]],
         "counts":{"entities":len(data["entities"]), "meshes":len(state["meshes"]), "models":len(state["models"]),
-                  "colliders":len(state["colliders"]), "instanced_vertices":vertices, "instanced_triangles":triangles,
+                  "colliders":len(state["colliders"]), "floors":len(state['floors']), "instanced_vertices":vertices, "instanced_triangles":triangles,
                   "lights":len(state["kinds"]["light"]), "enemies":len(state["enemies"]),
                   "test_starts":len(state["test_starts"]),
                   "patrol_points":sum(len(enemy["patrol_ids"]) for enemy in state["enemies"])},
-        "compiled_geometry_bytes":arrays,
+        "compiled_geometry_bytes":0 if state['streamed_source'] else arrays,
+        "authoring_geometry_bytes":arrays,
         "compiled_normal_bytes":normal_bytes,
         "characters": {ident: character["report"] for ident, character in state["characters"].items()},
         "memory_note":("Host source-study geometry estimate only; no ROM header or runnable simulation is emitted. "
                        "Preview capacity does not provide runtime streaming or an N64 memory budget."
                        if state['authoring_only'] else
+                       "Stream source geometry estimate only; mission cooking validates bounded working sets. No resident header or runnable simulation is emitted."
+                       if state['streamed_source'] else
                        "Geometry arrays only; runtime buffers, state and other data need separate RDRAM measurement. Baseline 8 MiB."),
         "ids":{e["id"]:{"kind":e["kind"],"source_index":i,"transform":e["transform"],
                          "loot_highlight":e.get("loot_highlight", False),

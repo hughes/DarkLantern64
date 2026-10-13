@@ -49,10 +49,12 @@ def collect(context, data):
     seen = set()
     # Blender's Object.children scans the scene. Imported source studies can
     # have tens of thousands of independent proxies; index parents once.
-    collision_proxies = {}
+    collision_proxies, floor_proxies = {}, {}
     for candidate in context.scene.objects:
         if candidate.get('dl64_collision_proxy'):
             collision_proxies.setdefault(candidate.parent, []).append(candidate)
+        if candidate.get('dl64_floor_proxy'):
+            floor_proxies.setdefault(candidate.parent, []).append(candidate)
     for obj in context.scene.objects:
         if not obj.get("dl64_entity_id"):
             continue
@@ -100,11 +102,33 @@ def collect(context, data):
                         row["collider"][field] = base["collider"][field]
             require(abs(row["transform"]["rotation"][0]) < 1e-4 and abs(row["transform"]["rotation"][2]) < 1e-4,
                     f"{ident}: game box collision requires upright yaw")
-        require("model" in row or "collider" in row, f"{ident}: object has no mesh or collision")
+        floors = floor_proxies.get(obj, [])
+        require(len(floors) <= 1, f"{ident}: only one floor triangle per object is supported")
+        require(not (proxies and floors), f"{ident}: floor triangle and opaque box cannot share an object")
+        if floors:
+            proxy = floors[0]
+            require(proxy.type == 'MESH' and not proxy.constraints and not proxy.animation_data,
+                    f"{ident}: floor must be a static triangle mesh")
+            evaluated = proxy.evaluated_get(context.evaluated_depsgraph_get())
+            mesh = evaluated.to_mesh()
+            try:
+                require(len(mesh.vertices) == 3 and len(mesh.polygons) == 1 and len(mesh.polygons[0].vertices) == 3,
+                        f"{ident}: floor proxy must contain exactly one triangle")
+                local = AXIS @ obj.matrix_world.inverted() @ proxy.matrix_world
+                vertices = [list(local @ vertex.co) for vertex in mesh.vertices]
+                require(all(math.isfinite(v) for point in vertices for v in point), f"{ident}: non-finite floor vertex")
+                old = base.get('floor', {}).get('vertices', [])
+                vertices = [[old[i][axis] if i < len(old) and abs(value-old[i][axis]) < 1e-5
+                             else round(value,7) for axis,value in enumerate(point)]
+                            for i,point in enumerate(vertices)]
+                row['floor'] = dict(vertices=vertices)
+            finally:
+                evaluated.to_mesh_clear()
+        require("model" in row or "collider" in row or "floor" in row, f"{ident}: object has no mesh or collision")
         entities[ident] = row
     require(entities, "Scene has no tagged architecture")
     # Accidental unparenting must not silently remove collision from an object.
-    for parent, proxies in collision_proxies.items():
+    for parent, proxies in list(collision_proxies.items()) + list(floor_proxies.items()):
         for obj in proxies:
             require(parent and parent.get("dl64_entity_id") in entities,
                     f"{obj.name}: collision proxy lost its architecture parent")

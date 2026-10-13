@@ -12,6 +12,12 @@ cc_binary(
     deps = [":play_session"],
 )
 
+cc_test(
+    name = "play_floors_test",
+    srcs = ["test_play_floors.cpp"],
+    deps = [":play_session"],
+)
+
 cc_library(
     name = "character_preview",
     hdrs = ["character_preview.h"],

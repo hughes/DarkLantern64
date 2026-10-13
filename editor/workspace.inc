@@ -52,6 +52,23 @@
         bool pending=false;
     };
     std::map<std::string,StreamBoundsInput> streamBoundsInputs_;
+    char newTransitionId_[65]="new-gate";
+    std::string newTransitionFrom_,newTransitionTo_;
+    void DrawPolicyBounds(const std::string& id,const std::string& key,const Json& bounds,const char* label,const std::string& op) {
+        ImGui::PushID((op+":"+id+":"+key).c_str());
+        auto [iterator,inserted]=streamBoundsInputs_.try_emplace(op+":"+id+":"+key);auto& input=iterator->second;
+        Json row={{"bounds",bounds}};float minimum[3],maximum[3];const bool valid=ReadStreamBounds(row,minimum,maximum);
+        if(inserted||input.source!=bounds){input=StreamBoundsInput{};input.source=bounds;ReadStreamBounds(row,input.minimum,input.maximum);}
+        ImGui::TextUnformatted(label);if(!valid)ImGui::TextWrapped("Repair these bounds with two finite XYZ vectors.");
+        input.pending|=ImGui::InputFloat3("Minimum",input.minimum,"%.3f");
+        input.pending|=ImGui::InputFloat3("Maximum",input.maximum,"%.3f");
+        ImGui::BeginDisabled(!input.pending&&valid);
+        if(ImGui::Button("Apply bounds")){
+            Json value={{input.minimum[0],input.minimum[1],input.minimum[2]},{input.maximum[0],input.maximum[1],input.maximum[2]}};
+            Defer([this,id,key,value,op]{StreamCommand(op,{{"id",id},{"patch",{{key,value}}}});});
+        }
+        ImGui::EndDisabled();if(input.pending)ImGui::TextWrapped("Bounds have unapplied edits.");ImGui::PopID();
+    }
     void DrawStreaming() {
         if(BeginPanel("Streaming")) {
             if(const auto* info=StreamingInfo()) {
@@ -67,7 +84,7 @@
                 const auto visibility=StreamText(streamDraft_,"visibility","door-distance");
                 ImGui::BeginDisabled(engine_.IsPlaying()||Busy()||!pendingAction_.empty());
                 if(ImGui::BeginCombo("Visibility",visibility.c_str())){
-                    for(const char* value:{"door-distance","all-regions"})if(ImGui::Selectable(value,visibility==value))
+                    for(const char* value:{"door-distance","all-regions","authored-sets"})if(ImGui::Selectable(value,visibility==value))
                         Defer([this,value]{StreamCommand("set_streaming",{{"patch",{{"visibility",value}}}});});
                     ImGui::EndCombo();
                 }
@@ -79,12 +96,14 @@
                 }
                 if(visibility=="all-regions")
                     ImGui::TextWrapped("Open exterior: all region chunks stay resident until visibility is proven.");
+                if(visibility=="authored-sets")ImGui::TextWrapped("Authored conservative working sets: one nearby transition target is prefetched. Geometry/collision remain bounded per reachable set.");
                 if(dirty_)ImGui::TextWrapped("Scene/partition draft has unsaved changes. Undo/Redo and Save + Cook apply to both files.");
                 if(ImGui::Button("Validate draft"))Defer([this]{RefreshDraft();});
                 const auto& validation=info->at("status");
                 if(validation.value("valid",false)) {
                     ImGui::Text("Directory %u bytes | ROM %u bytes",validation.value("directory_bytes",0u),validation.value("package_bytes",0u));
                     ImGui::Text("Neighbor chunk overlap: %u bytes",validation.value("peak_neighbor_overlap_chunk_bytes",0u));
+                    if(visibility=="authored-sets")ImGui::Text("Worst resident regions: %u / 5",validation.value("max_resident_regions",0u));
                     ImGui::TextWrapped("Renderer, stream banks/slots, gameplay, audio and display costs are additional.");
                 } else ImGui::TextWrapped("Region cook needs repair: %s",validation.value("error",std::string()).c_str());
                 for(const auto& region:regions) {
@@ -106,6 +125,20 @@
                             Defer([this,id,bounds]{StreamCommand("set_region",{{"id",id},{"patch",{{"bounds",bounds}}}});});}
                         ImGui::EndDisabled();
                         if(ImGui::Button("Fit bounds to owned objects"))Defer([this,id]{StreamCommand("fit_region_bounds",{{"id",id}});});
+                        if(visibility=="authored-sets"){
+                            DrawPolicyBounds(id,"activation_bounds",region.contains("activation_bounds")?region.at("activation_bounds"):Json(),"Player activation bounds","set_region");
+                            ImGui::TextWrapped("Conservative visible working set (include every region visible from this activation area):");
+                            Json working=region.contains("working_set")&&region.at("working_set").is_array()?region.at("working_set"):Json::array({id});
+                            for(const auto& peer:regions)if(StreamRegion(peer)){
+                                const auto other=StreamText(peer,"id");bool included=std::find(working.begin(),working.end(),Json(other))!=working.end();
+                                ImGui::BeginDisabled(other==id);
+                                if(ImGui::Checkbox(("Visible "+other).c_str(),&included)){
+                                    if(included)working.push_back(other);else working.erase(std::remove(working.begin(),working.end(),Json(other)),working.end());
+                                    Defer([this,id,working]{StreamCommand("set_region",{{"id",id},{"patch",{{"working_set",working}}}});});
+                                }
+                                ImGui::EndDisabled();
+                            }
+                        }
                         if(region.contains("entities")&&region.at("entities").is_array()&&std::all_of(region.at("entities").begin(),region.at("entities").end(),[](const Json& id){return id.is_string();}))ImGui::Text("Home objects: %u",(unsigned)region.at("entities").size());
                         else ImGui::TextWrapped("Home entities must be an array of object IDs. Repair this manifest row and reload.");
                         ImGui::TextUnformatted("Prefetch neighbors:");
@@ -121,6 +154,49 @@
                             }
                         }
                         ImGui::TreePop();
+                    }
+                }
+                if(visibility=="authored-sets"){
+                    ImGui::SeparatorText("Directed transition gates");
+                    ImGui::TextWrapped("Gate blockers must span the player's body and jump range. Bounds are movement gates; working sets must independently preserve visible architecture.");
+                    const Json emptyGates=Json::array();
+                    const auto& gates=streamDraft_.contains("transitions")&&streamDraft_.at("transitions").is_array()?streamDraft_.at("transitions"):emptyGates;
+                    for(const auto& gate:gates){
+                        const auto id=StreamText(gate,"id");if(id.empty()){ImGui::TextWrapped("Malformed transition; repair its ID and endpoints in the manifest.");continue;}
+                        if(ImGui::TreeNodeEx(("Gate "+id).c_str(),ImGuiTreeNodeFlags_DefaultOpen)){
+                            for(const char* key:{"from","to"}){
+                                const auto selected=StreamText(gate,key);
+                                if(ImGui::BeginCombo(key,selected.c_str())){
+                                    for(const auto& region:regions)if(StreamRegion(region)){const auto peer=StreamText(region,"id");
+                                        if(ImGui::Selectable(peer.c_str(),peer==selected))Defer([this,id,key,peer]{StreamCommand("set_transition",{{"id",id},{"patch",{{key,peer}}}});});}
+                                    ImGui::EndCombo();
+                                }
+                            }
+                            const auto door=StreamText(gate,"door");
+                            if(ImGui::BeginCombo("Door",door.empty()?"Open gate":door.c_str())){
+                                if(ImGui::Selectable("Open gate",door.empty()))Defer([this,id]{StreamCommand("set_transition",{{"id",id},{"patch",{{"door",nullptr}}}});});
+                                for(const auto& object:document_.at("entities"))if(object.at("kind")=="door"){
+                                    const std::string peer=object.at("id");
+                                    if(ImGui::Selectable(peer.c_str(),peer==door))Defer([this,id,peer]{StreamCommand("set_transition",{{"id",id},{"patch",{{"door",peer}}}});});
+                                }
+                                ImGui::EndCombo();
+                            }
+                            DrawPolicyBounds(id,"bounds",gate.contains("bounds")?gate.at("bounds"):Json(),"Gate blocker bounds","set_transition");
+                            if(ImGui::Button("Delete gate"))Defer([this,id]{StreamCommand("delete_transition",{{"id",id}});});
+                            ImGui::TreePop();
+                        }
+                    }
+                    ImGui::InputText("New gate ID",newTransitionId_,sizeof newTransitionId_);
+                    for(const char* key:{"from","to"}){
+                        auto& selected=std::string(key)=="from"?newTransitionFrom_:newTransitionTo_;
+                        if(ImGui::BeginCombo((std::string("New gate ")+key).c_str(),selected.c_str())){
+                            for(const auto& region:regions)if(StreamRegion(region)){const auto peer=StreamText(region,"id");if(ImGui::Selectable(peer.c_str(),peer==selected))selected=peer;}
+                            ImGui::EndCombo();
+                        }
+                    }
+                    if(ImGui::Button("Add directed gate")){
+                        const std::string id=newTransitionId_,from=newTransitionFrom_,to=newTransitionTo_;
+                        Defer([this,id,from,to]{StreamCommand("add_transition",{{"id",id},{"patch",{{"from",from},{"to",to},{"bounds",{{-.5,-.5,-.5},{.5,3,.5}}}}}});});
                     }
                 }
                 if(!selected_.empty()) {

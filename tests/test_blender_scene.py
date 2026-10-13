@@ -92,6 +92,18 @@ class SceneMergeTests(unittest.TestCase):
         self.assertEqual(base, self.base)
         self.assertEqual(report['updated'], [])
 
+    def test_floor_edits_merge_and_conflicting_editor_edits_are_preserved(self):
+        self.wall.pop('collider')
+        self.wall['floor'] = dict(vertices=[[0,0,0],[1,.25,0],[0,0,1]])
+        self.base = {'wall': owned(self.wall)}
+        self.incoming = copy.deepcopy(self.base)
+        self.incoming['wall']['floor']['vertices'][1][1] = .5
+        result, _, _ = self.merge()
+        self.assertEqual(result['entities'][0]['floor']['vertices'][1][1], .5)
+        self.wall['floor']['vertices'][1][1] = .75
+        with self.assertRaisesRegex(ValueError, 'wall.floor'):
+            self.merge()
+
 
 class BackgroundExportTests(unittest.TestCase):
     def test_export_uses_addon_and_persists_report(self):

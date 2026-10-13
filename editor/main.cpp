@@ -442,7 +442,7 @@ class DemoEditor
         AtomicWrite(queue_/"session.json",Json{{"pid",GetCurrentProcessId()},{"root",root_.string()},
             {"source",source_.string()},{"output",output_.string()},{"scene_path",scenePath_},{"project_editor",true},
             {"operations",{"pick_editor","inspect","list_levels","open_level","create_level","duplicate_level","delete_level","update_level","play_level","play_menu",
-                "drop_selection","save_prefab","place_prefab","add_game_object","set_game_object","undo","redo","add_blockout","select_entities","transform_selection","group_entities","duplicate_entities","delete_entities","refresh_preview","import_blender_scene","import_asset_pack","add_prop","set_entity","add_enemy","duplicate_enemy","add_waypoint","delete_entity","set_environment","set_material",
+                "drop_selection","save_prefab","place_prefab","add_game_object","set_game_object","undo","redo","add_blockout","select_entities","transform_selection","group_entities","duplicate_entities","delete_entities","refresh_preview","add_floor","add_transition","set_transition","delete_transition","import_blender_scene","import_asset_pack","add_prop","set_entity","add_enemy","duplicate_enemy","add_waypoint","delete_entity","set_environment","set_material",
                 "set_preview_transform","get_animation","set_animation","focus_character","save","build","capture","get_layout","set_panel","reset_layout","get_streaming","assign_region","set_region","set_streaming","fit_region_bounds","start_play","stop_play","inspect_scene","query_play","set_play_debug","inspect_play","pause_play","step_play","restart_play","set_play_input","get_play_trace","export_replay","replay_play","reload","get_audio_memory","set_audio_config","recalculate_audio","quit"}}}.dump(2));
     }
     void InvalidatePreviewAssets(const Json& cooked)
@@ -479,7 +479,7 @@ class DemoEditor
         source_=source;sourceSnapshot_=snapshot;document_=document;sourceSavedSha_=sourceSha;
         streamDraft_=std::move(partition);streamSnapshot_=std::move(partitionSnapshot);
         streamSavedSha_=std::move(partitionSha);streamPath_=std::move(partitionPath);
-        streamBoundsInputs_.clear();
+        streamBoundsInputs_.clear();floorVertexInputs_.clear();
         history_.Reset(AuthorSnapshot());selection_.clear();lastPreviewDraft_.clear();
         output_=output;scenePath_=scenePath;report_=report;catalog_=catalog;
         loadedPreviewFingerprint_=fingerprint;selected_=selected;
@@ -1128,12 +1128,27 @@ class DemoEditor
         used.insert(result);
         return result;
     }
+    size_t AuthorLimit(const char* key,size_t fallback) const {
+        return report_.contains("limits")&&report_.at("limits").contains(key)?report_.at("limits").at(key).get<size_t>():fallback;
+    }
+    void CheckAuthorCapacity(const Json& document) const {
+        size_t models=0,enemies=0,boxes=0,floors=0,lights=0,objects=0;
+        for(const auto& row:document.at("entities")){const std::string kind=row.at("kind");
+            models+=row.contains("model");enemies+=kind=="guard";boxes+=row.contains("collider");floors+=row.contains("floor");lights+=kind=="light";
+            objects+=kind=="door"||kind=="control"||kind=="loot"||kind=="objective";}
+        if(document.at("entities").size()>AuthorLimit("entities",256)||models>AuthorLimit("models",128)||
+            enemies>AuthorLimit("enemies",16)||boxes>AuthorLimit("colliders",256)||floors>AuthorLimit("floors",64)||
+            lights>AuthorLimit("lights",16)||objects>AuthorLimit("interactive_objects",64))
+            throw std::runtime_error("Scene exceeds its prepared authoring profile object/model/collision limits");
+    }
     void CheckCapacity(size_t extraEntities, int extraEnemies) const
     {
-        if (document_.at("entities").size() + extraEntities > 256) throw std::runtime_error("The level limit is 256 objects");
+        if (document_.at("entities").size() + extraEntities > AuthorLimit("entities",256)) throw std::runtime_error("The source profile object limit is reached");
         int count = 0;
-        for (const auto& entity : document_.at("entities")) if (entity.at("kind") == "guard") ++count;
-        if (count + extraEnemies > 16) throw std::runtime_error("The current authoring limit is 16 enemies; this is not a frame-rate guarantee");
+        size_t models=0;
+        for (const auto& entity : document_.at("entities")){if (entity.at("kind") == "guard") ++count;models+=entity.contains("model");}
+        if (count + extraEnemies > (int)AuthorLimit("enemies",16)) throw std::runtime_error("The source profile enemy limit is reached");
+        if(models+(size_t)extraEnemies>AuthorLimit("models",128))throw std::runtime_error("The source profile model limit is reached");
     }
     Json PlacementPosition(const Json& args)
     {
@@ -1240,7 +1255,7 @@ class DemoEditor
         CheckCapacity(1,0);
         size_t models = 0;
         for (const auto& entity : document_.at("entities")) if (entity.contains("model")) ++models;
-        if (models >= 128) throw std::runtime_error("The level limit is 128 model instances");
+        if (models >= AuthorLimit("models",128)) throw std::runtime_error("The source profile model limit is reached");
         auto used = UsedIds();
         const std::string id = NewId(args,"id",prefabId,used);
         Json transform = {{"position",PlacementPosition(args)},{"rotation",{0,0,0}},{"scale",prefab->at("scale")}};
@@ -1664,8 +1679,8 @@ class DemoEditor
                     if (!found) throw std::runtime_error("Unknown test start");
                     testStart_=preset; Save(true,id,op=="play_menu"?"menu":"level");
                 }
-                else if(op=="drop_selection"||op=="save_prefab"||op=="place_prefab"||op=="add_game_object"||op=="set_game_object"||op=="undo"||op=="redo"||op=="add_blockout"||op=="select_entities"||op=="transform_selection"||op=="group_entities"||op=="duplicate_entities"||op=="delete_entities"||op=="refresh_preview")Respond(id,true,AuthorCommand(op,args));
-                else if(op=="assign_region"||op=="set_region"||op=="set_streaming"||op=="fit_region_bounds")Respond(id,true,StreamCommand(op,args));
+                else if(op=="drop_selection"||op=="save_prefab"||op=="place_prefab"||op=="add_game_object"||op=="set_game_object"||op=="undo"||op=="redo"||op=="add_blockout"||op=="add_floor"||op=="select_entities"||op=="transform_selection"||op=="group_entities"||op=="duplicate_entities"||op=="delete_entities"||op=="refresh_preview")Respond(id,true,AuthorCommand(op,args));
+                else if(op=="assign_region"||op=="set_region"||op=="set_streaming"||op=="fit_region_bounds"||op=="add_transition"||op=="set_transition"||op=="delete_transition")Respond(id,true,StreamCommand(op,args));
                 else if (op == "set_entity") { SetEntity(args); Respond(id,true,{{"entity",*Entity(args.at("id"))},{"dirty",true},{"validation","pending save"}}); }
                 else if (op == "import_blender_scene") Respond(id,true,ImportBlenderScene(args));
                 else if (op == "import_asset_pack") Respond(id,true,ImportAssetPack(args));
@@ -2126,7 +2141,7 @@ class DemoEditor
                 if (entity->contains("material")) DrawMaterial(entity->at("material").get<std::string>());
 
                 if (entity->at("kind") == "guard" && ImGui::CollapsingHeader("Behavior",ImGuiTreeNodeFlags_DefaultOpen)) DrawEnemy(selected_);
-                DrawInteractions();
+                DrawInteractions();DrawFloorVertices();
                 ImGui::EndDisabled();
             }
         }

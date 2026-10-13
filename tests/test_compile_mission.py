@@ -37,6 +37,159 @@ class MissionCookTests(unittest.TestCase):
     def write_source(self):
         self.source.write_text(json.dumps(self.document), encoding="utf-8")
 
+    def authored_five_regions(self,count=5):
+        self.document["authoring_profile"] = "streamed-mission"
+        first, second = self.manifest["regions"]
+        first.update(id="r00", neighbors=["r01"], working_set=["r00"],
+                     activation_bounds=[[-8,-.5,-4],[.05,4,4]])
+        second.update(id="r01", neighbors=["r00","r02"], working_set=["r01"],
+                      activation_bounds=[[-.05,-.5,-4],[8.05,4,4]])
+        regions = [first, second]
+        for index in range(2,count):
+            ident, start = f"r{index:02d}", (index-1)*8
+            homes = []
+            for model in range(40):
+                entity_id = f"{ident}-mesh-{model:03d}"
+                self.document["entities"].append(dict(id=entity_id,kind="static",model="probe-box",material="probe-east",
+                    transform=dict(position=[start+4,2,0],rotation=[0,0,0],scale=[.1,.1,.1])))
+                homes.append(entity_id)
+            for box in range(130):
+                entity_id = f"{ident}-box-{box:03d}"
+                self.document["entities"].append(dict(id=entity_id,kind="static",
+                    transform=dict(position=[start+4,1,0],rotation=[0,0,0],scale=[1,1,1]),
+                    collider=dict(shape="box",center=[0,0,0],half_size=[.01,.01,.01])))
+                homes.append(entity_id)
+            neighbors = [f"r{index-1:02d}"] + ([f"r{index+1:02d}"] if index<count-1 else [])
+            regions.append(dict(id=ident,bounds=[[start-.1,-.5,-4],[start+8.1,4,4]],entities=homes,
+                neighbors=neighbors,working_set=[ident],activation_bounds=[[start-.05,-.5,-4],[start+8.05,4,4]]))
+        gates = []
+        for index, x in enumerate(range(0,(count-1)*8,8)):
+            for source,target in ((index,index+1),(index+1,index)):
+                gates.append(dict(id=f"gate-{source}-{target}",**{"from":f"r{source:02d}","to":f"r{target:02d}"},
+                    bounds=[[x-.25,-.5,-1],[x+.25,4,1]]))
+        self.manifest.update(entry_region="r00",visibility="authored-sets",regions=regions,transitions=gates)
+        self.write_source()
+
+    def test_authored_five_region_world_validates_working_sets_instead_of_total_source(self):
+        self.authored_five_regions()
+        package, report = self.cook()
+        self.assertGreater(sum(row["triangle_count"] for row in report["regions"]),1440)
+        self.assertGreater(sum(row["collider_count"] for row in report["regions"]),400)
+        self.assertGreater(len(report["entity_ids"]),256)
+        mission.validate_stream_bridge(report)
+        self.assertEqual(report["max_resident_regions"],2)
+        self.assertTrue(all(len(row["regions"])<=2 for row in report["working_sets"]))
+        path = self.content/"five.mission.json"
+        path.write_text(json.dumps(self.manifest))
+        output = self.root/"five-output"
+        prepared = mission.prepare_stream_level(path,output,self.content)
+        header = (output/"generated/demo_level.h").read_text()
+        self.assertIn("DL_STREAM_POLICY_AUTHORED",header)
+        self.assertIn(".max_resident_regions=2",header)
+        self.assertEqual(prepared["bootstrap"]["static_model_count"],0)
+        self.assertEqual((output/prepared["mission"]["path"]).read_bytes(),package)
+
+    def test_authored_working_set_gate_rejects_oversized_transition_union(self):
+        self.authored_five_regions(count=6)
+        self.manifest["regions"][1]["working_set"] = ["r01","r02","r03","r04","r05"]
+        _,report = self.cook()
+        with self.assertRaisesRegex(ValueError,"5 resident region slots"):
+            mission.validate_stream_bridge(report)
+
+    def test_authored_rejects_bad_activation_gate_or_unreachable_region(self):
+        self.authored_five_regions()
+        original = copy.deepcopy(self.manifest)
+        self.manifest["regions"][0]["activation_bounds"] = [[0,0,0],[0,1,1]]
+        with self.assertRaisesRegex(ValueError,"activation bounds"):
+            self.cook()
+        self.manifest = copy.deepcopy(original)
+        self.manifest["transitions"][0]["bounds"] = [[100,0,0],[101,1,1]]
+        with self.assertRaisesRegex(ValueError,"intersect both activation"):
+            self.cook()
+        self.manifest = copy.deepcopy(original)
+        self.manifest["transitions"] = [row for row in self.manifest["transitions"] if row["to"]!="r04"]
+        with self.assertRaisesRegex(ValueError,"reachable"):
+            self.cook()
+
+    def test_v3_exact_floor_records_preserve_transformed_vertices_and_bootstrap_omits_contacts(self):
+        self.document["entities"].append(dict(id="ramp-plane",kind="static",
+            transform=dict(position=[-4,0,0],rotation=[0,0,0],scale=[2,1,1]),
+            floor=dict(vertices=[[0,.05,-2],[.5,.05,-2],[0,.55,-1]])))
+        self.manifest["regions"][0]["entities"].append("ramp-plane")
+        self.write_source()
+        package,report=self.cook()
+        self.assertEqual(report["chunk_version"],3)
+        self.assertEqual(sum(row["floor_count"] for row in report["regions"]),1)
+        row=next(row for row in report["regions"] if row["floor_count"])
+        chunk=package[row["file_offset"]:row["file_offset"]+row["chunk_bytes"]]
+        section=next(section for section in self.sections(chunk) if section[0]==4)
+        self.assertEqual((section[3],section[4],section[5]),(36,1,36))
+        points=struct.unpack_from(">9f",chunk,section[2])
+        world=[[points[v*3+a]+row["origin"][a] for a in range(3)] for v in range(3)]
+        for actual,expected in zip(world,[[-4,.05,-2],[-3,.05,-2],[-4,.55,-1]]):
+            for a,b in zip(actual,expected):self.assertAlmostEqual(a,b,places=5)
+        path=self.content/"floor.mission.json";path.write_text(json.dumps(self.manifest))
+        output=self.root/"floor-output";mission.prepare_stream_level(path,output,self.content)
+        header=(output/"generated/demo_level.h").read_text()
+        self.assertIn(".floor_count=0",header)
+        self.assertNotIn("static const DlFloorTriangle",header)
+
+    def test_authored_contact_budget_includes_gate_barriers_and_floor_triangles(self):
+        self.authored_five_regions()
+        _,report=self.cook()
+        row=next(row for row in report["regions"] if row["source_id"]=="r02")
+        row["collider_count"]=152
+        row["floor_count"]=120
+        with self.assertRaisesRegex(ValueError,r"boxes \+ floors \+ unavailable-region barriers"):
+            mission.validate_stream_bridge(report)
+        row["floor_count"]=129
+        with self.assertRaisesRegex(ValueError,"128 floor triangles"):
+            mission.validate_stream_bridge(report)
+
+    def test_floor_target_local_and_reconstructed_precision_are_preflighted(self):
+        # Both canonical planes and direct f32 world positions are usable;
+        # the additional chunk-local encoding/reconstruction must also be usable.
+        self.document["entities"].append(dict(id="small-plane",kind="static",
+            transform=dict(position=[1000.00001,0,0],rotation=[0,0,0],scale=[1,1,1]),
+            floor=dict(vertices=[[0,0,0],[.001,.00099,0],[0,0,1]])))
+        self.manifest["regions"].append(dict(id="far",bounds=[[999.2,-1,-1],[1001,2,2]],entities=["small-plane"],neighbors=[]))
+        self.write_source()
+        with self.assertRaisesRegex(ValueError,"target reconstructed float precision"):
+            self.cook()
+        self.document["entities"][-1]["transform"]["position"]=[-4,0,0]
+        self.document["entities"][-1]["floor"]["vertices"]=[[0,0,0],[.00001,0,0],[0,0,1]]
+        self.manifest["regions"][-1]["bounds"]=[[-8,-1,-1],[1008,2,2]]
+        self.write_source()
+        with self.assertRaisesRegex(ValueError,"target local float precision"):
+            self.cook()
+
+    def test_floor_reconstruction_checks_target_arithmetic_not_only_rounded_vertices(self):
+        # Direct source f32 arithmetic and local-wire double arithmetic are
+        # usable. Encoded origin [2.1,2.1,-.7] shifts the reconstructed vertices
+        # so f32 cancellation makes the runtime gradient exceed its limit.
+        points=[[0,0,0],[1.000000238418579,1.314579963684082,1.000000238418579],
+                [1.0000003576278687,1.314579725265503,.9999997615814209]]
+        self.document['entities'].append(dict(id='arithmetic-plane',kind='static',floor=dict(vertices=points),
+            transform=dict(position=[0,0,0],rotation=[0,0,0],scale=[1,1,1])))
+        self.manifest['regions'].append(dict(id='thin-plane-region',bounds=[[-.9,-.9,-3.7],[5.1,5.1,2.3]],
+                                            entities=['arithmetic-plane'],neighbors=[]))
+        self.write_source()
+        with self.assertRaisesRegex(ValueError,'target reconstructed float precision.*floor grade'):
+            self.cook()
+        for point in self.document['entities'][-1]['floor']['vertices']:point[1]*=.5
+        self.write_source()
+        _,report=self.cook()
+        self.assertEqual(sum(row['floor_count'] for row in report['regions']),1)
+
+    def test_authored_door_transition_uses_canonical_id_and_endpoint_home(self):
+        self.authored_five_regions()
+        self.manifest["transitions"][0]["door"]="probe-door"
+        _,report=self.cook()
+        self.assertEqual(next(row for row in report["transitions"] if row["id"]=="gate-0-1")["door"],"probe-door")
+        self.manifest["transitions"][2]["door"]="probe-door"
+        with self.assertRaisesRegex(ValueError,"door home must match"):
+            self.cook()
+
     def cook(self):
         return mission.cook_mission(self.manifest, self.content)
 
@@ -411,7 +564,7 @@ class MissionCookTests(unittest.TestCase):
 
     def test_rom_bridge_reserves_an_unavailable_region_collider(self):
         _, report = self.cook()
-        report["regions"][0]["collider_count"] = 256
+        report["regions"][0]["collider_count"] = 400
         with self.assertRaisesRegex(ValueError, "unavailable-region barrier"):
             mission.validate_stream_bridge(report)
 

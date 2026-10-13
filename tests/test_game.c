@@ -727,6 +727,126 @@ static bool direct_door_keeps_other_obstructions_and_independent_state(void) {
     CHECK(!dl_game_object_open(&g,0)&&g.object_revision==2);
     return true;
 }
+static void rectangular_floor(DlFloorTriangle out[2],DlVec3 center,float hx,float hz,float gx,float gz,float yaw) {
+    float c=cosf(yaw),q=sinf(yaw);DlVec3 vertices[4];
+    float local[4][2]={{-hx,-hz},{hx,-hz},{hx,hz},{-hx,hz}};
+    for(int i=0;i<4;++i){float x=local[i][0],z=local[i][1];
+        vertices[i]=(DlVec3){center.x+c*x+q*z,center.y+gx*x+gz*z,center.z-q*x+c*z};}
+    out[0]=(DlFloorTriangle){{vertices[0],vertices[1],vertices[2]}};
+    out[1]=(DlFloorTriangle){{vertices[0],vertices[2],vertices[3]}};
+}
+static bool exact_slope_ascent_descent_and_edge_fall(void) {
+    Fixture f;fixture_init(&f);f.level.collider_count=0;f.level.enemy_count=0;
+    DlFloorTriangle ramp[2];rectangular_floor(ramp,(DlVec3){0,.5f,2},1,2,0,.25f,0);
+    f.level.floors=ramp;f.level.floor_count=2;
+    f.level.spawn=(DlVec3){0,.025f,.1f};DlGame g;dl_game_init(&g,&f.level);
+    CHECK(g.grounded);
+    for(int i=0;i<80;++i){
+        dl_game_update(&g,&(DlInput){.forward=1},DT);
+        CHECK(g.grounded&&NEAR(g.player.y,.25f*g.player.z)&&clear_actors(&g));
+    }
+    CHECK(g.player.z>2.8f&&g.player.y>.7f);
+    for(int i=0;i<80;++i){
+        dl_game_update(&g,&(DlInput){.forward=-1},DT);
+        CHECK(g.grounded&&NEAR(g.player.y,.25f*g.player.z)&&clear_actors(&g));
+    }
+    CHECK(NEAR(g.player.z,.1f));
+    for(int i=0;i<20;++i)dl_game_update(&g,&(DlInput){.strafe=1},DT);
+    CHECK(g.grounded);
+    advance(&g,(DlInput){.strafe=1},.35f);
+    CHECK(fabsf(g.player.x)>1&& !g.grounded&&g.player.y<0&&g.vertical_velocity<0);
+    /* The plane has no artificial solid volume under its footprint. */
+    CHECK(dl_position_clear(&g,(DlVec3){0,-2,2},.18f,1));
+    CHECK(!dl_position_clear(&g,(DlVec3){0,0,2},.18f,1));
+    return true;
+}
+static bool slope_jump_landing_and_ceiling(void) {
+    Fixture f;fixture_init(&f);f.level.collider_count=0;f.level.enemy_count=0;
+    DlFloorTriangle ramp[2];rectangular_floor(ramp,(DlVec3){0,.5f,2},1,2,0,.25f,0);
+    f.level.floors=ramp;f.level.floor_count=2;
+    f.level.spawn=(DlVec3){0,.25f,1};DlGame g;dl_game_init(&g,&f.level);
+    dl_game_update(&g,&(DlInput){.jump=true,.forward=1},DT);
+    CHECK(!g.grounded&&g.vertical_velocity>0);
+    bool rose=false,landed=false;
+    for(int i=0;i<75;++i){
+        dl_game_update(&g,&(DlInput){.forward=.4f},DT);
+        CHECK(clear_actors(&g));
+        rose|=g.player.y>.25f*g.player.z+.4f;
+        if(g.grounded){CHECK(NEAR(g.player.y,.25f*g.player.z));landed=true;}
+    }
+    CHECK(rose&&landed&&g.grounded);
+    f.level.collider_count=1;f.level.spawn=(DlVec3){0,0,0};
+    rectangular_floor(ramp,(DlVec3){0,2,0},2,2,0,.1f,0);dl_game_init(&g,&f.level);
+    float highest=0;dl_game_update(&g,&(DlInput){.jump=true},DT);
+    for(int i=0;i<60;++i){dl_game_update(&g,&(DlInput){0},DT);highest=fmaxf(highest,g.player.y);}
+    CHECK(highest<=.3501f&&g.grounded&&NEAR(g.player.y,0));
+    return true;
+}
+static bool slope_projection_respects_headroom_and_rotated_bounds(void) {
+    Fixture f;fixture_init(&f);f.level.collider_count=0;f.level.enemy_count=0;
+    DlFloorTriangle ramp[2];rectangular_floor(ramp,(DlVec3){0,.5f,2},1,2,0,.25f,0);
+    f.level.floors=ramp;f.level.floor_count=2;
+    box(&f,(DlVec3){0,2.3f,2},(DlVec3){1,.3f,1},0,false);
+    f.level.spawn=(DlVec3){0,.025f,.1f};DlGame g;dl_game_init(&g,&f.level);
+    advance(&g,(DlInput){.forward=1},2);
+    CHECK(g.player.z<1.42f&&g.grounded&&clear_actors(&g));
+    advance(&g,(DlInput){.forward=1,.crouch=true},1.5f);
+    CHECK(g.player.z>2&&g.grounded&&clear_actors(&g));
+    f.level.collider_count=0;rectangular_floor(ramp,(DlVec3){0,0,0},2,1,.25f,0,PI/2);
+    f.level.spawn=(DlVec3){0,.25f,-1};dl_game_init(&g,&f.level);
+    advance(&g,(DlInput){.forward=1},.5f);
+    CHECK(g.grounded&&NEAR(g.player.y,-.25f*g.player.z)&&g.player.z>0);
+    CHECK(!dl_line_of_sight(&g,(DlVec3){0,2,0},(DlVec3){0,-2,0}));
+    CHECK(dl_line_of_sight(&g,(DlVec3){2,2,0},(DlVec3){2,-2,0}));
+    CHECK(!dl_line_of_sight(&g,(DlVec3){0,.25f,-1},(DlVec3){0,-.25f,1}));
+    return true;
+}
+static bool malformed_slopes_never_supply_support_or_occlusion(void) {
+    Fixture f;fixture_init(&f);f.level.collider_count=0;f.level.enemy_count=0;
+    DlFloorTriangle valid={{{-1,0,-1},{1,0,-1},{1,0,1}}};f.level.floor_count=1;
+    for(int variant=0;variant<7;++variant){
+        DlFloorTriangle bad=valid;
+        switch(variant){
+            case 0:bad.vertices[1]=bad.vertices[0];break;
+            case 1:bad.vertices[2].z=-1;break;
+            case 2:bad.vertices[0].y=NAN;break;
+            case 3:bad.vertices[1].y=INFINITY;break;
+            case 4:bad.vertices[2].x=NAN;break;
+            case 5:bad.vertices[0].x=-3e38f;bad.vertices[1].x=3e38f;break;
+            case 6:bad.vertices[1].y=5;break; /* unsupported steep floor */
+        }
+        f.level.floors=&bad;DlGame g;dl_game_init(&g,&f.level);
+        CHECK(!g.grounded&&dl_position_clear(&g,(DlVec3){0,-.5f,0},.18f,1.65f));
+        CHECK(dl_line_of_sight(&g,(DlVec3){0,1,0},(DlVec3){0,-1,0}));
+        dl_game_update(&g,&(DlInput){0},DT);CHECK(g.player.y<0&&isfinite(g.player.y));
+    }
+    return true;
+}
+static bool nonrectangular_floor_fan_preserves_empty_notch(void) {
+    Fixture f;fixture_init(&f);f.level.collider_count=0;f.level.enemy_count=0;
+    DlVec3 a={0,0,0},b={2,0,0},c={2,0,1},d={1,0,1},e={1,0,2},q={0,0,2};
+    DlFloorTriangle floors[]={{{a,b,c}},{{a,c,d}},{{a,d,e}},{{a,e,q}}};
+    f.level.floors=floors;f.level.floor_count=4;
+    f.level.spawn=(DlVec3){.5f,0,1.5f};DlGame g;dl_game_init(&g,&f.level);CHECK(g.grounded);
+    CHECK(!dl_position_clear(&g,(DlVec3){.5f,-.5f,1.5f},.18f,1.65f));
+    CHECK(dl_position_clear(&g,(DlVec3){1.5f,-.5f,1.5f},.18f,1.65f));
+    CHECK(dl_line_of_sight(&g,(DlVec3){1.5f,1,1.5f},(DlVec3){1.5f,-1,1.5f}));
+    CHECK(!dl_line_of_sight(&g,(DlVec3){.5f,1,1.5f},(DlVec3){.5f,-1,1.5f}));
+    advance(&g,(DlInput){.strafe=-1},.7f);
+    CHECK(g.player.x>1&& !g.grounded&&g.player.y<0); /* no bounding rectangle support */
+    return true;
+}
+static bool floor_grade_quantization_matches_wire_tolerance(void) {
+    Fixture f;fixture_init(&f);f.level.collider_count=0;f.level.enemy_count=0;
+    DlFloorTriangle floors[2];f.level.floors=floors;f.level.floor_count=2;
+    rectangular_floor(floors,(DlVec3){0,0,0},1,1,1.0000002f,0,0);
+    DlGame g;dl_game_init(&g,&f.level);CHECK(g.grounded);
+    CHECK(!dl_line_of_sight(&g,(DlVec3){0,1,0},(DlVec3){0,-1,0}));
+    rectangular_floor(floors,(DlVec3){0,0,0},1,1,1.000001f,0,0);
+    dl_game_init(&g,&f.level);CHECK(!g.grounded);
+    CHECK(dl_line_of_sight(&g,(DlVec3){0,1,0},(DlVec3){0,-1,0}));
+    return true;
+}
 int main(void) {
     struct { const char *name; bool (*run)(void); } cases[]={
         {"rotated wall collision and sliding",rotated_wall_sliding},{"stairs and falling",stairs_and_falling},
@@ -757,7 +877,13 @@ int main(void) {
         {"sound wakes an inactive guard without local collision queries",sound_wakes_inactive_guard_without_local_queries},
         {"inactive guard does not block a loaded door",inactive_guard_does_not_block_loaded_door},
         {"direct door use preserves state, events and body occupancy",direct_door_interaction_and_occupancy},
-        {"direct door use retains other obstructions and independent doors",direct_door_keeps_other_obstructions_and_independent_state}
+        {"direct door use retains other obstructions and independent doors",direct_door_keeps_other_obstructions_and_independent_state},
+        {"exact bounded slope ascent, descent and edge falling",exact_slope_ascent_descent_and_edge_fall},
+        {"slope jumping, landing and underside ceiling contact",slope_jump_landing_and_ceiling},
+        {"slope projection respects headroom and rotated bounds",slope_projection_respects_headroom_and_rotated_bounds},
+        {"malformed/steep floor triangles cannot supply support or occlusion",malformed_slopes_never_supply_support_or_occlusion},
+        {"nonrectangular floor fan preserves empty notch",nonrectangular_floor_fan_preserves_empty_notch},
+        {"floor grade quantization matches wire tolerance",floor_grade_quantization_matches_wire_tolerance}
     };
     int failures=0;
     for(unsigned i=0;i<sizeof(cases)/sizeof(cases[0]);++i) {

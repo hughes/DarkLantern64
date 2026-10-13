@@ -56,10 +56,13 @@ these sources; Native Play reports why it is blocked. The ROM demo is the
 current stream simulation path. This is a deliberate integration gate, not
 editor support being complete.
 
-The current ROM bridge requires exactly two regions, at most 1,024 static triangles
-and 64 nonempty region/material groups across those regions, and at most 255
-colliders in either region to reserve an unavailable-region barrier. These are
-demo runtime capacities, not portable package limits. The panel distinguishes
+The authored ROM policy supports up to 32 regions with at most five region
+chunks resident at once. Each reachable stable set, selected transition union
+and partial publication state must fit 1,440 static triangles, 64 nonempty
+region/material groups and 400 total box contacts, exact floor triangles and
+gate barriers. Floor triangles have a separate 128-record bank bound. Render
+instances and vertices retain their ordinary limits. These are explicit
+working-set capacities, not total mission geometry limits. The panel distinguishes
 a valid portable partition from one that fits the current ROM bridge; a
 bridge-capacity failure keeps the authoring preview available and prevents ROM
 publication.
@@ -68,8 +71,30 @@ Textured region chunks retain evaluated UVs and normals. Shared texture sprites
 use the ordinary texture cooker and active-level renderer lifetime; they are
 not yet evicted by region. The manifest's optional `visibility` chooses the
 original `door-distance` probe policy or conservative `all-regions` residency.
-The panel displays this policy. Open Bafford street regions stay loaded together
-until a spatial compiler can prove safe visibility and retirement.
+Those legacy policies remain two-region probes. `authored-sets` supports larger
+worlds: each region owns separate player activation bounds and a conservative
+visible `working_set`, while directed gate bounds define transitions. The
+nearest nearby gate supplies one pending target, with hysteresis; the source
+set remains loaded until the target set is complete and the player crosses
+its gate. Other unavailable gates block movement. Geometry ownership bounds
+can overlap without changing activation meaning.
+
+The Streaming panel edits activation bounds, visible-set members and directed
+gate endpoints/bounds; gates can be added or deleted with paired Undo/Redo.
+Numeric fields use persistent buffers and explicit Apply actions. Validation
+reports the reachable working sets and worst slot count. Authored visibility
+is a conservative content contract; this metadata does not prove a PVS.
+
+Larger canonical sources opt in to `authoring_profile: "streamed-mission"`.
+Their total static geometry and home IDs can exceed a resident scene, while
+ordinary global gameplay/material/light caps remain. Editor creation reads
+the prepared source limits. Resident compilation and Native Play reject this
+profile even if its partition is missing. **Add floor triangle** and the
+Inspector's local floor vertices edit exact horizontal or sloping support;
+Collision debug draws its transformed edges. **Drop to surface** uses the
+highest supporting box top or transformed triangular floor at the object's
+footprint. Region cooking preserves these
+floor triangles in DLR1 v3 instead of filling a nonrectangular floor with boxes.
 
 Scene and partition drafts share Undo/Redo and unsaved-change handling through
 an internal paired history snapshot. The canonical scene JSON does not embed

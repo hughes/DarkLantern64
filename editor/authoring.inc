@@ -5,6 +5,8 @@
     std::vector<std::pair<std::string,std::optional<EntityId>>> editorCommands_;
     std::set<std::string> selection_;
     std::string lastPreviewDraft_;
+    struct FloorVertexInput {Json source;float points[3][3]{};bool pending=false;};
+    std::map<std::string,FloorVertexInput> floorVertexInputs_;
     float snapMetres_=.25f, groupOffset_[3]={0,0,0}, blockSize_[3]={2,.2f,2};
     float groupYaw_=90,groupScale_=1;
     char groupName_[65]="group";
@@ -16,6 +18,8 @@
             auto& homes=region["entities"];
             homes.erase(std::remove_if(homes.begin(),homes.end(),[&](const Json& id){return id.is_string()&&ids.contains(id.get<std::string>());}),homes.end());
         }
+        if(partition.contains("transitions")&&partition.at("transitions").is_array())
+            for(auto& gate:partition["transitions"])if(gate.is_object()&&gate.contains("door")&&gate.at("door").is_string()&&ids.contains(gate.at("door").get<std::string>()))gate.erase("door");
     }
     void UpdateAuthorDirty(){dirty_=document_!=Json::parse(sourceSnapshot_)||
         (!streamDraft_.is_null()&&(streamSnapshot_.empty()||streamDraft_!=Json::parse(streamSnapshot_)));}
@@ -105,9 +109,22 @@
                     if(found->at("kind")!="static"&&found->at("kind")!="door")throw std::runtime_error("Only static objects and doors have collision proxies");
                     if(value.at("shape")!="box")throw std::runtime_error("Only box collision is supported");
                     CheckVector(value.at("center"),"collider centre",-1024,1024);CheckVector(value.at("half_size"),"collider half size",.001,1024);
+                } else if(key=="floor") {
+                    if(found->at("kind")!="static"||found->contains("collider"))throw std::runtime_error("A floor plane needs a static object without an opaque box collider");
+                    if(!value.is_object()||!value.contains("vertices")||!value.at("vertices").is_array()||value.at("vertices").size()!=3)
+                        throw std::runtime_error("A floor needs three local XYZ vertices");
+                    for(const auto& point:value.at("vertices"))CheckVector(point,"floor vertex",-1024,1024);
                 } else throw std::runtime_error("Unsupported object property");
                 (*found)[key]=value;
             }
+        } else if(op=="add_floor") {
+            auto used=UsedIds();const auto id=NewId(args,"id","floor-triangle",used);
+            const auto position=args.value("position",PlacementPosition(args));CheckVector(position,"position",-1024,1024);
+            const auto vertices=args.value("vertices",Json::array({{-1,0,-1},{1,0,-1},{-1,0,1}}));
+            if(!vertices.is_array()||vertices.size()!=3)throw std::runtime_error("A floor needs three local XYZ vertices");
+            for(const auto& point:vertices)CheckVector(point,"floor vertex",-1024,1024);
+            candidate["entities"].push_back({{"id",id},{"kind","static"},{"floor",{{"vertices",vertices}}},
+                {"transform",{{"position",position},{"rotation",{0,0,0}},{"scale",{1,1,1}}}}});created.push_back(id);
         } else if(op=="add_blockout"||op=="add_game_object") {
             const auto position=args.value("position",Json::array({0,0,0}));CheckVector(position,"position",-1024,1024);
             const auto size=args.value("size",op=="add_game_object"?Json::array({.3,.3,.3}):Json::array({2,.2,2}));CheckVector(size,"size",.01f,128);
@@ -177,8 +194,21 @@
                     auto& p=row["transform"]["position"];float offset=0;
                     if(row.contains("collider"))offset=(row["collider"]["center"][1].get<float>()-row["collider"]["half_size"][1].get<float>())*row["transform"]["scale"][1].get<float>();
                     float floor=-INFINITY;
-                    for(const auto& support:candidate["entities"])if(!ids.contains(support.at("id"))&&support.contains("collider")) {
+                    for(const auto& support:candidate["entities"])if(!ids.contains(support.at("id"))&&(support.contains("collider")||support.contains("floor"))) {
                         const auto t=PreviewTransform(support.at("transform"));
+                        if(support.contains("floor")) {
+                            const auto& vertices=support.at("floor").at("vertices");glm::vec3 world[3];
+                            for(int i=0;i<3;++i)world[i]=t.position+t.rotation*(Vector(vertices.at(i))*t.scale);
+                            const auto a=world[0],b=world[1]-a,c=world[2]-a;const float determinant=b.x*c.z-b.z*c.x;
+                            if(std::isfinite(determinant)&&std::abs(determinant)>1e-8f) {
+                                const auto delta=Vector(p)-a;
+                                const float u=(delta.x*c.z-delta.z*c.x)/determinant,v=(b.x*delta.z-b.z*delta.x)/determinant;
+                                const float top=a.y+u*b.y+v*c.y;
+                                if(u>=-1e-6f&&v>=-1e-6f&&u+v<=1.000001f&&std::isfinite(top)&&top<=p[1].get<float>()+offset+.01f)
+                                    floor=std::max(floor,top);
+                            }
+                            continue;
+                        }
                         const glm::vec3 centre=t.position+t.rotation*(Vector(support["collider"]["center"])*t.scale);
                         const glm::vec3 half=Vector(support["collider"]["half_size"])*t.scale;
                         const glm::vec3 local=glm::inverse(t.rotation)*(Vector(p)-centre);
@@ -221,6 +251,7 @@
                 if(ids.contains(selected_))selected_=rows.empty()?"":rows[0].at("id").get<std::string>();
             } else throw std::runtime_error("Unknown authoring command");
         }
+        CheckAuthorCapacity(candidate);
         document_=std::move(candidate);streamDraft_=std::move(partition);history_.Commit(AuthorSnapshot(),op);dirty_=true;structureDirty_=true;
         if(!created.empty()){selection_.clear();for(const auto& id:created)selection_.insert(id);selected_=created[0];}
         return {{"created",created},{"dirty",true},{"selection",selection_}};
@@ -249,18 +280,19 @@
             const std::string id=args.at("id");auto& row=findRegion(id);
             const auto& patch=args.at("patch");
             for(auto it=patch.begin();it!=patch.end();++it){
-                if(it.key()=="bounds"){
+                if(it.key()=="bounds"||it.key()=="activation_bounds"){
                     if(!it.value().is_array()||it.value().size()!=2)throw std::runtime_error("Bounds need minimum and maximum XYZ");
                     for(int a=0;a<3;++a)if(!it.value()[0].is_array()||!it.value()[1].is_array()||
                         it.value()[0].size()!=3||it.value()[1].size()!=3||!it.value()[0][a].is_number()||!it.value()[1][a].is_number()||
                         !std::isfinite(it.value()[0][a].get<double>())||!std::isfinite(it.value()[1][a].get<double>())||
                         it.value()[0][a].get<double>()>=it.value()[1][a].get<double>())throw std::runtime_error("Minimum must be finite and below maximum");
-                }else if(it.key()=="neighbors"){
+                }else if(it.key()=="neighbors"||it.key()=="working_set"){
                     if(!it.value().is_array())throw std::runtime_error("Neighbors must be a region ID list");
                     std::set<std::string> seen;
                     for(const auto& value:it.value()){const auto peer=value.get<std::string>();findRegion(peer);
-                        if(peer==id||!seen.insert(peer).second)throw std::runtime_error("Neighbors must be distinct and non-self");}
-                }else throw std::runtime_error("Only bounds and neighbors can be changed here");
+                        if((it.key()=="neighbors"&&peer==id)||!seen.insert(peer).second)throw std::runtime_error("Region IDs must be distinct; neighbors cannot include self");}
+                    if(it.key()=="working_set"&&!seen.contains(id))throw std::runtime_error("Working set must include its own region");
+                }else throw std::runtime_error("Only geometry/activation bounds, working set and neighbors can be changed here");
                 row[it.key()]=it.value();
             }
         }else if(op=="set_streaming") {
@@ -268,10 +300,53 @@
             for(auto it=patch.begin();it!=patch.end();++it){
                 if(it.key()=="entry_region")findRegion(it.value().get<std::string>());
                 else if(it.key()=="visibility"){
-                    if(it.value()!="door-distance"&&it.value()!="all-regions")throw std::runtime_error("Choose door-distance or all-regions visibility");
+                    if(it.value()!="door-distance"&&it.value()!="all-regions"&&it.value()!="authored-sets")throw std::runtime_error("Choose door-distance, all-regions or authored-sets visibility");
                 }else throw std::runtime_error("Only entry region and visibility can be changed here");
                 candidate[it.key()]=it.value();
             }
+            if(candidate.value("visibility",std::string())=="authored-sets"){
+                for(auto& row:regions)if(row.is_object()&&row.contains("id")){
+                    if(!row.contains("activation_bounds")&&row.contains("bounds"))row["activation_bounds"]=row.at("bounds");
+                    if(!row.contains("working_set"))row["working_set"]=Json::array({row.at("id")});
+                }
+                if(!candidate.contains("transitions"))candidate["transitions"]=Json::array();
+            }
+        }else if(op=="set_transition"||op=="add_transition"||op=="delete_transition") {
+            if(!candidate.contains("transitions"))candidate["transitions"]=Json::array();
+            auto& gates=candidate["transitions"];if(!gates.is_array())throw std::runtime_error("Transitions must be an array; repair the manifest and reload");
+            const std::string id=args.at("id");auto gate=std::find_if(gates.begin(),gates.end(),[&](const Json& row){return row.is_object()&&row.value("id",std::string())==id;});
+            if(op=="delete_transition"){if(gate==gates.end())throw std::runtime_error("Unknown transition");gates.erase(gate);}
+            else {
+                Json row=op=="add_transition"?Json{{"id",id}}:(gate==gates.end()?throw std::runtime_error("Unknown transition"):*gate);
+                if(op=="add_transition"&&gate!=gates.end())throw std::runtime_error("Transition ID already exists");
+                const auto& patch=args.at("patch");
+                for(const auto& [key,value]:patch.items()){
+                    if(key=="from"||key=="to")findRegion(value.get<std::string>());
+                    else if(key=="door"){
+                        if(value.is_null()){row.erase("door");continue;}
+                        if(!value.is_string())throw std::runtime_error("A gate door needs a canonical door ID");
+                        const auto* door=Entity(value.get<std::string>());
+                        if(!door||door->at("kind")!="door")throw std::runtime_error("Choose an existing door object");
+                    }
+                    else if(key=="bounds"){
+                        if(!value.is_array()||value.size()!=2)throw std::runtime_error("Gate bounds need two XYZ vectors");
+                        for(const auto& point:value)CheckVector(point,"gate bounds",-1024,1024);
+                        for(int axis=0;axis<3;++axis)if(value[0][axis].get<double>()>=value[1][axis].get<double>())throw std::runtime_error("Gate minimum must be below maximum");
+                    }else throw std::runtime_error("Only gate endpoints, door and bounds can be changed");
+                    row[key]=value;
+                }
+                if(op=="add_transition"){
+                    if(!row.contains("from")||!row.contains("to")||!row.contains("bounds"))throw std::runtime_error("A new gate needs from/to/bounds");
+                    gates.push_back(row);
+                }else *gate=std::move(row);
+            }
+            if(candidate.value("visibility",std::string())=="authored-sets")for(auto& region:regions)
+                if(region.is_object()&&region.contains("id")&&region.at("id").is_string()){
+                    std::set<std::string> neighbors;
+                    for(const auto& row:gates)if(row.is_object()&&row.contains("from")&&row.at("from")==region.at("id")&&row.contains("to")&&row.at("to").is_string())
+                        neighbors.insert(row.at("to").get<std::string>());
+                    region["neighbors"]=neighbors;
+                }
         }else if(op=="fit_region_bounds") {
             const auto sourceStage=queue_/"bounds-scene.json",missionStage=queue_/"bounds-partition.json";
             AtomicWrite(sourceStage,document_.dump(2)+"\n");AtomicWrite(missionStage,candidate.dump(2)+"\n");
@@ -293,6 +368,7 @@
                     if(ImGui::Button(shape))AuthorCommand("add_blockout",{{"shape",shape},{"size",{blockSize_[0],blockSize_[1],blockSize_[2]}}});
                     ImGui::SameLine();
                 }
+                ImGui::NewLine();if(ImGui::Button("Add floor triangle"))AuthorCommand("add_floor",Json::object());
                 ImGui::NewLine();ImGui::SeparatorText("Selection");
                 ImGui::TextDisabled("%zu selected in Objects",selection_.size());
                 ImGui::InputFloat3("Move selection",groupOffset_);ImGui::InputFloat("Snap spacing",&snapMetres_);
@@ -344,7 +420,7 @@
                         if(kind=="objective") {bool zone=entity.value("zone",false);if(ImGui::Checkbox("Complete on entering zone",&zone))AuthorCommand("set_game_object",{{"id",selected_},{"patch",{{"zone",zone}}}});}
                         float radius=entity.value("interaction_radius",1.5f);if(ImGui::InputFloat("Interaction / zone radius",&radius)&&radius>=.05f&&radius<=128)AuthorCommand("set_game_object",{{"id",selected_},{"patch",{{"interaction_radius",radius}}}});
                     }
-                    if(kind=="static"||kind=="loot")if(ImGui::Button(kind=="loot"?"Make decorative":"Make collectible"))AuthorCommand("set_game_object",{{"id",selected_},{"patch",{{"kind",kind=="loot"?"static":"loot"}}}});
+                    if((kind=="static"||kind=="loot")&&entity.contains("model")&&!entity.contains("floor"))if(ImGui::Button(kind=="loot"?"Make decorative":"Make collectible"))AuthorCommand("set_game_object",{{"id",selected_},{"patch",{{"kind",kind=="loot"?"static":"loot"}}}});
                     if(entity.contains("collider"))for(const char* field:{"center","half_size"}) {
                         auto proxy=entity.at("collider");float xyz[3]={proxy[field][0],proxy[field][1],proxy[field][2]};
                         if(ImGui::InputFloat3(field,xyz)){proxy[field]={xyz[0],xyz[1],xyz[2]};AuthorCommand("set_game_object",{{"id",selected_},{"patch",{{"collider",proxy}}}});}
@@ -362,4 +438,22 @@
             }catch(const std::exception& e){status_=e.what();}
             ImGui::EndDisabled();
         }
+    }
+    void DrawFloorVertices() {
+        const auto* entity=Entity(selected_);
+        if(!entity||!entity->contains("floor"))return;
+        if(!ImGui::CollapsingHeader("Floor triangle",ImGuiTreeNodeFlags_DefaultOpen))return;
+        const auto source=entity->at("floor").at("vertices");const auto id=selected_;
+        auto [iterator,inserted]=floorVertexInputs_.try_emplace(id);auto& input=iterator->second;
+        if(inserted||input.source!=source){input=FloorVertexInput{};input.source=source;
+            for(int vertex=0;vertex<3;++vertex)for(int axis=0;axis<3;++axis)input.points[vertex][axis]=source[vertex][axis];}
+        ImGui::TextWrapped("Local XYZ vertices. Collision follows this triangle and its slope, including transformed placement. Enable Collision debug for its edges.");
+        for(int vertex=0;vertex<3;++vertex){const auto label="Vertex "+std::to_string(vertex+1);input.pending|=ImGui::InputFloat3(label.c_str(),input.points[vertex]);}
+        ImGui::BeginDisabled(!input.pending);
+        if(ImGui::Button("Apply floor vertices")){
+            Json vertices=Json::array();for(const auto& point:input.points)vertices.push_back({point[0],point[1],point[2]});
+            Defer([this,id,vertices]{AuthorCommand("set_game_object",{{"id",id},{"patch",{{"floor",{{"vertices",vertices}}}}}});});
+        }
+        ImGui::EndDisabled();
+        if(input.pending)ImGui::TextWrapped("Apply the vertices before saving or validating.");
     }

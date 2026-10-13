@@ -570,6 +570,22 @@ class ProjectLevelTests(unittest.TestCase):
         partition.write_bytes(project.json_bytes(mission))
         return source, partition, scene, mission, self.hash("streaming_probe.mission.json")
 
+    def test_stream_profile_menu_catalog_and_missing_partition_keep_native_play_blocked(self):
+        self.stream_fixture()
+        self.stream_source["authoring_profile"]="streamed-mission"
+        self.write("streaming_probe.json",self.stream_source)
+        entry=next(row for row in self.project.list()["levels"] if row["file"]=="streaming_probe.json")
+        self.assertTrue(entry["in_bundle"])
+        self.assertFalse(entry["native_play_supported"])
+        cooked=self.project.cook("streaming_probe.json")
+        self.assertFalse(cooked["native_play_supported"])
+        standalone=copy.deepcopy(self.one);standalone["authoring_profile"]="streamed-mission"
+        self.write("unpartitioned.json",standalone)
+        entry=next(row for row in self.project.list()["levels"] if row["file"]=="unpartitioned.json")
+        self.assertIsNone(entry["streaming"])
+        self.assertFalse(entry["native_play_supported"])
+        self.assertFalse(self.project.cook("unpartitioned.json")["native_play_supported"])
+
     def test_stream_paired_preview_and_save_commit_both_files_without_scene_embedding(self):
         source, partition, scene, mission, mission_sha = self.paired_drafts()
         before = self.content_bytes()

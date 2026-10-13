@@ -15,10 +15,11 @@ enum {
     DL_MISSION_ENTITY_BYTES = 16,
     DL_MISSION_CHUNK_HEADER_BYTES = 32,
     DL_MISSION_SECTION_BYTES = 24,
-    DL_MISSION_MAX_SECTIONS = 3,
+    DL_MISSION_MAX_SECTIONS = 4,
     DL_MISSION_TRIANGLE_BYTES = 44,
     DL_MISSION_TRIANGLE_V2_BYTES = 80,
-    DL_MISSION_COLLIDER_BYTES = 32
+    DL_MISSION_COLLIDER_BYTES = 32,
+    DL_MISSION_FLOOR_BYTES = 36
 };
 enum { DL_MISSION_TRIANGLE_UV = 1, DL_MISSION_TRIANGLE_NORMAL = 2 };
 
@@ -37,7 +38,8 @@ typedef enum {
 typedef enum {
     DL_MISSION_SECTION_TRIANGLES = 1,
     DL_MISSION_SECTION_COLLIDERS = 2,
-    DL_MISSION_SECTION_ENTITIES = 3
+    DL_MISSION_SECTION_ENTITIES = 3,
+    DL_MISSION_SECTION_FLOORS = 4
 } DlMissionSectionKind;
 
 typedef struct { float x, y, z; } DlMissionVec3;
@@ -70,7 +72,7 @@ typedef struct {
     const uint8_t *data;
     size_t bytes;
     DlMissionVec3 origin;
-    uint16_t version; /* DLR1 chunk version: 1 or 2 */
+    uint16_t version; /* DLR1 chunk version: 1, 2 or 3 */
     uint32_t section_count;
     DlMissionSection sections[DL_MISSION_MAX_SECTIONS];
 } DlMissionChunk;
@@ -86,6 +88,7 @@ typedef struct {
     float yaw;
     uint32_t entity_id; /* zero: no association; otherwise a global entity ID */
 } DlMissionCollider;
+typedef struct { DlMissionVec3 vertices[3]; } DlMissionFloorTriangle;
 
 /* Failed open clears the output view. Other getters leave outputs untouched
  * on failure. All indexes except IDs are zero-based. No function allocates. */
@@ -102,6 +105,8 @@ DlMissionStatus dl_mission_triangle(const DlMissionChunk *chunk, uint32_t index,
     DlMissionTriangle *triangle);
 DlMissionStatus dl_mission_collider(const DlMissionChunk *chunk, const DlMission *mission,
     uint32_t index, DlMissionCollider *collider);
+DlMissionStatus dl_mission_floor(const DlMissionChunk *chunk, uint32_t index,
+    DlMissionFloorTriangle *floor);
 DlMissionStatus dl_mission_entity_id(const DlMissionChunk *chunk, const DlMission *mission,
     uint32_t region_id, uint32_t index, uint32_t *entity_id);
 /* IEEE CRC32: begin with UINT32_MAX; finalize with xor UINT32_MAX. */

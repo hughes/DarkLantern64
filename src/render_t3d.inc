@@ -71,6 +71,9 @@ static void gpu_release(void){
 static void gpu_prepare(const DlGame *g){
     unsigned bytes=0,batch_count=0,loads=0;
     for(int i=0;i<g->level->model_count;++i){
+        /* Mesh packing can exceed one audio queue window for a streamed view.
+         * Service between models, before recording its RSP command block. */
+        prepare_audio(g);
         const DlModelInstance *instance=&g->level->models[i];
         const DlMesh *mesh=&g->level->meshes[instance->mesh];
         GpuModel *model=&gpu_models[i];
@@ -83,6 +86,7 @@ static void gpu_prepare(const DlGame *g){
             assertf(model->mesh,"Cannot allocate RSP mesh");
             GpuMesh *shared=model->mesh;
             assertf(dl_render_batches_build(mesh,&shared->batches),"Cannot batch RSP mesh");
+            prepare_audio(g);
             shared->packed_units=1024;
             float extent=0;
             for(int v=0;v<mesh->vertex_count;++v){
@@ -106,6 +110,7 @@ static void gpu_prepare(const DlGame *g){
         int bone_count=mesh->animation?mesh->animation->bone_count:1;
         unsigned vertex_bytes=batches->vertex_count/2*sizeof(T3DVertPacked);
         int16_t *packed_uv=NULL;
+        prepare_audio(g);
         if(mesh->uvs&&instance->texture>=0){
             assertf(instance->texture<g->level->texture_count,"Invalid RSP texture index");
             const DlTexture *texture=&g->level->textures[instance->texture];
@@ -116,6 +121,7 @@ static void gpu_prepare(const DlGame *g){
             assertf(valid,"RSP texture packing model=%d batch=%lu: %s; split triangles with excessive UV spans",i,(unsigned long)error.batch,dl_render_texture_pack_status_name(error.status));
         }
         for(int frame=0;frame<GPU_FRAMES;++frame){
+            prepare_audio(g);
             model->matrices[frame]=memalign(16,bone_count*sizeof(T3DMat4FP));
             assertf(model->matrices[frame],"Cannot allocate RSP palette");
             bytes+=bone_count*sizeof(T3DMat4FP);
@@ -124,6 +130,7 @@ static void gpu_prepare(const DlGame *g){
                 T3DVertPacked *packed=memalign(16,vertex_bytes);model->vertices[frame][side]=packed;
                 assertf(packed,"Cannot allocate RSP vertices");memset(packed,0,vertex_bytes);bytes+=vertex_bytes;
                 for(unsigned v=0;v<batches->vertex_count;++v){
+                    if((v&127u)==0)prepare_audio(g);
                     unsigned source=batches->vertices[v].source_vertex;
                     DlVec3 point=mesh->vertices[source];
                     T3DVertPacked *pair=&packed[v/2];
@@ -137,6 +144,7 @@ static void gpu_prepare(const DlGame *g){
             }
         }
         free(packed_uv);
+        prepare_audio(g);
         /* Vertices and matrices are segment-relative: one immutable command
          * block safely serves all instances' buffered data. A vertex loaded
          * under an earlier bone matrix stays in the RSP cache for joint faces. */

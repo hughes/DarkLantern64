@@ -8,6 +8,8 @@
 #include "render_transform.h"
 #include "static_lighting.h"
 #include "lighting_bake.h"
+#include "dl_music.h"
+#include "stream_rom.h"
 #ifdef DL_RENDER_T3D
 #include "render_batches.h"
 #include "render_lighting.h"
@@ -231,6 +233,12 @@ static void transform_model(const DlGame *g,int index){
     transform_model_vertices(g,index,&pose);
 }
 
+/* Stream scene changes can spend seconds rebuilding CPU lighting in Ares.
+ * Refill audio between bounded CPU batches, with no live world PI transfer.
+ * These calls are outside Tiny3D command-block recording and IRQ context. */
+static void prepare_audio(const DlGame *g){
+    if(g->level->stream&&dl_stream_rom_music_ready())dl_music_service();
+}
 static color_t face_color(const DlGame *g,const DlModelInstance *model,DlVec3 normal,float light){
     float shape=0.72f+0.28f*fmaxf(0,dot(normal,(DlVec3){0.30f,0.81f,-0.50f}));
     float exposure=(0.24f+0.92f*light)*shape;
@@ -285,6 +293,7 @@ static void light_model(const DlGame *g,int index,bool illuminate){
     if(illuminate&&mesh->normals)pose=update_model_pose(g,index);
     if(illuminate&&mesh->normals&&!g->level->environment.enabled){
         for(int v=0;v<mesh->vertex_count;++v){
+            prepare_audio(g);
             DlVec3 normal=mesh->animation?animation_normals[cache->animation_normal_start+v]:
                 dl_render_normal(mesh->normals[v],model->scale,pose.sine,pose.cosine,pose.door_open);
             DlVec3 point=world_vertices[cache->vertex_start+v],back_normal=mul(normal,-1);
@@ -299,6 +308,7 @@ static void light_model(const DlGame *g,int index,bool illuminate){
         }
     }
     for(int t=0;t<mesh->index_count/3;++t){
+        if(illuminate)prepare_audio(g);
         DlVec3 a=world_vertices[cache->vertex_start+mesh->indices[t*3]];
         DlVec3 b=world_vertices[cache->vertex_start+mesh->indices[t*3+1]];
         DlVec3 c=world_vertices[cache->vertex_start+mesh->indices[t*3+2]];
@@ -425,6 +435,7 @@ static void load_textures(const DlGame *g){
     for(int i=0;i<g->level->texture_count;++i){
         textures[i]=sprite_load(g->level->textures[i].path);
         assertf(textures[i],"Cannot load texture %s",g->level->textures[i].path);
+        prepare_audio(g);
     }
     texture_level=g->level;
 }
@@ -934,8 +945,10 @@ static void hud(const DlGame *g,const DlRenderStats *stats){
         /* This probe exposes residency because loading is the demonstrated
          * behavior. Detailed memory/fence instrumentation remains in logs. */
         box(7,30,314,47,rgb(9,12,17));
-        rdpq_text_printf(NULL,1,12,42,"Room %lu  Loaded %lu/2  Loot %lu%s",
+        const DlWorldStream *world=dl_stream_rom_world();
+        rdpq_text_printf(NULL,1,12,42,"Room %lu  Loaded %lu/%lu  Loot %lu%s",
             (unsigned long)stats->stream_current,(unsigned long)stats->stream_regions,
+            world?(unsigned long)world->slot_count:0ul,
             (unsigned long)g->loot_value,
             stats->stream_loading?"  Loading...":"");
         if(stats->debug)rdpq_text_printf(NULL,1,12,188,"Loads %lu  Retired %lu  Slots %luK",
@@ -1001,7 +1014,7 @@ static void background(const DlGame *game){
         }
     }
 }
-#if defined(DL_CAPTURE) || defined(DL_MENU_TEST) || defined(DL_STREAM_TEST) || defined(DL_BAFFORD_STREAM_TEST) || defined(DL_BAFFORD_EXPANDED_TEST)
+#if defined(DL_CAPTURE) || defined(DL_MENU_TEST) || defined(DL_STREAM_TEST) || defined(DL_BAFFORD_STREAM_TEST) || defined(DL_BAFFORD_EXPANDED_TEST) || defined(DL_BAFFORD_DISTRICT_TEST)
 /* Diagnostic builds only: export the actual completed RGBA5551 framebuffer.
  * The explicit GPU wait and dump are outside normal performance captures. */
 static int capture_id;
@@ -1055,7 +1068,7 @@ float dl_render_frame(const DlGame *game,const DlRenderStats *stats){
     dl_profile_record(DL_PROFILE_RENDER_SETUP,mark);
     geometry(game);hud(game,stats);
     mark=dl_profile_mark();
-#if defined(DL_CAPTURE) || defined(DL_STREAM_TEST) || defined(DL_BAFFORD_STREAM_TEST) || defined(DL_BAFFORD_EXPANDED_TEST)
+#if defined(DL_CAPTURE) || defined(DL_STREAM_TEST) || defined(DL_BAFFORD_STREAM_TEST) || defined(DL_BAFFORD_EXPANDED_TEST) || defined(DL_BAFFORD_DISTRICT_TEST)
     if(capture_id){
         rdpq_detach();capture_frame(display);display_show(display);
         if(stats->streaming){

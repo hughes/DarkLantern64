@@ -1,0 +1,699 @@
+{
+  "passed": true,
+  "identities": {
+    "source_sha256": "16160232d3051ba95ca0d78fa66bf02522399aa06659199a3c0285c2832fdcbe",
+    "manifest_sha256": "2f6aeeb0911aaf4806d8a848f0609c2552621a659df66fb5e78b1125fbd329d0",
+    "cook_sha256": "5cc9d0498ef83eb8cece1dfd493bee8e879237bad6c927207a1cbbe7e8dee9c0",
+    "package_sha256": "bb709d76895198bbccf36f9febf52990f2691e0ae67ed4c28e1aa9df7c14aaf5"
+  },
+  "sample_step_metres": 0.02,
+  "doors": "open",
+  "body_radius": 0.18,
+  "body_height": 1.65,
+  "source_contact_scope": "All canonical boxes and exact floor triangles for standing support and body clearance, support heights -3..2m",
+  "gate_apertures": [
+    {
+      "id": "east-to-lower-east-alley",
+      "normal_axis": 2,
+      "plane": 46.7868,
+      "sample_step": 0.02,
+      "valid_samples": 218,
+      "sample_extent": [
+        3.8576,
+        8.1976
+      ],
+      "uncovered_samples": 0,
+      "uncovered_extent": null
+    },
+    {
+      "id": "east-to-ramp-lower",
+      "normal_axis": 2,
+      "plane": 46.7868,
+      "sample_step": 0.02,
+      "valid_samples": 46,
+      "sample_extent": [
+        -0.448,
+        0.452
+      ],
+      "uncovered_samples": 0,
+      "uncovered_extent": null
+    },
+    {
+      "id": "east-to-west",
+      "normal_axis": 0,
+      "plane": -3.048,
+      "sample_step": 0.02,
+      "valid_samples": 214,
+      "sample_extent": [
+        46.9868,
+        51.3468
+      ],
+      "uncovered_samples": 0,
+      "uncovered_extent": null
+    },
+    {
+      "id": "lower-east-alley-to-east",
+      "normal_axis": 2,
+      "plane": 46.7868,
+      "sample_step": 0.02,
+      "valid_samples": 218,
+      "sample_extent": [
+        3.8576,
+        8.1976
+      ],
+      "uncovered_samples": 0,
+      "uncovered_extent": null
+    },
+    {
+      "id": "lower-east-alley-to-outer-east-walk",
+      "normal_axis": 0,
+      "plane": 8.382,
+      "sample_step": 0.02,
+      "valid_samples": 273,
+      "sample_extent": [
+        27.632,
+        33.0708
+      ],
+      "uncovered_samples": 0,
+      "uncovered_extent": null
+    },
+    {
+      "id": "lower-east-alley-to-rear-courtyard",
+      "normal_axis": 0,
+      "plane": 3.6576,
+      "sample_step": 0.02,
+      "valid_samples": 253,
+      "sample_extent": [
+        27.432,
+        32.46
+      ],
+      "uncovered_samples": 0,
+      "uncovered_extent": null
+    },
+    {
+      "id": "lower-east-alley-to-rear-courtyard-north-overlap",
+      "normal_axis": 2,
+      "plane": 27.432000000000002,
+      "sample_step": 0.02,
+      "valid_samples": 118,
+      "sample_extent": [
+        3.6576,
+        6.8176
+      ],
+      "uncovered_samples": 0,
+      "uncovered_extent": null
+    },
+    {
+      "id": "main-interior-to-ramp-upper",
+      "normal_axis": 2,
+      "plane": 39.32,
+      "sample_step": 0.02,
+      "valid_samples": 74,
+      "sample_extent": [
+        -0.728,
+        0.732
+      ],
+      "uncovered_samples": 0,
+      "uncovered_extent": null
+    },
+    {
+      "id": "main-interior-to-rear-courtyard",
+      "normal_axis": 2,
+      "plane": 32.459999999999994,
+      "sample_step": 0.02,
+      "valid_samples": 124,
+      "sample_extent": [
+        -3.2,
+        3.2
+      ],
+      "uncovered_samples": 0,
+      "uncovered_extent": null
+    },
+    {
+      "id": "next-passage-to-rear-courtyard",
+      "normal_axis": 2,
+      "plane": 27.127200000000002,
+      "sample_step": 0.02,
+      "valid_samples": 372,
+      "sample_extent": [
+        -3.6576,
+        3.7624
+      ],
+      "uncovered_samples": 0,
+      "uncovered_extent": null
+    },
+    {
+      "id": "next-passage-to-west-return",
+      "normal_axis": 0,
+      "plane": -3.9624,
+      "sample_step": 0.02,
+      "valid_samples": 96,
+      "sample_extent": [
+        24.8888,
+        26.7888
+      ],
+      "uncovered_samples": 0,
+      "uncovered_extent": null
+    },
+    {
+      "id": "outer-east-walk-to-lower-east-alley",
+      "normal_axis": 0,
+      "plane": 8.382,
+      "sample_step": 0.02,
+      "valid_samples": 273,
+      "sample_extent": [
+        27.632,
+        33.0708
+      ],
+      "uncovered_samples": 0,
+      "uncovered_extent": null
+    },
+    {
+      "id": "ramp-lower-to-east",
+      "normal_axis": 2,
+      "plane": 46.7868,
+      "sample_step": 0.02,
+      "valid_samples": 46,
+      "sample_extent": [
+        -0.448,
+        0.452
+      ],
+      "uncovered_samples": 0,
+      "uncovered_extent": null
+    },
+    {
+      "id": "ramp-lower-to-ramp-upper",
+      "normal_axis": 2,
+      "plane": 43.0,
+      "sample_step": 0.02,
+      "valid_samples": 287,
+      "sample_extent": [
+        -2.868,
+        2.852
+      ],
+      "uncovered_samples": 0,
+      "uncovered_extent": null
+    },
+    {
+      "id": "ramp-upper-to-main-interior",
+      "normal_axis": 2,
+      "plane": 39.32,
+      "sample_step": 0.02,
+      "valid_samples": 74,
+      "sample_extent": [
+        -0.728,
+        0.732
+      ],
+      "uncovered_samples": 0,
+      "uncovered_extent": null
+    },
+    {
+      "id": "ramp-upper-to-ramp-lower",
+      "normal_axis": 2,
+      "plane": 43.0,
+      "sample_step": 0.02,
+      "valid_samples": 287,
+      "sample_extent": [
+        -2.868,
+        2.852
+      ],
+      "uncovered_samples": 0,
+      "uncovered_extent": null
+    },
+    {
+      "id": "rear-courtyard-to-lower-east-alley",
+      "normal_axis": 0,
+      "plane": 3.6576,
+      "sample_step": 0.02,
+      "valid_samples": 253,
+      "sample_extent": [
+        27.432,
+        32.46
+      ],
+      "uncovered_samples": 0,
+      "uncovered_extent": null
+    },
+    {
+      "id": "rear-courtyard-to-lower-east-alley-north-overlap",
+      "normal_axis": 2,
+      "plane": 27.432000000000002,
+      "sample_step": 0.02,
+      "valid_samples": 118,
+      "sample_extent": [
+        3.6576,
+        6.8176
+      ],
+      "uncovered_samples": 0,
+      "uncovered_extent": null
+    },
+    {
+      "id": "rear-courtyard-to-main-interior",
+      "normal_axis": 2,
+      "plane": 32.459999999999994,
+      "sample_step": 0.02,
+      "valid_samples": 124,
+      "sample_extent": [
+        -3.2,
+        3.2
+      ],
+      "uncovered_samples": 0,
+      "uncovered_extent": null
+    },
+    {
+      "id": "rear-courtyard-to-next-passage",
+      "normal_axis": 2,
+      "plane": 27.127200000000002,
+      "sample_step": 0.02,
+      "valid_samples": 372,
+      "sample_extent": [
+        -3.6576,
+        3.7624
+      ],
+      "uncovered_samples": 0,
+      "uncovered_extent": null
+    },
+    {
+      "id": "rear-courtyard-to-west-return",
+      "normal_axis": 0,
+      "plane": -3.6576,
+      "sample_step": 0.02,
+      "valid_samples": 268,
+      "sample_extent": [
+        27.1272,
+        32.46
+      ],
+      "uncovered_samples": 0,
+      "uncovered_extent": null
+    },
+    {
+      "id": "west-return-to-next-passage",
+      "normal_axis": 0,
+      "plane": -3.9624,
+      "sample_step": 0.02,
+      "valid_samples": 96,
+      "sample_extent": [
+        24.8888,
+        26.7888
+      ],
+      "uncovered_samples": 0,
+      "uncovered_extent": null
+    },
+    {
+      "id": "west-return-to-rear-courtyard",
+      "normal_axis": 0,
+      "plane": -3.6576,
+      "sample_step": 0.02,
+      "valid_samples": 268,
+      "sample_extent": [
+        27.1272,
+        32.46
+      ],
+      "uncovered_samples": 0,
+      "uncovered_extent": null
+    },
+    {
+      "id": "west-return-to-west",
+      "normal_axis": 2,
+      "plane": 36.57599999999999,
+      "sample_step": 0.02,
+      "valid_samples": 150,
+      "sample_extent": [
+        -6.8192,
+        -3.8392
+      ],
+      "uncovered_samples": 0,
+      "uncovered_extent": null
+    },
+    {
+      "id": "west-to-east",
+      "normal_axis": 0,
+      "plane": -3.048,
+      "sample_step": 0.02,
+      "valid_samples": 214,
+      "sample_extent": [
+        46.9868,
+        51.3468
+      ],
+      "uncovered_samples": 0,
+      "uncovered_extent": null
+    },
+    {
+      "id": "west-to-west-return",
+      "normal_axis": 2,
+      "plane": 36.57599999999999,
+      "sample_step": 0.02,
+      "valid_samples": 150,
+      "sample_extent": [
+        -6.8192,
+        -3.8392
+      ],
+      "uncovered_samples": 0,
+      "uncovered_extent": null
+    }
+  ],
+  "activation_exits": [
+    {
+      "source": "east",
+      "target": "west",
+      "normal_axis": 0,
+      "plane": -3.048,
+      "sample_step": 0.02,
+      "valid_samples": 214,
+      "sample_extent": [
+        46.9868,
+        51.3468
+      ],
+      "missing_edge": false
+    },
+    {
+      "source": "east",
+      "target": "lower-east-alley",
+      "normal_axis": 2,
+      "plane": 46.7868,
+      "sample_step": 0.02,
+      "valid_samples": 218,
+      "sample_extent": [
+        3.8576,
+        8.1976
+      ],
+      "missing_edge": false
+    },
+    {
+      "source": "east",
+      "target": "ramp-lower",
+      "normal_axis": 2,
+      "plane": 46.7868,
+      "sample_step": 0.02,
+      "valid_samples": 46,
+      "sample_extent": [
+        -0.448,
+        0.452
+      ],
+      "missing_edge": false
+    },
+    {
+      "source": "lower-east-alley",
+      "target": "rear-courtyard",
+      "normal_axis": 0,
+      "plane": 3.6576,
+      "sample_step": 0.02,
+      "valid_samples": 253,
+      "sample_extent": [
+        27.432,
+        32.46
+      ],
+      "missing_edge": false
+    },
+    {
+      "source": "lower-east-alley",
+      "target": "outer-east-walk",
+      "normal_axis": 0,
+      "plane": 8.382,
+      "sample_step": 0.02,
+      "valid_samples": 273,
+      "sample_extent": [
+        27.632,
+        33.0708
+      ],
+      "missing_edge": false
+    },
+    {
+      "source": "lower-east-alley",
+      "target": "rear-courtyard",
+      "normal_axis": 2,
+      "plane": 27.432,
+      "sample_step": 0.02,
+      "valid_samples": 118,
+      "sample_extent": [
+        3.6576,
+        6.8176
+      ],
+      "missing_edge": false
+    },
+    {
+      "source": "lower-east-alley",
+      "target": "east",
+      "normal_axis": 2,
+      "plane": 46.7868,
+      "sample_step": 0.02,
+      "valid_samples": 218,
+      "sample_extent": [
+        3.8576,
+        8.1976
+      ],
+      "missing_edge": false
+    },
+    {
+      "source": "main-interior",
+      "target": "rear-courtyard",
+      "normal_axis": 2,
+      "plane": 32.46,
+      "sample_step": 0.02,
+      "valid_samples": 124,
+      "sample_extent": [
+        -3.2,
+        3.2
+      ],
+      "missing_edge": false
+    },
+    {
+      "source": "main-interior",
+      "target": "ramp-upper",
+      "normal_axis": 2,
+      "plane": 39.32,
+      "sample_step": 0.02,
+      "valid_samples": 74,
+      "sample_extent": [
+        -0.728,
+        0.732
+      ],
+      "missing_edge": false
+    },
+    {
+      "source": "next-passage",
+      "target": "west-return",
+      "normal_axis": 0,
+      "plane": -3.9624,
+      "sample_step": 0.02,
+      "valid_samples": 96,
+      "sample_extent": [
+        24.8888,
+        26.7888
+      ],
+      "missing_edge": false
+    },
+    {
+      "source": "next-passage",
+      "target": "rear-courtyard",
+      "normal_axis": 2,
+      "plane": 27.1272,
+      "sample_step": 0.02,
+      "valid_samples": 372,
+      "sample_extent": [
+        -3.6576,
+        3.7624
+      ],
+      "missing_edge": false
+    },
+    {
+      "source": "next-passage",
+      "target": "west-return",
+      "normal_axis": 2,
+      "plane": 27.1272,
+      "sample_step": 0.02,
+      "valid_samples": 8,
+      "sample_extent": [
+        -3.7824,
+        -3.6576
+      ],
+      "missing_edge": false
+    },
+    {
+      "source": "outer-east-walk",
+      "target": "lower-east-alley",
+      "normal_axis": 0,
+      "plane": 8.382,
+      "sample_step": 0.02,
+      "valid_samples": 273,
+      "sample_extent": [
+        27.632,
+        33.0708
+      ],
+      "missing_edge": false
+    },
+    {
+      "source": "ramp-lower",
+      "target": "ramp-upper",
+      "normal_axis": 2,
+      "plane": 43,
+      "sample_step": 0.02,
+      "valid_samples": 287,
+      "sample_extent": [
+        -2.868,
+        2.852
+      ],
+      "missing_edge": false
+    },
+    {
+      "source": "ramp-lower",
+      "target": "east",
+      "normal_axis": 2,
+      "plane": 46.7868,
+      "sample_step": 0.02,
+      "valid_samples": 46,
+      "sample_extent": [
+        -0.448,
+        0.452
+      ],
+      "missing_edge": false
+    },
+    {
+      "source": "ramp-upper",
+      "target": "main-interior",
+      "normal_axis": 2,
+      "plane": 39.32,
+      "sample_step": 0.02,
+      "valid_samples": 74,
+      "sample_extent": [
+        -0.728,
+        0.732
+      ],
+      "missing_edge": false
+    },
+    {
+      "source": "ramp-upper",
+      "target": "ramp-lower",
+      "normal_axis": 2,
+      "plane": 43,
+      "sample_step": 0.02,
+      "valid_samples": 287,
+      "sample_extent": [
+        -2.868,
+        2.852
+      ],
+      "missing_edge": false
+    },
+    {
+      "source": "rear-courtyard",
+      "target": "west-return",
+      "normal_axis": 0,
+      "plane": -3.6576,
+      "sample_step": 0.02,
+      "valid_samples": 268,
+      "sample_extent": [
+        27.1272,
+        32.46
+      ],
+      "missing_edge": false
+    },
+    {
+      "source": "rear-courtyard",
+      "target": "next-passage",
+      "normal_axis": 2,
+      "plane": 27.1272,
+      "sample_step": 0.02,
+      "valid_samples": 372,
+      "sample_extent": [
+        -3.6576,
+        3.7624
+      ],
+      "missing_edge": false
+    },
+    {
+      "source": "rear-courtyard",
+      "target": "lower-east-alley",
+      "normal_axis": 2,
+      "plane": 32.46,
+      "sample_step": 0.02,
+      "valid_samples": 136,
+      "sample_extent": [
+        3.6576,
+        6.3576
+      ],
+      "missing_edge": false
+    },
+    {
+      "source": "rear-courtyard",
+      "target": "main-interior",
+      "normal_axis": 2,
+      "plane": 32.46,
+      "sample_step": 0.02,
+      "valid_samples": 124,
+      "sample_extent": [
+        -3.2,
+        3.2
+      ],
+      "missing_edge": false
+    },
+    {
+      "source": "west",
+      "target": "east",
+      "normal_axis": 0,
+      "plane": -3.048,
+      "sample_step": 0.02,
+      "valid_samples": 214,
+      "sample_extent": [
+        46.9868,
+        51.3468
+      ],
+      "missing_edge": false
+    },
+    {
+      "source": "west",
+      "target": "west-return",
+      "normal_axis": 2,
+      "plane": 36.576,
+      "sample_step": 0.02,
+      "valid_samples": 150,
+      "sample_extent": [
+        -6.8192,
+        -3.8392
+      ],
+      "missing_edge": false
+    },
+    {
+      "source": "west-return",
+      "target": "next-passage",
+      "normal_axis": 0,
+      "plane": -3.6576,
+      "sample_step": 0.02,
+      "valid_samples": 113,
+      "sample_extent": [
+        24.8888,
+        27.1272
+      ],
+      "missing_edge": false
+    },
+    {
+      "source": "west-return",
+      "target": "rear-courtyard",
+      "normal_axis": 0,
+      "plane": -3.6576,
+      "sample_step": 0.02,
+      "valid_samples": 268,
+      "sample_extent": [
+        27.1272,
+        32.46
+      ],
+      "missing_edge": false
+    },
+    {
+      "source": "west-return",
+      "target": "west",
+      "normal_axis": 2,
+      "plane": 36.576,
+      "sample_step": 0.02,
+      "valid_samples": 150,
+      "sample_extent": [
+        -6.8192,
+        -3.8392
+      ],
+      "missing_edge": false
+    }
+  ],
+  "limits": [
+    "Bounded XZ face/cut sampling at 0.02m; not an exhaustive navigation or PVS proof",
+    "Only standing ground/interior support, not jumping or high roofs",
+    "Activation overlap retains the earlier gate sample until leaving the preferred region"
+  ]
+}

@@ -25,6 +25,11 @@ typedef struct {
     bool door;
 } DlCollider;
 
+/* Exact bounded floor surface; support is sampled at the actor's feet center.
+ * The triangle supplies no artificial solid volume below its plane. */
+typedef struct { DlVec3 vertices[3]; } DlFloorTriangle;
+#define DL_MAX_FLOORS 256
+
 typedef struct {
     const DlVec3 *vertices;
     int vertex_count;
@@ -126,6 +131,8 @@ typedef struct {
     const int16_t *collider_objects; /* collider -> door object index, -1 static */
     const DlFootContacts *foot_contacts; /* optional, one track per enemy */
     const struct DlStreamDefinition *stream; /* optional bounded mission package bootstrap */
+    const DlFloorTriangle *floors;
+    int floor_count;
 } DlLevel;
 
 typedef enum { DL_PATROL, DL_INVESTIGATE, DL_SEARCH, DL_CHASE } DlGuardState;

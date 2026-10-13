@@ -26,14 +26,14 @@ try:
     from compile_bundle import MAX_LEVELS, read_manifest
     import editor_cache
     from character_assets import configure_editor_cache
-    from content_profile import content_limits, is_study, STUDY_LIMITS, STUDY_PLAY_REASON
+    from content_profile import content_limits, is_study, is_streamed, STUDY_LIMITS, STUDY_PLAY_REASON
     from compile_mission import mission_source, cook_mission, validate_stream_bridge, collider_corners
 except ModuleNotFoundError:
     from tools.compile_level import compile_level, validate, transform_point
     from tools.compile_bundle import MAX_LEVELS, read_manifest
     from tools import editor_cache
     from tools.character_assets import configure_editor_cache
-    from tools.content_profile import content_limits, is_study, STUDY_LIMITS, STUDY_PLAY_REASON
+    from tools.content_profile import content_limits, is_study, is_streamed, STUDY_LIMITS, STUDY_PLAY_REASON
     from tools.compile_mission import mission_source, cook_mission, validate_stream_bridge, collider_corners
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -232,10 +232,12 @@ class ProjectLevels:
             return None
         row = self.bundle_row(bundle, path)
         status = {"valid": False, "portable_valid": False, "rom_valid": False, "error": ""}
+        report = None
         try:
             _, report = cook_mission(partition["document"], self.content, source_document=data)
             status = dict(valid=False, portable_valid=True, rom_valid=False, error="", directory_bytes=report["directory_bytes"], package_bytes=report["package_bytes"],
                           peak_neighbor_overlap_chunk_bytes=report["memory"]["peak_neighbor_overlap_chunk_bytes"],
+                          max_resident_regions=report["max_resident_regions"],
                           unknown_costs=report["memory"]["unknown_costs"])
             validate_stream_bridge(report)
             status.update(valid=True, rom_valid=True)
@@ -247,7 +249,8 @@ class ProjectLevels:
                     bundle_id=row["id"] if row and "mission" in row else None,
                     native_play_supported=False, native_play_reason=STREAM_NATIVE_REASON,
                     preview_mode="Complete authoring scene; streaming residency and visibility are not simulated",
-                    regions=copy.deepcopy(partition["document"].get("regions", [])), status=status)
+                    regions=copy.deepcopy(partition["document"].get("regions", [])),
+                    working_sets=copy.deepcopy(report["working_sets"]) if report else [], status=status)
 
     def entry(self, path, raw, data, bundle):
         row = self.bundle_row(bundle, path)
@@ -257,7 +260,7 @@ class ProjectLevels:
                 "in_bundle": row is not None, "bundle_id": row["id"] if row else None,
                 "authoring_profile": data.get('authoring_profile'), "playable": not is_study(data),
                 "runtime_format": "stream-mission-v1" if streaming else "resident-level",
-                "native_play_supported": not is_study(data) and streaming is None,
+                "native_play_supported": not (is_study(data) or is_streamed(data)) and streaming is None,
                 "streaming": streaming,
                 "test_starts": copy.deepcopy(data.get("test_starts", []))}
 
@@ -502,6 +505,7 @@ class ProjectLevels:
             require(len(rows) == 1, "Choose one existing region")
             state = validate(data, self.content, authoring=True)
             boxes = {box["id"]: box for box in state["colliders"]}
+            floors = {row["id"]: row for row in state.get("floors", [])}
             points = []
             for ident in rows[0]["entities"]:
                 require(ident in state["by_id"], "Region contains an unknown entity: " + ident)
@@ -511,6 +515,8 @@ class ProjectLevels:
                     points.extend(transform_point(p, entity["transform"]) for p in state["meshes"][entity["model"]]["vertices"])
                 if ident in boxes:
                     points.extend(collider_corners(boxes[ident]))
+                if ident in floors:
+                    points.extend(floors[ident]["vertices"])
             require(points, "Assign an object before fitting region bounds")
             rows[0]["bounds"] = [[min(p[axis] for p in points)-.01 for axis in range(3)],
                                  [max(p[axis] for p in points)+.01 for axis in range(3)]]
@@ -649,7 +655,7 @@ class ProjectLevels:
                     "changed_preview_assets": changed_preview_assets,
                      "report": report, "preview_fingerprint": preview_fingerprint,
                      "runtime_format": "stream-mission-v1" if streaming else "resident-level",
-                     "native_play_supported": streaming is None and not is_study(candidate_data), "streaming": streaming}
+                     "native_play_supported": streaming is None and not (is_study(candidate_data) or is_streamed(candidate_data)), "streaming": streaming}
             if publish_pair:
                 result.update(source_sha256=sha256(candidate_raw), source_text=candidate_raw.decode("utf-8"), saved_pair=True)
             try:

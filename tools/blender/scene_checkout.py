@@ -24,7 +24,7 @@ def checkout(data):
     scene.unit_settings.system = 'METRIC'
     scene.unit_settings.scale_length = 1
     collections = {}
-    for name in ("Architecture | edit meshes and placement", "Collision | edit box proxies", "Gameplay | reference only"):
+    for name in ("Architecture | edit meshes and placement", "Collision | edit boxes and floor triangles", "Gameplay | reference only"):
         collection = bpy.data.collections.new(name)
         scene.collection.children.link(collection)
         collections[name.split(' |')[0]] = collection
@@ -104,6 +104,16 @@ def checkout(data):
             proxy.location = (x,-z,y)
             x,y,z = row["collider"]["half_size"]
             proxy.scale = (x,z,y)
+        if "floor" in row:
+            floor_mesh = bpy.data.meshes.new(row["id"] + ' | floor')
+            floor_mesh.from_pydata([(x,-z,y) for x,y,z in row["floor"]["vertices"]], [], [(0,1,2)])
+            proxy = bpy.data.objects.new(row["id"] + ' | floor', floor_mesh)
+            collections['Collision'].objects.link(proxy)
+            proxy.parent = obj
+            proxy.display_type = 'WIRE'
+            proxy.show_in_front = True
+            proxy.color = (.2, .8, 1, 1)
+            proxy["dl64_floor_proxy"] = True
     for row in data["context"]:
         obj = bpy.data.objects.new(row['kind'] + ' | ' + row['id'], None)
         collections['Gameplay'].objects.link(obj)
@@ -115,7 +125,7 @@ def checkout(data):
         obj['dl64_reference_only'] = row['id']
         if 'source' in row:
             obj['dl64_source'] = json.dumps(row['source'])
-    data['baseline'] = {row['id']: {k:row[k] for k in ('transform','model','material','collider','collision_authoring') if k in row} for row in data.pop('entities')}
+    data['baseline'] = {row['id']: {k:row[k] for k in ('transform','model','material','collider','floor','collision_authoring') if k in row} for row in data.pop('entities')}
     bpy.context.view_layer.update()
     _, payloads = collect(bpy.context, data)
     for ident, spec in data['meshes'].items():

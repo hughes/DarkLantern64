@@ -15,6 +15,10 @@
                 bool open=b.door&&(g.level->collider_objects?dl_game_object_open(&g,g.level->collider_objects[i]):g.door_open);
                 for(int k=0;k<8;++k)for(int bit:{1,2,4})if(!(k&bit))line(corners[k],corners[k|bit],open?glm::vec4(.2f,.4f,.2f,1):glm::vec4(.2f,.9f,.4f,1));
             }
+            if(debugCollision_)for(int i=0;i<g.level->floor_count;++i) {
+                const auto& floor=g.level->floors[i];
+                for(int j=0;j<3;++j)line(floor.vertices[j],floor.vertices[(j+1)%3],glm::vec4(.2f,.7f,1,1));
+            }
             if(debugSight_)for(int i=0;i<g.enemy_count;++i) {
                 const auto& e=g.enemies[i];DlVec3 eye{e.position.x,e.position.y+1.6f,e.position.z};
                 line(eye,dl_player_eye(&g),e.sees_player?glm::vec4(1,.15f,.1f,1):glm::vec4(.8f,.7f,.1f,1));
@@ -27,6 +31,12 @@
                 for(int k=0;k<8;++k)corners[k]=transform.position+transform.rotation*((centre+half*glm::vec3(k&1?1:-1,k&2?1:-1,k&4?1:-1))*transform.scale);
                 for(int k=0;k<8;++k)for(int bit:{1,2,4})if(!(k&bit))renderer.DrawDebugLine(corners[k],corners[k|bit],glm::vec4(.2f,.9f,.4f,1));
             }
+            for(const auto& row:document_.at("entities"))if(row.contains("floor")) {
+                const auto transform=PreviewTransform(row.at("transform"));const auto& points=row.at("floor").at("vertices");
+                glm::vec3 vertices[3];
+                for(int j=0;j<3;++j)vertices[j]=transform.position+transform.rotation*(Vector(points.at(j))*transform.scale);
+                for(int j=0;j<3;++j)renderer.DrawDebugLine(vertices[j],vertices[(j+1)%3],glm::vec4(.2f,.7f,1,1));
+            }
         }
         (void)scene;
     }
@@ -36,8 +46,8 @@
         result["mode"]=engine_.IsPlaying()?(engine_.IsPlayPaused()?"paused":"playing"):"edit";
         result["systems"]=engine_.PlaySystemNames();result["error"]=nativeError_;
         result["authoring_dirty"]=dirty_;
-        result["native_play_supported"]=StreamingInfo()==nullptr&&
-            (!document_.contains("authoring_profile")||document_.at("authoring_profile")!="external-scale-study");
+        const auto profile=document_.value("authoring_profile",std::string());
+        result["native_play_supported"]=StreamingInfo()==nullptr&&profile!="external-scale-study"&&profile!="streamed-mission";
         if(const auto* streaming=StreamingInfo())result["streaming"]=*streaming;
         return result;
     }
@@ -45,6 +55,8 @@
         if(engine_.IsPlaying()||Busy()||!pendingAction_.empty())throw std::runtime_error("Stop play and finish pending editor work first");
         if(const auto* streaming=StreamingInfo())
             throw std::runtime_error(streaming->value("native_play_reason",std::string("Native Play for stream missions is unavailable; use Run level in Ares.")));
+        if(document_.value("authoring_profile",std::string())=="streamed-mission")
+            throw std::runtime_error("Streamed mission source needs a mission partition and bounded cook; Native Play is unavailable. Use Run level in Ares after preparing its mission manifest.");
         if(document_.contains("authoring_profile")&&document_.at("authoring_profile")=="external-scale-study")
             throw std::runtime_error("This source study is available for editor and Blender inspection. Open its bounded runtime level for Native Play; the full mission needs streaming and runtime capacity work.");
         SyncPreviewTransforms();

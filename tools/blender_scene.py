@@ -24,7 +24,7 @@ from tools.compile_level import read_obj, validate, LIMITS
 from tools.content_profile import content_limits, STUDY_LIMITS
 from tools.project_levels import ProjectLevels, json_bytes, require
 
-OWNED = ("transform", "model", "material", "collider", "collision_authoring")
+OWNED = ("transform", "model", "material", "collider", "floor", "collision_authoring")
 
 
 def sha(raw):

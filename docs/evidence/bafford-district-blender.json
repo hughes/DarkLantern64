@@ -1,0 +1,9 @@
+{
+  "passed": true,
+  "checks": [
+    "exact rotated/scaled round trip",
+    "parent placement",
+    "floor vertex edit",
+    "lost parent rejection"
+  ]
+}

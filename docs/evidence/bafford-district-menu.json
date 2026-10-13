@@ -1,0 +1,471 @@
+{
+  "passed": true,
+  "platform": "Ares",
+  "runs": [
+    {
+      "name": "bundle-idle",
+      "passed": true,
+      "log": ".dev\\ares\\runs\\d1a907757f064d01beaf8c79fa8af5cc\\bundle-idle.log",
+      "tested_rom": ".dev\\ares\\runs\\d1a907757f064d01beaf8c79fa8af5cc\\DarkLantern64-bundle-level_bundle-menu-t3d.z64",
+      "rom_sha256": "2956591ac959445b1e0dc7b2afef5cbccd5ffc593dc086e72f28c17e0570c6ef",
+      "rom_bytes": 1409024,
+      "settings": ".dev\\ares\\runs\\d1a907757f064d01beaf8c79fa8af5cc\\settings.bml",
+      "settings_source_sha256": "d3917400079a47105fa6bd7df53e4f530915aa3b4b70e79769f1b389bc2b196a",
+      "profile_report": null,
+      "elapsed_seconds": 6.031,
+      "peak_sampled_heap_bytes": null,
+      "max_reported_cpu_ms": null,
+      "boot": null,
+      "terminal_event": "DL64 profile_end window=1"
+    },
+    {
+      "name": "bundle-4mb",
+      "passed": true,
+      "log": ".dev\\ares\\runs\\f936a922923d4893bb0c20bd444adaf8\\bundle-4mb.log",
+      "tested_rom": ".dev\\ares\\runs\\f936a922923d4893bb0c20bd444adaf8\\DarkLantern64-bundle-level_bundle-menu-t3d.z64",
+      "rom_sha256": "2956591ac959445b1e0dc7b2afef5cbccd5ffc593dc086e72f28c17e0570c6ef",
+      "rom_bytes": 1409024,
+      "settings": ".dev\\ares\\runs\\f936a922923d4893bb0c20bd444adaf8\\settings.bml",
+      "settings_source_sha256": "d3917400079a47105fa6bd7df53e4f530915aa3b4b70e79769f1b389bc2b196a",
+      "profile_report": null,
+      "elapsed_seconds": 5.016,
+      "peak_sampled_heap_bytes": null,
+      "max_reported_cpu_ms": null,
+      "boot": null,
+      "terminal_event": "DL64 boot_failed reason=expansion_pak memory=4194304 required=8388608"
+    },
+    {
+      "name": "bundle-switching",
+      "passed": true,
+      "log": ".dev\\ares\\runs\\a234299632eb47f19882f409e573ae88\\bundle-switching.log",
+      "tested_rom": ".dev\\ares\\runs\\a234299632eb47f19882f409e573ae88\\DarkLantern64-bundle-level_bundle-menu-menu-test-t3d.z64",
+      "rom_sha256": "92631b865cc8de2c1a828955c3b63a7735baff1b8ac2019740a298a2955e2549",
+      "rom_bytes": 1409024,
+      "settings": ".dev\\ares\\runs\\a234299632eb47f19882f409e573ae88\\settings.bml",
+      "settings_source_sha256": "d3917400079a47105fa6bd7df53e4f530915aa3b4b70e79769f1b389bc2b196a",
+      "profile_report": null,
+      "elapsed_seconds": 445.219,
+      "peak_sampled_heap_bytes": 1743904,
+      "max_reported_cpu_ms": 0.0,
+      "boot": "DL64 boot_ok memory=8388608 scene=\"DarkLantern64 - The Lantern Store\" meshes=9 models=25 colliders=14 version=2 world=3d renderer=rsp-tiny3d depth=hardware",
+      "terminal_event": "DL64 menu_test_complete transitions=186 variants=31 cycles=3"
+    },
+    {
+      "name": "bundle-direct",
+      "passed": true,
+      "log": ".dev\\ares\\runs\\e320b89134484d6fb53d24f1154e5f3b\\bundle-direct.log",
+      "tested_rom": ".dev\\ares\\runs\\e320b89134484d6fb53d24f1154e5f3b\\DarkLantern64-bundle-level_bundle-start-enemy-workshop-preset-store-door-open-t3d.z64",
+      "rom_sha256": "9414cc7a7da4f5a82d00c86e0eb154790e11cf6771ef3f44bac8bd2f95da76f4",
+      "rom_bytes": 1409024,
+      "settings": ".dev\\ares\\runs\\e320b89134484d6fb53d24f1154e5f3b\\settings.bml",
+      "settings_source_sha256": "d3917400079a47105fa6bd7df53e4f530915aa3b4b70e79769f1b389bc2b196a",
+      "profile_report": null,
+      "elapsed_seconds": 5.047,
+      "peak_sampled_heap_bytes": 1291400,
+      "max_reported_cpu_ms": 0.0,
+      "boot": "DL64 boot_ok memory=8388608 scene=\"Enemy Patrol Workshop\" meshes=9 models=27 colliders=14 version=2 world=3d renderer=rsp-tiny3d depth=hardware",
+      "terminal_event": "DL64 frame n=0 t=0.02 ms=16.67 cpu_ms=0.00 heap=1291400/7311696 triangles=0 player=2.50,0.00,0.00 yaw=1.571 pitch=0.000 grounded=1 guard=3.01,0.00,-4.00 light=0.184 alert=0.000 state=PATROL door=1 complete=0 caught=0"
+    },
+    {
+      "name": "single-direct-preset",
+      "passed": true,
+      "log": ".dev\\ares\\runs\\b6056fbbee1b4d0792da04688748b4a6\\single-direct-preset.log",
+      "tested_rom": ".dev\\ares\\runs\\b6056fbbee1b4d0792da04688748b4a6\\DarkLantern64-enemy_patrols-preset-scout-observation-t3d.z64",
+      "rom_sha256": "b4b9b2429f853f71c1accb1e393fd3b62ba08605ea66132742364295d4ba1d2f",
+      "rom_bytes": 491520,
+      "settings": ".dev\\ares\\runs\\b6056fbbee1b4d0792da04688748b4a6\\settings.bml",
+      "settings_source_sha256": "d3917400079a47105fa6bd7df53e4f530915aa3b4b70e79769f1b389bc2b196a",
+      "profile_report": null,
+      "elapsed_seconds": 5.047,
+      "peak_sampled_heap_bytes": 1290368,
+      "max_reported_cpu_ms": 0.0,
+      "boot": "DL64 boot_ok memory=8388608 scene=\"Enemy Patrol Workshop\" meshes=9 models=27 colliders=14 version=2 world=3d renderer=rsp-tiny3d depth=hardware",
+      "terminal_event": "DL64 frame n=0 t=0.02 ms=16.67 cpu_ms=0.00 heap=1290368/7495488 triangles=0 player=-6.00,0.00,2.70 yaw=3.142 pitch=-0.070 grounded=1 guard=3.01,0.00,-4.00 light=0.080 alert=0.000 state=PATROL door=0 complete=0 caught=0"
+    }
+  ],
+  "checks": [
+    "Ordinary menu renders without starting a level; 4 MiB boot gate works",
+    "Every bundled default/test start launches and restarts three times",
+    "Position, view, stance, door and clean mission state match authored starts",
+    "Repeated textured/untextured launches and restarts each reach an exactly stable per-start heap",
+    "Menu resume preserves paused simulation time",
+    "Both bundle and standalone ROMs bypass the menu into a named start"
+  ],
+  "steady_heap_bytes": {
+    "lantern-store/default": {
+      "launch": 1185480,
+      "restart": 1185480
+    },
+    "lantern-store/loot-crate": {
+      "launch": 1185480,
+      "restart": 1185480
+    },
+    "moonlit-yard/default": {
+      "launch": 1297888,
+      "restart": 1297888
+    },
+    "moonlit-yard/loot-counter": {
+      "launch": 1297888,
+      "restart": 1297888
+    },
+    "enemy-workshop/default": {
+      "launch": 1312296,
+      "restart": 1312296
+    },
+    "enemy-workshop/store-door-open": {
+      "launch": 1312296,
+      "restart": 1312296
+    },
+    "enemy-workshop/scout-observation": {
+      "launch": 1312296,
+      "restart": 1312296
+    },
+    "enemy-workshop/loot-crate": {
+      "launch": 1312296,
+      "restart": 1312296
+    },
+    "animation_workshop/default": {
+      "launch": 999448,
+      "restart": 999448
+    },
+    "animation_workshop/guard-front": {
+      "launch": 999448,
+      "restart": 999448
+    },
+    "animation_workshop/two-guards": {
+      "launch": 999448,
+      "restart": 999448
+    },
+    "sponza/default": {
+      "launch": 1488320,
+      "restart": 1488320
+    },
+    "sponza/upper-gallery": {
+      "launch": 1488320,
+      "restart": 1488320
+    },
+    "sponza/east-stairs": {
+      "launch": 1488320,
+      "restart": 1488320
+    },
+    "sponza/west-stairs": {
+      "launch": 1488320,
+      "restart": 1488320
+    },
+    "sponza/courtyard": {
+      "launch": 1488320,
+      "restart": 1488320
+    },
+    "sponza/open-vault": {
+      "launch": 1488320,
+      "restart": 1488320
+    },
+    "bafford-district/default": {
+      "launch": 1570416,
+      "restart": 1570416
+    },
+    "bafford-district/east-street": {
+      "launch": 1570416,
+      "restart": 1570416
+    },
+    "bafford-district/bridge-west": {
+      "launch": 1667296,
+      "restart": 1667296
+    },
+    "bafford-district/upper-room": {
+      "launch": 1636088,
+      "restart": 1636088
+    },
+    "bafford-district/rear-courtyard": {
+      "launch": 1743904,
+      "restart": 1743904
+    },
+    "bafford-district/east-alley": {
+      "launch": 1567432,
+      "restart": 1567432
+    },
+    "bafford-district/west-return": {
+      "launch": 1688584,
+      "restart": 1688584
+    },
+    "bafford-district/outer-east-walk": {
+      "launch": 1660624,
+      "restart": 1660624
+    },
+    "bafford-expanded/default": {
+      "launch": 1394408,
+      "restart": 1394408
+    },
+    "bafford-expanded/east-street": {
+      "launch": 1394408,
+      "restart": 1394408
+    },
+    "bafford-expanded/bridge-west": {
+      "launch": 1394408,
+      "restart": 1394408
+    },
+    "streaming-probe/default": {
+      "launch": 1154640,
+      "restart": 1154640
+    },
+    "streaming-probe/west": {
+      "launch": 1154640,
+      "restart": 1154640
+    },
+    "streaming-probe/east": {
+      "launch": 1176728,
+      "restart": 1176728
+    }
+  },
+  "heap_samples": {
+    "lantern-store/default": [
+      1164584,
+      1164584,
+      1185480,
+      1185480,
+      1185480,
+      1185480
+    ],
+    "lantern-store/loot-crate": [
+      1164584,
+      1164584,
+      1185480,
+      1185480,
+      1185480,
+      1185480
+    ],
+    "moonlit-yard/default": [
+      1276992,
+      1276992,
+      1297888,
+      1297888,
+      1297888,
+      1297888
+    ],
+    "moonlit-yard/loot-counter": [
+      1276992,
+      1276992,
+      1297888,
+      1297888,
+      1297888,
+      1297888
+    ],
+    "enemy-workshop/default": [
+      1291384,
+      1291384,
+      1312296,
+      1312296,
+      1312296,
+      1312296
+    ],
+    "enemy-workshop/store-door-open": [
+      1291384,
+      1291384,
+      1312296,
+      1312296,
+      1312296,
+      1312296
+    ],
+    "enemy-workshop/scout-observation": [
+      1291384,
+      1291384,
+      1312296,
+      1312296,
+      1312296,
+      1312296
+    ],
+    "enemy-workshop/loot-crate": [
+      1291384,
+      1291384,
+      1312296,
+      1312296,
+      1312296,
+      1312296
+    ],
+    "animation_workshop/default": [
+      978528,
+      978528,
+      999448,
+      999448,
+      999448,
+      999448
+    ],
+    "animation_workshop/guard-front": [
+      978528,
+      978528,
+      999448,
+      999448,
+      999448,
+      999448
+    ],
+    "animation_workshop/two-guards": [
+      978528,
+      978528,
+      999448,
+      999448,
+      999448,
+      999448
+    ],
+    "sponza/default": [
+      1488088,
+      1488200,
+      1488320,
+      1488320,
+      1488320,
+      1488320
+    ],
+    "sponza/upper-gallery": [
+      1488200,
+      1488200,
+      1488320,
+      1488320,
+      1488320,
+      1488320
+    ],
+    "sponza/east-stairs": [
+      1488200,
+      1488200,
+      1488320,
+      1488320,
+      1488320,
+      1488320
+    ],
+    "sponza/west-stairs": [
+      1488200,
+      1488200,
+      1488320,
+      1488320,
+      1488320,
+      1488320
+    ],
+    "sponza/courtyard": [
+      1488200,
+      1488200,
+      1488320,
+      1488320,
+      1488320,
+      1488320
+    ],
+    "sponza/open-vault": [
+      1488200,
+      1488200,
+      1488320,
+      1488320,
+      1488320,
+      1488320
+    ],
+    "bafford-district/default": [
+      1570296,
+      1570296,
+      1570416,
+      1570416,
+      1570416,
+      1570416
+    ],
+    "bafford-district/east-street": [
+      1570296,
+      1570296,
+      1570416,
+      1570416,
+      1570416,
+      1570416
+    ],
+    "bafford-district/bridge-west": [
+      1667104,
+      1667104,
+      1667296,
+      1667296,
+      1667296,
+      1667296
+    ],
+    "bafford-district/upper-room": [
+      1636000,
+      1636000,
+      1636088,
+      1636088,
+      1636088,
+      1636088
+    ],
+    "bafford-district/rear-courtyard": [
+      1743704,
+      1743904,
+      1743904,
+      1743904,
+      1743904,
+      1743904
+    ],
+    "bafford-district/east-alley": [
+      1567432,
+      1567432,
+      1567432,
+      1567432,
+      1567432,
+      1567432
+    ],
+    "bafford-district/west-return": [
+      1688584,
+      1688584,
+      1688584,
+      1688584,
+      1688584,
+      1688584
+    ],
+    "bafford-district/outer-east-walk": [
+      1660624,
+      1660624,
+      1660624,
+      1660624,
+      1660624,
+      1660624
+    ],
+    "bafford-expanded/default": [
+      1394408,
+      1394408,
+      1394408,
+      1394408,
+      1394408,
+      1394408
+    ],
+    "bafford-expanded/east-street": [
+      1394408,
+      1394408,
+      1394408,
+      1394408,
+      1394408,
+      1394408
+    ],
+    "bafford-expanded/bridge-west": [
+      1394408,
+      1394408,
+      1394408,
+      1394408,
+      1394408,
+      1394408
+    ],
+    "streaming-probe/default": [
+      1154640,
+      1154640,
+      1154640,
+      1154640,
+      1154640,
+      1154640
+    ],
+    "streaming-probe/west": [
+      1154640,
+      1154640,
+      1154640,
+      1154640,
+      1154640,
+      1154640
+    ],
+    "streaming-probe/east": [
+      1176728,
+      1176728,
+      1176728,
+      1176728,
+      1176728,
+      1176728
+    ]
+  },
+  "menu_image": "C:\\Users\\hughe\\dev\\DarkLantern64\\.dev\\ares\\runs\\a234299632eb47f19882f409e573ae88\\level-select.png"
+}

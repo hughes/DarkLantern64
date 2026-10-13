@@ -32,7 +32,7 @@ ENTITY_RECORD_BYTES = 16
 CHUNK_HEADER_BYTES = 32
 SECTION_RECORD_BYTES = 24
 ENTITY_KINDS = {"guard": 1, "door": 2, "loot": 3, "objective": 4}
-RECORD_BYTES = {1: 44, 2: 32, 3: 4}
+RECORD_BYTES = {1: 44, 2: 32, 3: 4, 4: 36}
 
 
 def canonical_json(value):
@@ -59,13 +59,14 @@ def fields(value, required, label, optional=()):
 
 def read_source(manifest, content_root, source_document=None):
     path = content_path(manifest["source"], content_root, {".json"})
-    level.require(path.stat().st_size <= 8 * 1024 * 1024, "Mission source exceeds 8 MiB")
+    level.require(path.stat().st_size <= 64 * 1024 * 1024, "Mission source exceeds 64 MiB")
     raw = path.read_bytes()
     document = json.loads(raw) if source_document is None else source_document
     if source_document is not None:
         raw = canonical_json(source_document)
     # Run the profile gate before unsupported-feature checks or asset reads.
-    level.content_limits(document, level.LIMITS, authoring=False)
+    limits = level.content_limits(document, level.LIMITS, streaming=True)
+    level.require(len(raw) <= limits["level_bytes"], "Mission source exceeds its source profile byte limit")
     level.require(not document.get("asset_packs"), "DLM1 v1 does not support linked asset packs; use local bounded definitions")
     dependencies = {}
     for asset in document.get("assets", []):
@@ -81,7 +82,7 @@ def read_source(manifest, content_root, source_document=None):
             level.require(isinstance(material["texture"], dict), "material.texture: expected an object")
             dependency = content_path(material["texture"].get("uri"), content_root, {".png", ".jpg", ".jpeg"})
             dependencies[dependency.relative_to(content_root).as_posix()] = hashlib.sha256(dependency.read_bytes()).hexdigest()
-    state = level.validate(document, content_root, authoring=False)
+    state = level.validate(document, content_root, streaming=True)
     for entity in state["models"]:
         if entity["kind"] == "static" and "texture" in state["materials"][entity["material"]]:
             level.require("uvs" in state["meshes"][entity["model"]],
@@ -94,7 +95,7 @@ def validated_regions(manifest, state):
     level.require(isinstance(regions, list) and 1 <= len(regions) <= 256, "regions: expected 1..256 manual regions")
     by_id, homes = {}, {}
     for region in regions:
-        fields(region, {"id", "bounds", "entities", "neighbors"}, "region")
+        fields(region, {"id", "bounds", "entities", "neighbors"}, "region", {"activation_bounds", "working_set"})
         ident = level.identifier(region["id"], "region.id")
         level.require(ident not in by_id, ident + ": duplicate region ID")
         bounds = region["bounds"]
@@ -112,14 +113,122 @@ def validated_regions(manifest, state):
         level.require(len(neighbors) == len(set(neighbors)), ident + ": duplicate neighbor")
         level.require(ident not in neighbors, ident + ": self neighbor is invalid")
         by_id[ident] = dict(id=ident, bounds=[minimum, maximum], entities=sorted(entities), neighbors=sorted(neighbors))
+        if manifest.get("visibility") == "authored-sets":
+            activation = region.get("activation_bounds")
+            level.require(isinstance(activation, list) and len(activation) == 2, ident + ": activation_bounds need minimum/maximum XYZ")
+            activation = [level.vector(row, ident + ".activation_bounds") for row in activation]
+            level.require(all(a < b for a, b in zip(*activation)), ident + ": activation bounds must be ordered")
+            working = region.get("working_set")
+            level.require(isinstance(working, list) and working and all(isinstance(row, str) for row in working) and
+                          len(working) == len(set(working)) and ident in working, ident + ": working_set needs distinct region IDs including self")
+            by_id[ident].update(activation_bounds=activation, working_set=sorted(working))
     level.require(set(homes) == set(state["by_id"]), "Every source entity must have exactly one home region; missing: " + ", ".join(sorted(set(state["by_id"]) - set(homes))))
     level.require(isinstance(manifest["entry_region"], str) and manifest["entry_region"] in by_id, "entry_region: unknown region")
     for region in by_id.values():
         level.require(all(neighbor in by_id for neighbor in region["neighbors"]), region["id"] + ": unknown neighbor reference")
+        if "working_set" in region:
+            level.require(all(ident in by_id for ident in region["working_set"]), region["id"] + ": unknown working_set region")
     # A home is ownership, not necessarily a disjoint geometric volume.
     for entity, home in homes.items():
         assert_bounds(by_id[home], [state["by_id"][entity]["transform"]["position"]], entity + " position")
     return [by_id[ident] for ident in sorted(by_id)], homes
+
+
+def authored_policy(manifest, regions, state, homes):
+    if manifest.get("visibility") != "authored-sets":
+        level.require(not manifest.get("transitions"), "Transitions require authored-sets visibility")
+        return None
+    by_id = {row["id"]: row for row in regions}
+    source = manifest.get("transitions")
+    level.require(isinstance(source, list) and source and len(source) <= 256, "Authored transitions need 1..256 directed gates")
+    gates, ids = [], set()
+    for row in source:
+        fields(row, {"id", "from", "to", "bounds"}, "transition", {"door"})
+        ident = level.identifier(row["id"], "transition.id")
+        level.require(ident not in ids, ident + ": duplicate transition ID")
+        ids.add(ident)
+        level.require(isinstance(row["from"], str) and isinstance(row["to"], str) and row["from"] in by_id and
+                      row["to"] in by_id and row["from"] != row["to"], ident + ": invalid transition regions")
+        level.require(row["to"] in by_id[row["from"]]["neighbors"], ident + ": destination must be an authored neighbor")
+        bounds = row["bounds"]
+        level.require(isinstance(bounds, list) and len(bounds) == 2, ident + ": transition bounds need minimum/maximum XYZ")
+        bounds = [level.vector(value, ident + ".bounds") for value in bounds]
+        level.require(all(a < b for a, b in zip(*bounds)), ident + ": gate bounds must be ordered")
+        for side in (row["from"], row["to"]):
+            activation = by_id[side]["activation_bounds"]
+            level.require(all(max(bounds[0][a], activation[0][a]) <= min(bounds[1][a], activation[1][a]) for a in range(3)),
+                          ident + ": gate must intersect both activation regions")
+        gate=dict(id=ident, **{"from": row["from"], "to": row["to"]}, bounds=bounds)
+        if row.get("door") is not None:
+            door=row["door"]
+            level.require(isinstance(door,str) and door in state["by_id"] and state["by_id"][door]["kind"]=="door",
+                          ident + ": door must identify a canonical door")
+            level.require(homes[door] in (row["from"],row["to"]),ident + ": door home must match an endpoint")
+            level.require(not any(other.get("door")==door and other["from"]==row["from"] for other in gates),
+                          ident + ": one door can select only one target from a region")
+            gate["door"]=door
+        gates.append(gate)
+    gates.sort(key=lambda row: row["id"])
+    reached = {manifest["entry_region"]}
+    while True:
+        expanded = reached | {row["to"] for row in gates if row["from"] in reached}
+        if expanded == reached:
+            break
+        reached = expanded
+    level.require(reached == set(by_id), "Every authored region must be reachable from entry through directed transitions")
+    for region in regions:
+        outgoing = [row for row in gates if row["from"] == region["id"]]
+        level.require(len(outgoing) <= 8, region["id"] + ": at most 8 outgoing gates are supported")
+        level.require(set(region["neighbors"]) == {row["to"] for row in outgoing}, region["id"] + ": every neighbor needs a directed gate")
+    starts = [("spawn", state["kinds"]["spawn"][0]["transform"]["position"])] + [(row["id"], row["position"]) for row in state["test_starts"]]
+    for label, point in starts:
+        level.require(any(all(row["activation_bounds"][0][a] <= point[a] <= row["activation_bounds"][1][a] for a in range(3)) for row in regions),
+                      label + ": start is outside all activation bounds")
+    return dict(regions=regions, transitions=gates)
+
+
+def working_sets(policy, region_reports, state, homes):
+    """Stable/chosen-transition unions, including partial publication."""
+    rows = {row["source_id"]: row for row in region_reports}
+    definitions = {row["id"]: row for row in policy["regions"]} if policy else {}
+    gates = policy["transitions"] if policy else []
+    requests = []
+    if policy:
+        for region in policy["regions"]:
+            outgoing = [row for row in gates if row["from"] == region["id"]]
+            for selected in [[],*[[gate] for gate in outgoing]]:
+                wanted = set(region["working_set"])
+                for gate in selected:
+                    wanted.update(definitions[gate["to"]]["working_set"])
+                requests.append((region["id"], set(region["working_set"]), wanted, [row["id"] for row in selected]))
+    else:
+        requests = [(name, {name}, set(rows), []) for name in rows]
+    result, seen = [], set()
+    for anchor, stable, wanted, gate_ids in requests:
+        optional = sorted(wanted-stable)
+        candidates = [stable,wanted] if not policy or len(wanted)>5 else [
+            stable | {name for index,name in enumerate(optional) if bits & (1 << index)} for bits in range(1 << len(optional))]
+        for resident in candidates:
+            key = (anchor, tuple(sorted(resident)))
+            if key in seen:
+                continue
+            seen.add(key)
+            if policy:
+                barriers = sum(row["from"] in resident and not set(definitions[row["to"]]["working_set"]) <= resident for row in gates)
+            else:
+                barriers = len(rows)-len(resident)
+            dynamic = [entity for entity in state["models"] if entity["kind"] != "static" and
+                       (entity["kind"] in ("door", "guard") or homes[entity["id"]] in resident)]
+            triangles = sum(rows[name]["triangle_count"] for name in resident)
+            groups = sum(len(rows[name]["material_ids"]) for name in resident)
+            result.append(dict(anchor=anchor, gates=gate_ids, regions=[rows[name]["id"] for name in sorted(resident)],
+                source_regions=sorted(resident), triangle_count=triangles, group_count=groups,
+                collider_count=sum(rows[name]["collider_count"] for name in resident),
+                floor_count=sum(rows[name].get("floor_count", 0) for name in resident), barrier_count=barriers,
+                model_count=groups+len(dynamic), scene_vertices=triangles*3+sum(len(state["meshes"][entity["model"]]["vertices"]) for entity in dynamic),
+                scene_triangles=triangles+sum(len(state["meshes"][entity["model"]]["indices"])//3 for entity in dynamic),
+                chunk_bytes=sum(rows[name]["chunk_bytes"] for name in resident)))
+    return result, max(len(wanted) for _, _, wanted, _ in requests)
 
 
 def assert_bounds(region, points, label):
@@ -139,11 +248,11 @@ def collider_corners(box):
 def make_chunk(origin, sections, version=1):
     """Section tuples are (kind, payload, count); empty sections are omitted."""
     sections = sorted((row for row in sections if row[2]), key=lambda row: row[0])
-    level.require(1 <= len(sections) <= 3, "Region requires at least one section")
+    level.require(1 <= len(sections) <= (4 if version == 3 else 3), "Region requires at least one section")
     cursor = align16(CHUNK_HEADER_BYTES + SECTION_RECORD_BYTES * len(sections))
     descriptors, payloads = [], []
     for kind, payload, count in sections:
-        record_bytes = 80 if kind == 1 and version == 2 else RECORD_BYTES[kind]
+        record_bytes = 80 if kind == 1 and version >= 2 else RECORD_BYTES[kind]
         level.require(len(payload) == count * record_bytes, "Internal section length mismatch")
         descriptors.append(struct.pack(">HHIIIII", kind, 0, cursor, len(payload), count, record_bytes, 0))
         payloads.append((cursor, payload))
@@ -179,14 +288,15 @@ def triangle_attributes(mesh, corners, transform, positions):
 
 def cook_mission(manifest, content_root=ROOT / "content", *, source_document=None):
     """Validate all inputs before returning reproducible package bytes/report."""
-    fields(manifest, {"version", "source", "entry_region", "regions"}, "Mission manifest", {"visibility"})
+    fields(manifest, {"version", "source", "entry_region", "regions"}, "Mission manifest", {"visibility", "transitions"})
     level.require(type(manifest["version"]) is int and manifest["version"] == 1, "Mission manifest version must be 1")
-    level.require(manifest.get("visibility", "door-distance") in ("door-distance", "all-regions"), "Unsupported mission visibility policy")
+    level.require(manifest.get("visibility", "door-distance") in ("door-distance", "all-regions", "authored-sets"), "Unsupported mission visibility policy")
     content_root = Path(content_root).resolve()
     document, state, source_raw, dependencies = read_source(manifest, content_root, source_document)
-    chunk_version = 2 if state["textures"] else 1
-    triangle_bytes = 80 if chunk_version == 2 else 44
+    chunk_version = 3 if state.get("floors") else 2 if state["textures"] else 1
+    triangle_bytes = 80 if chunk_version >= 2 else 44
     regions, homes = validated_regions(manifest, state)
+    policy = authored_policy(manifest, regions, state, homes)
     region_ids = {row["id"]: index + 1 for index, row in enumerate(regions)}
     entity_ids = {ident: index + 1 for index, ident in enumerate(sorted(state["by_id"]))}
     material_ids = {ident: index + 1 for index, ident in enumerate(sorted(state["materials"]))}
@@ -200,10 +310,11 @@ def cook_mission(manifest, content_root=ROOT / "content", *, source_document=Non
     surface_rows.sort(key=lambda row: row["source_id"])
     surface_ids = {(row["entity"], row["triangle"]): index + 1 for index, row in enumerate(surface_rows)}
     boxes = {box["id"]: box for box in state["colliders"]}
+    floors = {floor["id"]: floor for floor in state.get("floors", [])}
     chunks, region_reports = [], []
     for region in regions:
         origin = [(a + b) / 2 for a, b in zip(*region["bounds"])]
-        triangle_payload, collider_payload = bytearray(), bytearray()
+        triangle_payload, collider_payload, floor_payload = bytearray(), bytearray(), bytearray()
         region_materials = set()
         for ident in region["entities"]:
             entity = state["by_id"][ident]
@@ -216,7 +327,7 @@ def cook_mission(manifest, content_root=ROOT / "content", *, source_document=Non
                     positions = [points[index] for index in corners]
                     local = [value - origin[axis] for point in positions for axis, value in enumerate(point)]
                     triangle_payload.extend(struct.pack(">9fII", *local, material_ids[entity["material"]], surface_ids[(ident, triangle)]))
-                    if chunk_version == 2:
+                    if chunk_version >= 2:
                         triangle_payload.extend(triangle_attributes(mesh, corners, entity["transform"], positions))
                     region_materials.add(material_ids[entity["material"]])
             if ident in boxes:
@@ -224,16 +335,33 @@ def cook_mission(manifest, content_root=ROOT / "content", *, source_document=Non
                 assert_bounds(region, collider_corners(box), ident + " collider")
                 local = [box["center"][axis] - origin[axis] for axis in range(3)]
                 collider_payload.extend(struct.pack(">7fI", *local, *box["half_size"], box["yaw"], entity_ids[ident]))
+            if ident in floors:
+                points = floors[ident]["vertices"]
+                assert_bounds(region, points, ident + " floor")
+                local = [value-origin[axis] for point in points for axis, value in enumerate(point)]
+                payload = struct.pack(">9f", *local)
+                decoded = struct.unpack(">9f", payload)
+                target_origin = struct.unpack(">3f", struct.pack(">3f", *origin))
+                target_local = [list(decoded[vertex*3:vertex*3+3]) for vertex in range(3)]
+                level.validate_floor_vertices(target_local, ident + " floor at target local float precision")
+                target_world = [[struct.unpack(">f", struct.pack(">f", decoded[vertex*3+axis]+target_origin[axis]))[0]
+                                 for axis in range(3)] for vertex in range(3)]
+                level.validate_floor_vertices(target_world, ident + " floor at target reconstructed float precision", target_float=True)
+                floor_payload.extend(payload)
         entity_payload = b"".join(struct.pack(">I", entity_ids[ident]) for ident in region["entities"])
-        chunk = make_chunk(origin, [(1, triangle_payload, len(triangle_payload) // triangle_bytes),
-                                    (2, collider_payload, len(collider_payload) // 32),
-                                    (3, entity_payload, len(region["entities"]))], version=chunk_version)
+        sections = [(1, triangle_payload, len(triangle_payload) // triangle_bytes),
+                    (2, collider_payload, len(collider_payload) // 32), (3, entity_payload, len(region["entities"]))]
+        if chunk_version == 3:
+            sections.append((4, floor_payload, len(floor_payload)//36))
+        chunk = make_chunk(origin, sections, version=chunk_version)
         chunks.append(chunk)
         region_reports.append(dict(id=region_ids[region["id"]], source_id=region["id"], bounds=region["bounds"], origin=origin,
                                    chunk_version=chunk_version, triangle_count=len(triangle_payload) // triangle_bytes, collider_count=len(collider_payload) // 32,
-                                   material_ids=sorted(region_materials),
+                                   material_ids=sorted(region_materials), floor_count=len(floor_payload)//36,
                                    entity_count=len(region["entities"]), chunk_bytes=len(chunk), crc32=f"{zlib.crc32(chunk):08x}"))
     canonical_manifest = dict(manifest, regions=regions)
+    if policy:
+        canonical_manifest["transitions"] = policy["transitions"]
     source_sha = hashlib.sha256(canonical_json(canonical_source(document))).hexdigest()
     identity = hashlib.sha256(canonical_json(dict(format=f"DLM1/DLR1-v{chunk_version}", source_sha256=source_sha,
                                                  manifest=canonical_manifest, content_dependencies=dependencies))).digest()
@@ -287,6 +415,11 @@ def cook_mission(manifest, content_root=ROOT / "content", *, source_document=Non
                   features=["dynamic model geometry and animation", "material colors in chunk payloads", "lighting and probes", "gameplay definitions, transforms and scripts", "visibility/PVS, navigation, BVHs and triangle sweeps"] + (["UVs and normals"] if chunk_version == 1 else []),
                   unsupported_inputs=["external-scale-study", "animated character assets", "linked asset packs"]),
                   acceptance="Portable package foundation only; neighbor overlap is authored adjacency, not a proven PVS or an 8 MiB runtime budget.")
+    report["working_sets"], report["max_resident_regions"] = working_sets(policy, region_reports, state, homes)
+    if policy:
+        report["policy_regions"] = [dict(id=region_ids[row["id"]], activation_bounds=row["activation_bounds"],
+            working_mask=sum(1 << (region_ids[name]-1) for name in row["working_set"])) for row in regions]
+        report["transitions"] = [dict(row, from_region=region_ids[row["from"]], to_region=region_ids[row["to"]]) for row in policy["transitions"]]
     return bytes(result), report
 
 
@@ -313,6 +446,8 @@ def bootstrap_header(document, state, package_report, package_path):
     model_ids = {entity["model"] for entity in bootstrap["models"]}
     bootstrap["meshes"] = {ident: state["meshes"][ident] for ident in sorted(model_ids)}
     bootstrap["colliders"] = []
+    bootstrap["floors"] = []
+    bootstrap["streamed_source"] = False
     bootstrap.pop("baked_lighting", None)
     text = level.header(document, bootstrap)
     # The existing helper emits legacy collision declarations even at count=0.
@@ -333,12 +468,25 @@ def bootstrap_header(document, state, package_report, package_path):
         color = ",".join(str(round(component * 255)) for component in material["color"])
         materials.append("    {" + str(row["id"]) + ",{ " + color + " }," + str(material.get("double_sided", True)).lower() + "," + str(state["texture_indices"].get(row["source_id"], -1) + 1) + "}")
     links.append("static const DlStreamMaterial dl_stream_materials[] = {\n" + ",\n".join(materials) + "\n};")
+    if package_report.get("visibility") == "authored-sets":
+        def vector(point):
+            return "{" + ",".join(level.f(value) for value in point) + "}"
+        values = ["    {" + vector(row["activation_bounds"][0]) + "," + vector(row["activation_bounds"][1]) +
+                  "," + str(row["working_mask"]) + "u}" for row in package_report["policy_regions"]]
+        links.append("static const DlStreamPolicyRegion dl_stream_policy_regions[] = {\n" + ",\n".join(values) + "\n};")
+        values = ["    {" + str(row["from_region"]) + "," + str(row["to_region"]) + "," +
+                  vector(row["bounds"][0]) + "," + vector(row["bounds"][1]) + "," +
+                  str(entity_ids[row["door"]] if row.get("door") else 0) + "}" for row in package_report["transitions"]]
+        links.append("static const DlStreamTransition dl_stream_transitions[] = {\n" + ",\n".join(values) + "\n};")
     links.append("static const DlStreamDefinition dl_stream_definition = {\n" +
                  "    .package_path=" + json.dumps(package_path) + ",\n" +
                  f"    .directory_bytes={package_report['directory_bytes']}, .file_bytes={package_report['package_bytes']}, " +
                  f".max_region_bytes={max(row['chunk_bytes'] for row in package_report['regions'])}, .region_count={len(package_report['regions'])},\n" +
                  "    .model_entity_ids=dl_stream_model_ids, .object_entity_ids=dl_stream_object_ids, .enemy_entity_ids=dl_stream_enemy_ids,\n" +
                  "    .keep_neighbors_resident=" + str(package_report.get("visibility") == "all-regions").lower() + ",\n" +
+                 (f"    .policy=DL_STREAM_POLICY_AUTHORED, .policy_regions=dl_stream_policy_regions, .transitions=dl_stream_transitions, .transition_count={len(package_report['transitions'])},\n"
+                  if package_report.get("visibility") == "authored-sets" else "") +
+                 f"    .max_resident_regions={package_report['max_resident_regions']},\n" +
                  f"    .materials=dl_stream_materials, .material_count={len(materials)}\n" + "};")
     text = text.replace("static const DlLevel dl_demo_level = {", "\n".join(links) + "\nstatic const DlLevel dl_demo_level = {\n    .stream=&dl_stream_definition,")
     meshes = list(bootstrap["meshes"].values())
@@ -356,13 +504,29 @@ def bootstrap_header(document, state, package_report, package_path):
 def validate_stream_bridge(package_report):
     """The first ROM adapter is deliberately smaller than the portable format."""
     regions = package_report["regions"]
-    level.require(len(regions) == 2, "Stream ROM bridge requires exactly 2 regions")
-    level.require(sum(row["triangle_count"] for row in regions) <= 1024,
-                  "Stream ROM bridge supports at most 1024 resident static triangles")
-    level.require(sum(len(row["material_ids"]) for row in regions) <= 64,
-                  "Stream ROM bridge supports at most 64 nonempty region/material groups")
-    level.require(max(row["collider_count"] for row in regions) + 1 <= 256,
-                  "Stream ROM bridge needs one unavailable-region barrier: each region permits at most 255 colliders")
+    authored = package_report.get("visibility") == "authored-sets"
+    level.require((1 <= len(regions) <= 32) if authored else len(regions) == 2,
+                  "Authored ROM policy requires 1..32 regions" if authored else "Stream ROM bridge requires exactly 2 regions")
+    level.require(len(package_report["entity_ids"]) <= 2048 and package_report["directory_bytes"] <= 65536,
+                  "Stream directory exceeds 2048 entities or 65536 bytes")
+    level.require(package_report["max_resident_regions"] <= 5, "Reachable working set exceeds 5 resident region slots")
+    by_id = {row["id"]: row for row in regions}
+    for working in package_report["working_sets"]:
+        label = "Working set " + ",".join(working["source_regions"]) + " from " + working["anchor"]
+        selected = [by_id[ident] for ident in working["regions"]]
+        triangles = sum(row["triangle_count"] for row in selected)
+        groups = sum(len(row["material_ids"]) for row in selected)
+        floors = sum(row.get("floor_count", 0) for row in selected)
+        boxes = sum(row["collider_count"] for row in selected)
+        level.require(triangles <= 1440, label + ": at most 1440 resident static triangles")
+        level.require(groups <= 64, label + ": at most 64 nonempty region/material groups")
+        level.require(floors <= 128, label + ": at most 128 floor triangles")
+        level.require(boxes+floors+working["barrier_count"] <= 400,
+                      label + ": boxes + floors + unavailable-region barriers exceed 400")
+        level.require(working["model_count"]-working["group_count"]+groups <= 128 and
+                      working["scene_vertices"]-working["triangle_count"]*3+triangles*3 <= 6144 and
+                      working["scene_triangles"]-working["triangle_count"]+triangles <= 4096,
+                      label + ": rendered models/vertices/triangles exceed 128/6144/4096")
     level.require(max(row["chunk_bytes"] for row in regions) <= 65536,
                   "Stream ROM bridge permits at most 65536 bytes per region chunk")
 
@@ -375,7 +539,7 @@ def prepare_stream_level(manifest_path, output, content_root=None):
     manifest_raw, source_raw = manifest_path.read_bytes(), source.read_bytes()
     package, package_report = cook_mission(manifest, content_root)
     document = canonical_source(json.loads(source_raw))
-    state = level.validate(document, content_root, authoring=False)
+    state = level.validate(document, content_root, streaming=True)
     validate_stream_bridge(package_report)
     relative = "romfs/missions/mission-" + package_report["package_sha256"] + ".dlm"
     rom_path = "rom:/missions/" + Path(relative).name

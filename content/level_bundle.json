@@ -23,6 +23,10 @@
       "source": "sponza_courtyard.json"
     },
     {
+      "id": "bafford-district",
+      "mission": "thief_bafford_district.mission.json"
+    },
+    {
       "id": "bafford-expanded",
       "mission": "thief_bafford_expanded.mission.json"
     },

@@ -9,7 +9,7 @@ from unittest.mock import patch
 
 from tools.blender_scene import load_exchange
 from tools.compile_level import ContentError, compile_level, header, play_package, validate
-from tools.content_profile import STUDY_PROFILE
+from tools.content_profile import STUDY_PROFILE, STREAM_PROFILE
 from tools.project_levels import ProjectLevels, json_bytes, sha256, starter_level
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -26,6 +26,45 @@ def large_study():
 
 
 class ContentProfileTests(unittest.TestCase):
+    def test_stream_source_increases_only_total_static_budgets_and_requires_mission_caller(self):
+        document = large_study()
+        document['authoring_profile'] = STREAM_PROFILE
+        with self.assertRaisesRegex(ContentError, 'mission partition'):
+            validate(document)
+        state = validate(document, streaming=True)
+        self.assertGreater(len(state['colliders']), 256)
+        self.assertTrue(state['streamed_source'])
+        self.assertFalse(state['authoring_only'])
+        self.assertEqual(state['limits']['lights'], 16)
+        self.assertEqual(state['limits']['enemies'], 16)
+        for exporter in (header, play_package):
+            with self.assertRaisesRegex(ContentError, 'mission partition'):
+                exporter(document, state)
+        document['authoring_profile'] = STUDY_PROFILE
+        with self.assertRaisesRegex(ContentError, 'authoring-only'):
+            validate(document, streaming=True)
+
+    def test_stream_authoring_preview_does_not_emit_resident_arrays_or_bake_lighting(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            document = large_study()
+            document['authoring_profile'] = STREAM_PROFILE
+            source = root / 'stream.json'
+            source.write_bytes(json_bytes(document))
+            output = root / 'output'
+            (output / 'generated').mkdir(parents=True)
+            (output / 'generated/demo_level.h').write_text('stale resident header')
+            with patch('tools.compile_level.prepare_lighting', side_effect=AssertionError('No resident bake')):
+                report = compile_level(source, output, ROOT / 'content', authoring=True)
+            self.assertFalse(report['playable'])
+            self.assertEqual(report['compiled_geometry_bytes'], 0)
+            self.assertGreater(report['authoring_geometry_bytes'], 0)
+            self.assertFalse((output / 'generated/demo_level.h').exists())
+            self.assertEqual(json.loads((output / 'generated/play.json').read_bytes())['format'], 'darklantern-stream-source')
+            with self.assertRaisesRegex(ContentError, 'mission partition'):
+                compile_level(source, root / 'resident', ROOT / 'content')
+            self.assertFalse((root / 'resident').exists())
+
     def test_profile_requires_document_opt_in_and_authoring_caller(self):
         document = large_study()
         with self.assertRaisesRegex(ContentError, 'authoring-only source study'):

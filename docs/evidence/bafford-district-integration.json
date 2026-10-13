@@ -1,0 +1,292 @@
+{
+  "accepted_functionality": true,
+  "platform": "Ares, 8 MiB RDRAM; original N64/M64 remains unverified",
+  "implementation_branch": "codex/bafford-expanded-coverage",
+  "branch_start": "0acd64f",
+  "menu_entry": "Bafford District",
+  "scope": {
+    "source_cells": 201,
+    "previous_static_triangles": 593,
+    "static_triangles": 2537,
+    "regions": 10,
+    "entities": 843,
+    "materials": 50,
+    "floors": 118,
+    "boxes": 603,
+    "named_starts": 7,
+    "textures": 48
+  },
+  "identities": {
+    "source_sha256": "16160232d3051ba95ca0d78fa66bf02522399aa06659199a3c0285c2832fdcbe",
+    "manifest_sha256": "2f6aeeb0911aaf4806d8a848f0609c2552621a659df66fb5e78b1125fbd329d0",
+    "cook_sha256": "5cc9d0498ef83eb8cece1dfd493bee8e879237bad6c927207a1cbbe7e8dee9c0",
+    "package_sha256": "bb709d76895198bbccf36f9febf52990f2691e0ae67ed4c28e1aa9df7c14aaf5",
+    "normal_rom_sha256": "2956591ac959445b1e0dc7b2afef5cbccd5ffc593dc086e72f28c17e0570c6ef",
+    "build_signature": "f33cc66427b1134b458e3eaf94997c94ab745b6b113207590296e360f622bc92"
+  },
+  "storage": {
+    "rom_bytes": 1409024,
+    "static_image_bytes": 1010736,
+    "mission_bytes": 245496,
+    "directory_bytes": 14288
+  },
+  "bounded_working_sets": {
+    "checked_cases": 49,
+    "triangles": {
+      "value": 1322,
+      "regions": [
+        "main-interior",
+        "next-passage",
+        "rear-courtyard",
+        "west",
+        "west-return"
+      ],
+      "gates": [
+        "rear-courtyard-to-west-return"
+      ]
+    },
+    "combined_contacts": {
+      "value": 383,
+      "regions": [
+        "east",
+        "lower-east-alley",
+        "main-interior",
+        "next-passage",
+        "rear-courtyard"
+      ],
+      "gates": [
+        "lower-east-alley-to-rear-courtyard"
+      ]
+    },
+    "floors": {
+      "value": 64,
+      "regions": [
+        "east",
+        "lower-east-alley",
+        "main-interior",
+        "next-passage",
+        "rear-courtyard"
+      ],
+      "gates": [
+        "lower-east-alley-to-rear-courtyard"
+      ]
+    },
+    "groups": {
+      "value": 50,
+      "regions": [
+        "east",
+        "lower-east-alley",
+        "west"
+      ],
+      "gates": [
+        "east-to-lower-east-alley"
+      ]
+    },
+    "chunk_reservation": {
+      "value": 118696,
+      "regions": [
+        "main-interior",
+        "next-passage",
+        "rear-courtyard",
+        "west",
+        "west-return"
+      ],
+      "gates": [
+        "rear-courtyard-to-west-return"
+      ]
+    },
+    "slots": 5,
+    "allocated_slot_bytes": 178720,
+    "caps": {
+      "triangles": 1440,
+      "combined_contacts": 400,
+      "floors": 128,
+      "groups": 64,
+      "slots": 5
+    }
+  },
+  "runtime": {
+    "bootstrap": {
+      "compiled_geometry_bytes": 624,
+      "mesh_count": 1,
+      "model_count": 2,
+      "models": [
+        "district-demonstration-door",
+        "district-demonstration-loot"
+      ],
+      "model_entity_ids": [
+        825,
+        826
+      ],
+      "object_entity_ids": [
+        825,
+        826
+      ],
+      "enemy_entity_ids": [],
+      "collider_count": 0,
+      "static_model_count": 0,
+      "memory_note": "Shared dynamic geometry arrays only. Descriptors, global gameplay state, stream scene banks, slots and renderer/audio/display costs are additional."
+    },
+    "reported_heap_total_bytes": [
+      7303152
+    ],
+    "ordinary_peak_checkpoint_heap_bytes": 1752304,
+    "ordinary_run": {
+      "name": "bafford-district",
+      "passed": true,
+      "log": ".dev\\ares\\runs\\629e5e3cfbae4fabbb3519dc2b057af9\\bafford-district.log",
+      "tested_rom": ".dev\\ares\\runs\\629e5e3cfbae4fabbb3519dc2b057af9\\DarkLantern64-bundle-level_bundle-menu-bafford-district-test-t3d.z64",
+      "rom_sha256": "a3853764ae08cae5f8c43e221dc32f71b99cb04e319527159bc4b23fb673d89e",
+      "rom_bytes": 1409024,
+      "settings": ".dev\\ares\\runs\\629e5e3cfbae4fabbb3519dc2b057af9\\settings.bml",
+      "settings_source_sha256": "d3917400079a47105fa6bd7df53e4f530915aa3b4b70e79769f1b389bc2b196a",
+      "profile_report": null,
+      "elapsed_seconds": 442.469,
+      "peak_sampled_heap_bytes": 1752304,
+      "max_reported_cpu_ms": 15793.69,
+      "boot": "DL64 boot_ok memory=8388608 scene=\"Bafford District\" meshes=32 models=32 colliders=166 version=2 world=3d renderer=rsp-tiny3d depth=hardware",
+      "terminal_event": "DL64 bafford_district_test_complete passed=1 input_only=1 coverage=1 collision_clear=1 stair_jumps=2 visited_regions=9 loot_persist=1 restart_reload=1 pre_restart_loads=27 audio_calls=11030"
+    },
+    "ordinary_music": {
+      "cue": "lanterns_below",
+      "consumed_frames": 13698168,
+      "generated_blocks": 10773,
+      "max_underruns": 0,
+      "sample_count": 156
+    },
+    "visited_regions": [
+      1,
+      2,
+      3,
+      4,
+      6,
+      7,
+      8,
+      9,
+      10
+    ],
+    "loads": 27,
+    "retirements": 25,
+    "checkpoint_count": 41,
+    "capture_run": {
+      "name": "bafford-district",
+      "passed": true,
+      "log": ".dev\\ares\\runs\\afeda6cb15184eda970b8294a9d630d5\\bafford-district.log",
+      "tested_rom": ".dev\\ares\\runs\\afeda6cb15184eda970b8294a9d630d5\\DarkLantern64-bundle-level_bundle-menu-bafford-district-test-capture-t3d.z64",
+      "rom_sha256": "1f2c874fb4f5b21d3c6aa27cc8117c2794fb60e404f7eb5425af5a68aa7ae5fc",
+      "rom_bytes": 1409024,
+      "settings": ".dev\\ares\\runs\\afeda6cb15184eda970b8294a9d630d5\\settings.bml",
+      "settings_source_sha256": "d3917400079a47105fa6bd7df53e4f530915aa3b4b70e79769f1b389bc2b196a",
+      "profile_report": null,
+      "elapsed_seconds": 450.609,
+      "peak_sampled_heap_bytes": 1752304,
+      "max_reported_cpu_ms": 15814.39,
+      "boot": "DL64 boot_ok memory=8388608 scene=\"Bafford District\" meshes=32 models=32 colliders=166 version=2 world=3d renderer=rsp-tiny3d depth=hardware",
+      "terminal_event": "DL64 bafford_district_test_complete passed=1 input_only=1 coverage=1 collision_clear=1 stair_jumps=2 visited_regions=9 loot_persist=1 restart_reload=1 pre_restart_loads=27 audio_calls=11171"
+    },
+    "capture_music": {
+      "cue": "lanterns_below",
+      "consumed_frames": 13872432,
+      "generated_blocks": 10910,
+      "max_underruns": 4,
+      "sample_count": 160
+    },
+    "performance_accepted": false,
+    "unknown_memory_categories": [
+      "renderer caches, packing and textures",
+      "audio",
+      "code and display/depth buffers",
+      "loader slot padding and scratch",
+      "visibility, navigation and richer collision"
+    ]
+  },
+  "menu": {
+    "variants": 31,
+    "starts_and_restarts": 186,
+    "resumes": 93,
+    "district_steady_heaps": {
+      "bafford-district/default": {
+        "launch": 1570416,
+        "restart": 1570416
+      },
+      "bafford-district/east-street": {
+        "launch": 1570416,
+        "restart": 1570416
+      },
+      "bafford-district/bridge-west": {
+        "launch": 1667296,
+        "restart": 1667296
+      },
+      "bafford-district/upper-room": {
+        "launch": 1636088,
+        "restart": 1636088
+      },
+      "bafford-district/rear-courtyard": {
+        "launch": 1743904,
+        "restart": 1743904
+      },
+      "bafford-district/east-alley": {
+        "launch": 1567432,
+        "restart": 1567432
+      },
+      "bafford-district/west-return": {
+        "launch": 1688584,
+        "restart": 1688584
+      },
+      "bafford-district/outer-east-walk": {
+        "launch": 1660624,
+        "restart": 1660624
+      }
+    }
+  },
+  "authoring": {
+    "editor": {
+      "ok": true,
+      "source": "isolated copy of thief_bafford_district.json",
+      "checks": [
+        "rendered actual ten-region district policy panel with 843 editable source entities",
+        "district activation and working-set paired Undo/Redo",
+        "district directed-gate edits and door deletion clean paired homes/references with Undo",
+        "Drop to surface finds transformed floor-only support under actual district loot and Undo restores placement",
+        "district floor vertex source-only Undo/Redo preserves partition and renders collision edges",
+        "actual district paired Save publishes both identities, remains ROM-valid and explicitly gates Native Play"
+      ],
+      "source_sha256": "16160232d3051ba95ca0d78fa66bf02522399aa06659199a3c0285c2832fdcbe",
+      "manifest_sha256": "2f6aeeb0911aaf4806d8a848f0609c2552621a659df66fb5e78b1125fbd329d0",
+      "editor_pid": 45304,
+      "editor_sha256": "71bf8e8a3c8dcac8519eb575e7411c59689af801354efc88aa20fab3064d8648"
+    },
+    "blender": {
+      "passed": true,
+      "checks": [
+        "exact rotated/scaled round trip",
+        "parent placement",
+        "floor vertex edit",
+        "lost parent rejection"
+      ]
+    },
+    "native_stream_play_supported": false,
+    "gate_aperture_audit": "bafford-district-gates.json"
+  },
+  "verification": {
+    "python_suite": {
+      "ran": 450,
+      "passed": 447,
+      "skipped": 2,
+      "existing_unrelated_error": "test_sponza_physics: sponza-collision-parapet-north geometry/collider mismatch"
+    },
+    "focused_final_checks": "102 compiler, derivation, verifier and bundle checks passed; 14 final derivation checks also passed, including thick landing support",
+    "portable_c": "All gameplay, loader, adapter, renderer helper and launcher groups passed",
+    "bazel": "Editor build and play_floors_test passed",
+    "legacy_regressions": [
+      "streaming-probe",
+      "bafford-expanded"
+    ]
+  },
+  "limitations": [
+    "Synchronous room renderer/lighting preparation causes long pauses; no frame-rate acceptance",
+    "Original mission scripts, guards and objectives remain omitted",
+    "Diagonal wall triangle collision, complete source PVS and outer-route closure remain unproven",
+    "Editor region create/rename/delete and stream Native Play remain future work"
+  ]
+}

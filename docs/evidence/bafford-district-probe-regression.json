@@ -1,0 +1,430 @@
+{
+  "passed": true,
+  "platform": "Ares emulator",
+  "started_at_utc": "2026-10-13T15:25:36Z",
+  "hardware_validation": "Original N64 and M64 pending; emulator traversal is not full memory/frame acceptance",
+  "rom": "C:\\Users\\hughe\\dev\\DarkLantern64\\build\\DarkLantern64-bundle-level_bundle-menu-stream-test-t3d.z64",
+  "rom_sha256": "d0165dc8e3ded44eae42346f02fa5413d0dd9e6e0790a9e4ef1be073669ae1e3",
+  "source_sha256": "59cba6d377174658443f3e0f971d66a792da6351bb78fd593246c8e9a08bf725",
+  "run": {
+    "name": "streaming-probe",
+    "passed": true,
+    "log": ".dev\\ares\\runs\\d8675fcc394a47f786e6becc4923b2b5\\streaming-probe.log",
+    "tested_rom": ".dev\\ares\\runs\\d8675fcc394a47f786e6becc4923b2b5\\DarkLantern64-bundle-level_bundle-menu-stream-test-t3d.z64",
+    "rom_sha256": "d0165dc8e3ded44eae42346f02fa5413d0dd9e6e0790a9e4ef1be073669ae1e3",
+    "rom_bytes": 1409024,
+    "settings": ".dev\\ares\\runs\\d8675fcc394a47f786e6becc4923b2b5\\settings.bml",
+    "settings_source_sha256": "d3917400079a47105fa6bd7df53e4f530915aa3b4b70e79769f1b389bc2b196a",
+    "profile_report": null,
+    "elapsed_seconds": 23.25,
+    "peak_sampled_heap_bytes": 1207448,
+    "max_reported_cpu_ms": 151.49,
+    "boot": "DL64 boot_ok memory=8388608 scene=\"Streaming Rooms\" meshes=3 models=2 colliders=10 version=2 world=3d renderer=rsp-tiny3d depth=hardware",
+    "terminal_event": "DL64 stream_test_complete passed=1 input_only=1 guard_persisted=1 audio_calls=470"
+  },
+  "log": "C:\\Users\\hughe\\dev\\DarkLantern64\\.dev\\ares\\runs\\d8675fcc394a47f786e6becc4923b2b5\\streaming-probe.log",
+  "log_sha256": "5e7957e1cf7e1fd6b156fa0b4db78e9d5e6fad8a7cb02b6898aec3a916f84ff6",
+  "music": {
+    "cue": "lanterns_below",
+    "consumed_frames": 580032,
+    "generated_blocks": 460,
+    "max_underruns": 0,
+    "sample_count": 19
+  },
+  "checkpoints": [
+    {
+      "checkpoint": "start",
+      "tick": 2,
+      "player": [
+        -5.0,
+        0.0,
+        0.0
+      ],
+      "door_open": 0,
+      "loot_value": 0,
+      "collected_objects": 0,
+      "guards": [
+        {
+          "position": [
+            6.0,
+            0.0,
+            -2.0
+          ],
+          "awareness": 0.0,
+          "state": "PATROL",
+          "patrol_index": 0
+        }
+      ],
+      "stream": {
+        "current": 2,
+        "resident": [
+          2
+        ],
+        "reserved": 4672,
+        "allocated": 9344,
+        "completed_loads": 1,
+        "retired": 0,
+        "readbytes": 4672,
+        "stalls": 235,
+        "resident_count": 1
+      }
+    },
+    {
+      "checkpoint": "east_gate_open",
+      "tick": 112,
+      "player": [
+        -1.22,
+        0.0,
+        0.0
+      ],
+      "door_open": 1,
+      "loot_value": 0,
+      "collected_objects": 0,
+      "guards": [
+        {
+          "position": [
+            6.0,
+            0.0,
+            -2.0
+          ],
+          "awareness": 0.0,
+          "state": "PATROL",
+          "patrol_index": 0
+        }
+      ],
+      "stream": {
+        "current": 2,
+        "resident": [
+          2,
+          1
+        ],
+        "reserved": 9308,
+        "allocated": 9344,
+        "completed_loads": 2,
+        "retired": 0,
+        "readbytes": 9308,
+        "stalls": 254,
+        "resident_count": 2
+      }
+    },
+    {
+      "checkpoint": "east_closed",
+      "tick": 177,
+      "player": [
+        0.985,
+        0.0,
+        0.0
+      ],
+      "door_open": 0,
+      "loot_value": 0,
+      "collected_objects": 0,
+      "guards": [
+        {
+          "position": [
+            6.0,
+            0.0,
+            -2.0
+          ],
+          "awareness": 0.0,
+          "state": "PATROL",
+          "patrol_index": 0
+        }
+      ],
+      "stream": {
+        "current": 1,
+        "resident": [
+          2,
+          1
+        ],
+        "reserved": 9308,
+        "allocated": 9344,
+        "completed_loads": 2,
+        "retired": 0,
+        "readbytes": 9308,
+        "stalls": 254,
+        "resident_count": 2
+      }
+    },
+    {
+      "checkpoint": "east_closed_loot",
+      "tick": 314,
+      "player": [
+        4.901,
+        0.0,
+        1.9506
+      ],
+      "door_open": 0,
+      "loot_value": 25,
+      "collected_objects": 4,
+      "guards": [
+        {
+          "position": [
+            6.0,
+            0.0,
+            -2.0
+          ],
+          "awareness": 0.0,
+          "state": "PATROL",
+          "patrol_index": 0
+        }
+      ],
+      "stream": {
+        "current": 1,
+        "resident": [
+          1
+        ],
+        "reserved": 4636,
+        "allocated": 9344,
+        "completed_loads": 2,
+        "retired": 1,
+        "readbytes": 9308,
+        "stalls": 254,
+        "resident_count": 1
+      }
+    },
+    {
+      "checkpoint": "west_retired",
+      "tick": 315,
+      "player": [
+        4.901,
+        0.0,
+        1.9506
+      ],
+      "door_open": 0,
+      "loot_value": 25,
+      "collected_objects": 4,
+      "guards": [
+        {
+          "position": [
+            6.0,
+            0.0,
+            -2.0
+          ],
+          "awareness": 0.0,
+          "state": "PATROL",
+          "patrol_index": 0
+        }
+      ],
+      "stream": {
+        "current": 1,
+        "resident": [
+          1
+        ],
+        "reserved": 4636,
+        "allocated": 9344,
+        "completed_loads": 2,
+        "retired": 1,
+        "readbytes": 9308,
+        "stalls": 254,
+        "resident_count": 1
+      }
+    },
+    {
+      "checkpoint": "west_gate_open",
+      "tick": 516,
+      "player": [
+        1.1955,
+        0.0,
+        0.049
+      ],
+      "door_open": 1,
+      "loot_value": 25,
+      "collected_objects": 4,
+      "guards": [
+        {
+          "position": [
+            6.0,
+            0.0,
+            -2.0
+          ],
+          "awareness": 0.0,
+          "state": "PATROL",
+          "patrol_index": 0
+        }
+      ],
+      "stream": {
+        "current": 1,
+        "resident": [
+          2,
+          1
+        ],
+        "reserved": 9308,
+        "allocated": 9344,
+        "completed_loads": 3,
+        "retired": 1,
+        "readbytes": 13980,
+        "stalls": 273,
+        "resident_count": 2
+      }
+    },
+    {
+      "checkpoint": "west_closed",
+      "tick": 591,
+      "player": [
+        -1.009,
+        0.0,
+        0.0019
+      ],
+      "door_open": 0,
+      "loot_value": 25,
+      "collected_objects": 4,
+      "guards": [
+        {
+          "position": [
+            6.0,
+            0.0,
+            -2.0
+          ],
+          "awareness": 0.0,
+          "state": "PATROL",
+          "patrol_index": 0
+        }
+      ],
+      "stream": {
+        "current": 2,
+        "resident": [
+          2,
+          1
+        ],
+        "reserved": 9308,
+        "allocated": 9344,
+        "completed_loads": 3,
+        "retired": 1,
+        "readbytes": 13980,
+        "stalls": 273,
+        "resident_count": 2
+      }
+    },
+    {
+      "checkpoint": "east_retired",
+      "tick": 703,
+      "player": [
+        -4.8939,
+        0.0,
+        0.0
+      ],
+      "door_open": 0,
+      "loot_value": 25,
+      "collected_objects": 4,
+      "guards": [
+        {
+          "position": [
+            6.0,
+            0.0,
+            -2.0
+          ],
+          "awareness": 0.0,
+          "state": "PATROL",
+          "patrol_index": 0
+        }
+      ],
+      "stream": {
+        "current": 2,
+        "resident": [
+          2
+        ],
+        "reserved": 4672,
+        "allocated": 9344,
+        "completed_loads": 3,
+        "retired": 2,
+        "readbytes": 13980,
+        "stalls": 273,
+        "resident_count": 1
+      }
+    },
+    {
+      "checkpoint": "east_reload_gate_open",
+      "tick": 890,
+      "player": [
+        -1.219,
+        0.0,
+        -0.0001
+      ],
+      "door_open": 1,
+      "loot_value": 25,
+      "collected_objects": 4,
+      "guards": [
+        {
+          "position": [
+            6.0,
+            0.0,
+            -2.0
+          ],
+          "awareness": 0.0,
+          "state": "PATROL",
+          "patrol_index": 0
+        }
+      ],
+      "stream": {
+        "current": 2,
+        "resident": [
+          2,
+          1
+        ],
+        "reserved": 9308,
+        "allocated": 9344,
+        "completed_loads": 4,
+        "retired": 2,
+        "readbytes": 18616,
+        "stalls": 292,
+        "resident_count": 2
+      }
+    },
+    {
+      "checkpoint": "east_reload",
+      "tick": 1082,
+      "player": [
+        4.9117,
+        0.0,
+        1.9716
+      ],
+      "door_open": 1,
+      "loot_value": 25,
+      "collected_objects": 4,
+      "guards": [
+        {
+          "position": [
+            6.0,
+            0.0,
+            -2.0
+          ],
+          "awareness": 0.0,
+          "state": "PATROL",
+          "patrol_index": 0
+        }
+      ],
+      "stream": {
+        "current": 1,
+        "resident": [
+          2,
+          1
+        ],
+        "reserved": 9308,
+        "allocated": 9344,
+        "completed_loads": 4,
+        "retired": 2,
+        "readbytes": 18616,
+        "stalls": 292,
+        "resident_count": 2
+      }
+    }
+  ],
+  "terminal": {
+    "passed": "1",
+    "input_only": "1",
+    "guard_persisted": "1",
+    "audio_calls": "470"
+  },
+  "route": [
+    2,
+    1,
+    2,
+    1
+  ],
+  "functional_passed": true,
+  "capture_diagnostic": false,
+  "audio_continuity_passed": true,
+  "timing_scope": "Ordinary input route without framebuffer export; emulator continuity only",
+  "peak_reserved_chunk_bytes": 9308,
+  "allocated_slot_bytes": 9344
+}

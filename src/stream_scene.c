@@ -7,9 +7,36 @@ static bool valid(const DlStreamScene *scene){
 }
 static DlVec3 vec(DlMissionVec3 p){return (DlVec3){p.x,p.y,p.z};}
 static bool finite_vec(DlVec3 p){return isfinite(p.x)&&isfinite(p.y)&&isfinite(p.z);}
+/* Match the gameplay query after adding the chunk origin: an otherwise valid
+ * local plane can lose its footprint or usable grade at world f32 precision. */
+static bool valid_floor(const DlFloorTriangle *floor){
+    DlVec3 a=floor->vertices[0],b=floor->vertices[1],c=floor->vertices[2];
+    float bx=b.x-a.x,bz=b.z-a.z,by=b.y-a.y,cx=c.x-a.x,cz=c.z-a.z,cy=c.y-a.y;
+    float determinant=bx*cz-bz*cx;
+    if(!isfinite(determinant)||fabsf(determinant)<=1e-8f)return false;
+    float gx=(by*cz-bz*cy)/determinant,gz=(bx*cy-by*cx)/determinant;
+    return isfinite(gx)&&isfinite(gz)&&gx*gx+gz*gz<=1.000001f;
+}
 static bool contains(const DlMissionRegion *region,DlVec3 p){
     return p.x>=region->minimum.x&&p.x<=region->maximum.x&&
         p.y>=region->minimum.y&&p.y<=region->maximum.y&&p.z>=region->minimum.z&&p.z<=region->maximum.z;
+}
+static bool contains_bounds(DlVec3 minimum,DlVec3 maximum,DlVec3 p){
+    return p.x>=minimum.x&&p.x<=maximum.x&&p.y>=minimum.y&&p.y<=maximum.y&&p.z>=minimum.z&&p.z<=maximum.z;
+}
+static bool ordered_bounds(DlVec3 minimum,DlVec3 maximum){
+    return finite_vec(minimum)&&finite_vec(maximum)&&minimum.x<maximum.x&&minimum.y<maximum.y&&minimum.z<maximum.z;
+}
+static unsigned mask_count(uint32_t mask){unsigned count=0;while(mask){mask&=mask-1;++count;}return count;}
+static uint32_t all_regions(uint32_t count){return count==32?UINT32_MAX:(UINT32_C(1)<<count)-1u;}
+static bool region_contains(const DlStreamScene *scene,uint32_t id,DlVec3 position){
+    const DlStreamDefinition *definition=scene->bootstrap->stream;
+    if(definition->policy==DL_STREAM_POLICY_AUTHORED){
+        const DlStreamPolicyRegion *row=&definition->policy_regions[id-1];
+        return contains_bounds(row->activation_minimum,row->activation_maximum,position);
+    }
+    DlMissionRegion region;
+    return dl_mission_region(scene->mission,id,&region)==DL_MISSION_OK&&contains(&region,position);
 }
 static bool bank_resident(const DlStreamSceneBank *bank,uint32_t id){
     for(uint32_t i=0;i<bank->resident_count;++i)if(bank->resident_ids[i]==id)return true;
@@ -19,9 +46,7 @@ static uint32_t locate(const DlStreamScene *scene,const DlStreamSceneBank *bank,
     if(!finite_vec(p))return 0;
     uint32_t first=0;
     for(uint32_t i=1;i<=scene->mission->region_count;++i){
-        DlMissionRegion region;
-        if(dl_mission_region(scene->mission,i,&region)!=DL_MISSION_OK)return 0;
-        if(contains(&region,p)){if(bank_resident(bank,i))return i;if(!first)first=i;}
+        if(region_contains(scene,i,p)){if(bank_resident(bank,i))return i;if(!first)first=i;}
     }
     return first;
 }
@@ -50,7 +75,7 @@ DlStreamSceneStatus dl_stream_scene_init(DlStreamScene *scene,const DlLevel *boo
     const DlStreamDefinition *definition=bootstrap->stream;
     if(!definition->package_path||!*definition->package_path||definition->directory_bytes!=mission->directory_bytes||
         definition->file_bytes!=mission->file_bytes||definition->region_count!=mission->region_count||
-        !definition->max_region_bytes||bootstrap->collider_count!=0)return DL_STREAM_SCENE_ARGUMENT;
+        !definition->max_region_bytes||bootstrap->collider_count!=0||bootstrap->floor_count!=0)return DL_STREAM_SCENE_ARGUMENT;
     if(mission->region_count>DL_STREAM_SCENE_MAX_REGIONS||mission->entity_count>DL_STREAM_SCENE_MAX_ENTITIES||
         bootstrap->model_count<0||bootstrap->model_count>DL_MAX_MODELS||
         bootstrap->mesh_count<0||bootstrap->mesh_count>DL_MAX_MODELS||
@@ -59,6 +84,29 @@ DlStreamSceneStatus dl_stream_scene_init(DlStreamScene *scene,const DlLevel *boo
         bootstrap->texture_count<0||bootstrap->texture_count>64||
         bootstrap->light_count<0||bootstrap->light_count>16||
         definition->material_count>DL_STREAM_SCENE_MAX_MATERIALS)return DL_STREAM_SCENE_CAPACITY;
+    if(definition->policy!=DL_STREAM_POLICY_LEGACY&&definition->policy!=DL_STREAM_POLICY_AUTHORED)return DL_STREAM_SCENE_ARGUMENT;
+    if(definition->max_resident_regions>DL_STREAM_SCENE_MAX_RESIDENT_REGIONS)return DL_STREAM_SCENE_CAPACITY;
+    if(definition->policy==DL_STREAM_POLICY_AUTHORED){
+        if(!definition->policy_regions||!definition->max_resident_regions||definition->keep_neighbors_resident||
+            !definition->transitions||!definition->transition_count||definition->transition_count>256)return DL_STREAM_SCENE_ARGUMENT;
+        uint32_t allowed=all_regions(mission->region_count);
+        for(uint32_t id=1;id<=mission->region_count;++id){
+            const DlStreamPolicyRegion *row=&definition->policy_regions[id-1];
+            if(!ordered_bounds(row->activation_minimum,row->activation_maximum)||
+                !(row->working_mask&(UINT32_C(1)<<(id-1)))||(row->working_mask&~allowed)||
+                mask_count(row->working_mask)>definition->max_resident_regions)return DL_STREAM_SCENE_ARGUMENT;
+        }
+        for(uint32_t i=0;i<definition->transition_count;++i){
+            const DlStreamTransition *gate=&definition->transitions[i];
+            if(!gate->from_region||gate->from_region>mission->region_count||!gate->to_region||
+                gate->to_region>mission->region_count||gate->from_region==gate->to_region||
+                !ordered_bounds(gate->minimum,gate->maximum))return DL_STREAM_SCENE_ARGUMENT;
+            if(gate->door_entity_id){DlMissionEntity door;
+                if(dl_mission_entity(mission,gate->door_entity_id,&door)!=DL_MISSION_OK||door.kind!=DL_MISSION_ENTITY_DOOR||
+                    (door.home_region_id!=gate->from_region&&door.home_region_id!=gate->to_region)||!definition->object_entity_ids||
+                    object_index(&(DlStreamScene){.bootstrap=bootstrap},door.id)<0)return DL_STREAM_SCENE_ARGUMENT;}
+        }
+    }
     if((bootstrap->model_count&&!bootstrap->models)||(bootstrap->mesh_count&&!bootstrap->meshes)||
         (bootstrap->object_count&&!bootstrap->objects)||(bootstrap->enemy_count&&!bootstrap->enemies)||
         (bootstrap->light_count&&!bootstrap->lights)||(bootstrap->texture_count&&!bootstrap->textures)||
@@ -120,7 +168,7 @@ DlStreamSceneStatus dl_stream_scene_init(DlStreamScene *scene,const DlLevel *boo
     return DL_STREAM_SCENE_OK;
 }
 static DlStreamSceneStatus add_collider(DlStreamSceneBank *bank,DlCollider box,int object){
-    if(bank->level.collider_count>=DL_STREAM_SCENE_MAX_COLLIDERS)return DL_STREAM_SCENE_CAPACITY;
+    if(bank->level.collider_count+bank->level.floor_count>=DL_STREAM_SCENE_MAX_COLLIDERS)return DL_STREAM_SCENE_CAPACITY;
     int index=bank->level.collider_count++;
     bank->colliders[index]=box;bank->collider_objects[index]=(int16_t)object;return DL_STREAM_SCENE_OK;
 }
@@ -182,6 +230,22 @@ static DlStreamSceneStatus scan_chunk(DlStreamScene *scene,DlStreamSceneBank *ba
             if(status!=DL_STREAM_SCENE_OK)return status;
         }
     }
+    if(dl_mission_section(chunk,DL_MISSION_SECTION_FLOORS,&section)==DL_MISSION_OK){
+        if(section.count>(uint32_t)(DL_STREAM_SCENE_MAX_FLOORS-bank->level.floor_count)||
+            section.count>(uint32_t)(DL_STREAM_SCENE_MAX_COLLIDERS-bank->level.collider_count-bank->level.floor_count))return DL_STREAM_SCENE_CAPACITY;
+        for(uint32_t i=0;i<section.count;++i){
+            DlMissionFloorTriangle floor;
+            if(dl_mission_floor(chunk,i,&floor)!=DL_MISSION_OK)return DL_STREAM_SCENE_CORRUPT;
+            DlFloorTriangle value;
+            for(int vertex=0;vertex<3;++vertex){
+                value.vertices[vertex]=(DlVec3){floor.vertices[vertex].x+chunk->origin.x,
+                    floor.vertices[vertex].y+chunk->origin.y,floor.vertices[vertex].z+chunk->origin.z};
+                if(!finite_vec(value.vertices[vertex]))return DL_STREAM_SCENE_CORRUPT;
+            }
+            if(!valid_floor(&value))return DL_STREAM_SCENE_CORRUPT;
+            bank->floors[bank->level.floor_count++]=value;
+        }
+    }
     return DL_STREAM_SCENE_OK;
 }
 static DlStreamSceneStatus fill_chunk(DlStreamSceneBank *bank,const DlMissionChunk *chunk,uint32_t region_id){
@@ -214,6 +278,7 @@ DlStreamSceneStatus dl_stream_scene_refresh(DlStreamScene *scene,DlWorldStream *
     memset(bank,0,sizeof *bank);bank->level=*scene->bootstrap;
     bank->level.meshes=bank->meshes;bank->level.models=bank->models;bank->level.model_count=0;
     bank->level.colliders=bank->colliders;bank->level.collider_count=0;bank->level.collider_objects=bank->collider_objects;
+    bank->level.floors=bank->floors;bank->level.floor_count=0;
     bank->level.baked_lighting=NULL;
     if(scene->bootstrap->mesh_count)memcpy(bank->meshes,scene->bootstrap->meshes,
         (size_t)scene->bootstrap->mesh_count*sizeof(DlMesh));
@@ -277,13 +342,22 @@ DlStreamSceneStatus dl_stream_scene_refresh(DlStreamScene *scene,DlWorldStream *
             .texture=source->texture_id?(int16_t)(source->texture_id-1):-1,.double_sided=source->double_sided,.enemy_index=-1};
         memcpy(model->color,source->color,4);
     }
-    for(uint32_t id=1;id<=scene->mission->region_count;++id){
+    const DlStreamDefinition *definition=scene->bootstrap->stream;
+    if(definition->policy==DL_STREAM_POLICY_AUTHORED){
+        uint32_t mask=0;for(size_t i=0;i<borrowed;++i)mask|=UINT32_C(1)<<(bank->resident_ids[i]-1);
+        for(uint32_t i=0;i<definition->transition_count;++i){
+            const DlStreamTransition *gate=&definition->transitions[i];
+            if(!bank_resident(bank,gate->from_region)||
+                (mask&definition->policy_regions[gate->to_region-1].working_mask)==definition->policy_regions[gate->to_region-1].working_mask)continue;
+            DlCollider barrier={.center={(gate->minimum.x+gate->maximum.x)*.5f,(gate->minimum.y+gate->maximum.y)*.5f,(gate->minimum.z+gate->maximum.z)*.5f},
+                .half_size={(gate->maximum.x-gate->minimum.x)*.5f,(gate->maximum.y-gate->minimum.y)*.5f,(gate->maximum.z-gate->minimum.z)*.5f}};
+            result=add_collider(bank,barrier,-1);if(result!=DL_STREAM_SCENE_OK)goto finish;
+        }
+    }else for(uint32_t id=1;id<=scene->mission->region_count;++id){
         if(bank_resident(bank,id))continue;
         DlMissionRegion region;dl_mission_region(scene->mission,id,&region);
-        DlCollider barrier={.center={region.minimum.x*0.5f+region.maximum.x*0.5f,
-            region.minimum.y*0.5f+region.maximum.y*0.5f,region.minimum.z*0.5f+region.maximum.z*0.5f},
-            .half_size={(region.maximum.x-region.minimum.x)*0.5f,(region.maximum.y-region.minimum.y)*0.5f,
-                (region.maximum.z-region.minimum.z)*0.5f}};
+        DlCollider barrier={.center={region.minimum.x*.5f+region.maximum.x*.5f,region.minimum.y*.5f+region.maximum.y*.5f,region.minimum.z*.5f+region.maximum.z*.5f},
+            .half_size={(region.maximum.x-region.minimum.x)*.5f,(region.maximum.y-region.minimum.y)*.5f,(region.maximum.z-region.minimum.z)*.5f}};
         result=add_collider(bank,barrier,-1);if(result!=DL_STREAM_SCENE_OK)goto finish;
     }
 finish:
@@ -296,6 +370,119 @@ const DlLevel *dl_stream_scene_level(const DlStreamScene *scene){
 }
 uint32_t dl_stream_scene_region_at(const DlStreamScene *scene,DlVec3 position){
     return valid(scene)?locate(scene,&scene->banks[scene->active_bank],position):0;
+}
+uint32_t dl_stream_scene_region_at_preferred(const DlStreamScene *scene,DlVec3 position,uint32_t preferred){
+    if(!valid(scene)||!finite_vec(position))return 0;
+    if(preferred&&preferred<=scene->mission->region_count&&region_contains(scene,preferred,position))return preferred;
+    return locate(scene,&scene->banks[scene->active_bank],position);
+}
+uint32_t dl_stream_scene_working_mask(const DlStreamScene *scene,uint32_t region){
+    if(!valid(scene)||!region||region>scene->mission->region_count)return 0;
+    return scene->bootstrap->stream->policy==DL_STREAM_POLICY_AUTHORED?
+        scene->bootstrap->stream->policy_regions[region-1].working_mask:UINT32_C(1)<<(region-1);
+}
+static float gate_distance(const DlStreamTransition *gate,DlVec3 p){
+    float x=fmaxf(gate->minimum.x-p.x,fmaxf(0,p.x-gate->maximum.x));
+    float y=fmaxf(gate->minimum.y-p.y,fmaxf(0,p.y-gate->maximum.y));
+    float z=fmaxf(gate->minimum.z-p.z,fmaxf(0,p.z-gate->maximum.z));
+    return sqrtf(x*x+y*y+z*z);
+}
+static bool gate_crossed(const DlStreamTransition *gate,DlVec3 from,DlVec3 to){
+    float entry=0,exit=1;
+    const float start[3]={from.x,from.y,from.z},end[3]={to.x,to.y,to.z};
+    const float minimum[3]={gate->minimum.x,gate->minimum.y,gate->minimum.z};
+    const float maximum[3]={gate->maximum.x,gate->maximum.y,gate->maximum.z};
+    for(int axis=0;axis<3;++axis){
+        float delta=end[axis]-start[axis];
+        if(delta==0){if(start[axis]<minimum[axis]||start[axis]>maximum[axis])return false;}
+        else{
+            float first=(minimum[axis]-start[axis])/delta,last=(maximum[axis]-start[axis])/delta;
+            if(first>last){float swap=first;first=last;last=swap;}
+            entry=fmaxf(entry,first);exit=fminf(exit,last);
+            if(entry>exit)return false;
+        }
+    }
+    return true;
+}
+void dl_stream_scene_policy_reset(DlStreamPolicyState *state){if(state)memset(state,0,sizeof *state);}
+uint32_t dl_stream_scene_demand(const DlStreamScene *scene,DlVec3 position,uint32_t current){
+    DlStreamPolicyState state={.current_region=current};
+    return dl_stream_scene_policy_update(scene,position,0,&state);
+}
+uint32_t dl_stream_scene_policy_update(const DlStreamScene *scene,DlVec3 position,uint32_t resident,DlStreamPolicyState *state){
+    if(!valid(scene)||!state||!finite_vec(position))return 0;
+    const DlStreamDefinition *definition=scene->bootstrap->stream;
+    if(state->current_region>scene->mission->region_count||
+        (state->has_previous_position&&!finite_vec(state->previous_position)))return 0;
+    uint32_t waiting=0;
+    uint32_t candidate=dl_stream_scene_region_at_preferred(scene,position,state->current_region?state->current_region:scene->mission->entry_region_id);
+    if(!state->current_region){if(!candidate)return 0;state->current_region=candidate;}
+    else if(candidate&&candidate!=state->current_region){
+        uint32_t target=dl_stream_scene_working_mask(scene,candidate);
+        for(uint32_t i=0;i<definition->transition_count;++i){
+            const DlStreamTransition *gate=&definition->transitions[i];
+            if(gate->from_region!=state->current_region||gate->to_region!=candidate||
+                !(contains_bounds(gate->minimum,gate->maximum,position)||
+                  (state->has_previous_position&&gate_crossed(gate,state->previous_position,position))))continue;
+            if((resident&target)==target){state->current_region=candidate;state->pending_transition=0;}
+            else waiting=i+1;
+            break;
+        }
+    }
+    bool retain_sample=waiting!=0;
+    if(candidate==state->current_region&&state->has_previous_position&&definition->policy==DL_STREAM_POLICY_AUTHORED){
+        for(uint32_t i=0;i<definition->transition_count;++i){const DlStreamTransition *gate=&definition->transitions[i];
+            if(gate->from_region==state->current_region&&region_contains(scene,gate->to_region,position)&&
+                gate_crossed(gate,state->previous_position,position)){retain_sample=true;break;}
+        }
+    }
+    /* Keep the from-side sample while a crossed destination is loading, or
+     * preferred activation overlap still retains the current region. Otherwise
+     * the next frame could forget the thin gate before leaving that overlap.
+     * Returning to the from side replaces the sample and cancels the attempt. */
+    if(!retain_sample||!state->has_previous_position){state->previous_position=position;state->has_previous_position=true;}
+    uint32_t wanted=dl_stream_scene_working_mask(scene,state->current_region);
+    if(definition->policy!=DL_STREAM_POLICY_AUTHORED)return wanted;
+    uint32_t best=waiting;float nearest=3.f;
+    for(uint32_t i=0;i<definition->transition_count;++i){const DlStreamTransition *gate=&definition->transitions[i];
+        if(gate->from_region!=state->current_region)continue;
+        float distance=gate_distance(gate,position);
+        if(!waiting&&distance<=nearest&&(!best||distance<nearest)){nearest=distance;best=i+1;}
+    }
+    if(!waiting&&state->pending_transition&&state->pending_transition<=definition->transition_count){
+        const DlStreamTransition *pending=&definition->transitions[state->pending_transition-1];
+        float distance=gate_distance(pending,position);
+        if(pending->from_region==state->current_region&&distance<=3.f&&(!best||nearest+.15f>=distance))best=state->pending_transition;
+    }
+    state->pending_transition=best;
+    if(best)wanted|=dl_stream_scene_working_mask(scene,definition->transitions[best-1].to_region);
+    return wanted;
+}
+bool dl_stream_scene_transition_at(const DlStreamScene *scene,uint32_t from,uint32_t to,DlVec3 position){
+    if(!valid(scene)||!finite_vec(position))return false;
+    const DlStreamDefinition *definition=scene->bootstrap->stream;
+    for(uint32_t i=0;i<definition->transition_count;++i){const DlStreamTransition *gate=&definition->transitions[i];
+        if(gate->from_region==from&&gate->to_region==to&&contains_bounds(gate->minimum,gate->maximum,position))return true;}
+    return false;
+}
+bool dl_stream_scene_gate_waiting(const DlStreamScene *scene,DlVec3 position,uint32_t resident){
+    if(!valid(scene)||!finite_vec(position))return false;
+    const DlStreamDefinition *definition=scene->bootstrap->stream;
+    if(definition->policy!=DL_STREAM_POLICY_AUTHORED)return false;
+    for(uint32_t i=0;i<definition->transition_count;++i){const DlStreamTransition *gate=&definition->transitions[i];
+        uint32_t target=dl_stream_scene_working_mask(scene,gate->to_region);
+        if((resident&(UINT32_C(1)<<(gate->from_region-1)))&&(resident&target)!=target&&gate_distance(gate,position)<=.35f)return true;}
+    return false;
+}
+uint32_t dl_stream_scene_door_target(const DlStreamScene *scene,uint32_t current,uint32_t door,uint32_t *transition){
+    if(transition)*transition=0;
+    if(!valid(scene)||!door||!transition)return 0;
+    const DlStreamDefinition *definition=scene->bootstrap->stream;
+    if(definition->policy!=DL_STREAM_POLICY_AUTHORED)return 0;
+    for(uint32_t i=0;i<definition->transition_count;++i){const DlStreamTransition *gate=&definition->transitions[i];
+        if(gate->from_region==current&&gate->door_entity_id==door){*transition=i+1;
+            return dl_stream_scene_working_mask(scene,current)|dl_stream_scene_working_mask(scene,gate->to_region);}}
+    return 0;
 }
 bool dl_stream_scene_region_resident(const DlStreamScene *scene,uint32_t region_id){
     return valid(scene)&&bank_resident(&scene->banks[scene->active_bank],region_id);

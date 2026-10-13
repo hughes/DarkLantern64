@@ -1,0 +1,96 @@
+{
+  "hits": {
+    "resident": {
+      "rear-courtyard": 146,
+      "west-return": 574,
+      "sky": 2560
+    },
+    "resident-two-sided": {
+      "rear-courtyard": 146,
+      "west-return": 574,
+      "sky": 2560
+    },
+    "full": {
+      "rear-courtyard": 146,
+      "next-passage": 2407,
+      "west-return": 492,
+      "sky": 235
+    },
+    "full-two-sided": {
+      "rear-courtyard": 146,
+      "next-passage": 2407,
+      "west-return": 492,
+      "sky": 235
+    }
+  },
+  "center_samples": {
+    "158,109": {
+      "region": null,
+      "point": null,
+      "normal": null,
+      "result": "no hit within64m in selected full district geometry"
+    },
+    "158,149": {
+      "region": "next-passage",
+      "point": [
+        -1.2466412510972231,
+        0.0,
+        23.726622518216654
+      ],
+      "normal": [
+        0.0,
+        5.494826947708031,
+        -0.0
+      ]
+    },
+    "158,189": {
+      "region": "next-passage",
+      "point": [
+        -1.7514255272747208,
+        0.0,
+        26.81944137697557
+      ],
+      "normal": [
+        0.0,
+        5.852891778218253,
+        0.0
+      ]
+    }
+  },
+  "method": "Moller-Trumbore rays against decoded DLR1 v3 world triangles; front faces use cross(b-a,c-a) dot (eye-a)>=0. Lighting, texture shading and hardware position quantization are outside this geometric coverage audit.",
+  "sample_count": 3280,
+  "pixel_step": 4,
+  "view_rect": [
+    0,
+    27,
+    320,
+    192
+  ],
+  "focal": 164,
+  "horizon": 109.5,
+  "eye": [
+    -2.2499,
+    1.5,
+    29.8736
+  ],
+  "look_at_xz": [
+    -1.2,
+    23.9
+  ],
+  "resident_regions": [
+    "west",
+    "rear-courtyard",
+    "west-return",
+    "main-interior"
+  ],
+  "mission_sha256": "76adaeb7b9bb2318b52febf8ce42fc34a224bafc17552ea740e2211181a3296e",
+  "image_sha256": "be99fd4dd9b4c014e2d3fe5fd4392031d99493f4c1d7997d2759e2f03d30c049",
+  "conclusion": "Missing next-passage residency removes most visible floor/wall coverage. Disabling backface culling does not change sampled coverage; no reversed horizontal ground winding was found. Correct authored conservative visibility, then verify the same camera in Ares.",
+  "coverage_fraction": {
+    "resident": 0.21951219512195122,
+    "resident-two-sided": 0.21951219512195122,
+    "full": 0.9283536585365854,
+    "full-two-sided": 0.9283536585365854
+  },
+  "downward_horizontal_ground_triangle_count": 0
+}

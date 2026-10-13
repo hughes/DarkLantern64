@@ -65,8 +65,8 @@ def main():
     report = {"passed": False, "platform": "Ares", "runs": [], "checks": []}
     destination = ROOT / "build/bundle-smoke.json"
 
-    def run(rom, name, marker, memory=8):
-        result = exercise(exe, settings, rom, name, marker, 180,
+    def run(rom, name, marker, memory=8, timeout=180):
+        result = exercise(exe, settings, rom, name, marker, timeout,
                           hashlib.sha256(rom.read_bytes()).hexdigest(), memory)
         report["runs"].append(result)
         return result, (ROOT / result["log"]).read_text()
@@ -80,7 +80,7 @@ def main():
         report["checks"].append("Ordinary menu renders without starting a level; 4 MiB boot gate works")
 
         test = build_rom(sdk, bundle=manifest, menu_test=True)
-        result, log = run(test, "bundle-switching", "DL64 menu_test_complete")
+        result, log = run(test, "bundle-switching", "DL64 menu_test_complete", timeout=600)
         for row in starts(log):
             key = row["id"], row["preset"]
             assert key in expected, f"Unexpected start {key}"

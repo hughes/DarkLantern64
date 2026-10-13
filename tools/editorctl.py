@@ -56,7 +56,7 @@ OPERATIONS = ("pick_editor", "set_panel", "drop_selection", "save_prefab", "plac
 
 
 OPERATIONS += ("import_blender_scene",)
-OPERATIONS += ("get_streaming", "assign_region", "set_region", "set_streaming", "fit_region_bounds")
+OPERATIONS += ("get_streaming", "assign_region", "set_region", "set_streaming", "fit_region_bounds", "add_floor", "add_transition", "set_transition", "delete_transition")
 
 
 def command_queue(root, level=None):

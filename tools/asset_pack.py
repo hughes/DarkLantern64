@@ -125,7 +125,7 @@ def load_pack(uri, asset_root=ROOT / "content"):
     return pack
 
 
-def resolve_asset_packs(document, asset_root=ROOT / "content", *, authoring=False):
+def resolve_asset_packs(document, asset_root=ROOT / "content", *, authoring=False, streaming=False):
     """Return an expanded copy, catalog and manifest dependencies; never edit input.
 
     Linked definitions have one owner. A local or second-pack duplicate is an
@@ -133,7 +133,7 @@ def resolve_asset_packs(document, asset_root=ROOT / "content", *, authoring=Fals
     Packs cannot link further packs, keeping resolution finite and predictable.
     """
     require(isinstance(document, dict), "Level must be an object")
-    limits = content_limits(document, {'models': 128}, authoring=authoring)
+    limits = content_limits(document, {'models': 128}, authoring=authoring, streaming=streaming)
     group_limits = dict(assets=limits['models'], materials=limits['materials'], entities=limits['entities'])
     uris = document.get("asset_packs", [])
     require(isinstance(uris, list) and len(uris) <= 16, "asset_packs: expected at most 16 pack URIs")

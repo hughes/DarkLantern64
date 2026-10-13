@@ -22,6 +22,62 @@ class CompileLevelTests(unittest.TestCase):
     def entity(self, ident, data=None):
         return next(e for e in (data or self.level)["entities"] if e["id"] == ident)
 
+    def test_triangular_floor_supports_sloped_spawn_without_filling_its_bbox(self):
+        floor = dict(id='ramp-triangle', kind='static',
+                     transform=dict(position=[30, 1, 30], rotation=[0, 0, 0], scale=[1, 1, 1]),
+                     floor=dict(vertices=[[0, 0, 0], [2, 1, 0], [0, 0, 2]]))
+        self.level['entities'].append(floor)
+        spawn = next(row for row in self.level['entities'] if row['kind'] == 'spawn')
+        spawn['transform']['position'] = [30.25, 1.125, 30.25]
+        state = compiler.validate(self.level)
+        self.assertEqual(state['floors'][0]['vertices'][1], [32, 2, 30])
+        self.assertIn('.floor_count=1', compiler.header(self.level, state))
+        self.assertEqual(compiler.play_package(self.level, state)['floors'], state['floors'])
+        spawn['transform']['position'] = [31.75, 1.875, 31.75]
+        with self.assertRaisesRegex(compiler.ContentError, 'supporting surface'):
+            compiler.validate(self.level)
+
+    def test_floor_vertices_transform_and_malformed_footprints_are_checked(self):
+        floor = dict(id='floor-triangle', kind='static',
+                     transform=dict(position=[30, 1, 30], rotation=[0, 90, 0], scale=[2, 1, 1]),
+                     floor=dict(vertices=[[0, 0, 0], [1, .5, 0], [0, 0, 1]]))
+        evaluated = compiler.floor_triangle(floor)['vertices']
+        self.assertAlmostEqual(evaluated[1][0], 30)
+        self.assertAlmostEqual(evaluated[1][2], 28)
+        for vertices in ([[0,0,0],[0,1,0],[0,0,1]],
+                         [[0,0,0],[1,2,0],[0,0,1]],
+                         [[0,0,0],[float('nan'),0,0],[0,0,1]],
+                         [[0,0,0],[1,0,0]]):
+            malformed = copy.deepcopy(floor)
+            malformed['transform']['scale'] = [1,1,1]
+            malformed['floor']['vertices'] = vertices
+            with self.subTest(vertices=vertices), self.assertRaises(compiler.ContentError):
+                compiler.floor_triangle(malformed)
+
+    def test_floor_cannot_silently_lose_support_at_target_float_precision(self):
+        floor = dict(id='thin-slope', kind='static',
+                     transform=dict(position=[1000,0,0], rotation=[0,0,0], scale=[1,1,1]),
+                     floor=dict(vertices=[[0,0,0],[.001,.001,0],[0,0,1]]))
+        with self.assertRaisesRegex(compiler.ContentError, 'target float precision'):
+            compiler.floor_triangle(floor)
+        floor['floor']['vertices'][1][1] = .00025
+        self.assertEqual(compiler.floor_triangle(floor)['vertices'][1][0], 1000.001)
+
+    def test_floor_target_arithmetic_cancellation_is_checked_before_publication(self):
+        points=[[0,0,0],[1,1.3145796060562134,1],
+                [1.000000238418579,1.314579725265503,.9999997615814209]]
+        # Vertex rounding alone changes nothing in this fixture. Double products
+        # describe a usable plane, while actual f32 products yield grade^2=1.25.
+        compiler.validate_floor_vertices(points,'canonical thin floor')
+        floor=dict(id='cancellation-floor',kind='static',floor=dict(vertices=points),
+                   transform=dict(position=[0,0,0],rotation=[0,0,0],scale=[1,1,1]))
+        self.level['entities'].append(floor)
+        with self.assertRaisesRegex(compiler.ContentError,'target float precision.*floor grade'):
+            compiler.validate(self.level)
+        repaired=copy.deepcopy(floor)
+        for point in repaired['floor']['vertices']:point[1]*=.5
+        compiler.floor_triangle(repaired)
+
     def test_multiple_doors_have_independent_indices_and_link_masks(self):
         door = copy.deepcopy(next(e for e in self.level["entities"] if e["kind"]=="door"))
         door["id"]="second-door";door["transform"]["position"]=[12,1,12]

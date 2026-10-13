@@ -328,8 +328,223 @@ static int cooked_fixture(const char *path){
     free(bytes);return 0;
 }
 #endif
+static int authored_five_region_floor_views(void){
+    enum { COUNT=5,DIR=464,STRIDE=256,CHUNK=244,BYTES=DIR+(COUNT-1)*STRIDE+CHUNK };
+    static uint8_t bytes[BYTES],data[2][CHUNK];static DlStreamScene adapter;
+    memset(bytes,0,sizeof bytes);memcpy(bytes,"DLM1",4);put16(bytes+4,1);put16(bytes+6,64);
+    put32(bytes+8,BYTES);put32(bytes+12,COUNT);put32(bytes+16,COUNT);put32(bytes+20,DIR);put32(bytes+24,1);
+    DlStreamPolicyRegion policy[COUNT];DlStreamTransition gates[8];
+    for(unsigned i=0;i<COUNT;++i){
+        unsigned offset=DIR+i*STRIDE;uint8_t *chunk=bytes+offset;
+        memcpy(chunk,"DLR1",4);put16(chunk+4,3);put16(chunk+6,32);put32(chunk+8,CHUNK);put32(chunk+12,3);
+        putfloat(chunk+16,(float)i*10);section(chunk+32,1,112,1,80);section(chunk+56,3,192,1,4);section(chunk+80,4,208,1,36);
+        const float triangle[9]={-1,0,-1,1,0,-1,-1,0,1},floor[9]={-1,0,-1,1,0,-1,-1,1,1};
+        for(unsigned v=0;v<9;++v){putfloat(chunk+112+v*4,triangle[v]);putfloat(chunk+208+v*4,floor[v]);}
+        put32(chunk+148,1);put32(chunk+152,i+1);chunk[181]=127;chunk[184]=127;chunk[187]=127;chunk[189]=3;
+        put32(chunk+192,i+1);
+        uint8_t *region=bytes+64+i*64;put32(region,i+1);put32(region+4,offset);
+        put32(region+8,CHUNK);put32(region+12,CHUNK);put32(region+16,crc32(chunk,CHUNK));
+        putfloat(region+32,-100);putfloat(region+36,-1);putfloat(region+40,-10);
+        putfloat(region+44,100);putfloat(region+48,3);putfloat(region+52,10);
+        uint8_t *entity=bytes+384+i*16;put32(entity,i+1);put32(entity+4,i+1);
+        policy[i]=(DlStreamPolicyRegion){.activation_minimum={(float)i*10-5.1f,-1,-2},
+            .activation_maximum={(float)i*10+5.1f,3,2},.working_mask=UINT32_C(1)<<i};
+        if(i<COUNT-1){
+            gates[i*2]=(DlStreamTransition){.from_region=i+1,.to_region=i+2,
+                .minimum={(float)i*10+4.8f,-1,-1},.maximum={(float)i*10+5.2f,3,1}};
+            gates[i*2+1]=gates[i*2];gates[i*2+1].from_region=i+2;gates[i*2+1].to_region=i+1;
+        }
+    }
+    put32(bytes+28,crc32(bytes,DIR));DlMission parsed;
+    CHECK(dl_mission_open(bytes,DIR,BYTES,&parsed)==DL_MISSION_OK);
+    DlStreamDefinition def={.package_path="five",.directory_bytes=DIR,.file_bytes=BYTES,.max_region_bytes=CHUNK,
+        .region_count=COUNT,.materials=materials,.material_count=1,.policy=DL_STREAM_POLICY_AUTHORED,
+        .policy_regions=policy,.transitions=gates,.transition_count=8,.max_resident_regions=2};
+    DlLevel base={.stream=&def,.spawn={0,0,0}};
+    CHECK(dl_stream_scene_init(&adapter,&base,&parsed)==DL_STREAM_SCENE_OK);
+    CHECK(dl_stream_scene_region_at_preferred(&adapter,(DlVec3){5,0,0},1)==1);
+    CHECK(dl_stream_scene_region_at_preferred(&adapter,(DlVec3){5,0,0},2)==2);
+    CHECK(dl_stream_scene_region_at(&adapter,(DlVec3){19,0,0})==3);
+    CHECK(dl_stream_scene_demand(&adapter,(DlVec3){0,0,0},1)==1);
+    CHECK(dl_stream_scene_demand(&adapter,(DlVec3){4,0,0},1)==3);
+    CHECK(dl_stream_scene_demand(&adapter,(DlVec3){13,0,0},2)==6);
+    CHECK(dl_stream_scene_transition_at(&adapter,1,2,(DlVec3){5.2f,0,0}));
+    CHECK(!dl_stream_scene_transition_at(&adapter,1,3,(DlVec3){5.2f,0,0}));
+    DlStreamPolicyState policy_state={.current_region=2};
+    CHECK(dl_stream_scene_policy_update(&adapter,(DlVec3){13,0,0},2,&policy_state)==6);
+    CHECK(policy_state.pending_transition==3&&policy_state.current_region==2);
+    CHECK(dl_stream_scene_policy_update(&adapter,(DlVec3){7,0,0},2,&policy_state)==3);
+    CHECK(policy_state.pending_transition==2&&policy_state.current_region==2);
+    DlStreamTransition original_back=gates[1],original_forward=gates[2];
+    gates[1].minimum.x=7.8f;gates[1].maximum.x=8.2f;gates[2].minimum.x=11.8f;gates[2].maximum.x=12.2f;
+    policy_state=(DlStreamPolicyState){.current_region=2};
+    CHECK(dl_stream_scene_policy_update(&adapter,(DlVec3){10,0,0},2,&policy_state)==3); /* stable tie by gate order */
+    CHECK(dl_stream_scene_policy_update(&adapter,(DlVec3){10.05f,0,0},2,&policy_state)==3); /* hysteresis */
+    CHECK(dl_stream_scene_policy_update(&adapter,(DlVec3){10.3f,0,0},2,&policy_state)==6);
+    gates[1]=original_back;gates[2]=original_forward;
+    policy[2].working_mask=12;def.max_resident_regions=3;
+    CHECK(dl_stream_scene_init(&adapter,&base,&parsed)==DL_STREAM_SCENE_OK);
+    policy_state=(DlStreamPolicyState){.current_region=2};
+    CHECK(dl_stream_scene_policy_update(&adapter,(DlVec3){15.2f,0,0},4,&policy_state)==14);
+    CHECK(policy_state.current_region==2); /* one published target chunk is insufficient */
+    CHECK(dl_stream_scene_policy_update(&adapter,(DlVec3){15.2f,0,0},14,&policy_state)==14);
+    CHECK(policy_state.current_region==3);
+    CHECK(dl_stream_scene_policy_update(&adapter,(DlVec3){20,0,0},14,&policy_state)==12);
+    policy[2].working_mask=4;def.max_resident_regions=2;
+    CHECK(dl_stream_scene_init(&adapter,&base,&parsed)==DL_STREAM_SCENE_OK);
+    DlRegionSlot loaded[2]={{.buffer=data[0],.capacity=CHUNK},{.buffer=data[1],.capacity=CHUNK}};
+    DlWorldStream manager;LargeReader reader={bytes,BYTES};DlRegionHandle previous={0},current={0};
+    CHECK(dl_world_stream_init(&manager,&parsed,loaded,2,read_large,&reader)==DL_STREAM_OK);
+    CHECK(dl_world_stream_request(&manager,1,&previous)==DL_STREAM_OK);
+    while(loaded[previous.slot].state!=DL_STREAM_RESIDENT)dl_world_stream_pump(&manager,256);
+    CHECK(dl_stream_scene_refresh(&adapter,&manager,NULL)==DL_STREAM_SCENE_OK);
+    CHECK(dl_stream_scene_level(&adapter)->floor_count==1&&dl_stream_scene_level(&adapter)->collider_count==1);
+    CHECK(dl_stream_scene_level(&adapter)->colliders[0].center.x==5);
+    CHECK(dl_stream_scene_gate_waiting(&adapter,(DlVec3){4.6f,0,0},1));
+    DlGame game;dl_game_init(&game,dl_stream_scene_level(&adapter));game.elapsed=7;game.loot_value=23;
+    for(uint32_t id=2;id<=COUNT;++id){
+        CHECK(dl_world_stream_request(&manager,id,&current)==DL_STREAM_OK);
+        while(loaded[current.slot].state!=DL_STREAM_RESIDENT)dl_world_stream_pump(&manager,256);
+        CHECK(dl_stream_scene_refresh(&adapter,&manager,&game)==DL_STREAM_SCENE_OK);
+        game.level=dl_stream_scene_level(&adapter);CHECK(game.level->floor_count==2);
+        CHECK(game.elapsed==7&&game.loot_value==23&&adapter.banks[adapter.active_bank].resident_count==2);
+        CHECK(!dl_stream_scene_gate_waiting(&adapter,(DlVec3){(float)(id-2)*10+5,0,0},(UINT32_C(1)<<(id-2))|(UINT32_C(1)<<(id-1))));
+        if(id==2){
+            const DlMissionChunk *borrow;
+            CHECK(dl_world_stream_borrow(&manager,previous,&borrow)==DL_STREAM_OK);
+            CHECK(dl_world_stream_submit(&manager,previous,7,9)==DL_STREAM_OK);
+            CHECK(dl_world_stream_release(&manager,previous)==DL_STREAM_OK);
+            CHECK(dl_world_stream_cancel(&manager,previous)==DL_STREAM_OK);
+            DlRegionHandle next;CHECK(dl_world_stream_request(&manager,3,&next)==DL_STREAM_CAPACITY);
+            CHECK(loaded[current.slot].state==DL_STREAM_RESIDENT);
+            CHECK(dl_world_stream_complete(&manager,7,8)==DL_STREAM_OK);
+            CHECK(dl_world_stream_request(&manager,3,&next)==DL_STREAM_CAPACITY);
+            CHECK(dl_world_stream_complete(&manager,7,9)==DL_STREAM_OK);
+            CHECK(dl_world_stream_request(&manager,3,&next)==DL_STREAM_OK);
+            dl_world_stream_pump(&manager,128);
+            CHECK(loaded[next.slot].state==DL_STREAM_READING);
+            CHECK(dl_world_stream_cancel(&manager,next)==DL_STREAM_OK);
+            CHECK(loaded[next.slot].state==DL_STREAM_FREE&&loaded[current.slot].state==DL_STREAM_RESIDENT);
+            previous=current;
+            CHECK(dl_stream_scene_refresh(&adapter,&manager,&game)==DL_STREAM_SCENE_OK);
+            game.level=dl_stream_scene_level(&adapter);continue;
+        }
+        CHECK(dl_world_stream_cancel(&manager,previous)==DL_STREAM_OK);previous=current;
+        CHECK(dl_stream_scene_refresh(&adapter,&manager,&game)==DL_STREAM_SCENE_OK);
+        game.level=dl_stream_scene_level(&adapter);CHECK(game.level->floor_count==1);
+    }
+    const DlLevel *old=game.level;putfloat(data[current.slot]+208+12,-1);
+    CHECK(dl_stream_scene_refresh(&adapter,&manager,&game)==DL_STREAM_SCENE_CORRUPT);
+    CHECK(dl_stream_scene_level(&adapter)==old&&loaded[current.slot].cpu_pins==0);
+    const float precision_floor[9]={0,0,0,.001f,.001f,0,0,0,1};
+    for(unsigned v=0;v<9;++v)putfloat(data[current.slot]+208+v*4,precision_floor[v]);
+    loaded[current.slot].chunk.origin.x=1000;DlMissionFloorTriangle local_floor;
+    CHECK(dl_mission_floor(&loaded[current.slot].chunk,0,&local_floor)==DL_MISSION_OK);
+    CHECK(dl_stream_scene_refresh(&adapter,&manager,&game)==DL_STREAM_SCENE_CORRUPT);
+    CHECK(dl_stream_scene_level(&adapter)==old&&loaded[current.slot].cpu_pins==0);
+    /* A much larger origin collapses the world footprint entirely. */
+    loaded[current.slot].chunk.origin.x=100000000;
+    CHECK(dl_stream_scene_refresh(&adapter,&manager,&game)==DL_STREAM_SCENE_CORRUPT);
+    CHECK(dl_stream_scene_level(&adapter)==old&&loaded[current.slot].cpu_pins==0);
+    return 0;
+}
+static int authored_swept_gate_crossings(void){
+    prepare();DlMission parsed;CHECK(dl_mission_open(package,DIRECTORY,FILE_BYTES,&parsed)==DL_MISSION_OK);
+    DlStreamPolicyRegion policy[]={
+        {.activation_minimum={-4,-1,-2},.activation_maximum={0,3,2},.working_mask=1},
+        {.activation_minimum={0,-1,-2},.activation_maximum={4,3,2},.working_mask=2}};
+    DlStreamTransition gates[]={
+        {.from_region=1,.to_region=2,.minimum={-.02f,-1,-.5f},.maximum={.02f,3,.5f}},
+        {.from_region=2,.to_region=1,.minimum={-.02f,-1,-.5f},.maximum={.02f,3,.5f}}};
+    DlStreamDefinition def=definition;def.policy=DL_STREAM_POLICY_AUTHORED;def.policy_regions=policy;
+    def.transitions=gates;def.transition_count=2;def.max_resident_regions=2;
+    DlLevel base=bootstrap;base.stream=&def;static DlStreamScene adapter;
+    CHECK(dl_stream_scene_init(&adapter,&base,&parsed)==DL_STREAM_SCENE_OK);
+    DlStreamPolicyState state={0};
+    /* Two 60 Hz fixed ticks can move 0.07 m across a 0.04 m authored gate.
+     * Neither endpoint occupies the gate, and its bounds remain unchanged. */
+    CHECK(!dl_stream_scene_transition_at(&adapter,1,2,(DlVec3){.035f,0,0}));
+    CHECK(dl_stream_scene_policy_update(&adapter,(DlVec3){-.035f,0,0},3,&state)==3);
+    CHECK(state.current_region==1&&state.has_previous_position);
+    CHECK(dl_stream_scene_policy_update(&adapter,(DlVec3){.035f,0,0},3,&state)==3);
+    CHECK(state.current_region==2&&state.previous_position.x==.035f);
+    CHECK(dl_stream_scene_policy_update(&adapter,(DlVec3){-.035f,0,0},3,&state)==3);
+    CHECK(state.current_region==1); /* Immediate reverse uses the new segment. */
+    policy[0].activation_maximum.x=.1f;policy[1].activation_minimum.x=-.1f;
+    dl_stream_scene_policy_reset(&state);
+    CHECK(dl_stream_scene_policy_update(&adapter,(DlVec3){-.035f,0,0},3,&state)==3);
+    CHECK(dl_stream_scene_policy_update(&adapter,(DlVec3){.035f,0,0},3,&state)==3);
+    CHECK(state.current_region==1&&state.previous_position.x==-.035f);
+    CHECK(dl_stream_scene_policy_update(&adapter,(DlVec3){.14f,0,0},3,&state)==3);
+    CHECK(state.current_region==2); /* Gate crossed before preferred overlap ended. */
+    CHECK(dl_stream_scene_policy_update(&adapter,(DlVec3){-.035f,0,0},3,&state)==3);
+    CHECK(state.current_region==2&&state.previous_position.x==.14f);
+    CHECK(dl_stream_scene_policy_update(&adapter,(DlVec3){-.14f,0,0},3,&state)==3);
+    CHECK(state.current_region==1);
+    policy[0].activation_maximum.x=0;policy[1].activation_minimum.x=0;
+    dl_stream_scene_policy_reset(&state);
+    CHECK(dl_stream_scene_policy_update(&adapter,(DlVec3){-1,0,1},3,&state)==3);
+    CHECK(dl_stream_scene_policy_update(&adapter,(DlVec3){1,0,1},3,&state)==3);
+    CHECK(state.current_region==1); /* A segment outside the gate is no crossing. */
+    dl_stream_scene_policy_reset(&state);
+    CHECK(dl_stream_scene_policy_update(&adapter,(DlVec3){-.035f,0,0},1,&state)==3);
+    CHECK(dl_stream_scene_policy_update(&adapter,(DlVec3){.035f,0,0},1,&state)==3);
+    CHECK(state.current_region==1&&state.pending_transition==1&&state.previous_position.x==-.035f);
+    CHECK(dl_stream_scene_gate_waiting(&adapter,(DlVec3){.035f,0,0},1));
+    /* Only the from region is published: the same thin authored volume is
+     * present as a real collision barrier even if a caller attempts the step. */
+    DlRegionSlot loaded[2]={{.buffer=buffers[0],.capacity=CHUNK_BYTES},{.buffer=buffers[1],.capacity=CHUNK_BYTES}};
+    DlWorldStream manager;DlRegionHandle first,second;
+    CHECK(dl_world_stream_init(&manager,&parsed,loaded,2,read_memory,NULL)==DL_STREAM_OK);
+    CHECK(dl_world_stream_request(&manager,1,&first)==DL_STREAM_OK);
+    while(loaded[first.slot].state!=DL_STREAM_RESIDENT)dl_world_stream_pump(&manager,256);
+    CHECK(dl_stream_scene_refresh(&adapter,&manager,NULL)==DL_STREAM_SCENE_OK);
+    DlGame game;dl_game_init(&game,dl_stream_scene_level(&adapter));game.open_objects=1;game.door_open=true;
+    CHECK(game.level->collider_count==2&&!game.level->colliders[1].door);
+    CHECK(game.level->colliders[1].center.x==0&&game.level->colliders[1].half_size.x==.02f);
+    CHECK(!dl_position_clear(&game,(DlVec3){.035f,0,0},.18f,1.65f));
+    CHECK(dl_world_stream_request(&manager,2,&second)==DL_STREAM_OK);
+    while(loaded[second.slot].state!=DL_STREAM_RESIDENT)dl_world_stream_pump(&manager,256);
+    CHECK(dl_stream_scene_refresh(&adapter,&manager,&game)==DL_STREAM_SCENE_OK);
+    game.level=dl_stream_scene_level(&adapter);
+    CHECK(dl_position_clear(&game,(DlVec3){.035f,0,0},.18f,1.65f));
+    CHECK(!dl_stream_scene_gate_waiting(&adapter,(DlVec3){.035f,0,0},3));
+    CHECK(dl_stream_scene_policy_update(&adapter,(DlVec3){.1f,0,0},3,&state)==3);
+    CHECK(state.current_region==2); /* Completed publication commits retained crossing. */
+    dl_stream_scene_policy_reset(&state);
+    CHECK(dl_stream_scene_policy_update(&adapter,(DlVec3){-.035f,0,0},1,&state)==3);
+    CHECK(dl_stream_scene_policy_update(&adapter,(DlVec3){.035f,0,0},1,&state)==3);
+    CHECK(dl_stream_scene_policy_update(&adapter,(DlVec3){-.05f,0,0},1,&state)==3);
+    CHECK(state.current_region==1&&state.previous_position.x==-.05f);
+    CHECK(dl_stream_scene_policy_update(&adapter,(DlVec3){-.05f,0,0},3,&state)==3);
+    CHECK(state.current_region==1); /* Readiness does not commit a reversed attempt. */
+    state.current_region=2;state.pending_transition=2;state.previous_position=(DlVec3){3,0,0};
+    dl_stream_scene_policy_reset(&state);
+    CHECK(!state.current_region&&!state.pending_transition&&!state.has_previous_position);
+    CHECK(state.previous_position.x==0&&state.previous_position.y==0&&state.previous_position.z==0);
+    CHECK(dl_stream_scene_policy_update(&adapter,(DlVec3){-3.5f,0,0},1,&state)==1);
+    CHECK(state.current_region==1&&state.previous_position.x==-3.5f); /* Restart locates fresh start. */
+    return 0;
+}
+static int authored_door_target(void){
+    prepare();DlMission parsed;CHECK(dl_mission_open(package,DIRECTORY,FILE_BYTES,&parsed)==DL_MISSION_OK);
+    DlStreamPolicyRegion policy[]={
+        {.activation_minimum={-4,-1,-2},.activation_maximum={0,3,2},.working_mask=1},
+        {.activation_minimum={0,-1,-2},.activation_maximum={4,3,2},.working_mask=2}};
+    DlStreamTransition gates[]={
+        {.from_region=1,.to_region=2,.minimum={-.1f,-1,-2},.maximum={.1f,3,2},.door_entity_id=2},
+        {.from_region=2,.to_region=1,.minimum={-.1f,-1,-2},.maximum={.1f,3,2},.door_entity_id=2}};
+    DlStreamDefinition def=definition;def.policy=DL_STREAM_POLICY_AUTHORED;def.policy_regions=policy;def.transitions=gates;def.transition_count=2;def.max_resident_regions=2;
+    DlLevel base=bootstrap;base.stream=&def;static DlStreamScene adapter;
+    CHECK(dl_stream_scene_init(&adapter,&base,&parsed)==DL_STREAM_SCENE_OK);
+    uint32_t gate=0;CHECK(dl_stream_scene_door_target(&adapter,1,2,&gate)==3&&gate==1);
+    CHECK(dl_stream_scene_door_target(&adapter,2,2,&gate)==3&&gate==2);
+    CHECK(dl_stream_scene_door_target(&adapter,1,4,&gate)==0&&gate==0);
+    gates[0].door_entity_id=3;CHECK(dl_stream_scene_init(&adapter,&base,&parsed)==DL_STREAM_SCENE_ARGUMENT);
+    return 0;
+}
 int main(int argc,char **argv){
-    if(working_views()||atomic_failures()||initialization_limits()||refresh_capacity()||textured_v2_scene())return 1;
+    if(working_views()||atomic_failures()||initialization_limits()||refresh_capacity()||textured_v2_scene()||authored_five_region_floor_views()||authored_swept_gate_crossings()||authored_door_target())return 1;
 #ifdef DL_STREAM_SCENE_INTEGRATION
     if(argc>1&&cooked_fixture(argv[1]))return 1;
 #else

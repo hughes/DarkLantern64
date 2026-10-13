@@ -215,6 +215,14 @@ Final ROM framebuffer views, inspected separately from timing acceptance:
 
 ## Comparing preparation costs
 
+Optional [runtime tracing](runtime-inspector.md) now measures complete
+request-to-publication spans for individual region loads and prepared views,
+alongside active service CPU, audio callbacks, commit and startup costs. The
+[inspector acceptance evidence](evidence/runtime-inspector-performance.json)
+records traced and ordinary continuous tours with exact build/package/log
+identities, unchanged limits and all 41 checkpoints. The inspector separately
+reports trace completeness; a passing route does not excuse lost trace records.
+
 The historical renderer blocked gameplay while doing its complete lighting and
 packing work. In the final build, the `scene_load` measurement is the last
 publication/commit call after earlier preparation. Its 33 transition calls total

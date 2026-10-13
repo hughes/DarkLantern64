@@ -241,7 +241,15 @@ static void start_level(DlGame *game, const DlLauncher *launcher, DlRenderStats 
     if(level->stream)dl_stream_rom_start(game,level,launcher->active_start);
     else assertf(dl_game_start(game, level, launcher->active_start), "Invalid level start preset");
     level=game->level;
+#if DL_RUNTIME_TRACE
+    DlProfileMark trace_renderer_start=dl_profile_mark();
+#endif
     dl_render_prepare_scene(game);
+#if DL_RUNTIME_TRACE
+    DlProfileMark trace_renderer_end=dl_profile_mark();
+    dl_stream_rom_trace_startup_ready(game,trace_renderer_end.ticks-trace_renderer_start.ticks,
+        trace_renderer_end.audio_ticks-trace_renderer_start.audio_ticks);
+#endif
     stats->streaming=level->stream!=NULL;
     dl_music_start(&dl_level_music[launcher->active_level]);
     stats->frames = 0; stats->frame_ms = 16.67f; stats->cpu_ms = 0;
@@ -398,6 +406,7 @@ static DlInput stream_test_input(const DlGame *game,const DlLauncher *launcher,D
 #ifdef DL_STREAM_TEST_CAPTURE
         debugf("DL64 capture_complete views=2\n");
 #endif
+        dl_stream_rom_trace_finish();
         debugf("DL64 stream_test_complete passed=1 input_only=1 guard_persisted=1 audio_calls=%lu\n",(unsigned long)audio_call_total);
         ++stage;break;
     }
@@ -483,6 +492,7 @@ static DlInput bafford_stream_test_input(const DlGame *game,const DlLauncher *la
 #ifdef DL_BAFFORD_STREAM_TEST_CAPTURE
         debugf("DL64 bafford_capture_complete views=2\n");
 #endif
+        dl_stream_rom_trace_finish();
         debugf("DL64 bafford_stream_test_complete passed=1 input_only=1 coverage=1 feet_stable=1 collision_clear=1 audio_calls=%lu\n",(unsigned long)audio_call_total);
         ++stage;break;
     default:break;
@@ -575,6 +585,7 @@ static DlInput bafford_expanded_input(const DlGame *game,const DlLauncher *launc
 #ifdef DL_BAFFORD_EXPANDED_TEST_CAPTURE
         debugf("DL64 bafford_expanded_capture_complete views=2\n");
 #endif
+        dl_stream_rom_trace_finish();
         debugf("DL64 bafford_expanded_test_complete passed=1 input_only=1 coverage=1 bridge_jumps=2 collision_clear=1 audio_calls=%lu\n",(unsigned long)audio_call_total);
         ++stage;break;
     default:break;
@@ -828,6 +839,7 @@ static DlInput bafford_district_input(const DlGame *game,const DlLauncher *launc
 #ifdef DL_BAFFORD_DISTRICT_PERFORMANCE_TEST
         district_perf_complete_pending=true;district_perf_complete_visited=visited;district_perf_complete_loads=prior_loads;
 #else
+        dl_stream_rom_trace_finish();
         debugf("DL64 bafford_district_test_complete passed=1 input_only=1 coverage=1 collision_clear=1 stair_jumps=2 visited_regions=%u loot_persist=1 restart_reload=1 pre_restart_loads=%llu audio_calls=%lu\n",
             visited,(unsigned long long)prior_loads,(unsigned long)audio_call_total);
 #endif
@@ -952,6 +964,9 @@ int main(void) {
     while (1) {
 #ifdef DL_BAFFORD_DISTRICT_PERFORMANCE_TEST
         uint32_t perf_frame_start=TICKS_READ();
+#endif
+#if DL_RUNTIME_TRACE
+        dl_stream_rom_trace_poll();
 #endif
         dl_profile_frame_begin(stats.debug);
         /* PI world reads use a separate aligned staging buffer. Service music
@@ -1160,6 +1175,9 @@ int main(void) {
         dl_stream_rom_submitted();
         ++stats.frames;
         dl_profile_frame_end();
+#if DL_RUNTIME_TRACE
+        dl_stream_rom_trace_flush();
+#endif
 #ifdef DL_BAFFORD_DISTRICT_PERFORMANCE_TEST
         if(!district_perf_complete_logged){
         heap_stats_t perf_heap;sys_get_heap_stats(&perf_heap);
@@ -1180,6 +1198,7 @@ int main(void) {
             (unsigned long)district_perf_route_wait);
         if(district_perf_complete_pending){
             district_perf_complete_pending=false;district_perf_complete_logged=true;dl_profile_report();dl_music_report();
+            dl_stream_rom_trace_finish();
             debugf("DL64 stream_perf_complete frames=%lu epochs=%lu dropped_ticks=%lu\n",
                 (unsigned long)perf_sequence,(unsigned long)(perf_epoch+1),
                 (unsigned long)(perf_total_dropped+(uint32_t)ceil(clock.dropped_seconds*TICKS_PER_SECOND)));

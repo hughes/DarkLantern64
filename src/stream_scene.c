@@ -1,4 +1,10 @@
 #include "stream_scene.h"
+#if DL_RUNTIME_DIAGNOSTICS
+static uint64_t collider_source(uint32_t entity,uint32_t region,uint32_t record,uint32_t gate,bool synthetic){
+    return (uint64_t)entity|((uint64_t)region<<12)|((uint64_t)record<<18)|
+        ((uint64_t)gate<<27)|((uint64_t)synthetic<<59);
+}
+#endif
 #include <math.h>
 #include <string.h>
 static const float approach_distance=5.f;
@@ -223,7 +229,14 @@ static DlStreamSceneStatus scan_record(DlStreamScene *scene,DlStreamSceneBank *b
         int object=-1;
         if(collider.entity_id){DlMissionEntity entity;dl_mission_entity(scene->mission,collider.entity_id,&entity);
             if(entity.kind==DL_MISSION_ENTITY_DOOR){object=object_index(scene,entity.id);if(object<0)return DL_STREAM_SCENE_CORRUPT;box.door=true;}}
-        return add_collider(bank,box,object);
+#if DL_RUNTIME_DIAGNOSTICS
+        int source_index=bank->level.collider_count;
+#endif
+        DlStreamSceneStatus status=add_collider(bank,box,object);
+#if DL_RUNTIME_DIAGNOSTICS
+        if(status==DL_STREAM_SCENE_OK)bank->collider_sources[source_index]=collider_source(collider.entity_id,region_id,index+1,0,false);
+#endif
+        return status;
     }else if(kind==DL_MISSION_SECTION_FLOORS){
         DlMissionFloorTriangle floor;if(dl_mission_floor(chunk,index,&floor)!=DL_MISSION_OK)return DL_STREAM_SCENE_CORRUPT;
         DlFloorTriangle value;
@@ -387,14 +400,28 @@ static DlStreamSceneStatus assembly_record(DlStreamScene *scene){
                     .half_size={(gate->maximum.x-gate->minimum.x)*.5f,(gate->maximum.y-gate->minimum.y)*.5f,(gate->maximum.z-gate->minimum.z)*.5f}};
                 int object=gate->door_entity_id?object_index(scene,gate->door_entity_id):-1;
                 if(gate->door_entity_id&&object<0)return DL_STREAM_SCENE_CORRUPT;
-                return add_collider(bank,barrier,object);
+#if DL_RUNTIME_DIAGNOSTICS
+                int source_index=bank->level.collider_count;
+#endif
+                DlStreamSceneStatus status=add_collider(bank,barrier,object);
+#if DL_RUNTIME_DIAGNOSTICS
+                if(status==DL_STREAM_SCENE_OK)bank->collider_sources[source_index]=collider_source(gate->door_entity_id,gate->to_region,0,job->index,true);
+#endif
+                return status;
             }
             if(job->index==scene->mission->region_count){dl_query_cache_index_begin(&bank->query_cache);job->phase=ASSEMBLY_QUERY;continue;}
             uint32_t id=++job->index;if(bank_resident(bank,id))return DL_STREAM_SCENE_OK;
             DlMissionRegion region;if(dl_mission_region(scene->mission,id,&region)!=DL_MISSION_OK)return DL_STREAM_SCENE_CORRUPT;
             DlCollider barrier={.center={region.minimum.x*.5f+region.maximum.x*.5f,region.minimum.y*.5f+region.maximum.y*.5f,region.minimum.z*.5f+region.maximum.z*.5f},
                 .half_size={(region.maximum.x-region.minimum.x)*.5f,(region.maximum.y-region.minimum.y)*.5f,(region.maximum.z-region.minimum.z)*.5f}};
-            return add_collider(bank,barrier,-1);
+#if DL_RUNTIME_DIAGNOSTICS
+            int source_index=bank->level.collider_count;
+#endif
+            DlStreamSceneStatus status=add_collider(bank,barrier,-1);
+#if DL_RUNTIME_DIAGNOSTICS
+            if(status==DL_STREAM_SCENE_OK)bank->collider_sources[source_index]=collider_source(0,id,0,0,true);
+#endif
+            return status;
         }
         if(job->phase==ASSEMBLY_QUERY){
             if(dl_query_cache_index_step(&bank->query_cache))job->phase=ASSEMBLY_DONE;

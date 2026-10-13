@@ -1,6 +1,17 @@
 #include "world_stream.h"
 #include <string.h>
 
+#if DL_RUNTIME_TRACE
+static void trace_slot(DlWorldStream *s,const DlRegionSlot *slot,const char *kind,const char *reason){
+    uint32_t index=(uint32_t)(slot-s->slots);
+    dl_runtime_trace_event(s->trace,kind,reason,dl_runtime_region_job(index,slot->generation),
+        slot->region_id,index,slot->generation,(uint32_t)slot->bytes_read,slot->region.chunk_bytes,0);
+}
+#define TRACE_SLOT(s,slot,kind,reason) trace_slot(s,slot,kind,reason)
+#else
+#define TRACE_SLOT(s,slot,kind,reason) ((void)0)
+#endif
+
 static bool valid_stream(const DlWorldStream *s) {
     return s && s->mission && s->mission->directory && s->slots && s->slot_count && s->read;
 }
@@ -13,6 +24,7 @@ static DlRegionSlot *mutable_slot(DlWorldStream *s, DlRegionHandle h) {
     return (DlRegionSlot *)find_slot(s, h);
 }
 static void free_slot(DlWorldStream *s, DlRegionSlot *slot) {
+    TRACE_SLOT(s,slot,"release",slot->state==DL_STREAM_RETIRING?"ownership_complete":"cancelled");
     s->stats.reserved_bytes -= slot->region.decoded_bytes;
     uint8_t *buffer = slot->buffer;
     size_t capacity = slot->capacity;
@@ -95,12 +107,14 @@ DlStreamStatus dl_world_stream_request(DlWorldStream *s, uint32_t id, DlRegionHa
     s->stats.reserved_bytes += region.decoded_bytes;
     if (s->stats.reserved_bytes > s->stats.peak_reserved_bytes)
         s->stats.peak_reserved_bytes = s->stats.reserved_bytes;
-    *handle = (DlRegionHandle){(uint32_t)best, slot->generation}; return DL_STREAM_OK;
+    *handle = (DlRegionHandle){(uint32_t)best, slot->generation};
+    TRACE_SLOT(s,slot,"request","demand");return DL_STREAM_OK;
 }
 static void fail_slot(DlWorldStream *s, DlRegionSlot *slot, DlStreamStatus failure,
     DlMissionStatus validation) {
     slot->state = DL_STREAM_FAILED; slot->failure = failure;
     slot->validation_failure = validation; ++s->stats.failed_loads;
+    TRACE_SLOT(s,slot,"failed",dl_world_stream_status_name(failure));
 }
 size_t dl_world_stream_pump(DlWorldStream *s, size_t budget) {
     if (!valid_stream(s) || !budget) return 0;
@@ -122,7 +136,9 @@ size_t dl_world_stream_pump(DlWorldStream *s, size_t budget) {
             if (!n) { ++s->stats.read_stalls; continue; }
             slot->crc32 = dl_mission_crc32_update(slot->crc32, slot->buffer + slot->bytes_read, n);
             slot->bytes_read += n; processed += n; s->stats.bytes_read += n;
+            TRACE_SLOT(s,slot,"read_progress",n<wanted?"partial":"slice");
             if (slot->bytes_read == slot->region.chunk_bytes) slot->state = DL_STREAM_VALIDATING;
+            if (slot->state == DL_STREAM_VALIDATING)TRACE_SLOT(s,slot,"read_complete","await_validation");
         }
         /* Validation is a separate pump boundary, so callers can cancel a fully
          * read chunk before publication. No whole-payload CRC scan occurs here. */
@@ -136,6 +152,7 @@ size_t dl_world_stream_pump(DlWorldStream *s, size_t budget) {
             }
             slot->state = DL_STREAM_RESIDENT;
             s->stats.resident_bytes += slot->region.decoded_bytes; ++s->stats.completed_loads;
+            TRACE_SLOT(s,slot,"resident","validated");
         }
     }
     s->cursor = (start + 1) % s->slot_count;
@@ -179,12 +196,14 @@ DlStreamStatus dl_world_stream_retire(DlWorldStream *s, DlRegionHandle handle) {
     if (slot->state != DL_STREAM_RESIDENT && slot->state != DL_STREAM_RETIRING) return DL_STREAM_NOT_READY;
     if (slot->state == DL_STREAM_RESIDENT) {
         s->stats.resident_bytes -= slot->region.decoded_bytes; slot->state = DL_STREAM_RETIRING;
+        TRACE_SLOT(s,slot,"retire","demand_removed");
     }
     drain_retiring(s); return DL_STREAM_OK;
 }
 DlStreamStatus dl_world_stream_cancel(DlWorldStream *s, DlRegionHandle handle) {
     DlRegionSlot *slot = mutable_slot(s, handle);
     if (!slot) return DL_STREAM_HANDLE;
+    TRACE_SLOT(s,slot,"cancel",slot->state==DL_STREAM_RESIDENT||slot->state==DL_STREAM_RETIRING?"resident_retirement":"unpublished");
     if (slot->state == DL_STREAM_RESIDENT || slot->state == DL_STREAM_RETIRING)
         return dl_world_stream_retire(s, handle);
     free_slot(s, slot); return DL_STREAM_OK;

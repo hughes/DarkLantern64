@@ -65,6 +65,11 @@ python tools/estimate_audio.py
 
 Profiles need completed measurement windows; play for several seconds before reporting. Captures and studies create isolated diagnostic builds and save reports under ignored `build/` and `.dev/` directories. See [profiling](profiling.md), [night contrast](night-contrast.md), [mission scale](scaling-guide.md), and [audio memory planning](audio-memory-planning.md) for interpretation and limits.
 
+For streaming investigations, build with `--runtime-trace` and import the Ares
+log with `tools/runtime_inspector.py --map <matching-runtime_debug_map.json>`.
+The [runtime inspector guide](runtime-inspector.md) covers the offline timeline,
+authored ID map, gate/interaction diagnostics and complete-capture checks.
+
 ## Verification and automation
 
 ```powershell

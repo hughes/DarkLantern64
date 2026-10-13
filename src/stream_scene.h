@@ -4,6 +4,9 @@
 #include "game.h"
 #include "content_limits.h"
 #include "world_stream.h"
+#ifndef DL_RUNTIME_DIAGNOSTICS
+#define DL_RUNTIME_DIAGNOSTICS DL_RUNTIME_TRACE
+#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -44,6 +47,7 @@ typedef struct DlStreamDefinition {
     const DlStreamPolicyRegion *policy_regions; /* dense region ID - 1 */
     const DlStreamTransition *transitions;
     uint32_t transition_count, max_resident_regions;
+    const char *package_sha256; /* binds optional traces to the authored ID sidecar */
 } DlStreamDefinition;
 
 enum {
@@ -85,6 +89,12 @@ typedef struct {
     uint32_t resident_count;
     int group_count, triangle_count, last_group;
     DlQueryCache query_cache;
+#if DL_RUNTIME_DIAGNOSTICS
+    /* Cold provenance follows all hot fields. Existing caps bound entity to
+     * 12 bits, region to 6 and authored collider ordinal+1 to 9. Gate keeps its
+     * complete u32 domain; bit 59 distinguishes synthetic barriers. */
+    uint64_t collider_sources[DL_STREAM_SCENE_MAX_COLLIDERS];
+#endif
 } DlStreamSceneBank;
 typedef struct {
     DlWorldStream *stream;

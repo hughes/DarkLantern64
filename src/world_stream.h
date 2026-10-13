@@ -2,6 +2,7 @@
 #define DARKLANTERN_WORLD_STREAM_H
 
 #include "mission.h"
+#include "runtime_trace.h"
 #include <stdbool.h>
 
 #ifdef __cplusplus
@@ -57,6 +58,9 @@ typedef struct {
     void *read_context;
     uint64_t completed_rsp, completed_rdp;
     DlStreamStats stats;
+#if DL_RUNTIME_TRACE
+    DlRuntimeTrace *trace; /* optional foreground observer; never owns slots */
+#endif
 } DlWorldStream;
 
 /* No allocation. Only buffer/capacity need initial values in each slot.

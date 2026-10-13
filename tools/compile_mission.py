@@ -375,6 +375,53 @@ def bake_stream_payloads(document, state, regions, payloads, material_ids):
     return report
 
 
+def runtime_debug_map(package_report, state):
+    """Map target IDs/indices to authored content without adding ROM payloads."""
+    entity_ids = {row["source_id"]: row["id"] for row in package_report["entity_ids"]}
+    object_indices = {row["id"]: index for index, row in enumerate(state["objects"])}
+    enemy_indices = {row["id"]: index for index, row in enumerate(state["enemies"])}
+    policy = {row["id"]: row for row in package_report.get("policy_regions", [])}
+    entities = []
+    for row in package_report["entity_ids"]:
+        entity = state["by_id"][row["source_id"]]
+        mapped = dict(row)
+        if entity["id"] in object_indices:
+            mapped["object_index"] = object_indices[entity["id"]]
+        if entity["id"] in enemy_indices:
+            mapped["enemy_index"] = enemy_indices[entity["id"]]
+        # Preserve importer object IDs and original scene/entity references.
+        # Per-triangle provenance belongs to surfaces to avoid duplicating it.
+        if isinstance(entity.get("source"), dict):
+            mapped["source_provenance"] = {key: value for key, value in entity["source"].items()
+                                            if key != "triangle_provenance"}
+        entities.append(mapped)
+    surfaces = []
+    for row in package_report["surface_ids"]:
+        mapped = dict(row)
+        source = state["by_id"][row["entity"]].get("source")
+        provenance = source.get("triangle_provenance", []) if isinstance(source, dict) else []
+        if row["triangle"] < len(provenance):
+            mapped["source_provenance"] = provenance[row["triangle"]]
+        surfaces.append(mapped)
+    regions = [dict(row, **policy.get(row["id"], {})) for row in package_report["regions"]]
+    boxes = {box["id"]: box for box in state["colliders"]}
+    entities_by_id = {row["id"]: row["source_id"] for row in package_report["entity_ids"]}
+    colliders = [dict(region=row["id"], record=record, entity_id=ident,
+                      source_id=entities_by_id[ident],
+                      **{key: boxes[entities_by_id[ident]][key] for key in ("center", "half_size", "yaw")})
+                 for row in regions for record, ident in enumerate(row["collider_entity_ids"])]
+    transitions = [dict(row, index=index, door_entity_id=entity_ids.get(row.get("door"), 0))
+                   for index, row in enumerate(package_report.get("transitions", []))]
+    return dict(schema_version=1, package_sha256=package_report["package_sha256"],
+                content_identity_sha256=package_report["content_identity_sha256"],
+                source=package_report["source"], source_sha256=package_report["source_sha256"],
+                source_file_sha256=package_report["source_file_sha256"],
+                entry_region=package_report["entry_region"], regions=regions,
+                transitions=transitions, entities=entities, surfaces=surfaces, colliders=colliders,
+                object_entity_ids=[entity_ids[row["id"]] for row in state["objects"]],
+                enemy_entity_ids=[entity_ids[row["id"]] for row in state["enemies"]])
+
+
 def cook_mission(manifest, content_root=ROOT / "content", *, source_document=None):
     """Validate all inputs before returning reproducible package bytes/report."""
     fields(manifest, {"version", "source", "entry_region", "regions"}, "Mission manifest", {"visibility", "transitions"})
@@ -447,7 +494,8 @@ def cook_mission(manifest, content_root=ROOT / "content", *, source_document=Non
         region_reports.append(dict(id=region_ids[region["id"]], source_id=region["id"], bounds=region["bounds"], origin=origin,
                                    chunk_version=chunk_version, triangle_count=len(triangle_payload) // triangle_bytes, collider_count=len(collider_payload) // 32,
                                    material_ids=sorted(region_materials), floor_count=len(floor_payload)//36,
-                                   entity_count=len(region["entities"])))
+                                   entity_count=len(region["entities"]),
+                                   collider_entity_ids=[entity_ids[ident] for ident in collider_entities]))
     lighting = bake_stream_payloads(document, state, regions, payloads, material_ids) if chunk_version >= 4 else None
     for payload, region_report in zip(payloads, region_reports):
         sections = [(1, payload["triangles"], len(payload["triangles"]) // triangle_bytes),
@@ -520,6 +568,7 @@ def cook_mission(manifest, content_root=ROOT / "content", *, source_document=Non
         report["policy_regions"] = [dict(id=region_ids[row["id"]], activation_bounds=row["activation_bounds"],
             working_mask=sum(1 << (region_ids[name]-1) for name in row["working_set"])) for row in regions]
         report["transitions"] = [dict(row, from_region=region_ids[row["from"]], to_region=region_ids[row["to"]]) for row in policy["transitions"]]
+    report["runtime_debug_map"] = runtime_debug_map(report, state)
     return bytes(result), report
 
 
@@ -602,6 +651,7 @@ def bootstrap_header(document, state, package_report, package_path):
         links.append("static const DlStreamTransition dl_stream_transitions[] = {\n" + ",\n".join(values) + "\n};")
     links.append("static const DlStreamDefinition dl_stream_definition = {\n" +
                  "    .package_path=" + json.dumps(package_path) + ",\n" +
+                 "    .package_sha256=" + json.dumps(package_report["package_sha256"]) + ",\n" +
                  f"    .directory_bytes={package_report['directory_bytes']}, .file_bytes={package_report['package_bytes']}, " +
                  f".max_region_bytes={max(row['chunk_bytes'] for row in package_report['regions'])}, .region_count={len(package_report['regions'])},\n" +
                  "    .model_entity_ids=dl_stream_model_ids, .object_entity_ids=dl_stream_object_ids, .enemy_entity_ids=dl_stream_enemy_ids,\n" +
@@ -701,6 +751,7 @@ def prepare_stream_level(manifest_path, output, content_root=None):
     atomic_write(output / relative, package)
     atomic_write(output / "generated/demo_level.h", text.encode("utf-8"))
     atomic_write(output / "generated/mission_report.json", (json.dumps(package_report, indent=2, sort_keys=True) + "\n").encode("utf-8"))
+    atomic_write(output / "generated/runtime_debug_map.json", (json.dumps(package_report["runtime_debug_map"], indent=2, sort_keys=True) + "\n").encode("utf-8"))
     atomic_write(output / "generated/level_report.json", (json.dumps(report, indent=2, sort_keys=True) + "\n").encode("utf-8"))
     return report
 
@@ -710,7 +761,9 @@ def atomic_write(path, payload):
     path.parent.mkdir(parents=True, exist_ok=True)
     temporary = None
     try:
-        with tempfile.NamedTemporaryFile(dir=path.parent, prefix=path.name + ".", suffix=".tmp", delete=False) as stream:
+        # Hash-addressed package filenames are already long. Repeating them
+        # in a sibling temporary name exceeds Windows MAX_PATH in bundle cooks.
+        with tempfile.NamedTemporaryFile(dir=path.parent, prefix="dl-", suffix=".tmp", delete=False) as stream:
             temporary = Path(stream.name)
             stream.write(payload)
         os.replace(temporary, path)
@@ -731,8 +784,11 @@ def main(argv=None):
         report_path = args.output.with_suffix(".report.json")
         level.require(report_path.resolve() != args.output.resolve(), "Output package must differ from its .report.json path")
         atomic_write(report_path, (json.dumps(report, indent=2, sort_keys=True, allow_nan=False) + "\n").encode("utf-8"))
+        debug_map_path = args.output.with_suffix(".runtime_debug_map.json")
+        atomic_write(debug_map_path, (json.dumps(report["runtime_debug_map"], indent=2, sort_keys=True, allow_nan=False) + "\n").encode("utf-8"))
         atomic_write(args.output, package)
-        print(json.dumps(dict(package=str(args.output), report=str(report_path), package_bytes=len(package), directory_bytes=report["directory_bytes"])))
+        print(json.dumps(dict(package=str(args.output), report=str(report_path), runtime_debug_map=str(debug_map_path),
+                              package_bytes=len(package), directory_bytes=report["directory_bytes"])))
         return 0
     except (ValueError, OSError, KeyError, TypeError, RuntimeError) as error:
         print("Mission cook failed: " + str(error), file=sys.stderr)

@@ -20,5 +20,10 @@ uint32_t dl_stream_rom_retired(void);
 uint32_t dl_stream_rom_service_stage(void);
 bool dl_stream_rom_settled(void);
 uint32_t dl_stream_rom_view_mask(void);
+/* Foreground log transport. Compile-time disabled in ordinary builds. */
+void dl_stream_rom_trace_flush(void);
+void dl_stream_rom_trace_poll(void); /* maintain extended clock during menus */
+void dl_stream_rom_trace_finish(void);
+void dl_stream_rom_trace_startup_ready(const DlGame *game, uint32_t elapsed, uint32_t audio);
 
 #endif

@@ -1,0 +1,144 @@
+{
+  "schema_version": 1,
+  "verified_date_pacific": "2026-10-13",
+  "platform": "Ares emulator, 8 MiB",
+  "mission_sha256": "bb95b1537155d6c99e5e94c61d59b2ab298fe5f1a63a0e5c4fce2ede041f1f90",
+  "limits": {
+    "frame_ms": 33.333333333333336,
+    "service_cpu_ms": 8
+  },
+  "untraced": {
+    "accepted": true,
+    "rom_sha256": "294839fb3ee04fd4da955d8e76e25788462bc9a10dd750e5d22a74a8b4da8e9a",
+    "build_signature": "8dbea42ef944436ae0b5e50427e94b196cf7bfccf322f94788bde042c976a338",
+    "log": ".dev/ares/runs/7d2d255175f84b51ae37bd4d94ed83df/bafford-district-performance.log",
+    "log_sha256": "be803e7914a154433905f87a2c09aa93c8f60d3262b7bc5672b86c78345a3805",
+    "checkpoints": 41,
+    "frames": 3455,
+    "timings": {
+      "frame_ticks": {
+        "samples": 3455,
+        "average_ms": 16.358394924457308,
+        "max_ms": 30.351701333333335,
+        "over_budget_samples": 0
+      },
+      "interval_ticks": {
+        "samples": 3455,
+        "average_ms": 16.771246081234924,
+        "max_ms": 31.911445333333333,
+        "over_budget_samples": 0
+      },
+      "service_ticks": {
+        "samples": 3455,
+        "average_ms": 1.149124322238302,
+        "max_ms": 8.633642666666667,
+        "over_budget_samples": 0
+      },
+      "service_cpu_ticks": {
+        "samples": 3455,
+        "average_ms": 1.1133691924746745,
+        "max_ms": 7.5374506666666665,
+        "over_budget_samples": 0
+      },
+      "render_ticks": {
+        "samples": 3455,
+        "average_ms": 9.993188232706222,
+        "max_ms": 19.448832,
+        "over_budget_samples": 0
+      }
+    },
+    "peak_heap_bytes": 2059568,
+    "heap_headroom_bytes": 5163744,
+    "allocated_slot_bytes": 273680,
+    "dropped_simulation_ticks": 0,
+    "suppressed_movement_ticks": 0,
+    "loading_interaction_frames": 0,
+    "music_underruns": 0
+  },
+  "traced": {
+    "accepted": true,
+    "rom_sha256": "6612448227a0404d291be13ef7273eff2b73be2c2518c1c612854b29b84a3f3d",
+    "build_signature": "e7f7efda6c73b88ac7d8550f47984d90fd2f99646e24a22d6d4173ccd988bc41",
+    "log": ".dev/ares/runs/e04b1d7c9084431e829541b5b4b90aba/bafford-district-performance.log",
+    "log_sha256": "580bed1cfa2e356cd753832ea7b6e79b16219305e512c9d680fe92e99b19da9b",
+    "checkpoints": 41,
+    "frames": 3452,
+    "timings": {
+      "frame_ticks": {
+        "samples": 3452,
+        "average_ms": 16.529060937813828,
+        "max_ms": 32.04635733333333,
+        "over_budget_samples": 0
+      },
+      "interval_ticks": {
+        "samples": 3452,
+        "average_ms": 16.8067802425647,
+        "max_ms": 32.826944,
+        "over_budget_samples": 0
+      },
+      "service_ticks": {
+        "samples": 3452,
+        "average_ms": 1.2839763677095404,
+        "max_ms": 9.430144,
+        "over_budget_samples": 0
+      },
+      "service_cpu_ticks": {
+        "samples": 3452,
+        "average_ms": 1.2461344951718811,
+        "max_ms": 7.864384,
+        "over_budget_samples": 0
+      },
+      "render_ticks": {
+        "samples": 3452,
+        "average_ms": 9.715289980687524,
+        "max_ms": 22.44096,
+        "over_budget_samples": 0
+      }
+    },
+    "peak_heap_bytes": 2111440,
+    "heap_headroom_bytes": 5089296,
+    "allocated_slot_bytes": 273680,
+    "dropped_simulation_ticks": 0,
+    "suppressed_movement_ticks": 0,
+    "loading_interaction_frames": 0,
+    "music_underruns": 0
+  },
+  "inspector_complete": true,
+  "trace_sessions": [
+    {
+      "session": 1,
+      "events_emitted": 2346,
+      "events_dropped": 0,
+      "snapshots": 193,
+      "motion_observations": 484,
+      "interaction_observations": 3,
+      "trace_elapsed_overhead_ms": 1276.520448,
+      "queue_storage_bytes": 45128,
+      "maximum_request_to_publication_ms": 980.5574613333333
+    },
+    {
+      "session": 2,
+      "events_emitted": 46,
+      "events_dropped": 0,
+      "snapshots": 3,
+      "motion_observations": 0,
+      "interaction_observations": 0,
+      "trace_elapsed_overhead_ms": 11.522432,
+      "queue_storage_bytes": 45128,
+      "maximum_request_to_publication_ms": 168.34378666666666
+    }
+  ],
+  "optional_provenance_bytes": 6400,
+  "queue_capacity": 256,
+  "transport_records_per_frame": 1,
+  "observed_average_frame_delta_ms": 0.1706660133565201,
+  "measurement_notes": [
+    "Each ROM and log is identified independently; both runs use the same cooked mission and continuous 41-checkpoint route.",
+    "Every raw interval and gameplay frame remains under 33.333333 ms; every service CPU sample remains under 8 ms.",
+    "Recorded trace overhead includes recorder, probes, clock maintenance and transport elapsed time, including startup/end drains and interrupts.",
+    "A/B averages describe these complete runs; display waits, route pacing and frame counts differ, so their difference is not an isolated CPU microbenchmark.",
+    "Request-to-publication spans remain distinct from aggregated active service CPU/audio/commit/startup costs.",
+    "All portable C groups and targeted importer/compiler/build tests pass. The broad Python suite retains the documented Sponza parapet mismatch.",
+    "Original N64 and M64 hardware performance remains unverified."
+  ]
+}

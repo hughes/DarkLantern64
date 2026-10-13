@@ -40,6 +40,14 @@ class MissionCookTests(unittest.TestCase):
     def write_source(self):
         self.source.write_text(json.dumps(self.document), encoding="utf-8")
 
+    def test_atomic_write_with_long_hash_addressed_destination(self):
+        parent = self.root / ("p" * max(1, 170 - len(str(self.root.resolve())) - 1))
+        destination = parent / ("mission-" + "a" * 64 + ".dlm")
+        self.assertLess(len(str(destination.resolve())), 260)
+        mission.atomic_write(destination, b"new package")
+        self.assertEqual(destination.read_bytes(), b"new package")
+        self.assertEqual(list(parent.iterdir()), [destination])
+
     def authored_five_regions(self,count=5):
         self.document["authoring_profile"] = "streamed-mission"
         first, second = self.manifest["regions"]
@@ -98,6 +106,39 @@ class MissionCookTests(unittest.TestCase):
         _,report = self.cook()
         with self.assertRaisesRegex(ValueError,"5 resident region slots"):
             mission.validate_stream_bridge(report)
+
+    def test_runtime_debug_map_resolves_package_ids_gate_indices_and_blocker_ordinals(self):
+        self.authored_five_regions(count=3)
+        door = next(row for row in self.document["entities"] if row["id"] == "probe-door")
+        door["source"] = dict(game="Thief", object_id=471, source_scene="original.mis")
+        gate = next(row for row in self.manifest["transitions"] if row["id"] == "gate-0-1")
+        gate["door"] = "probe-door"
+        self.write_source()
+        package, report = self.cook()
+        mapped = report["runtime_debug_map"]
+        self.assertEqual(mapped["package_sha256"], hashlib.sha256(package).hexdigest())
+        self.assertEqual(mapped["content_identity_sha256"], package[32:64].hex())
+        door_row = next(row for row in mapped["entities"] if row["source_id"] == "probe-door")
+        self.assertEqual(door_row["source_provenance"]["object_id"], 471)
+        self.assertEqual(mapped["object_entity_ids"][door_row["object_index"]], door_row["id"])
+        for index, gate_row in enumerate(mapped["transitions"]):
+            self.assertEqual(gate_row["index"], index)
+            self.assertEqual(gate_row["id"], report["transitions"][index]["id"])
+        self.assertEqual(next(row for row in mapped["transitions"] if row["id"] == "gate-0-1")["door_entity_id"], door_row["id"])
+        for region in mapped["regions"]:
+            self.assertIn("activation_bounds", region)
+            self.assertIn("working_mask", region)
+            chunk = package[region["file_offset"]:region["file_offset"] + region["chunk_bytes"]]
+            _, _, start, size, _, _, _ = next(section for section in self.sections(chunk) if section[0] == 2)
+            colliders = chunk[start:start + size]
+            for row in (row for row in mapped["colliders"] if row["region"] == region["id"]):
+                self.assertEqual(row["entity_id"], struct.unpack_from(">I", colliders, row["record"] * 32 + 28)[0])
+        path = self.content / "mapped.mission.json"
+        path.write_text(json.dumps(self.manifest))
+        output = self.root / "mapped-output"
+        prepared = mission.prepare_stream_level(path, output, self.content)
+        self.assertEqual(json.loads((output / "generated/runtime_debug_map.json").read_text()), mapped)
+        self.assertIn('.package_sha256="' + prepared["mission"]["sha256"] + '"', (output / "generated/demo_level.h").read_text())
 
     def test_authored_rejects_bad_activation_gate_or_unreachable_region(self):
         self.authored_five_regions()

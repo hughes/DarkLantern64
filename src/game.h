@@ -243,6 +243,22 @@ bool dl_game_query_cache_ready(const DlLevel *level);
 DlVec3 dl_player_eye(const DlGame *game);
 bool dl_position_clear(const DlGame *game, DlVec3 feet, float radius, float height);
 bool dl_line_of_sight(const DlGame *game, DlVec3 a, DlVec3 b);
+/* Optional read-only probes use the same collision narrowphase. Blockers are
+ * reported in source order, giving stable IDs independently of cache traversal.
+ * No probe is called by ordinary simulation. -1 denotes no collider/floor/object. */
+typedef struct {
+    bool valid, clear, query_cache_ready;
+    int collider_index, floor_index, object_index;
+    bool door, object_open;
+    uint32_t ignored_colliders;
+} DlGameQueryDiagnostic;
+bool dl_game_diagnose_position(const DlGame *game, DlVec3 feet, float radius,
+    float height, DlGameQueryDiagnostic *out);
+/* ignore_object matches the interaction rule: a door ray ignores both its leaf
+ * and its associated loading barrier. Pass -1 for an ordinary sight ray. */
+bool dl_game_diagnose_line_of_sight(const DlGame *game, DlVec3 a, DlVec3 b,
+    int ignore_object, DlGameQueryDiagnostic *out);
+bool dl_game_door_occupied(const DlGame *game, int object);
 float dl_visibility(const DlGame *game, DlVec3 position);
 bool dl_game_object_open(const DlGame *game, int object);
 bool dl_game_model_visible(const DlGame *game, const DlModelInstance *model);

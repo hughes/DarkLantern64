@@ -360,6 +360,36 @@ bool dl_position_clear(const DlGame *g, DlVec3 feet, float radius, float height)
     }
     return true;
 }
+static void diagnostic_begin(const DlGame *g,DlGameQueryDiagnostic *out) {
+    memset(out,0,sizeof *out);
+    out->collider_index=out->floor_index=out->object_index=-1;
+    out->query_cache_ready=g&&dl_game_query_cache_ready(g->level);
+}
+static void diagnostic_collider(const DlGame *g,int index,DlGameQueryDiagnostic *out) {
+    out->collider_index=index;
+    out->door=g->level->colliders[index].door;
+    if(g->level->collider_objects)out->object_index=g->level->collider_objects[index];
+    if(out->object_index>=0)out->object_open=dl_game_object_open(g,out->object_index);
+    else if(out->door)out->object_open=g->door_open;
+}
+bool dl_game_diagnose_position(const DlGame *g,DlVec3 feet,float radius,float height,
+    DlGameQueryDiagnostic *out) {
+    if(!out)return false;
+    diagnostic_begin(g,out);
+    if(!g||!g->level||!finite_position(feet)||!isfinite(radius)||!isfinite(height)||radius<=0||height<=0)return false;
+    out->valid=true;
+    for(int i=0,count=collider_count(g);i<count;++i){const DlCollider *box=&g->level->colliders[i];
+        if(active(g,box)&&vertical_overlap(box,feet,height)&&horizontal_overlap(box,box_query(g,i),feet,radius)){
+            diagnostic_collider(g,i,out);return true;
+        }
+    }
+    for(int i=0,count=floor_count(g);i<count;++i){float y;
+        if(floor_height(&g->level->floors[i],floor_query(g,i),feet,&y)&&feet.y<y-EPSILON&&feet.y+height>y+EPSILON){
+            out->floor_index=i;return true;
+        }
+    }
+    out->clear=true;return true;
+}
 static bool outside_slab(float a, float b, float half_size) {
     /* Only reject clear separation. The original division-based narrow phase
      * can round a just-outside endpoint onto t=1, so leave contacts within a
@@ -506,6 +536,21 @@ static bool line_of_sight_without_door(const DlGame *g, DlVec3 a, DlVec3 b, int 
 }
 bool dl_line_of_sight(const DlGame *g, DlVec3 a, DlVec3 b) {
     return line_of_sight_without_door(g, a, b, -1);
+}
+bool dl_game_diagnose_line_of_sight(const DlGame *g,DlVec3 a,DlVec3 b,int object,
+    DlGameQueryDiagnostic *out) {
+    if(!out)return false;
+    diagnostic_begin(g,out);
+    if(!g||!g->level||!finite_position(a)||!finite_position(b)||object<-1||object>=DL_MAX_OBJECTS)return false;
+    out->valid=true;
+    for(int i=0,count=collider_count(g);i<count;++i){const DlCollider *box=&g->level->colliders[i];
+        if(object>=0&&g->level->collider_objects&&g->level->collider_objects[i]==object){++out->ignored_colliders;continue;}
+        if(active(g,box)&&ray_hits_box(box,box_query(g,i),a,b)){diagnostic_collider(g,i,out);return true;}
+    }
+    for(int i=0,count=floor_count(g);i<count;++i){
+        if(ray_hits_floor(&g->level->floors[i],floor_query(g,i),a,b)){out->floor_index=i;return true;}
+    }
+    out->clear=true;return true;
 }
 DlVec3 dl_player_eye(const DlGame *g) {
     if (!g) return (DlVec3){0};
@@ -895,6 +940,10 @@ static bool door_occupied_object(const DlGame *g,int object) {
                 horizontal_overlap(box, box_query(g,i), g->enemies[enemy].position, GUARD_RADIUS)) return true;
     }
     return false;
+}
+bool dl_game_door_occupied(const DlGame *g,int object) {
+    if(!g||!g->level||object<-1||object>=DL_MAX_OBJECTS)return false;
+    return door_occupied_object(g,object);
 }
 static void complete_objectives(DlGame *g) {
     uint64_t required=0;

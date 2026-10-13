@@ -53,6 +53,22 @@ def scene_paths(level=None):
     return source, BUILD if default else BUILD / "scenes" / source.stem, default
 
 
+def build_runtime_debug_map(catalog, build_id, rom_sha256):
+    """Bind authored ID maps to one immutable executable and content catalog."""
+    levels = []
+    for entry in catalog["levels"]:
+        mission = entry["content"].get("mission")
+        mapped = dict(mission["report"]["runtime_debug_map"]) if mission else dict(
+            regions=[], transitions=[], entities=[], surfaces=[], colliders=[], object_entity_ids=[], enemy_entity_ids=[])
+        mapped.update(id=entry["id"], source=entry["source"],
+                      compiled_source_sha256=entry["content"]["source_sha256"])
+        if entry.get("mission_manifest"):
+            mapped["mission_manifest"] = entry["mission_manifest"]
+            mapped["mission_manifest_sha256"] = entry["content"]["mission_manifest_sha256"]
+        levels.append(mapped)
+    return dict(schema_version=1, build_id=build_id, rom_sha256=rom_sha256, levels=levels)
+
+
 def build_rom(sdk, autoplay=False, debug_overlay=False, level=None, capture=False,
               scale_bench=False, disable_model_cull=False, *, bundle=None,
               start_level=None, start_preset=None, menu_test=False, renderer="t3d",
@@ -60,7 +76,7 @@ def build_rom(sdk, autoplay=False, debug_overlay=False, level=None, capture=Fals
               stream_test_capture=False, bafford_stream_test=False, bafford_stream_test_capture=False,
               bafford_expanded_test=False, bafford_expanded_test_capture=False,
               bafford_district_test=False, bafford_district_test_capture=False,
-              bafford_district_performance_test=False):
+              bafford_district_performance_test=False, runtime_trace=False):
     start = time.perf_counter()
     replay = None
     if bafford_district_performance_test:
@@ -125,6 +141,8 @@ def build_rom(sdk, autoplay=False, debug_overlay=False, level=None, capture=Fals
     if replay is not None: name += "-input-replay"
     if debug_overlay:
         name += "-debug"
+    if runtime_trace:
+        name += "-trace"
     if bundle is not None:
         name += "-bundle-" + bundle.stem
         name += "-start-" + start_level if start_level else "-menu"
@@ -210,6 +228,8 @@ def build_rom(sdk, autoplay=False, debug_overlay=False, level=None, capture=Fals
         common += ["-DDL_AUTOPLAY=1"]
     if debug_overlay:
         common += ["-DDL_DEBUG_OVERLAY=1"]
+    if runtime_trace:
+        common += ["-DDL_RUNTIME_TRACE=1"]
     if scale_bench:
         common += ["-DDL_SCALE_BENCH=1"]
     if disable_model_cull:
@@ -269,7 +289,7 @@ def build_rom(sdk, autoplay=False, debug_overlay=False, level=None, capture=Fals
     sources = [ROOT / "src" / f for f in ("game.c", "tick.c", "main.c", "dl_profile.c", "dl_music.c", "launch.c", "animation.c",
                                          "render_lighting.c", "render_batches.c", "render_transform.c", "render_texture_packing.c",
                                          "static_lighting.c", "lighting_bake.c", "mission.c", "world_stream.c",
-                                         "stream_scene.c", "stream_rom.c")]
+                                         "stream_scene.c", "stream_rom.c", "runtime_trace.c", "runtime_diagnostics.c")]
     sources += generated_sources
     if scale_bench:
         sources.append(ROOT / "src/scale_bench.c")
@@ -303,11 +323,29 @@ def build_rom(sdk, autoplay=False, debug_overlay=False, level=None, capture=Fals
                             {"flags": common, "kernel_flags": kernel_flags, "compiler": compiler_version, "renderer": renderer,
                              "tools": {n: (p.stat().st_size, p.stat().st_mtime_ns) for n, p in tools.items()}},
                             content_hashes=[entry["content"]["source_sha256"] for entry in catalog["levels"]])
+    if runtime_trace:
+        # Derive this header after fingerprinting to avoid a self-referential
+        # hash. The flag and generator are fingerprint inputs; the header's
+        # only variable input is that resulting build signature.
+        trace_header = work / "runtime_trace_build.h"
+        trace_header.write_text("#ifndef DL_RUNTIME_TRACE_BUILD_H\n#define DL_RUNTIME_TRACE_BUILD_H\n" +
+                                "#define DL_RUNTIME_TRACE_BUILD_ID " + json.dumps(signature) +
+                                "\n#endif\n", encoding="utf-8")
+        common += ["-include", str(trace_header)]
     manifest = work / "build.json"
     rom = BUILD / (name + ".z64")
     if manifest.exists() and rom.exists():
         previous = json.loads(manifest.read_text())
         if previous.get("signature") == signature and previous.get("rom_sha256") == hashlib.sha256(rom.read_bytes()).hexdigest():
+            debug_map = build_runtime_debug_map(catalog, signature, previous["rom_sha256"])
+            debug_map_path = work / "runtime_debug_map.json"
+            debug_map_path.write_text(json.dumps(debug_map, indent=2) + "\n", encoding="utf-8")
+            map_metadata = dict(runtime_trace=runtime_trace,
+                                runtime_debug_map=str(debug_map_path.relative_to(ROOT)),
+                                runtime_debug_map_sha256=hashlib.sha256(debug_map_path.read_bytes()).hexdigest())
+            if any(previous.get(key) != value for key, value in map_metadata.items()):
+                previous.update(map_metadata)
+                manifest.write_text(json.dumps(previous, indent=2) + "\n", encoding="utf-8")
             print(f"[cached] {rom}")
             return rom
     objects = []
@@ -353,10 +391,15 @@ def build_rom(sdk, autoplay=False, debug_overlay=False, level=None, capture=Fals
     os.replace(rom_temp, rom)
     source_sha256 = content["source_sha256"] if bundle is None else hashlib.sha256(
         bundle.read_bytes() + "".join(entry["content"]["source_sha256"] for entry in catalog["levels"]).encode()).hexdigest()
+    rom_sha256 = hashlib.sha256(rom.read_bytes()).hexdigest()
+    debug_map_path = work / "runtime_debug_map.json"
+    debug_map_path.write_text(json.dumps(build_runtime_debug_map(catalog, signature, rom_sha256), indent=2) + "\n", encoding="utf-8")
     report = {"signature": signature, "compiler": compiler_version, "sdk": str(sdk),
               "renderer": renderer, "renderer_dependency": renderer_dependency, "kernel_flags": kernel_flags,
               "source_sha256": source_sha256, "rom": str(rom.relative_to(ROOT)),
-              "rom_bytes": rom.stat().st_size, "rom_sha256": hashlib.sha256(rom.read_bytes()).hexdigest(),
+              "rom_bytes": rom.stat().st_size, "rom_sha256": rom_sha256,
+              "runtime_trace": runtime_trace, "runtime_debug_map": str(debug_map_path.relative_to(ROOT)),
+              "runtime_debug_map_sha256": hashlib.sha256(debug_map_path.read_bytes()).hexdigest(),
               "static_image_bytes": image_bytes, "elapsed_seconds": round(time.perf_counter() - start, 3),
               "autoplay": autoplay, "debug_overlay": debug_overlay, "capture": capture,
               "scale_bench": scale_bench, "model_culling": not disable_model_cull,
@@ -376,6 +419,7 @@ def build_rom(sdk, autoplay=False, debug_overlay=False, level=None, capture=Fals
     manifest.write_text(json.dumps(report, indent=2) + "\n")
     print(json.dumps({"manifest": str(manifest.relative_to(ROOT)), "rom": report["rom"],
                       "renderer": renderer,
+                      "runtime_trace": runtime_trace, "runtime_debug_map": report["runtime_debug_map"],
                       "rom_bytes": report["rom_bytes"], "rom_sha256": report["rom_sha256"],
                       "static_image_bytes": image_bytes, "elapsed_seconds": report["elapsed_seconds"],
                       "start_in_menu": catalog["start_in_menu"],
@@ -462,10 +506,16 @@ def run_portable_tests():
         "test_mission": ["src/mission.c"],
         "test_world_stream": ["src/mission.c", "src/world_stream.c"],
         "test_stream_scene": ["src/mission.c", "src/world_stream.c", "src/stream_scene.c", "src/game.c"],
+        "test_runtime_trace": ["src/runtime_trace.c", "src/mission.c", "src/world_stream.c"],
+        "test_runtime_diagnostics": ["src/game.c", "src/mission.c", "src/world_stream.c", "src/stream_scene.c", "src/runtime_diagnostics.c", "src/runtime_diagnostic_fixture.c", "src/runtime_trace.c"],
     }
     for name, sources in render_checks.items():
         render_output = BUILD / (name + ".exe")
         run([compiler, "-std=c17", "-O2", "-Wall", "-Wextra", "-Werror", "-Isrc",
+             *(["-DDL_RUNTIME_TRACE=1"] if name == "test_runtime_trace" else []),
+             # The blocker fixture requires provenance banks independently of
+             # emitting trace records; ordinary builds omit those banks.
+             *(["-DDL_RUNTIME_DIAGNOSTICS=1"] if name == "test_runtime_diagnostics" else []),
              *sources, f"tests/{name}.c", "-lm", "-o", render_output], env=env)
         run([render_output], env=env)
 
@@ -511,6 +561,7 @@ def main():
     parser.add_argument("--autoplay", action="store_true")
     parser.add_argument("--input-replay",type=Path,help="Replay native tick commands in a diagnostic ROM")
     parser.add_argument("--debug-overlay", action="store_true", help="Start with the timing overlay visible")
+    parser.add_argument("--runtime-trace", action="store_true", help="Opt in to bounded runtime lifecycle tracing and snapshots")
     parser.add_argument("--renderer", choices=("cpu", "t3d"), default="t3d",
                         help="Developer renderer selection; Tiny3D writes separate ROM/build outputs")
     sources = parser.add_mutually_exclusive_group()
@@ -556,7 +607,8 @@ def main():
                             bafford_expanded_test_capture=args.bafford_expanded_test_capture,
                             bafford_district_test=args.bafford_district_test,
                             bafford_district_test_capture=args.bafford_district_test_capture,
-                            bafford_district_performance_test=args.bafford_district_performance_test)
+                            bafford_district_performance_test=args.bafford_district_performance_test,
+                            runtime_trace=args.runtime_trace)
             if args.run:
                 ares = os.environ.get("ARES_EXE", str(Path(os.environ.get("LOCALAPPDATA", "")) / "ares/ares.exe"))
                 if not Path(ares).is_file():

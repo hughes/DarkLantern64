@@ -79,6 +79,7 @@ The engine revision is recorded in [dependencies.json](dependencies.json). Proje
 | [Music](docs/music.md) | N64 music capabilities, instruments, track budgets, playback choices, and a proposed composition/import workflow. |
 | [Audio memory planning](docs/audio-memory-planning.md) | Scenario estimates, retained buffers, transition peaks, and budget assumptions. |
 | [Game profiling](docs/profiling.md) | Record Ares subsystem timings and compare frame-budget costs. |
+| [Runtime inspector](docs/runtime-inspector.md) | Inspect streaming jobs, authored gates, resource ownership and interaction blockers from an optional ROM trace. |
 | [Mission scale](docs/scaling-guide.md) | Measured guard, room, loot and light costs; culling and larger-mission architecture. |
 | [Kaze performance research](docs/kaze-performance-notes.md) | Public SM64 optimization techniques mapped to our source and compiled-code audit. |
 | [Texture pipeline](docs/texture-pipeline.md) | Cook StreetLight textures from editor materials into the N64 ROM. |

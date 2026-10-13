@@ -1,5 +1,6 @@
 #pragma once
 #include "tick.h"
+#include "stream_play.h"
 #include <nlohmann/json.hpp>
 #include <cmath>
 #include <deque>
@@ -18,6 +19,7 @@ public:
     DlInput injected{};
     int preset=-1;
     bool inputOverride=false, diagnostics=true;
+    bool settleBeforeTick=false;
     uint64_t traceDropped=0;
     static constexpr size_t maxRecords=36000;
     DlPlaySession(const DlPlaySession&)=delete;
@@ -42,7 +44,7 @@ public:
                 throw std::runtime_error("Floor grade exceeds supported 45 degrees");
             floors.push_back(floor);
         }
-        if((boxes.empty()&&floors.empty())||boxes.size()+floors.size()>320||floors.size()>DL_MAX_FLOORS||
+        if((!package.contains("stream")&&boxes.empty()&&floors.empty())||boxes.size()+floors.size()>320||floors.size()>DL_MAX_FLOORS||
             package.at("enemies").size()>DL_MAX_ENEMIES)
             throw std::runtime_error("Play package exceeds ROM simulation capacity");
         for(const auto& row:package.at("lights"))
@@ -117,6 +119,7 @@ public:
             e.fog_near=env.at("fog_near");e.fog_far=env.at("fog_far");
             e.sky_top=V(env.at("sky_top"));e.sky_bottom=V(env.at("sky_bottom"));e.exposure=env.at("exposure");
         }
+        if(package.contains("stream"))stream_=std::make_unique<DlStreamPlay>(package,level);
         Restart();
     }
     static DlVec3 V(const Json& row) {
@@ -140,14 +143,24 @@ public:
         }
         return i;
     }
-    void Restart(){dl_game_start(&game,&level,preset);clock={};trace=Json::array();inputs=Json::array();traceDropped=0;injected={};}
+    static bool SettledBoundary(const Json& replay) {
+        const auto boundary=replay.value("stream_boundary",std::string("frame"));
+        if(boundary!="frame"&&boundary!="settled")throw std::runtime_error("Replay stream boundary must be frame or settled");
+        return boundary=="settled";
+    }
+    void ResetGame(){if(stream_)stream_->Restart(game,preset);else dl_game_start(&game,&level,preset);}
+    void Restart(){ResetGame();clock={};trace=Json::array();inputs=Json::array();traceDropped=0;injected={};}
+    bool Streamed() const{return stream_!=nullptr;}
+    bool StreamVisible(const std::string& id) const{return !stream_||stream_->Visible(id);}
     static void Tick(void* context,const DlInput* input,uint64_t tick) {
         auto& s=*static_cast<DlPlaySession*>(context);
         if(s.inputs.size()>=maxRecords)throw std::runtime_error("Recording capacity reached; restart or export the session");
+        if(s.stream_){if(s.settleBeforeTick)s.stream_->Settle(s.game);else s.stream_->Service(s.game);}
         const auto before=s.game;
-        if(input->restart)dl_game_start(&s.game,&s.level,s.preset);
-        else dl_game_update(&s.game,input,DL_TICK_SECONDS);
-        if(s.game.elapsed<before.elapsed&&!input->restart)dl_game_start(&s.game,&s.level,s.preset);
+        DlInput filtered=*input;if(s.stream_)s.stream_->Filter(s.game,filtered);
+        if(input->restart)s.ResetGame();
+        else dl_game_update(&s.game,&filtered,DL_TICK_SECONDS);
+        if(s.game.elapsed<before.elapsed&&!input->restart)s.ResetGame();
         s.inputs.push_back(InputJson(*input));
         if(s.diagnostics) {
             for(unsigned i=0;i<s.game.event_count;++i) {
@@ -191,11 +204,15 @@ public:
                 {"awareness",e.awareness},{"patrol_index",e.patrol_index},{"sees_player",e.sees_player},{"heard_sound",e.heard_sound},
                 {"sight_signal",e.sight_signal},{"player_distance",e.player_distance},{"in_viewcone",e.in_viewcone},{"perception_ray_passed",e.unoccluded},
                 {"investigate_target",J(e.investigate_target)},{"line_of_sight",dl_line_of_sight(&game,eye,dl_player_eye(&game))}});}
-        return {{"fingerprint",package.at("fingerprint")},{"tick",clock.tick},{"tick_rate",DL_TICK_RATE},
+        Json result={{"fingerprint",package.at("fingerprint")},{"tick",clock.tick},{"tick_rate",DL_TICK_RATE},
             {"dropped_seconds",clock.dropped_seconds},{"player",J(game.player)},{"yaw",game.yaw},{"pitch",game.pitch},
             {"grounded",game.grounded},{"crouched",game.crouched},{"visibility",game.visibility},{"elapsed",game.elapsed},{"events",events},
             {"door_open",game.door_open},{"complete",game.complete},{"caught",game.caught},{"enemies",actors},{"objects",objectState},{"loot_value",game.loot_value},
-            {"input_override",inputOverride},{"input",InputJson(injected)},{"recorded_ticks",inputs.size()},{"trace_dropped",traceDropped},{"event_overflow",game.event_overflow}};
+            {"input_override",inputOverride},{"input",InputJson(injected)},{"recorded_ticks",inputs.size()},{"trace_dropped",traceDropped},{"event_overflow",game.event_overflow},
+            {"open_objects",game.open_objects},{"collected_objects",game.collected_objects},{"completed_objectives",game.completed_objectives},{"active_enemy_mask",game.active_enemy_mask},
+            {"stream_boundary",settleBeforeTick?"settled":"frame"}};
+        if(stream_)result["stream"]=stream_->State(game);
+        return result;
     }
 private:
     std::vector<DlCollider> boxes;
@@ -208,4 +225,5 @@ private:
     std::vector<int16_t> colliderObjects;
     DlObjectDef emptyObject_{};
     std::vector<DlFootContacts> contacts;
+    std::unique_ptr<DlStreamPlay> stream_;
 };

@@ -1,0 +1,31 @@
+{
+  "description": "Amber spawn: open doorway, cross and close it, collect blue-room loot, retire and reload both rooms, then restart.",
+  "start_preset": "west",
+  "stream_boundary": "settled",
+  "segments": [
+    {"ticks": 111, "input": {"forward": 1}},
+    {"ticks": 1, "input": {"use": true}},
+    {"ticks": 64, "input": {"forward": 1}},
+    {"ticks": 1, "input": {"use": true}},
+    {"ticks": 111, "input": {"forward": 1}},
+    {"ticks": 57, "input": {"strafe": 1}},
+    {"ticks": 1, "input": {"use": true}},
+    {"ticks": 57, "input": {"strafe": -1}},
+    {"ticks": 111, "input": {"forward": -1}},
+    {"ticks": 1, "input": {"use": true}},
+    {"ticks": 64, "input": {"forward": -1}},
+    {"ticks": 1, "input": {"use": true}},
+    {"ticks": 111, "input": {"forward": -1}},
+    {"ticks": 1, "input": {}},
+    {"ticks": 111, "input": {"forward": 1}},
+    {"ticks": 1, "input": {"use": true}},
+    {"ticks": 64, "input": {"forward": 1}},
+    {"ticks": 1, "input": {"use": true}},
+    {"ticks": 111, "input": {"forward": 1}},
+    {"ticks": 57, "input": {"strafe": 1}},
+    {"ticks": 1, "input": {"use": true}},
+    {"ticks": 1, "input": {}},
+    {"ticks": 1, "input": {"restart": true}},
+    {"ticks": 30, "input": {}}
+  ]
+}

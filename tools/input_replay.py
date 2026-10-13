@@ -10,6 +10,8 @@ def load(path):
     replay=json.loads(Path(path).read_bytes())
     if replay.get("format")!="darklantern-replay" or replay.get("version")!=1 or replay.get("tick_rate")!=60:
         raise ValueError("Unsupported input replay")
+    if replay.get("stream_boundary", "frame") not in ("frame", "settled"):
+        raise ValueError("Unsupported stream replay boundary")
     rows=replay.get("inputs")
     if not isinstance(rows,list) or not 1<=len(rows)<=36000:
         raise ValueError("Replay must contain 1..36000 ticks")
@@ -30,4 +32,6 @@ def header(replay):
     rows=[]
     for row in replay["inputs"]:
         rows.append("{"+",".join(f(row.get(key,0)) for key in AXES)+","+",".join(str(row.get(key,False)).lower() for key in BUTTONS)+"}")
-    return "static const DlInput dl_replay_inputs[]={\n"+",\n".join(rows)+"\n};\n#define DL_REPLAY_TICKS "+str(len(rows))+"\n"
+    return ("static const DlInput dl_replay_inputs[]={\n"+",\n".join(rows)+"\n};\n#define DL_REPLAY_TICKS "+str(len(rows))+"\n"
+            + "#define DL_REPLAY_FINGERPRINT " + json.dumps(replay["fingerprint"]) + "\n"
+            + "#define DL_REPLAY_STREAM_BOUNDARY " + json.dumps(replay.get("stream_boundary", "frame")) + "\n")

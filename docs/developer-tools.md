@@ -93,8 +93,21 @@ python tools/build.py --editor
 python tools/verify_project_editor.py
 python tools/verify_asset_editor.py --editor editor/bazel-bin/darklantern64_project_editor.exe
 python tools/verify_enemy_editor.py --editor editor/bazel-bin/darklantern64_project_editor.exe
+
+# Shared streaming state machine and every-tick host/MIPS functional replay
+node tools/check_stream_coordinator.mjs --proof
+python tools/verify_stream_replay_parity.py --evidence docs/evidence/stream-replay-parity.json
+
+# Console streaming behavior and strict frame-stage budgets remain separate
+python tools/verify_streaming_probe.py
+python tools/verify_bafford_district_performance.py
 ```
 
 These checks are developer tools rather than individual VS Code tasks. Emulator and editor checks open their own instances and require the corresponding installed dependencies. Inspect each command's report and exit status; a historical checked-in report does not verify later source changes. Original N64 and M64 validation remains a separate hardware step.
+
+The [streaming coordinator guide](streaming-coordinator.md) describes ownership,
+the synthetic failure/delay suite, model-checker dependencies and settled
+replay boundaries. `--native-only` validates the fixed route without claiming
+ROM parity; console budgets and menu/lifecycle checks run independently.
 
 `python tools/editorctl.py inspect` reads the running project editor through the stable `.dev/editor/project/` queue, including after switching levels. Its bounded command interface supports content edits, save/build, captures and layout operations. Omit `--level` for everyday project use; that option selects the queue for an isolated diagnostic editor launched with a level argument. See the [editor reference](../editor/README.md) for argument files and the current operation contract.

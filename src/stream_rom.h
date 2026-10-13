@@ -4,6 +4,7 @@
 #include "game.h"
 #include "render.h"
 #include "world_stream.h"
+#include "stream_coordinator.h"
 
 /* N64 platform adapter for bounded authored working sets and legacy probes. */
 void dl_stream_rom_close(void);
@@ -20,6 +21,7 @@ uint32_t dl_stream_rom_retired(void);
 uint32_t dl_stream_rom_service_stage(void);
 bool dl_stream_rom_settled(void);
 uint32_t dl_stream_rom_view_mask(void);
+void dl_stream_rom_snapshot(const DlGame *game, DlStreamCoordinatorSnapshot *snapshot);
 /* Foreground log transport. Compile-time disabled in ordinary builds. */
 void dl_stream_rom_trace_flush(void);
 void dl_stream_rom_trace_poll(void); /* maintain extended clock during menus */

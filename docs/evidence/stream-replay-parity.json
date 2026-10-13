@@ -1,0 +1,93 @@
+{
+  "ticks": 1070,
+  "published_masks": [
+    1,
+    2,
+    3
+  ],
+  "publication_changes": 7,
+  "loot_persisted": true,
+  "reset_passed": true,
+  "native_passed": true,
+  "rom_parity_passed": true,
+  "numeric_tolerance": 0.002,
+  "stream_boundary": "settled",
+  "package_sha256": "9a3a63f86caa9920f08dc92bde78fc7516d0cdf0b3d5a9166ae64c3e087965ae",
+  "fingerprint": "66a9e970f2e505f2eb975c8d6e9aa8519a026645c5572fcfee52fe62311acb5b",
+  "replay_sha256": "5c285a6d00886f90263cc064b1cb4484b2cc46e3d8c26c08328a3af4b6778294",
+  "declared_game_fields": [
+    "tick",
+    "player",
+    "yaw",
+    "pitch",
+    "visibility",
+    "door_open",
+    "complete",
+    "caught",
+    "loot_value",
+    "grounded",
+    "crouched"
+  ],
+  "declared_stream_fields": [
+    "current_region",
+    "demand_mask",
+    "published_mask",
+    "active_enemy_mask",
+    "queued_use",
+    "queued_object",
+    "queued_transition"
+  ],
+  "declared_guard_fields": [
+    "position",
+    "state",
+    "awareness",
+    "patrol_index",
+    "sees_player",
+    "heard_sound"
+  ],
+  "declared_object_fields": [
+    "open",
+    "collected",
+    "completed"
+  ],
+  "declared_event_fields": [
+    "kind",
+    "position",
+    "time",
+    "strength",
+    "actor",
+    "detail",
+    "previous"
+  ],
+  "native": "C:\\Users\\hughe\\dev\\DarkLantern64\\build\\stream-replay-parity\\b38050a14d7a42f4beb01944f5298a21\\native.json",
+  "replay": "C:\\Users\\hughe\\dev\\DarkLantern64\\build\\stream-replay-parity\\b38050a14d7a42f4beb01944f5298a21\\input.json",
+  "host_timing": {
+    "elapsed_seconds": 0.4162588999897707,
+    "ticks": 1070,
+    "elapsed_ms_per_tick": 0.3890270093362343,
+    "scope": "Headless process wall time includes package/checksum startup, stream service, simulation and state serialization; no Native viewport or N64 timing claim."
+  },
+  "limitations": [
+    "Settled boundaries do not compare loading speed, frame pacing, graphics or audio.",
+    "Platform IO counters, slot placement, revision and graphics serials are excluded.",
+    "Synthetic delayed IO/fence tests and strict Ares performance/lifecycle checks are separate."
+  ],
+  "rom_run": {
+    "name": "stream-replay-parity",
+    "passed": true,
+    "log": ".dev\\ares\\runs\\8fee43f6fc444766bc72616dbda11a30\\stream-replay-parity.log",
+    "tested_rom": ".dev\\ares\\runs\\8fee43f6fc444766bc72616dbda11a30\\DarkLantern64-input-replay-bundle-level_bundle-start-streaming-probe-preset-west-t3d.z64",
+    "rom_sha256": "2b596dfb83b5e0d379148a36ec4b1f4455a739a73307cd660aa528df02494b00",
+    "rom_bytes": 1622016,
+    "settings": ".dev\\ares\\runs\\8fee43f6fc444766bc72616dbda11a30\\settings.bml",
+    "settings_source_sha256": "d3917400079a47105fa6bd7df53e4f530915aa3b4b70e79769f1b389bc2b196a",
+    "profile_report": null,
+    "elapsed_seconds": 23.344,
+    "peak_sampled_heap_bytes": 1482016,
+    "max_reported_cpu_ms": 147.92,
+    "boot": "DL64 boot_ok memory=8388608 scene=\"Streaming Rooms\" meshes=3 models=2 colliders=10 version=2 world=3d renderer=rsp-tiny3d depth=hardware",
+    "terminal_event": "DL64 input_replay_done ticks=1070"
+  },
+  "rom_log": "C:\\Users\\hughe\\dev\\DarkLantern64\\.dev\\ares\\runs\\8fee43f6fc444766bc72616dbda11a30\\stream-replay-parity.log",
+  "result": "C:\\Users\\hughe\\dev\\DarkLantern64\\build\\stream-replay-parity\\b38050a14d7a42f4beb01944f5298a21\\result.json"
+}

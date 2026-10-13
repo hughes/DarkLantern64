@@ -2,7 +2,7 @@ load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
 
 cc_library(
     name = "play_session",
-    hdrs = ["play_session.h"],
+    hdrs = ["play_session.h", "stream_play.h"],
     deps = ["@dl64_animation//:animation", "@nlohmann_json//:json"],
 )
 

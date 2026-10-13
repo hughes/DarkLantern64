@@ -850,7 +850,12 @@ class DemoEditor
     {
         for (auto& [name,instance] : characters_)
         {
-            if (instance.parent>=scene.alive.size() || !scene.alive[instance.parent]) continue;
+            if (instance.parent>=scene.alive.size() || !scene.alive[instance.parent]) {
+                // Joint pieces are independent scene entities. They must follow
+                // the parent's published stream membership as one character.
+                for(const auto& [id,bone]:instance.joints)if(id<scene.alive.size())scene.alive[id]=false;
+                continue;
+            }
             const auto& asset=instance.data->asset;
             if (instance.playing && instance.clip>=0)
             {

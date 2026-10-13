@@ -47,22 +47,24 @@
         result["systems"]=engine_.PlaySystemNames();result["error"]=nativeError_;
         result["authoring_dirty"]=dirty_;
         const auto profile=document_.value("authoring_profile",std::string());
-        result["native_play_supported"]=StreamingInfo()==nullptr&&profile!="external-scale-study"&&profile!="streamed-mission";
+        result["native_play_supported"]=profile!="external-scale-study"&&(StreamingInfo()!=nullptr||profile!="streamed-mission");
         if(const auto* streaming=StreamingInfo())result["streaming"]=*streaming;
         return result;
     }
     void StartNative(const std::string& preset="default",bool paused=false) {
         if(engine_.IsPlaying()||Busy()||!pendingAction_.empty())throw std::runtime_error("Stop play and finish pending editor work first");
-        if(const auto* streaming=StreamingInfo())
-            throw std::runtime_error(streaming->value("native_play_reason",std::string("Native Play for stream missions is unavailable; use Run level in Ares.")));
-        if(document_.value("authoring_profile",std::string())=="streamed-mission")
-            throw std::runtime_error("Streamed mission source needs a mission partition and bounded cook; Native Play is unavailable. Use Run level in Ares after preparing its mission manifest.");
+        if(document_.value("authoring_profile",std::string())=="streamed-mission"&&StreamingInfo()==nullptr)
+            throw std::runtime_error("Streamed mission source needs a mission partition and bounded cook before Native Play.");
         if(document_.contains("authoring_profile")&&document_.at("authoring_profile")=="external-scale-study")
             throw std::runtime_error("This source study is available for editor and Blender inspection. Open its bounded runtime level for Native Play; the full mission needs streaming and runtime capacity work.");
         SyncPreviewTransforms();
         const auto stage=queue_/"native-snapshot.json";
         AtomicWrite(stage,document_.dump(2)+"\n");
-        const auto cooked=ProjectCommand({L"cook",L"--level",source_.wstring(),L"--staged",stage.wstring()});
+        std::vector<std::wstring> args{L"cook",L"--level",source_.wstring(),L"--staged",stage.wstring()};
+        StagePartition(args,queue_/"native-partition.json");
+        const auto cooked=ProjectCommand(args);
+        if(!cooked.value("native_play_supported",false))throw std::runtime_error(cooked.contains("streaming")&&cooked.at("streaming").is_object()?
+            cooked.at("streaming").at("status").value("error",std::string("Mission partition needs repair")):"Native Play is unavailable for this source");
         auto session=std::make_unique<DlPlaySession>(ReadJson(fs::path(cooked.at("output").get<std::string>())/"generated/play.json"),preset);
         ApplyPreparedPreview(cooked);
         native_=std::move(session);nativeError_.clear();
@@ -93,6 +95,12 @@
         for(const auto& [id,name]:previewIds_) {
             if(id>=scene.transforms.size())continue;
             const auto* entity=Entity(name);if(!entity)continue;
+            if(native_->Streamed()) {
+                // Every rendered authored instance follows the published CPU
+                // bank; loading/physical residency never reveals a candidate.
+                const auto kind=entity->at("kind");
+                if(kind=="static"||kind=="guard"||kind=="door"||kind=="control"||kind=="loot"||kind=="objective")scene.alive[id]=native_->StreamVisible(name);
+            }
             auto& transform=scene.transforms[id];
             if(entity->at("kind")=="guard") {
                 for(int i=0;i<g.enemy_count;++i)if(name==g.level->enemies[i].id) {
@@ -112,7 +120,7 @@
                 }
             } else if(entity->at("kind")=="objective"||entity->at("kind")=="loot") {
                 DlModelInstance model{};model.id=name.c_str();model.role=entity->at("kind")=="loot"?DL_MODEL_LOOT:DL_MODEL_OBJECTIVE;
-                scene.alive[id]=dl_game_model_visible(&g,&model);
+                scene.alive[id]=native_->StreamVisible(name)&&dl_game_model_visible(&g,&model);
             }
         }
         if(scene.cameraId) {
@@ -174,6 +182,7 @@
         if(op=="export_replay") {
             const auto path=queue_/"replays"/"latest.json";
             AtomicWrite(path,Json{{"format","darklantern-replay"},{"version",1},{"tick_rate",DL_TICK_RATE},
+                {"stream_boundary",native_->settleBeforeTick?"settled":"frame"},
                 {"fingerprint",native_->package.at("fingerprint")},{"start_preset",native_->preset<0?"default":native_->level.test_starts[native_->preset].id},
                 {"inputs",native_->inputs},{"final_state",native_->State()}}.dump(2));
             return {{"path",path.string()},{"ticks",native_->inputs.size()}};
@@ -195,8 +204,9 @@
                 replay.at("fingerprint")!=native_->package.at("fingerprint")||
                 replay.at("start_preset")!=(native_->preset<0?"default":native_->level.test_starts[native_->preset].id))throw std::runtime_error("Replay/content or test start mismatch");
             const auto& rows=replay.at("inputs");if(!rows.is_array()||rows.size()>DlPlaySession::maxRecords)throw std::runtime_error("Invalid replay length");
+            const bool settle=DlPlaySession::SettledBoundary(replay);
             std::vector<DlInput> commands;for(const auto& row:rows)commands.push_back(DlPlaySession::Input(row));
-            native_->Restart();for(auto input:commands)native_->Step(input);SyncNative(engine_.GetActiveScene());
+            native_->settleBeforeTick=settle;native_->Restart();for(auto input:commands)native_->Step(input);SyncNative(engine_.GetActiveScene());
         } else throw std::runtime_error("Unknown Play command");
         return NativeState();
     }
@@ -206,6 +216,12 @@
                 const auto state=NativeState();
                 ImGui::Text("Tick %llu | 60 Hz | dropped %.3fs",(unsigned long long)native_->clock.tick,native_->clock.dropped_seconds);
                 ImGui::Text("Exposure %.3f | %s",native_->game.visibility,native_->game.caught?"Caught":native_->game.complete?"Complete":"Active");
+                if(state.contains("stream")) {
+                    const auto& stream=state.at("stream");
+                    ImGui::Text("Region %u | demand %08x | published %08x",stream.at("current_region").get<unsigned>(),stream.at("demand_mask").get<unsigned>(),stream.at("published_mask").get<unsigned>());
+                    ImGui::Text("Slots %u | reserved %u bytes | floors %u",stream.at("slot_count").get<unsigned>(),stream.at("reserved_bytes").get<unsigned>(),stream.at("floors").get<unsigned>());
+                    if(ImGui::CollapsingHeader("Stream coordinator"))ImGui::TextWrapped("%s",stream.dump(2).c_str());
+                }
                 for(const auto& e:state.at("enemies")) {
                     const auto label=e.at("id").get<std::string>()+": "+e.at("state").get<std::string>();
                     if(ImGui::TreeNode(label.c_str())){ImGui::TextWrapped("%s",e.dump(2).c_str());ImGui::TreePop();}

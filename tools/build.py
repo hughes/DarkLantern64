@@ -106,8 +106,8 @@ def build_rom(sdk, autoplay=False, debug_overlay=False, level=None, capture=Fals
                         autoplay or capture or scale_bench or menu_test or input_replay is not None):
         raise ValueError("--stream-test requires a bundle starting in its menu and runs separately from other diagnostics")
     if input_replay is not None:
-        if bundle is not None or autoplay or capture or scale_bench or menu_test:
-            raise ValueError("Recorded input replay requires an isolated single-level build")
+        if autoplay or capture or scale_bench or menu_test or (bundle is not None and start_level is None):
+            raise ValueError("Recorded input replay requires a direct level launch")
         replay=load_input_replay(input_replay)
         start_preset=replay.get("start_preset","default")
     if renderer not in ("cpu", "t3d"):
@@ -260,13 +260,16 @@ def build_rom(sdk, autoplay=False, debug_overlay=False, level=None, capture=Fals
         common += ["-DDL_DISABLE_LIGHTING_BAKE=1"]
     extra_headers = []
     if replay is not None:
-        package=json.loads((Path(catalog["levels"][0]["cooked_dir"])/"generated/play.json").read_bytes())
+        selected = catalog["levels"][catalog["initial_level"]]
+        package=json.loads((Path(selected["cooked_dir"])/"generated/play.json").read_bytes())
         if replay.get("fingerprint")!=package["fingerprint"]:
             raise ValueError("Replay/content fingerprint mismatch; cook and record again")
         replay_header=work/"input_replay.h"
         replay_header.write_text(input_replay_header(replay))
         extra_headers.extend([replay_header,Path(input_replay),ROOT/"tools/input_replay.py"])
         common += ["-DDL_INPUT_REPLAY=1"]
+        if replay.get("stream_boundary") == "settled":
+            common += ["-DDL_REPLAY_STREAM_SETTLED=1"]
     if capture:
         common += ["-DDL_CAPTURE=1"]
         data = json.loads(level.read_text())
@@ -289,8 +292,10 @@ def build_rom(sdk, autoplay=False, debug_overlay=False, level=None, capture=Fals
     sources = [ROOT / "src" / f for f in ("game.c", "tick.c", "main.c", "dl_profile.c", "dl_music.c", "launch.c", "animation.c",
                                          "render_lighting.c", "render_batches.c", "render_transform.c", "render_texture_packing.c",
                                          "static_lighting.c", "lighting_bake.c", "mission.c", "world_stream.c",
-                                         "stream_scene.c", "stream_rom.c", "runtime_trace.c", "runtime_diagnostics.c")]
+                                         "stream_scene.c", "stream_coordinator.c", "stream_rom.c", "runtime_trace.c", "runtime_diagnostics.c")]
     sources += generated_sources
+    if runtime_trace:
+        sources.append(ROOT / "src/runtime_trace_text.c")
     if scale_bench:
         sources.append(ROOT / "src/scale_bench.c")
     if (ROOT / "src/render.c").exists():
@@ -318,7 +323,7 @@ def build_rom(sdk, autoplay=False, debug_overlay=False, level=None, capture=Fals
     compiler_version = run([tools["mips64-elf-gcc"], "--version"], env=env, capture=True).stdout.splitlines()[0]
     kernel_flags = {name: ["-O3"] for name in (
         "render_lighting.c", "render_transform.c", "render.c", "render_batches.c", "game.c",
-        "mission.c", "stream_scene.c", "stream_rom.c")}
+        "mission.c", "stream_scene.c", "stream_coordinator.c", "stream_rom.c", "runtime_trace_text.c")}
     signature = fingerprint(sources + headers + sdk_inputs + renderer_inputs + [Path(__file__)],
                             {"flags": common, "kernel_flags": kernel_flags, "compiler": compiler_version, "renderer": renderer,
                              "tools": {n: (p.stat().st_size, p.stat().st_mtime_ns) for n, p in tools.items()}},
@@ -506,7 +511,9 @@ def run_portable_tests():
         "test_mission": ["src/mission.c"],
         "test_world_stream": ["src/mission.c", "src/world_stream.c"],
         "test_stream_scene": ["src/mission.c", "src/world_stream.c", "src/stream_scene.c", "src/game.c"],
+        "test_stream_coordinator": ["src/mission.c", "src/world_stream.c", "src/stream_scene.c", "src/stream_coordinator.c", "src/game.c"],
         "test_runtime_trace": ["src/runtime_trace.c", "src/mission.c", "src/world_stream.c"],
+        "test_runtime_trace_text": ["src/runtime_trace_text.c"],
         "test_runtime_diagnostics": ["src/game.c", "src/mission.c", "src/world_stream.c", "src/stream_scene.c", "src/runtime_diagnostics.c", "src/runtime_diagnostic_fixture.c", "src/runtime_trace.c"],
     }
     for name, sources in render_checks.items():

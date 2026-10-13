@@ -9,6 +9,7 @@ int main(int argc,char** argv) {
         if(argc>=3){std::ifstream input(argv[2]);replay=DlPlaySession::Json::parse(input);}
         DlPlaySession::Json states=DlPlaySession::Json::array();
         DlPlaySession session(std::move(package),replay.is_object()?replay.value("start_preset",std::string("default")):"default");
+        session.settleBeforeTick=replay.is_object()&&DlPlaySession::SettledBoundary(replay);
         if(!replay.is_null()) {
             if(replay.at("format")!="darklantern-replay"||replay.at("version")!=1||replay.at("tick_rate")!=DL_TICK_RATE||
                 replay.at("fingerprint")!=session.package.at("fingerprint"))throw std::runtime_error("Replay/content mismatch");

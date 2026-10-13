@@ -20,6 +20,16 @@ explicit single-step flag. The adapter cooks an unsaved snapshot, maps stable
 source IDs to scene entities, and allocates independent mutable character meshes
 for Play. Renderer asset handles are otherwise shared.
 
+Stream missions also compile `src/stream_coordinator.c`, `src/world_stream.c`
+and `src/stream_scene.c` on both platforms. Native Play reads the cooked package
+with its SHA256/checksums and authored IDs; working collision, exact floors,
+gate barriers and active visuals come from the published bank. The inspector
+includes demand/physical/pending/published masks, queued doorway use, slot
+generations, CPU pins and load counters. Door/loot/actor state persists
+across retirement and reload. See the
+[shared coordinator contract](streaming-coordinator.md) for callbacks and
+synthetic delay, cancellation and lifetime tests.
+
 ## Use Play and authoring
 
 Click **Play** on the menu bar. The active unsaved document is validated and
@@ -111,6 +121,11 @@ private project. Results live under `.dev/` and do not alter saved source levels
 
 `python tools/verify_replay_parity.py` compares a native `play_runner` replay with
 the same input executed by a MIPS ROM in Ares, using a 0.002 numeric tolerance.
+`python tools/verify_stream_replay_parity.py` runs the fixed streamed doorway,
+loot, retirement/reload and restart route with the same tolerance. Its explicit
+`stream_boundary: "settled"` completes streaming before each input; declared
+functional fields compare every tick, while IO speed, slot placement and
+graphics counters remain separate console acceptance checks.
 Recorded comparisons establish parity for exercised scenarios, not all possible
 inputs or original hardware. Renderer, audio, timing and platform behavior still
 need console validation. The desktop uses LightEngine rendering; it does not

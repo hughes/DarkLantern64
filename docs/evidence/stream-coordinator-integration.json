@@ -1,0 +1,135 @@
+{
+  "issue": "https://github.com/hughes/DarkLantern64/issues/2",
+  "verified_date": "2026-10-13",
+  "portable": {
+    "passed": true,
+    "command": "python -c \"from tools.build import run_portable_tests; run_portable_tests()\"",
+    "log": "build/issue2-portable-tests-final.log",
+    "log_sha256": "0471fcab7e39b82dbd9e6285508609813d59f097f614f4ced01c34dfd2915a06"
+  },
+  "model": {
+    "tlc_passed": true,
+    "states": 2304,
+    "edges": 11520,
+    "c_equivalence_proven": false,
+    "evidence": "docs/evidence/stream-coordinator-reference.json"
+  },
+  "native_editor": {
+    "passed": true,
+    "checks": [
+      "Cooked-package startup uses bounded slots, a published collision bank and matching viewport membership",
+      "Streamed editor replay reproduces identical headless gameplay and coordinator state",
+      "Host transport rejects a package whose cooked SHA-256 no longer matches",
+      "Editor import/export preserves settled replay boundaries and rejects invalid metadata before changing the session",
+      "The recorded door/loot/retire/reload/restart route reproduces the editor's final gameplay and coordinator state",
+      "Restart resets stream/game state; Stop restores authoring without changing sources",
+      "Native Play cooks unsaved scene and partition drafts together without changing canonical files",
+      "Viewport visibility and collision queries reveal a region only after its working bank publishes"
+    ],
+    "route": {
+      "ticks": 1070,
+      "published_masks": [
+        1,
+        2,
+        3
+      ],
+      "publication_changes": 7,
+      "loot_persisted": true,
+      "reset_passed": true
+    },
+    "private_result": ".dev/stream-native-verification/0c0e808fc42a405691681a43acf50204/result.json"
+  },
+  "native_build": {
+    "passed": true,
+    "floor_test_passed": true
+  },
+  "replay": {
+    "passed": true,
+    "ticks": 1070,
+    "numeric_tolerance": 0.002,
+    "boundary": "settled",
+    "package_sha256": "9a3a63f86caa9920f08dc92bde78fc7516d0cdf0b3d5a9166ae64c3e087965ae",
+    "host_timing": {
+      "elapsed_seconds": 0.4162588999897707,
+      "ticks": 1070,
+      "elapsed_ms_per_tick": 0.3890270093362343,
+      "scope": "Headless process wall time includes package/checksum startup, stream service, simulation and state serialization; no Native viewport or N64 timing claim."
+    },
+    "evidence": "docs/evidence/stream-replay-parity.json"
+  },
+  "ordinary_performance": {
+    "accepted": true,
+    "platform": "Ares emulator",
+    "rom_sha256": "6b1d092ae5a6df9241d9d74c8e68696d49ef35a09bd04f29b2a341c1921c20fb",
+    "build_signature": "a90b4ec2dd0468a3fb463ab6ad4ad4683744e9aaa5d7f011a5ac5589707e59a2",
+    "log": ".dev\\ares\\runs\\aace482ffa284e108453e21a9cd87f8c\\bafford-district-performance.log",
+    "frames": 3464,
+    "max_frame_ms": 31.294357333333334,
+    "max_interval_ms": 31.728042666666667,
+    "max_service_cpu_ms": 7.658730666666667,
+    "dropped_ticks": 0,
+    "blocked_ticks": 0,
+    "failures": []
+  },
+  "trace_performance": {
+    "accepted": true,
+    "platform": "Ares emulator",
+    "rom_sha256": "57e071b2d2ea76221e3f2c2aa92b60865ce870aa5c391ef622ee3e04175affee",
+    "build_signature": "81d8844c1af862476c2abb80e9337d61ee13ae3b4f01a31cb6f672d3400c1165",
+    "log": ".dev\\ares\\runs\\f25696c013b741bfb5291d105c413fce\\bafford-district-performance.log",
+    "frames": 3458,
+    "max_frame_ms": 32.71842133333333,
+    "max_interval_ms": 33.16074666666667,
+    "max_service_cpu_ms": 7.789632,
+    "dropped_ticks": 0,
+    "blocked_ticks": 0,
+    "failures": []
+  },
+  "inspector": {
+    "complete": true,
+    "sessions": 2,
+    "diagnostics": [],
+    "report": "build/issue2-runtime-inspector-final.json"
+  },
+  "stream_probe": {
+    "passed": true,
+    "report": "build/issue2-stream-probe.json",
+    "rom_sha256": "1f4a20b874c60a66ba657c866456547cd59ed1539bc8e699a5bca5ac88bd304c"
+  },
+  "menu_lifecycle": {
+    "passed": true,
+    "checked_starts": 31,
+    "checks": [
+      "Ordinary menu renders without starting a level; 4 MiB boot gate works",
+      "Every bundled default/test start launches and restarts three times",
+      "Position, view, stance, door and clean mission state match authored starts",
+      "Repeated textured/untextured launches and restarts each reach an exactly stable per-start heap",
+      "Menu resume preserves paused simulation time",
+      "Both bundle and standalone ROMs bypass the menu into a named start"
+    ],
+    "rom_sha256": [
+      "9d1dd9c562d75d8abdcc8b50def14325f00ee2fd6209990222081abd0233b929",
+      "9d1dd9c562d75d8abdcc8b50def14325f00ee2fd6209990222081abd0233b929",
+      "cff9ea97deecf14b137c93ea2b087f658113356a6dbdb4e1e87dd97e124fa101",
+      "8e16dd49643c63a72477abea6aafe37bb6b49551ede6ffbe1a3c66fea8b3cb81",
+      "e9917df5510738966982bd6aa6ccc60dd8d5eb9fa135a93e7930fcca012059da"
+    ],
+    "report": "build/bundle-smoke.json"
+  },
+  "python_discovery": {
+    "tests": 506,
+    "errors": 1,
+    "skipped": 2,
+    "log": "build/issue2-python-tests-final.log",
+    "baseline_error": "test_sponza_physics: unchanged sponza-collision-parapet-north differs between the saved level and geometry fixture"
+  },
+  "additional_python_checks": {
+    "parity_negative_tests": 5,
+    "passed": true
+  },
+  "limitations": [
+    "Ares timing is emulator evidence; original N64 and M64 validation remains pending.",
+    "Settled replay compares declared functional state, not platform load speed or graphics.",
+    "Finite model equality is not a proof that the handwritten C is equivalent."
+  ]
+}

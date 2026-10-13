@@ -704,6 +704,47 @@ def validate_stream_bridge(package_report):
                   "Stream ROM bridge permits at most 65536 bytes per region chunk")
 
 
+def stream_play_package(document, state, report, package_path):
+    """Desktop bootstrap for the shared bounded loader, never flattened collision.
+
+    Architecture and exact floors are decoded only from the checked DLM bytes.
+    The JSON holds the same resident gameplay and dynamic visual definitions as
+    bootstrap_header; it also binds replay identity to the entire cooked file.
+    """
+    validate_stream_bridge(report)
+    bootstrap = dict(state, colliders=[], floors=[], streamed_source=False)
+    result = level.play_package(document, bootstrap)
+    dynamic = [entity for entity in state["models"] if entity["kind"] != "static"]
+    mesh_ids = sorted({entity["model"] for entity in dynamic})
+    enemy_indices = {row["id"]: index for index, row in enumerate(state["enemies"])}
+    result["stream_meshes"] = [dict(id=ident, **{key: state["meshes"][ident][key]
+        for key in ("vertices", "indices")}) for ident in mesh_ids]
+    result["stream_models"] = [dict(id=entity["id"], mesh=mesh_ids.index(entity["model"]),
+        role=entity["kind"], position=entity["transform"]["position"],
+        rotation=[math.radians(value) for value in entity["transform"]["rotation"]],
+        scale=entity["transform"]["scale"], enemy_index=enemy_indices.get(entity["id"], -1)) for entity in dynamic]
+    entity_ids = {row["source_id"]: row["id"] for row in report["entity_ids"]}
+    result["stream"] = dict(package_path=str(package_path), package_sha256=report["package_sha256"],
+        directory_bytes=report["directory_bytes"], file_bytes=report["package_bytes"],
+        max_region_bytes=max(row["chunk_bytes"] for row in report["regions"]), region_count=len(report["regions"]),
+        max_resident_regions=report["max_resident_regions"], visibility=report["visibility"],
+        model_entity_ids=[entity_ids[row["id"]] for row in dynamic],
+        object_entity_ids=[entity_ids[row["id"]] for row in state["objects"]],
+        enemy_entity_ids=[entity_ids[row["id"]] for row in state["enemies"]],
+        materials=[dict(id=row["id"], color=[round(value*255) for value in state["materials"][row["source_id"]]["color"]],
+            double_sided=state["materials"][row["source_id"]].get("double_sided", True)) for row in report["material_ids"]],
+        policy_regions=report.get("policy_regions", []),
+        transitions=[dict(from_region=row["from_region"], to_region=row["to_region"], bounds=row["bounds"],
+            door_entity_id=entity_ids[row["door"]] if row.get("door") else 0) for row in report.get("transitions", [])],
+        runtime_debug_map=report["runtime_debug_map"])
+    identity = dict(result)
+    identity.pop("fingerprint", None)
+    identity["stream"] = {key: value for key, value in result["stream"].items()
+                          if key not in ("package_path", "runtime_debug_map")}
+    result["fingerprint"] = hashlib.sha256(canonical_json(identity)).hexdigest()
+    return result
+
+
 def prepare_stream_level(manifest_path, output, content_root=None):
     """Build the menu bootstrap and a checked, hash-addressed ROM package."""
     manifest_path, output = Path(manifest_path).resolve(), Path(output).resolve()
@@ -749,6 +790,8 @@ def prepare_stream_level(manifest_path, output, content_root=None):
         atomic_write(output / path, png)
     atomic_write(output / "generated/texture_report.json", (json.dumps(texture_report, indent=2) + "\n").encode())
     atomic_write(output / relative, package)
+    play = stream_play_package(document, state, package_report, (output / relative).as_posix())
+    atomic_write(output / "generated/play.json", (json.dumps(play, indent=2, allow_nan=False) + "\n").encode())
     atomic_write(output / "generated/demo_level.h", text.encode("utf-8"))
     atomic_write(output / "generated/mission_report.json", (json.dumps(package_report, indent=2, sort_keys=True) + "\n").encode("utf-8"))
     atomic_write(output / "generated/runtime_debug_map.json", (json.dumps(package_report["runtime_debug_map"], indent=2, sort_keys=True) + "\n").encode("utf-8"))

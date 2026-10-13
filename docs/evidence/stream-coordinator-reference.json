@@ -1,0 +1,21 @@
+{
+  "model": "docs/models/stream-coordinator.machine.ts",
+  "source_sha256": "0edaf0d6d215a0e5ac43c013a1c93a0eead693fef9b8ef5035decee0e8ab98f6",
+  "tool_version": "0.1.7",
+  "tier": "pr",
+  "interpreter_states": 2304,
+  "interpreter_edges": 11520,
+  "invariant_checks": 6912,
+  "publish_checks": 128,
+  "cancel_checks": 3840,
+  "interpreter_passed": true,
+  "c_equivalence_proven": false,
+  "limitations": [
+    "Two abstract demand and guard membership values, two bank IDs and a cancellation-safe job epoch.",
+    "Platform callbacks, DMA/fences, content/CRC, wall clock budgets and liveness are outside this model.",
+    "The N64 and native implementations use handwritten C; C synthetic tests supply separate conformance evidence."
+  ],
+  "tlc_proof_passed": true,
+  "interpreter_tla_graph_equivalent": true,
+  "machine_sha256": "460fa113cceb98ca9f838ece8dde8845de970e36559a3c4839ee4933c254d8e6"
+}

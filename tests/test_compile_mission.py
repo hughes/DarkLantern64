@@ -492,6 +492,26 @@ class MissionCookTests(unittest.TestCase):
         self.assertIn(".object_count=3", text)
         self.assertIn(".test_start_count=2", text)
         self.assertEqual(report["bootstrap"]["models"], ["probe-door", "probe-guard", "probe-loot"])
+
+    def test_native_stream_bootstrap_binds_package_and_has_relocatable_identity(self):
+        report, header = self.prepare_bootstrap()
+        output = header.parent.parent
+        play = json.loads((output / "generated/play.json").read_bytes())
+        stream = play["stream"]
+        self.assertEqual(play["colliders"], [])
+        self.assertEqual(play["floors"], [])
+        self.assertEqual(hashlib.sha256(Path(stream["package_path"]).read_bytes()).hexdigest(), stream["package_sha256"])
+        self.assertEqual([row["id"] for row in play["stream_models"]], report["bootstrap"]["models"])
+        self.assertEqual(stream["object_entity_ids"], report["bootstrap"]["object_entity_ids"])
+        document = mission.canonical_source(self.document)
+        state = mission.level.validate(document, self.content, streaming=True)
+        package, package_report = self.cook()
+        moved = mission.stream_play_package(document, state, package_report, "elsewhere/package.dlm")
+        self.assertEqual(play["fingerprint"], moved["fingerprint"])
+        staged_package, staged_report = mission.cook_mission(self.manifest, self.content, source_document=self.document)
+        self.assertEqual(staged_package, package)
+        staged = mission.stream_play_package(document, state, staged_report, "stage/package.dlm")
+        self.assertEqual(play["fingerprint"], staged["fingerprint"])
         self.assertEqual(report["compiled_geometry_bytes"], 1800)
         packaged = self.root / "bootstrap" / report["mission"]["path"]
         self.assertEqual(hashlib.sha256(packaged.read_bytes()).hexdigest(), report["mission"]["sha256"])

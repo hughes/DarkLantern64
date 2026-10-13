@@ -53,13 +53,14 @@ menu must be included before this launch path is available. **Run game menu**
 uses the complete bundle as before. ROM cooking validates the partition before
 publishing its package.
 
-The viewport currently displays the complete authoring scene. It does not
-simulate streamed residency, conservative visibility, loading delays or slot
-retirement. **Native Play is explicitly unavailable for stream missions.**
-Preparation omits the resident `play.json` and generated scene C header for
-these sources; Native Play reports why it is blocked. The ROM demo is the
-current stream simulation path. This is a deliberate integration gate, not
-editor support being complete.
+The authoring viewport displays the complete editable scene. **Native Play
+uses the same cooked DLM1/DLR1 package and portable streaming coordinator as
+the ROM.** Preparation emits a bootstrap `play.json` bound to the package's
+SHA256; architecture and collision are decoded from region chunks during
+Play. The Play Inspector exposes current, demanded, physical, candidate and
+published masks, queued interactions, slot generations, pins and lifecycle
+state. See the [shared coordinator](streaming-coordinator.md) for ownership,
+synthetic delay/failure tests and functional host/ROM replay comparisons.
 
 The authored ROM policy supports up to 32 regions with at most five region
 chunks resident at once. Each reachable stable set, selected transition union
@@ -93,8 +94,9 @@ is a conservative content contract; this metadata does not prove a PVS.
 Larger canonical sources opt in to `authoring_profile: "streamed-mission"`.
 Their total static geometry and home IDs can exceed a resident scene, while
 ordinary global gameplay/material/light caps remain. Editor creation reads
-the prepared source limits. Resident compilation and Native Play reject this
-profile even if its partition is missing. **Add floor triangle** and the
+the prepared source limits. Resident compilation rejects this profile;
+Native Play requires its valid partition and bounded stream cook.
+**Add floor triangle** and the
 Inspector's local floor vertices edit exact horizontal or sloping support;
 Collision debug draws its transformed edges. **Drop to surface** uses the
 highest supporting box top or transformed triangular floor at the object's
@@ -116,8 +118,8 @@ or fitting.
 After a successful publication, an ancillary cache/catalog failure reports a
 warning and retains the new saved identities so the next save can proceed.
 
-Region create/rename/delete controls, viewport bounds handles, selection
-overlays and Native Play stream simulation remain future work. The following
+Region create/rename/delete controls, viewport bounds handles and selection
+overlays remain future work. The following
 work is necessary before the complete larger-level workflow is accepted.
 
 ## Region authoring as first-class scene editing
@@ -185,14 +187,13 @@ object or boundary.
 
 ## One portable Native Play and ROM contract
 
-Enable stream Native Play only after it reads the same DLM1/DLR1 package,
-checksums and IDs and uses the same portable loader, residency scheduler,
-working-scene adapter and mission-owned persistent state as ROM. Provide a
-host file reader and configurable delayed/error reads; preserve the loading
-and unavailable-collision rules. Host graphics completion can have a host
-implementation, while exercising the same pin/generation/retirement protocol.
-Host preview must not replace region lifetime with a resident scene and then
-claim simulation parity.
+Native Play reads the same DLM1/DLR1 package, checksums and IDs and uses the
+portable loader, residency coordinator, working-scene adapter and mission-owned
+persistent state as ROM. Its host file reader supplies bounded reads; synthetic
+callbacks exercise delayed/error reads and delayed graphics completion through
+that same coordinator. Loading and unavailable collision use the published
+bank. Host graphics completion has a desktop implementation, while region
+buffers use the same pin/generation/retirement protocol.
 
 Presentation can differ: the authoring viewport uses full source assets, while
 runtime preview should expose target packing, texture formats and active draw

@@ -14,7 +14,8 @@
 #include "stream_rom.h"
 #ifdef DL_INPUT_REPLAY
 #include "input_replay.h"
-static int replay_start_preset=-1;
+static DlLauncher *replay_launcher;
+static DlRenderStats *replay_stats;
 #endif
 #ifdef DL_SCALE_BENCH
 #include "scale_bench.h"
@@ -249,6 +250,8 @@ static void start_level(DlGame *game, const DlLauncher *launcher, DlRenderStats 
     DlProfileMark trace_renderer_end=dl_profile_mark();
     dl_stream_rom_trace_startup_ready(game,trace_renderer_end.ticks-trace_renderer_start.ticks,
         trace_renderer_end.audio_ticks-trace_renderer_start.audio_ticks);
+#else
+    dl_stream_rom_trace_startup_ready(game,0,0);
 #endif
     stats->streaming=level->stream!=NULL;
     dl_music_start(&dl_level_music[launcher->active_level]);
@@ -863,9 +866,9 @@ static void gameplay_tick(void *context, const DlInput *input, uint64_t tick) {
     input=&effective;
 #ifdef DL_INPUT_REPLAY
     float before=game->elapsed;
-    if(input->restart)dl_game_start(game,game->level,replay_start_preset);
+    if(input->restart)start_level(game,replay_launcher,replay_stats);
     else dl_game_update(game,input,DL_TICK_SECONDS);
-    if(game->elapsed<before&&!input->restart)dl_game_start(game,game->level,replay_start_preset);
+    if(game->elapsed<before&&!input->restart)start_level(game,replay_launcher,replay_stats);
 #else
     dl_game_update(game,input,DL_TICK_SECONDS);
     /* A frame can contain several fixed ticks. Stop advancing after the game
@@ -897,7 +900,14 @@ static void gameplay_tick(void *context, const DlInput *input, uint64_t tick) {
     for(unsigned i=0;i<game->event_count;++i){const DlWorldEvent *e=&game->events[i];
         debugf("%s{\"kind\":%d,\"position\":[%.7f,%.7f,%.7f],\"time\":%.7f,\"strength\":%.7f,\"actor\":%d,\"detail\":%d,\"previous\":%d}",
             i?",":"",e->kind,e->position.x,e->position.y,e->position.z,e->time,e->strength,e->actor,e->detail,e->previous);}
-    debugf("],\"grounded\":%d,\"crouched\":%d}\n",game->grounded,game->crouched);
+    debugf("],\"grounded\":%d,\"crouched\":%d",game->grounded,game->crouched);
+    if(dl_stream_rom_active()){
+        DlStreamCoordinatorSnapshot stream;dl_stream_rom_snapshot(game,&stream);
+        debugf(",\"stream\":{\"current_region\":%lu,\"demand_mask\":%lu,\"published_mask\":%lu,\"active_enemy_mask\":%u,\"queued_use\":%d,\"queued_object\":%d,\"queued_transition\":%lu}",
+            (unsigned long)stream.current_region,(unsigned long)stream.wanted_mask,(unsigned long)stream.published_mask,
+            (unsigned)game->active_enemy_mask,stream.queued_use,stream.queued_object,(unsigned long)stream.queued_transition);
+    }
+    debugf("}\n");
 #endif
 }
 
@@ -945,7 +955,7 @@ int main(void) {
 #endif
     if (launcher.has_active) start_level(&game,&launcher,&stats);
 #ifdef DL_INPUT_REPLAY
-    replay_start_preset=launcher.active_start;
+    replay_launcher=&launcher;replay_stats=&stats;
 #endif
     debugf("DL64 controls stick=look dpad=look c_up_down=move c_left_right=strafe l=jump z=crouch a=use b=noise r=restart start=debug z_start=level_menu\n");
     debugf("DL64 menu_ready levels=%d initial=%s mode=%s\n",dl_bundle.level_count,
@@ -953,6 +963,10 @@ int main(void) {
 #ifdef DL_AUTOPLAY
     debugf("DL64 replay_start mode=input-only scene_version=%lu fixed_dt=0.016666667\n",
         (unsigned long)game.level->version);
+#endif
+#ifdef DL_INPUT_REPLAY
+    debugf("DL64 replay_start mode=input-only scene_version=%lu fixed_dt=0.016666667 fingerprint=%s stream_boundary=%s\n",
+        (unsigned long)game.level->version,DL_REPLAY_FINGERPRINT,DL_REPLAY_STREAM_BOUNDARY);
 #endif
     uint32_t previous = TICKS_READ(), next_report = previous;
 #ifdef DL_BAFFORD_DISTRICT_PERFORMANCE_TEST
@@ -1104,6 +1118,12 @@ int main(void) {
 #endif
 #ifdef DL_INPUT_REPLAY
         if(clock.tick<DL_REPLAY_TICKS) {
+#ifdef DL_REPLAY_STREAM_SETTLED
+            /* This diagnostic compares functional ticks after the same demand
+             * is published. Rendering/service still advances while IO waits;
+             * target timing is measured by the separate wall-time route. */
+            if(dl_stream_rom_settled())
+#endif
             dl_tick_step(&clock,dl_replay_inputs[clock.tick],gameplay_tick,&game);
             if(clock.tick==DL_REPLAY_TICKS)debugf("DL64 input_replay_done ticks=%llu\n",(unsigned long long)clock.tick);
         } else game.event_count=0;

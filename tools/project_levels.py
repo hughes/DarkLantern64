@@ -27,20 +27,19 @@ try:
     import editor_cache
     from character_assets import configure_editor_cache
     from content_profile import content_limits, is_study, is_streamed, STUDY_LIMITS, STUDY_PLAY_REASON
-    from compile_mission import mission_source, cook_mission, validate_stream_bridge, collider_corners
+    from compile_mission import mission_source, cook_mission, validate_stream_bridge, collider_corners, stream_play_package, canonical_source
 except ModuleNotFoundError:
     from tools.compile_level import compile_level, validate, transform_point
     from tools.compile_bundle import MAX_LEVELS, read_manifest
     from tools import editor_cache
     from tools.character_assets import configure_editor_cache
     from tools.content_profile import content_limits, is_study, is_streamed, STUDY_LIMITS, STUDY_PLAY_REASON
-    from tools.compile_mission import mission_source, cook_mission, validate_stream_bridge, collider_corners
+    from tools.compile_mission import mission_source, cook_mission, validate_stream_bridge, collider_corners, stream_play_package, canonical_source
 
 ROOT = Path(__file__).resolve().parents[1]
 FILENAME = re.compile(r"[A-Za-z][A-Za-z0-9_-]{0,63}\.json")
 RESERVED = re.compile(r"(?:con|prn|aux|nul|com[1-9]|lpt[1-9])", re.IGNORECASE)
-STREAM_NATIVE_REASON = ("Native Play for stream missions is not implemented yet. The editor shows the complete authoring scene; "
-                       "use Run level in Ares to exercise the ROM chunk loader. Native Play must use the same portable mission loader and working-scene adapter before it is enabled.")
+STREAM_NATIVE_REASON = "Repair the mission partition and bounded cook before starting Native Play."
 
 
 def require(condition, message):
@@ -226,7 +225,7 @@ class ProjectLevels:
                     return row
         return None
 
-    def stream_metadata(self, path, data, bundle, partition=None):
+    def stream_metadata(self, path, data, bundle, partition=None, artifacts=None):
         partition = partition or self.mission_for(path)
         if partition is None:
             return None
@@ -234,20 +233,22 @@ class ProjectLevels:
         status = {"valid": False, "portable_valid": False, "rom_valid": False, "error": ""}
         report = None
         try:
-            _, report = cook_mission(partition["document"], self.content, source_document=data)
+            package, report = cook_mission(partition["document"], self.content, source_document=data)
             status = dict(valid=False, portable_valid=True, rom_valid=False, error="", directory_bytes=report["directory_bytes"], package_bytes=report["package_bytes"],
                           peak_neighbor_overlap_chunk_bytes=report["memory"]["peak_neighbor_overlap_chunk_bytes"],
                           max_resident_regions=report["max_resident_regions"],
                           unknown_costs=report["memory"]["unknown_costs"])
             validate_stream_bridge(report)
             status.update(valid=True, rom_valid=True)
+            if artifacts is not None:
+                artifacts.update(package=package, report=report)
         except (ValueError, OSError, KeyError, TypeError, RuntimeError) as error:
             status["error"] = str(error)
         return dict(mission_manifest=partition["path"].as_posix(), mission_manifest_sha256=sha256(partition["raw"]),
                     mission_document=copy.deepcopy(partition["document"]), mission_text=partition["raw"].decode("utf-8"),
                     visibility=partition["document"].get("visibility", "door-distance"),
                     bundle_id=row["id"] if row and "mission" in row else None,
-                    native_play_supported=False, native_play_reason=STREAM_NATIVE_REASON,
+                    native_play_supported=status["valid"], native_play_reason="" if status["valid"] else STREAM_NATIVE_REASON,
                     preview_mode="Complete authoring scene; streaming residency and visibility are not simulated",
                     regions=copy.deepcopy(partition["document"].get("regions", [])),
                     working_sets=copy.deepcopy(report["working_sets"]) if report else [], status=status)
@@ -260,7 +261,7 @@ class ProjectLevels:
                 "in_bundle": row is not None, "bundle_id": row["id"] if row else None,
                 "authoring_profile": data.get('authoring_profile'), "playable": not is_study(data),
                 "runtime_format": "stream-mission-v1" if streaming else "resident-level",
-                "native_play_supported": not (is_study(data) or is_streamed(data)) and streaming is None,
+                "native_play_supported": streaming["native_play_supported"] if streaming else not (is_study(data) or is_streamed(data)),
                 "streaming": streaming,
                 "test_starts": copy.deepcopy(data.get("test_starts", []))}
 
@@ -558,7 +559,8 @@ class ProjectLevels:
             if publish_pair:
                 require(staged is not None and mission_candidate is not None and expected_sha256 is not None,
                         "Paired save requires both staged files and both saved SHA-256 identities")
-            streaming = self.stream_metadata(path, candidate_data, bundle, partition)
+            stream_artifacts = {}
+            streaming = self.stream_metadata(path, candidate_data, bundle, partition, stream_artifacts)
             output = self.safe(self.root / "build" if path.stem == "first_room" else self.root / "build/scenes" / path.stem)
             asset_root = self.safe(self.root / "build/project/editor-assets")
             cache = self.safe(self.cache / "cooked" / path.name)
@@ -580,17 +582,27 @@ class ProjectLevels:
                 cooked = temporary / "output"
                 report = compile_level(snapshot, cooked, self.content, authoring=True)
                 if streaming:
-                    report.update(playable=False, native_play_supported=False, streaming=streaming,
-                                  preview_mode="Complete authoring scene; stream simulation requires the ROM pipeline")
+                    report.update(playable=streaming["native_play_supported"], native_play_supported=streaming["native_play_supported"], streaming=streaming,
+                                  preview_mode="Complete authoring scene; Native Play publishes bounded stream working sets")
                 changes = {output / item.relative_to(cooked): item.read_bytes()
                            for item in cooked.rglob("*") if item.is_file() and
                            (not streaming or item.relative_to(cooked).as_posix() not in ("generated/demo_level.h", "generated/play.json"))}
                 if streaming:
                     changes[output / "generated/level_report.json"] = json_bytes(report)
-                    for blocked in ("generated/demo_level.h", "generated/play.json"):
+                    for blocked in ("generated/demo_level.h",):
                         target = output / blocked
                         if target.exists():
                             changes[target] = None
+                    if stream_artifacts:
+                        package_report = stream_artifacts["report"]
+                        package_path = output / "romfs/missions" / ("mission-" + package_report["package_sha256"] + ".dlm")
+                        state = validate(canonical_source(candidate_data), self.content, streaming=True)
+                        changes[package_path] = stream_artifacts["package"]
+                        changes[output / "generated/play.json"] = json_bytes(stream_play_package(candidate_data, state, package_report, package_path.as_posix()))
+                        changes[output / "generated/mission_report.json"] = json_bytes(package_report)
+                        changes[output / "generated/runtime_debug_map.json"] = json_bytes(package_report["runtime_debug_map"])
+                    elif (output / "generated/play.json").exists():
+                        changes[output / "generated/play.json"] = None
                 preview = json.loads((cooked / "editor-assets/levels/first_room.json").read_bytes())
                 texture_folder = cooked / "editor-assets/textures"
                 texture_names = {item.name: f"{item.stem}-{sha256(item.read_bytes())[:16]}.png"
@@ -655,7 +667,7 @@ class ProjectLevels:
                     "changed_preview_assets": changed_preview_assets,
                      "report": report, "preview_fingerprint": preview_fingerprint,
                      "runtime_format": "stream-mission-v1" if streaming else "resident-level",
-                     "native_play_supported": streaming is None and not (is_study(candidate_data) or is_streamed(candidate_data)), "streaming": streaming}
+                     "native_play_supported": streaming["native_play_supported"] if streaming else not (is_study(candidate_data) or is_streamed(candidate_data)), "streaming": streaming}
             if publish_pair:
                 result.update(source_sha256=sha256(candidate_raw), source_text=candidate_raw.decode("utf-8"), saved_pair=True)
             try:

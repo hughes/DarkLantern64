@@ -1,5 +1,33 @@
 # Region lifetime verification
 
+The companion `stream-coordinator.machine.ts` models inactive-bank assembly,
+generation-tagged renderer readiness, demand/guard snapshots, publication,
+queued use and cancellation/reset. Run
+`node tools/check_stream_coordinator.mjs --proof` using the same pinned npm
+dependency and Java setup below. Its unmodified certificate records 2,304
+states and 11,520 edges with matching TLC and interpreter graphs; the checker
+validates 128 publication transitions and 3,840 cancellation/reset transitions.
+It uses two abstract demand values, two guard membership values, two bank IDs
+and a cancellation-safe Boolean job epoch. Demand/guard changes may occur
+during preparation but live snapshots must match before publication.
+Cancellation cannot change the active bank or its published mask, and assembly
+alone owns CPU pins.
+
+This companion has no generated C interpreter or C equivalence proof.
+`tests/test_stream_coordinator.c` independently exercises the actual C.
+Platform callbacks, DMA/fences, content validity, wall-clock budgets and
+liveness remain outside this finite coordinator model. The
+[coordinator guide](../streaming-coordinator.md) explains the runtime boundary
+and separate console acceptance. Generated artifacts stay under
+`build/stream-coordinator-proof/`; checked-in evidence is
+`docs/evidence/stream-coordinator-reference.json` and
+`docs/evidence/stream-coordinator.pr.certificate.json`.
+
+The coordinator proof used Java 21.0.10 and the TLC jar with SHA256
+`baf125a62e192f8d9df38035b8283b9d05f08dbf01860b2df40af489b894563d`,
+reporting `2026.10.13.000515 (rev: 5737c47)`. Set `TLA2TOOLS_JAR` to the
+installed jar and use an actual Java `bin` path if the Oracle shim stalls.
+
 `region-lifetime.machine.ts` is a finite executable reference for the ownership
 protocol in `src/world_stream.c`. The reference runs through the TLA PreCheck
 interpreter on the host. The N64 implementation is handwritten C17; it does not

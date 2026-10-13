@@ -210,7 +210,7 @@
                         ImGui::EndCombo();
                     }
                 }
-                ImGui::TextWrapped("Create/delete regions, viewport bounds handles and Native Play stream simulation remain future work.");
+                ImGui::TextWrapped("Native Play uses the cooked mission and bounded working sets. Create/delete regions and viewport bounds handles remain future work.");
                 ImGui::EndDisabled();
             } else ImGui::TextWrapped("This scene uses the resident level format. Streaming partition controls are experimental.");
         }
@@ -287,12 +287,12 @@
         }
         ImGui::Separator();
         if(!playing) {
-            ImGui::BeginDisabled(locked||StreamingInfo()!=nullptr);
+            ImGui::BeginDisabled(locked);
             if(ImGui::SmallButton("Play")){nativeStart_=testStart_;nativeRequested_=true;}
             ImGui::EndDisabled();
             if(StreamingInfo()) {
                 if(ImGui::SmallButton("Stream regions"))ShowPanel("Streaming");
-                if(ImGui::IsItemHovered())ImGui::SetTooltip("Native Play is unavailable for stream missions. Run level in Ares uses the ROM streaming pipeline.");
+                if(ImGui::IsItemHovered())ImGui::SetTooltip("Native Play and Ares use the same mission package, stream coordinator and collision banks.");
             }
         } else {
             if(ImGui::SmallButton(engine_.IsPlayPaused()?"Resume":"Pause"))Defer([this]{engine_.SetPlayPaused(!engine_.IsPlayPaused());});

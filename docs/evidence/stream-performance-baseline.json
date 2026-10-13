@@ -1,0 +1,185 @@
+{
+  "platform": "Ares emulator",
+  "accepted": false,
+  "baseline": true,
+  "rom_sha256": "a3853764ae08cae5f8c43e221dc32f71b99cb04e319527159bc4b23fb673d89e",
+  "mission_sha256": "bb709d76895198bbccf36f9febf52990f2691e0ae67ed4c28e1aa9df7c14aaf5",
+  "build_signature": "408b88d806b5c6e751ac204898f5eb3265f98f4a34d020dddd28a4552cabaadc",
+  "log": "C:\\Users\\hughe\\dev\\DarkLantern64\\.dev\\ares\\runs\\629e5e3cfbae4fabbb3519dc2b057af9\\bafford-district.log",
+  "log_sha256": "0933e71c901c20473d9d38be6864c35340a7c6bf97b514438c807bcc80c49d7e",
+  "renderer_preparations": {
+    "initial_start": {
+      "count": 1,
+      "total_seconds": 4.250118869333333,
+      "elapsed": {
+        "samples": 1,
+        "average_ms": 4250.118869333333,
+        "min_ms": 4250.118869333333,
+        "max_ms": 4250.118869333333,
+        "p50_ms": 4250.118869333333,
+        "p95_ms": 4250.118869333333,
+        "p99_ms": 4250.118869333333,
+        "over_budget_samples": 1,
+        "quantile_method": "nearest rank; acceptance uses every sample and the maximum"
+      },
+      "lighting": {
+        "samples": 1,
+        "average_ms": 4132.184554666666,
+        "min_ms": 4132.184554666666,
+        "max_ms": 4132.184554666666,
+        "p50_ms": 4132.184554666666,
+        "p95_ms": 4132.184554666666,
+        "p99_ms": 4132.184554666666,
+        "over_budget_samples": 1,
+        "quantile_method": "nearest rank; acceptance uses every sample and the maximum"
+      },
+      "gpu_prepare": {
+        "samples": 1,
+        "average_ms": 66.54016,
+        "min_ms": 66.54016,
+        "max_ms": 66.54016,
+        "p50_ms": 66.54016,
+        "p95_ms": 66.54016,
+        "p99_ms": 66.54016,
+        "over_budget_samples": 1,
+        "quantile_method": "nearest rank; acceptance uses every sample and the maximum"
+      },
+      "lighting_fraction": 0.9722515255943499
+    },
+    "restart": {
+      "count": 1,
+      "total_seconds": 4.248854272,
+      "elapsed": {
+        "samples": 1,
+        "average_ms": 4248.854272,
+        "min_ms": 4248.854272,
+        "max_ms": 4248.854272,
+        "p50_ms": 4248.854272,
+        "p95_ms": 4248.854272,
+        "p99_ms": 4248.854272,
+        "over_budget_samples": 1,
+        "quantile_method": "nearest rank; acceptance uses every sample and the maximum"
+      },
+      "lighting": {
+        "samples": 1,
+        "average_ms": 4131.851434666667,
+        "min_ms": 4131.851434666667,
+        "max_ms": 4131.851434666667,
+        "p50_ms": 4131.851434666667,
+        "p95_ms": 4131.851434666667,
+        "p99_ms": 4131.851434666667,
+        "over_budget_samples": 1,
+        "quantile_method": "nearest rank; acceptance uses every sample and the maximum"
+      },
+      "gpu_prepare": {
+        "samples": 1,
+        "average_ms": 66.25909333333334,
+        "min_ms": 66.25909333333334,
+        "max_ms": 66.25909333333334,
+        "p50_ms": 66.25909333333334,
+        "p95_ms": 66.25909333333334,
+        "p99_ms": 66.25909333333334,
+        "over_budget_samples": 1,
+        "quantile_method": "nearest rank; acceptance uses every sample and the maximum"
+      },
+      "lighting_fraction": 0.9724624969831553
+    },
+    "transition": {
+      "count": 42,
+      "total_seconds": 292.52599605333336,
+      "elapsed": {
+        "samples": 42,
+        "average_ms": 6964.904667936508,
+        "min_ms": 946.007616,
+        "max_ms": 15702.282133333334,
+        "p50_ms": 5824.660458666666,
+        "p95_ms": 15518.672981333333,
+        "p99_ms": 15702.282133333334,
+        "over_budget_samples": 42,
+        "quantile_method": "nearest rank; acceptance uses every sample and the maximum"
+      },
+      "lighting": {
+        "samples": 42,
+        "average_ms": 6787.684028444444,
+        "min_ms": 828.2375466666666,
+        "max_ms": 15497.964565333334,
+        "p50_ms": 5640.893077333333,
+        "p95_ms": 15306.942570666666,
+        "p99_ms": 15497.964565333334,
+        "over_budget_samples": 42,
+        "quantile_method": "nearest rank; acceptance uses every sample and the maximum"
+      },
+      "gpu_prepare": {
+        "samples": 42,
+        "average_ms": 110.73417193650795,
+        "min_ms": 60.740821333333336,
+        "max_ms": 168.790848,
+        "p50_ms": 110.725568,
+        "p95_ms": 166.92928,
+        "p99_ms": 168.790848,
+        "over_budget_samples": 42,
+        "quantile_method": "nearest rank; acceptance uses every sample and the maximum"
+      },
+      "lighting_fraction": 0.9745551952336242
+    }
+  },
+  "legacy_profile": {
+    "windows": 155,
+    "partial": false,
+    "exact_samples": true,
+    "elapsed": {
+      "samples": 7833,
+      "average_ms": 54.774015566960294,
+      "min_ms": 0.067072,
+      "max_ms": 15797.998357333334,
+      "p50_ms": 16.721450666666666,
+      "p95_ms": 21.926250666666668,
+      "p99_ms": 28.597610666666668,
+      "over_budget_samples": 46,
+      "quantile_method": "nearest rank; acceptance uses every sample and the maximum"
+    },
+    "work": {
+      "samples": 7833,
+      "average_ms": 49.62873638946338,
+      "min_ms": 0.067072,
+      "max_ms": 15797.981717333334,
+      "p50_ms": 11.150613333333334,
+      "p95_ms": 21.907605333333333,
+      "p99_ms": 28.577472,
+      "over_budget_samples": 46,
+      "quantile_method": "nearest rank; acceptance uses every sample and the maximum"
+    }
+  },
+  "failures": [
+    "Missing wall-time performance instrumentation; fixed-dt route proves no dropped-wall-time claim."
+  ],
+  "functional": {
+    "functional_passed": true,
+    "audio_continuity_passed": true,
+    "visited_regions": [
+      1,
+      2,
+      3,
+      4,
+      6,
+      7,
+      8,
+      9,
+      10
+    ],
+    "pre_restart_loads": 27,
+    "retirements": 25,
+    "allocated_slot_bytes": 178720,
+    "peak_heap_bytes": 1752304,
+    "music": {
+      "cue": "lanterns_below",
+      "consumed_frames": 13698168,
+      "generated_blocks": 10773,
+      "max_underruns": 0,
+      "sample_count": 156
+    },
+    "timing_scope": "Input-only tour on Ares; original N64 performance remains unverified"
+  },
+  "checkpoint_count": 41,
+  "command": "python tools/verify_bafford_district_performance.py --baseline --log .dev/ares/runs/629e5e3cfbae4fabbb3519dc2b057af9/bafford-district.log --output build/stream-performance-baseline.json"
+}

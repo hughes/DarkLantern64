@@ -113,8 +113,61 @@ static int repeated_and_degenerate(void){
     return 0;
 }
 
+static int same_batches(const DlRenderBatches *a,const DlRenderBatches *b){
+    CHECK(a->batch_count==b->batch_count&&a->vertex_count==b->vertex_count&&
+        a->group_count==b->group_count&&a->index_count==b->index_count&&a->allocated_bytes==b->allocated_bytes);
+    if(a->batch_count)CHECK(memcmp(a->batches,b->batches,a->batch_count*sizeof *a->batches)==0);
+    if(a->vertex_count)CHECK(memcmp(a->vertices,b->vertices,a->vertex_count*sizeof *a->vertices)==0);
+    if(a->group_count)CHECK(memcmp(a->groups,b->groups,a->group_count*sizeof *a->groups)==0);
+    if(a->index_count)CHECK(memcmp(a->indices,b->indices,a->index_count)==0);
+    return 0;
+}
+
+static int sequential_static(void){
+    enum {MAX_VERTICES=65535};
+    DlVec3 *vertices=calloc(MAX_VERTICES,sizeof *vertices);DlNormal *normals=calloc(MAX_VERTICES,sizeof *normals);
+    DlVec2 *uvs=calloc(MAX_VERTICES,sizeof *uvs);uint8_t *bones=calloc(MAX_VERTICES,sizeof *bones);
+    uint16_t *indices=malloc(MAX_VERTICES*sizeof *indices);CHECK(vertices&&normals&&uvs&&bones&&indices);
+    for(unsigned i=0;i<MAX_VERTICES;++i)indices[i]=(uint16_t)i;
+    DlAnimationAsset single_bone={.bone_count=1,.vertex_bones=bones};
+    const int triangles[]={0,1,2,21,22,23,24,25,45,46,47,48,91,92,93,511,1440,21844,21845};
+    for(unsigned c=0;c<sizeof triangles/sizeof triangles[0];++c)
+    for(int smooth=0;smooth<2;++smooth)for(int textured=0;textured<2;++textured){
+        int count=triangles[c]*3;
+        DlMesh mesh={.vertices=vertices,.vertex_count=count,.indices=indices,.index_count=count,
+            .normals=smooth?normals:NULL,.uvs=textured?uvs:NULL};
+        DlRenderBatches packed={0},reference={0};
+        CHECK(dl_render_batches_build(&mesh,&packed));CHECK(topology(&mesh,&packed)==0);
+        /* A one-bone asset selects the unchanged general algorithm, while its
+         * group 0 layout is exactly the nonanimated legacy result. */
+        mesh.animation=&single_bone;CHECK(dl_render_batches_build(&mesh,&reference));
+        CHECK(same_batches(&packed,&reference)==0);
+        if(triangles[c]>=23){CHECK(packed.batches[0].index_count==69&&packed.batches[0].vertex_count==70);
+            CHECK(memcmp(&packed.vertices[68],&packed.vertices[69],sizeof *packed.vertices)==0);}
+        dl_render_batches_free(&packed);dl_render_batches_free(&reference);
+    }
+    /* Unreferenced trailing vertices do not change the sequential topology. */
+    DlMesh mesh={.vertices=vertices,.vertex_count=90,.indices=indices,.index_count=72};
+    DlRenderBatches packed={0},reference={0};CHECK(dl_render_batches_build(&mesh,&packed));
+    mesh.animation=&single_bone;CHECK(dl_render_batches_build(&mesh,&reference));CHECK(same_batches(&packed,&reference)==0);
+    dl_render_batches_free(&packed);dl_render_batches_free(&reference);
+    /* A repeated corner must use the general key/remapping path, with either
+     * flat faces or authored normals. It still matches the legacy algorithm. */
+    indices[71]=indices[70];mesh.animation=NULL;
+    for(int smooth=0;smooth<2;++smooth){mesh.normals=smooth?normals:NULL;
+        CHECK(dl_render_batches_build(&mesh,&packed));CHECK(topology(&mesh,&packed)==0);
+        mesh.animation=&single_bone;CHECK(dl_render_batches_build(&mesh,&reference));CHECK(same_batches(&packed,&reference)==0);
+        dl_render_batches_free(&packed);dl_render_batches_free(&reference);mesh.animation=NULL;
+    }
+    DlRenderBatches failed={.vertex_count=137,.allocated_bytes=55},before=failed;
+    indices[71]=90;CHECK(!dl_render_batches_build(&mesh,&failed)&&memcmp(&failed,&before,sizeof failed)==0);
+    indices[71]=71;--mesh.index_count;
+    CHECK(!dl_render_batches_build(&mesh,&failed)&&memcmp(&failed,&before,sizeof failed)==0);
+    free(vertices);free(normals);free(uvs);free(bones);free(indices);return 0;
+}
+
 int main(void){
-    CHECK(fixtures()==0);CHECK(repeated_and_degenerate()==0);
-    puts("render batches: exact triangle order/connectivity, 32-joint pair padding, flat face isolation, deterministic lifetimes and index limits passed");
+    CHECK(fixtures()==0);CHECK(repeated_and_degenerate()==0);CHECK(sequential_static()==0);
+    puts("render batches: byte-exact sequential static/general layouts, triangle order/connectivity, 32-joint pair padding, flat face isolation, deterministic lifetimes and index limits passed");
     return 0;
 }

@@ -16,5 +16,9 @@ bool dl_stream_rom_active(void);
 const DlWorldStream *dl_stream_rom_world(void);
 uint32_t dl_stream_rom_current(const DlGame *game);
 uint32_t dl_stream_rom_retired(void);
+/* Last service work: 0 idle/read, 1 assemble, 2 GPU preparation, 3 publication. */
+uint32_t dl_stream_rom_service_stage(void);
+bool dl_stream_rom_settled(void);
+uint32_t dl_stream_rom_view_mask(void);
 
 #endif

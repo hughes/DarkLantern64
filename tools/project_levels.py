@@ -241,7 +241,7 @@ class ProjectLevels:
                           unknown_costs=report["memory"]["unknown_costs"])
             validate_stream_bridge(report)
             status.update(valid=True, rom_valid=True)
-        except (ValueError, OSError, KeyError, TypeError) as error:
+        except (ValueError, OSError, KeyError, TypeError, RuntimeError) as error:
             status["error"] = str(error)
         return dict(mission_manifest=partition["path"].as_posix(), mission_manifest_sha256=sha256(partition["raw"]),
                     mission_document=copy.deepcopy(partition["document"]), mission_text=partition["raw"].decode("utf-8"),
@@ -279,7 +279,7 @@ class ProjectLevels:
                     continue
                 self.validate_cached(path, raw, data)
                 levels.append(self.entry(path, raw, data, bundle))
-            except (ValueError, OSError, KeyError, TypeError) as error:
+            except (ValueError, OSError, KeyError, TypeError, RuntimeError) as error:
                 warnings.append({"file": path.name, "message": str(error)})
         return {"ok": True, "levels": levels,
                 "bundle": {"source": self.manifest.as_posix(), "title": bundle["title"],

@@ -42,7 +42,7 @@ WAYPOINTS = {'start':(-6.522049,-2.4384,49.8252936),'street_center':(0,-2.4384,4
     'restart_loaded':(-6.522049,-2.4384,49.8252936)}
 
 
-def decode_log(text, content, *, capture=None, require_music=True):
+def decode_log(text, content, *, capture=None, require_music=True, wall_time=False, require_audio_continuity=True):
     require(not any(v in text for v in ('ASSERTION FAILED:', 'RSP CRASH |')), 'ROM reported a runtime failure')
     lines = text.splitlines()
     rows = [json.loads(line[len(PREFIX):]) for line in lines if line.startswith(PREFIX)]
@@ -93,27 +93,39 @@ def decode_log(text, content, *, capture=None, require_music=True):
         integer(row['tick'],'tick',1); integer(row['heap_used'],'heap_used',1)
         require(type(row['elapsed']) in (float,int) and math.isfinite(row['elapsed']) and row['elapsed']>0,
                 'Invalid simulation time')
-        stream = row['stream']; case = working(stream['resident'])
-        require(stream['settled']==1 and stream['current'] in stream['resident'], 'Checkpoint lacks ready current region')
-        require(stream['slots']==slot_count and stream['allocated']==allocated and stream['reserved']==case['chunk_bytes'],
+        stream = row['stream']; visible = stream['view'] if wall_time else stream['resident']; case = working(visible)
+        resident = stream['resident']
+        require(isinstance(resident,list) and len(resident)<=slot_count and len(set(resident))==len(resident) and
+                all(type(i) is int and i in regions for i in resident), 'Invalid physical resident IDs')
+        require(stream['current'] in visible and stream['current'] in resident and
+                (stream['settled'] in (0,1) if wall_time else stream['settled']==1), 'Checkpoint lacks ready current region')
+        if row['checkpoint'] in ('start','restart_loaded'):
+            require(stream['settled']==1, 'Mission admission lacks complete published working set')
+        reserved_ok = (sum(regions[i]['chunk_bytes'] for i in resident)<=stream['reserved']<=allocated
+                       if wall_time else stream['reserved']==case['chunk_bytes'])
+        require(stream['slots']==slot_count and stream['allocated']==allocated and reserved_ok,
                 'Unbounded or incorrect slot reservation')
         require(row['models']==case['model_count'] and row['triangles']==case['triangle_count'] and
                 row['colliders']==case['collider_count']+case['barrier_count'] and
                 row['floors']==case['floor_count'] and row['textures']==textures, 'Working resources differ from cook')
         policy = mission['policy_regions'][stream['current']-1]
-        resident_mask=sum(1 << (i-1) for i in stream['resident'])
+        resident_mask=sum(1 << (i-1) for i in visible)
         require(resident_mask & policy['working_mask'] == policy['working_mask'], 'Current visible set is not fully ready')
         lo,hi = policy['activation_bounds']
         require(all(lo[i]-.025 <= point[i] <= hi[i]+.025 for i in range(3)), 'Checkpoint outside activation bounds')
         for field in ('completed_loads','retired','readbytes','stalls'):
             integer(stream[field],field)
     for a,b in zip(rows,rows[1:]):
-        require(b['tick']>a['tick'], 'Input ticks regressed')
+        require(b['tick']>=a['tick'] if wall_time else b['tick']>a['tick'], 'Input ticks regressed')
         if b['epoch'] != a['epoch']:
             require(a['epoch']==0 and b['epoch']==1 and b['checkpoint']=='restart_loaded', 'Unexpected state reset')
             continue
         seconds = b['elapsed']-a['elapsed']
-        require(seconds>0 and abs(seconds-(b['tick']-a['tick'])/60)<.012, 'Time differs from ordinary fixed input ticks')
+        if wall_time and b['tick']==a['tick']:
+            require(seconds==0 and b['player']==a['player'] and b['grounded']==a['grounded'] and
+                    b['vertical_velocity']==a['vertical_velocity'], 'Unstepped checkpoint changed physical pose or elapsed time')
+        else:
+            require(seconds>0 and abs(seconds-(b['tick']-a['tick'])/60)<.012, 'Time differs from ordinary fixed input ticks')
         require(math.hypot(b['player'][0]-a['player'][0],b['player'][2]-a['player'][2]) <= 2.15*seconds+.025,
                 'Movement exceeds ordinary walking speed')
         require(all(b['stream'][k]>=a['stream'][k] for k in ('completed_loads','retired','readbytes','stalls')),
@@ -126,7 +138,8 @@ def decode_log(text, content, *, capture=None, require_music=True):
     for jump in (1,2):
         takeoff,air = named[f'jump{jump}_takeoff'],named[f'jump{jump}_air']
         require(takeoff['grounded']==1 and air['grounded']==0 and air['vertical_velocity']>0 and
-                air['jump_inputs']==takeoff['jump_inputs']==jump, 'Missing rising physical stair jump')
+                air['jump_inputs']==takeoff['jump_inputs']==jump and air['tick']>takeoff['tick'] and
+                air['elapsed']>takeoff['elapsed'], 'Missing rising physical stair jump')
     source_regions = {row['source_id']: row['id'] for row in regions.values()}
     for name, source in (('next_west_approach','next-passage'), ('next_west_crossed','west-return'),
                          ('next_west_return','next-passage'),('courtyard_east_approach','rear-courtyard'),
@@ -153,13 +166,16 @@ def decode_log(text, content, *, capture=None, require_music=True):
     require(('DL64 capture_begin ' in text)==actual_capture, 'Incomplete framebuffer diagnostic')
     music = music_evidence(text) if 'DL64 music cue=' in text else None
     require(not require_music or music is not None, 'Missing assigned music playback')
-    require(actual_capture or not music or music['max_underruns']==0, 'Ordinary district route has music underruns')
+    require(not require_audio_continuity or actual_capture or not music or music['max_underruns']==0,
+            'Ordinary district route has music underruns')
     return dict(passed=True,functional_passed=True,checkpoints=rows,terminal=terminal,
                 visited_regions=sorted(visited),pre_restart_loads=int(terminal['pre_restart_loads']),
                 retirements=named['east_interior']['stream']['retired'],allocated_slot_bytes=allocated,
                 peak_heap_bytes=max(row['heap_used'] for row in rows),working_views=views,
                 capture_diagnostic=actual_capture,music=music,audio_continuity_passed=bool(music and music['max_underruns']==0),
+                checkpoint_scope='Pre-update observations; queued input is not executed until a later fixed tick',
                 timing_scope='Framebuffer diagnostic; ordinary timing/audio assessed separately' if actual_capture else
+                             'Continuous wall-time input tour on Ares; original N64 performance remains unverified' if wall_time else
                              'Input-only tour on Ares; original N64 performance remains unverified')
 
 
@@ -187,8 +203,9 @@ def main(argv=None):
         entries = [row for row in build['level_catalog']['levels'] if row['id']=='bafford-district']
         require(len(entries)==1,'Missing district mission entry'); entry = entries[0]; content = entry['content']
         require(content['experimental_stream'] and content['bootstrap']['static_model_count']==0 and
-                content['bootstrap']['collider_count']==0 and content['mission']['report']['chunk_version']==3 and
-                content['mission']['report']['visibility']=='authored-sets','Terrain is not the expected streamed floor/policy package')
+                content['bootstrap']['collider_count']==0 and content['mission']['report']['chunk_version']==4 and
+                content['mission']['report'].get('lighting') and
+                content['mission']['report']['visibility']=='authored-sets','Terrain is not the expected streamed floor/policy/precomputed-color package')
         from tools.compile_mission import prepare_stream_level
         with tempfile.TemporaryDirectory(dir=ROOT/'build',prefix='verify-district-') as temp:
             current = prepare_stream_level(Path(entry['mission_manifest']),Path(temp))

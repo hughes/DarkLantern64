@@ -451,6 +451,18 @@ class ProjectLevelTests(unittest.TestCase):
         self.assertFalse((Path(cooked["output"]) / "generated/demo_level.h").exists())
         self.assertTrue((Path(cooked["asset_root"]) / cooked["scene_path"]).exists())
 
+    def test_missing_native_stream_cooker_keeps_source_editable_with_error_status(self):
+        from tools import compile_mission
+        self.stream_fixture()
+        before = self.content_bytes()
+        with patch.object(compile_mission, "prepare_stream_lighting", side_effect=RuntimeError("Static night-lighting cook requires host GCC")):
+            catalog = self.project.list()
+            entry = next(row for row in catalog["levels"] if row["file"] == "streaming_probe.json")
+        self.assertFalse(entry["streaming"]["status"]["valid"])
+        self.assertIn("requires host GCC", entry["streaming"]["status"]["error"])
+        self.assertEqual(entry["source_sha256"], self.hash("streaming_probe.json"))
+        self.assertEqual(before, self.content_bytes())
+
     def test_stream_include_update_exclude_and_reinclude_preserve_mission_kind(self):
         self.stream_fixture()
         original_manifest = (self.content / "streaming_probe.mission.json").read_bytes()

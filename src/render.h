@@ -24,6 +24,12 @@ typedef struct {
 
 void dl_render_init(void);
 void dl_render_prepare_scene(const DlGame *game);
+/* Stream preparation keeps the published scene drawable until commit. */
+void dl_render_stage_scene(const DlGame *game);
+bool dl_render_stage_step(const DlGame *game,uint32_t tick_budget);
+void dl_render_commit_scene(const DlGame *game);
+/* Discard only the staged candidate; current draw resources remain owned. */
+void dl_render_cancel_scene(void);
 /* Call between frames before replacing a level. Frame/depth buffers persist;
  * level textures and lighting caches are released after queued graphics finish. */
 void dl_render_release_scene(void);

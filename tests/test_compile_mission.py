@@ -28,6 +28,9 @@ class MissionCookTests(unittest.TestCase):
         self.content = self.root / "content"
         self.content.mkdir()
         self.document = json.loads((ROOT / "content/streaming_probe.json").read_text())
+        # Keep the legacy v1/v2/v3 decoder fixtures scalar. Dedicated night
+        # fixtures below exercise the v4 native lighting contract.
+        self.environment = self.document.pop("environment", None)
         self.manifest = json.loads((ROOT / "content/streaming_probe.mission.json").read_text())
         self.source = self.content / self.manifest["source"]
         (self.content / "models").mkdir()
@@ -468,6 +471,22 @@ class MissionCookTests(unittest.TestCase):
         changed, _ = self.prepare_bootstrap()
         self.assertNotEqual(report["source_sha256"], changed["source_sha256"])
 
+    def test_bootstrap_manifest_fingerprint_matches_exact_saved_bytes(self):
+        path = self.content / "proof.mission.json"
+        output = self.root / "manifest-proof"
+        source_before = self.source.read_bytes()
+        raw = json.dumps(self.manifest).encode("utf-8")
+        path.write_bytes(raw)
+        first = mission.prepare_stream_level(path, output, self.content)
+        self.assertEqual(first["mission_manifest_sha256"], hashlib.sha256(raw).hexdigest())
+        reformatted = (json.dumps(self.manifest, indent=2) + "\n").encode("utf-8")
+        path.write_bytes(reformatted)
+        second = mission.prepare_stream_level(path, output, self.content)
+        self.assertEqual(second["mission_manifest_sha256"], hashlib.sha256(reformatted).hexdigest())
+        self.assertNotEqual(first["mission_manifest_sha256"], second["mission_manifest_sha256"])
+        self.assertEqual(first["mission"]["sha256"], second["mission"]["sha256"])
+        self.assertEqual(self.source.read_bytes(), source_before)
+
     def test_generated_bootstrap_compiles_against_runtime_contract(self):
         report, header = self.prepare_bootstrap()
         compiler = shutil.which("gcc") or next((str(path) for path in [Path("C:/ProgramData/mingw64/mingw64/bin/gcc.exe"), Path("C:/msys64/ucrt64/bin/gcc.exe")] if path.is_file()), None)
@@ -481,6 +500,96 @@ class MissionCookTests(unittest.TestCase):
         env = dict(os.environ, PATH=str(Path(compiler).parent) + os.pathsep + os.environ.get("PATH", ""))
         subprocess.run([compiler, "-std=c17", "-Wall", "-Wextra", "-Werror", "-I" + str(ROOT / "src"), str(source), "-o", str(executable)], check=True, capture_output=True, text=True, env=env)
         subprocess.run([executable], check=True, capture_output=True, env=env)
+
+    def test_night_v4_cooks_both_rgba_states_and_instance_bootstrap_colors(self):
+        self.document["environment"] = dict(self.environment, ambient=[.25, .25, .25])
+        for entity in self.document["entities"]:
+            if entity["kind"] == "light":
+                entity["intensity"] = 0
+        self.write_source()
+        package, report = self.cook()
+        self.assertEqual(report["chunk_version"], 4)
+        lighting = report["lighting"]
+        self.assertEqual(lighting["states"], 2)
+        self.assertEqual(lighting["stream_triangles"], 192)
+        self.assertEqual(lighting["full_scene_colliders"], 17)
+        self.assertEqual(lighting["global_lights"], 2)
+        for region in self.region_rows(package):
+            chunk = package[region[1]:region[1] + region[2]]
+            self.assertEqual(struct.unpack_from(">H", chunk, 4)[0], 4)
+            for kind, _, start, _, count, stride, _ in self.sections(chunk):
+                if kind != 1:
+                    continue
+                self.assertEqual(stride, 128)
+                for index in range(count):
+                    offset = start + index * stride
+                    self.assertEqual(chunk[offset + 77:offset + 80], bytes([3, 0, 0]))
+                    closed, opened = chunk[offset + 80:offset + 104], chunk[offset + 104:offset + 128]
+                    self.assertEqual(closed, opened)
+                    self.assertEqual(closed[3::4], bytes([255]) * 6)
+        prepared, header = self.prepare_bootstrap()
+        text = header.read_text()
+        self.assertEqual([row["id"] for row in lighting["bootstrap_models"]], ["probe-door", "probe-loot"])
+        self.assertEqual(prepared["bootstrap"]["baked_color_bytes"], 2 * 12 * 48)
+        self.assertEqual(prepared["compiled_baked_color_bytes"], 1152)
+        self.assertEqual(prepared["compiled_known_array_bytes"], prepared["compiled_geometry_bytes"] + 1152)
+        self.assertEqual(lighting["host_worker_bytes"], lighting["bytes"])
+        self.assertEqual(lighting["standalone_rom_asset_bytes"], 0)
+        self.assertEqual(lighting["mission_embedded_rgba_bytes"], 192 * 48)
+        self.assertEqual(lighting["bootstrap_embedded_rgba_bytes"], 1152)
+        self.assertIn("dl_stream_baked_model_0_0", text)
+        self.assertIn("dl_stream_baked_model_2_1", text)
+        door, loot = lighting["bootstrap_models"]
+        self.assertNotEqual(door["closed_rgba"], loot["closed_rgba"])
+
+    def test_night_reordering_preserves_native_cook_and_package(self):
+        self.document["environment"] = self.environment
+        self.write_source()
+        package, report = self.cook()
+        for key in ("assets", "materials", "entities"):
+            self.document[key].reverse()
+        self.manifest["regions"].reverse()
+        for region in self.manifest["regions"]:
+            region["entities"].reverse()
+        self.write_source()
+        changed, changed_report = self.cook()
+        self.assertEqual(changed, package)
+        self.assertEqual(changed_report["lighting"], report["lighting"])
+
+    def test_night_full_scene_exceeds_target_totals_with_bounded_resident_views(self):
+        self.authored_five_regions(count=12)
+        self.document["environment"] = self.environment
+        for index in range(14):
+            self.document["materials"].append(dict(id=f"night-group-{index:02d}", color=[.4, .4, .4, 1]))
+        removed = set()
+        for region in self.manifest["regions"][2:]:
+            models = [entity for entity in self.document["entities"] if entity["id"] in region["entities"] and "model" in entity]
+            for index, entity in enumerate(models):
+                entity["material"] = f"night-group-{index % 14:02d}"
+            # Keep each v4 chunk below 64 KiB; source-wide counts remain large.
+            removed.update(ident for ident in region["entities"] if "-box-" in ident and int(ident.rsplit("-", 1)[1]) >= 70)
+            region["entities"] = [ident for ident in region["entities"] if ident not in removed]
+        self.document["entities"] = [entity for entity in self.document["entities"] if entity["id"] not in removed]
+        for entity in self.document["entities"]:
+            if entity["kind"] == "light":
+                entity["intensity"] = 0
+        self.write_source()
+        _, report = self.cook()
+        mission.validate_stream_bridge(report)
+        self.assertGreater(report["lighting"]["level_models"], 128)
+        self.assertGreater(report["lighting"]["level_triangles"], 4096)
+        self.assertTrue(all(row["group_count"] <= 64 and row["triangle_count"] <= 1440 for row in report["working_sets"]))
+
+    def test_failed_night_bake_preserves_all_previously_published_outputs(self):
+        _, header = self.prepare_bootstrap()
+        output = header.parents[1]
+        before = {path.relative_to(output): path.read_bytes() for path in output.rglob("*") if path.is_file()}
+        self.document["environment"] = self.environment
+        self.write_source()
+        with patch.object(mission, "prepare_stream_lighting", side_effect=RuntimeError("native cook failed")):
+            with self.assertRaisesRegex(RuntimeError, "native cook failed"):
+                self.prepare_bootstrap()
+        self.assertEqual(before, {path.relative_to(output): path.read_bytes() for path in output.rglob("*") if path.is_file()})
 
     def test_one_region_portable_package_is_rejected_by_rom_before_publication(self):
         self.manifest["regions"] = [dict(id="west", bounds=[[-8, -.5, -4], [8, 4, 4]],

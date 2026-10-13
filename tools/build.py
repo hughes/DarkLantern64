@@ -59,9 +59,14 @@ def build_rom(sdk, autoplay=False, debug_overlay=False, level=None, capture=Fals
               lighting_bake_verify=False, disable_lighting_bake=False, input_replay=None, stream_test=False,
               stream_test_capture=False, bafford_stream_test=False, bafford_stream_test_capture=False,
               bafford_expanded_test=False, bafford_expanded_test_capture=False,
-              bafford_district_test=False, bafford_district_test_capture=False):
+              bafford_district_test=False, bafford_district_test_capture=False,
+              bafford_district_performance_test=False):
     start = time.perf_counter()
     replay = None
+    if bafford_district_performance_test:
+        if bafford_district_test_capture:
+            raise ValueError('--bafford-district-performance-test runs separately from framebuffer capture')
+        bafford_district_test = True
     if sum(bool(flag) for flag in (stream_test, bafford_stream_test, bafford_expanded_test, bafford_district_test)) > 1:
         raise ValueError('Streaming diagnostics must run separately')
     if bafford_district_test_capture and not bafford_district_test:
@@ -151,6 +156,8 @@ def build_rom(sdk, autoplay=False, debug_overlay=False, level=None, capture=Fals
         name += '-bafford-district-test'
     if bafford_district_test_capture:
         name += '-capture'
+    if bafford_district_performance_test:
+        name += '-performance'
     if lighting_bake_verify:
         name += "-verify-lighting"
     if disable_lighting_bake:
@@ -225,6 +232,8 @@ def build_rom(sdk, autoplay=False, debug_overlay=False, level=None, capture=Fals
         common += ['-DDL_BAFFORD_DISTRICT_TEST=1']
     if bafford_district_test_capture:
         common += ['-DDL_BAFFORD_DISTRICT_TEST_CAPTURE=1']
+    if bafford_district_performance_test:
+        common += ['-DDL_BAFFORD_DISTRICT_PERFORMANCE_TEST=1']
     if lighting_bake_verify:
         common += ["-DDL_VERIFY_LIGHTING_BAKE=1"]
     if disable_lighting_bake:
@@ -282,11 +291,14 @@ def build_rom(sdk, autoplay=False, debug_overlay=False, level=None, capture=Fals
     if bundle is not None:
         headers.append(bundle)
     headers += [ROOT / "tools" / name for name in ("compile_bundle.py", "compile_level.py", "cook_textures.py", "cook_lighting.py",
-                                                  "bake_lighting.c", "character_assets.py", "asset_pack.py", "cook_music.py")]
+                                                  "bake_lighting.c", "cook_stream_lighting.py", "bake_stream_lighting.c",
+                                                  "character_assets.py", "asset_pack.py", "cook_music.py")]
     sdk_inputs = [lib / n for n in ("libdragon.a", "libdragonsys.a", "n64.ld")]
     sdk_inputs += sorted((sdk / "mips64-elf/include").rglob("*.h"))
     compiler_version = run([tools["mips64-elf-gcc"], "--version"], env=env, capture=True).stdout.splitlines()[0]
-    kernel_flags = {"render_lighting.c": ["-O3"], "render_transform.c": ["-O3"]}
+    kernel_flags = {name: ["-O3"] for name in (
+        "render_lighting.c", "render_transform.c", "render.c", "render_batches.c", "game.c",
+        "mission.c", "stream_scene.c", "stream_rom.c")}
     signature = fingerprint(sources + headers + sdk_inputs + renderer_inputs + [Path(__file__)],
                             {"flags": common, "kernel_flags": kernel_flags, "compiler": compiler_version, "renderer": renderer,
                              "tools": {n: (p.stat().st_size, p.stat().st_mtime_ns) for n, p in tools.items()}},
@@ -359,6 +371,7 @@ def build_rom(sdk, autoplay=False, debug_overlay=False, level=None, capture=Fals
               "bafford_expanded_test_capture": bafford_expanded_test_capture,
               "bafford_district_test": bafford_district_test,
               "bafford_district_test_capture": bafford_district_test_capture,
+              "bafford_district_performance_test": bafford_district_performance_test,
               "level_catalog": catalog, "textures": texture_report, "lighting": catalog["lighting"], "size_output": size}
     manifest.write_text(json.dumps(report, indent=2) + "\n")
     print(json.dumps({"manifest": str(manifest.relative_to(ROOT)), "rom": report["rom"],
@@ -443,6 +456,7 @@ def run_portable_tests():
         "test_render_transform": ["src/render_transform.c", "src/animation.c"],
         "test_hud_cache": [],
         "test_render_texture_packing": ["src/render_texture_packing.c", "src/render_batches.c"],
+        "test_collision_cache": ["src/game.c"],
         "test_lighting_bake": ["src/lighting_bake.c", "src/static_lighting.c", "src/game.c"],
         "test_static_lighting": ["src/static_lighting.c", "src/game.c"],
         "test_mission": ["src/mission.c"],
@@ -513,6 +527,7 @@ def main():
     parser.add_argument("--bafford-expanded-test-capture", action="store_true", help="Separate expanded Bafford framebuffer-export diagnostic")
     parser.add_argument('--bafford-district-test', action='store_true', help='Diagnostic walking tour of the multi-region Bafford district')
     parser.add_argument('--bafford-district-test-capture', action='store_true', help='Separate Bafford district framebuffer diagnostic')
+    parser.add_argument('--bafford-district-performance-test', action='store_true', help='Wall-time district route with exact transition/frame/tick timing')
     parser.add_argument("--capture", action="store_true", help="Diagnostic framebuffer export at authored views")
     parser.add_argument("--scale-bench", action="store_true", help="Diagnostic CPU workload sweeps, without rendering")
     parser.add_argument("--disable-model-cull", action="store_true", help="Disable early bounds rejection for controlled A/B measurements")
@@ -540,7 +555,8 @@ def main():
                             bafford_expanded_test=args.bafford_expanded_test,
                             bafford_expanded_test_capture=args.bafford_expanded_test_capture,
                             bafford_district_test=args.bafford_district_test,
-                            bafford_district_test_capture=args.bafford_district_test_capture)
+                            bafford_district_test_capture=args.bafford_district_test_capture,
+                            bafford_district_performance_test=args.bafford_district_performance_test)
             if args.run:
                 ares = os.environ.get("ARES_EXE", str(Path(os.environ.get("LOCALAPPDATA", "")) / "ares/ares.exe"))
                 if not Path(ares).is_file():

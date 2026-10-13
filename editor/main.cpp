@@ -354,6 +354,8 @@ class DemoEditor
     SessionLock sessionLock_;
     LightEngine engine_;
     Json document_, report_, audioConfig_, audioDraft_, audioReport_;
+    Json streamCookReport_=Json::object();
+    fs::path streamCookReportPath_;
     Json prefabs_ = Json::array();
     char assetPackUri_[256] = "assets/loot/pack.json";
     char blenderScenePath_[512] = "";
@@ -482,6 +484,7 @@ class DemoEditor
         streamBoundsInputs_.clear();floorVertexInputs_.clear();
         history_.Reset(AuthorSnapshot());selection_.clear();lastPreviewDraft_.clear();
         output_=output;scenePath_=scenePath;report_=report;catalog_=catalog;
+        RefreshStreamCookReport();
         loadedPreviewFingerprint_=fingerprint;selected_=selected;
         browserLevel_=source_.filename().string(); testStart_="default";
         prefabs_=Json::array(); selectedPrefab_.clear();
@@ -685,6 +688,7 @@ class DemoEditor
                 streamSavedSha_=result.project.at("streaming").at("mission_manifest_sha256");
                 sourceSavedSha_=result.project.at("source_sha256");
             }
+            RefreshStreamCookReport();
             UpdateAuthorDirty();
             InvalidatePreviewAssets(result.project);
             try { RefreshLevels(); }
@@ -1634,7 +1638,7 @@ class DemoEditor
                 fs::remove(path);
                 const Json args = request.value("args",Json::object());
                 ObserveDocument();
-                if (op == "inspect") { Respond(id,true,{{"document",document_},{"source",source_.string()},{"output",output_.string()},{"scene_path",scenePath_},{"catalog",catalog_},{"pending_action",pendingAction_},{"dirty",dirty_},{"busy",Busy()},{"status",status_},{"report",report_},{"enemy_types",EnemyTypes()},{"prefabs",PrefabCatalog()},{"frame",frame_},{"preparing",preparationKind_},{"last_preparation",lastPreparation_},{"preview_refresh_pending",structureDirty_},{"audio",AudioState()},{"animation",AnimationState()},{"play",NativeState()},{"selection",selection_},{"history",{{"can_undo",history_.CanUndo()},{"can_redo",history_.CanRedo()}}}}); continue; }
+                if (op == "inspect") { Respond(id,true,{{"document",document_},{"source",source_.string()},{"output",output_.string()},{"scene_path",scenePath_},{"catalog",catalog_},{"pending_action",pendingAction_},{"dirty",dirty_},{"busy",Busy()},{"status",status_},{"report",report_},{"stream_cook_report",streamCookReport_},{"stream_cook_report_path",streamCookReportPath_.string()},{"enemy_types",EnemyTypes()},{"prefabs",PrefabCatalog()},{"frame",frame_},{"preparing",preparationKind_},{"last_preparation",lastPreparation_},{"preview_refresh_pending",structureDirty_},{"audio",AudioState()},{"animation",AnimationState()},{"play",NativeState()},{"selection",selection_},{"history",{{"can_undo",history_.CanUndo()},{"can_redo",history_.CanRedo()}}}}); continue; }
                 if (op == "get_audio_memory") { Respond(id,true,AudioState()); continue; }
                 if (op == "get_animation") { Respond(id,true,AnimationState()); continue; }
                 if (op == "get_layout") { Respond(id,true,Layout()); continue; }
@@ -2253,6 +2257,73 @@ class DemoEditor
         }
         ImGui::EndDisabled();
     }
+    void RefreshStreamCookReport()
+    {
+        streamCookReport_=Json::object();streamCookReportPath_.clear();
+        if(streamPath_.empty())return;
+        std::vector<std::pair<fs::file_time_type,fs::path>> candidates;
+        std::error_code error;
+        const auto build=root_/"build";
+        if(!fs::is_directory(build,error))return;
+        for(const auto& entry:fs::directory_iterator(build,error)){
+            if(!entry.is_directory(error))continue;
+            const auto path=entry.path()/"catalog/generated/bundle_report.json";
+            if(fs::is_regular_file(path,error))candidates.emplace_back(fs::last_write_time(path,error),path);
+        }
+        std::sort(candidates.begin(),candidates.end(),[](const auto& a,const auto& b){return a.first>b.first;});
+        for(const auto& [modified,path]:candidates)try{
+            if(fs::last_write_time(streamPath_)>modified)continue;
+            const auto catalog=ReadJson(path);
+            for(const auto& entry:catalog.value("levels",Json::array())){
+                if(fs::path(entry.value("source",std::string())).lexically_normal()!=source_.lexically_normal()||
+                   fs::path(entry.value("mission_manifest",std::string())).lexically_normal()!=streamPath_.lexically_normal())continue;
+                const auto content=entry.value("content",Json::object());
+                const auto mission=content.value("mission",Json::object());
+                const auto package=mission.value("report",Json::object());
+                if(!content.value("experimental_stream",false)||package.value("source_file_sha256",std::string())!=sourceSavedSha_||
+                   content.value("mission_manifest_sha256",std::string())!=streamSavedSha_)continue;
+                if(document_.contains("environment")&&package.value("chunk_version",0)!=4)continue;
+                streamCookReport_=content;streamCookReportPath_=path;return;
+            }
+        }catch(const std::exception&){}
+    }
+    void DrawStreamCook()
+    {
+        ImGui::TextUnformatted("Experimental stream mission");
+        if(ImGui::Button("Refresh ROM cook report"))RefreshStreamCookReport();
+        if(streamCookReport_.empty()){
+            ImGui::TextWrapped("Build the ROM to view its region budgets and cooked lighting. Authoring preview counts describe the complete source scene.");
+            return;
+        }
+        const auto mission=streamCookReport_.value("mission",Json::object());
+        const auto package=mission.value("report",Json::object());
+        const auto lighting=streamCookReport_.contains("lighting")&&streamCookReport_.at("lighting").is_object()?streamCookReport_.at("lighting"):Json::object();
+        unsigned triangles=0,largestChunk=0,peakTriangles=0,peakGroups=0;
+        const auto regions=package.value("regions",Json::array());
+        for(const auto& region:regions){
+            triangles+=region.value("triangle_count",0u);
+            largestChunk=std::max(largestChunk,region.value("chunk_bytes",0u));
+        }
+        for(const auto& working:package.value("working_sets",Json::array())){
+            peakTriangles=std::max(peakTriangles,working.value("triangle_count",0u));
+            peakGroups=std::max(peakGroups,working.value("group_count",0u));
+        }
+        ImGui::Text("Last saved ROM cook | %u regions | %u static triangles",static_cast<unsigned>(regions.size()),triangles);
+        if(dirty_)ImGui::TextWrapped("Unsaved edits are not included in these ROM measurements.");
+        ImGui::Text("Largest resident view: %u triangles | %u groups",peakTriangles,peakGroups);
+        ImGui::Text("Mission ROM: %u bytes",mission.value("bytes",0u));
+        ImGui::Text("Embedded triangle RGBA: %u bytes (included in mission)",lighting.value("mission_embedded_rgba_bytes",triangles*(package.value("chunk_version",0)==4?48u:0u)));
+        const auto geometry=streamCookReport_.value("compiled_geometry_bytes",0u);
+        const auto colors=streamCookReport_.value("compiled_baked_color_bytes",lighting.value("bootstrap_embedded_rgba_bytes",0u));
+        ImGui::Text("Shared geometry: %u | Constant lighting: %u bytes",geometry,colors);
+        ImGui::Text("Known resident arrays: %u bytes",streamCookReport_.value("compiled_known_array_bytes",geometry+colors));
+        ImGui::Text("Region slots: %u | Largest chunk: %u bytes",package.value("max_resident_regions",0u),largestChunk);
+        if(lighting.value("states",0)==2){
+            ImGui::TextWrapped("Lighting baked automatically in closed/open states using the complete mission's shadow blockers.");
+            ImGui::Text("Shadow scene: %u colliders | %u floors | %u lights",lighting.value("full_scene_colliders",0u),lighting.value("full_scene_floors",0u),lighting.value("global_lights",0u));
+        }
+        ImGui::TextWrapped("Descriptors, scene banks, slots, renderer, audio and display buffers require separate memory measurement.");
+    }
     void DrawBuild()
     {
         if (BeginPanel("Build & Diagnostics"))
@@ -2283,8 +2354,8 @@ class DemoEditor
             if (!report_.empty())
             {
                 const Json counts = report_.value("counts",Json::object());
-                ImGui::Text("Cook %.2f ms | %d models | %d triangles | %d geometry bytes",report_.value("elapsed_ms",0.0),counts.value("models",0),counts.value("instanced_triangles",0),report_.value("compiled_geometry_bytes",0));
-
+                if(!streamPath_.empty())DrawStreamCook();
+                else ImGui::Text("Cook %.2f ms | %d models | %d triangles | %d geometry bytes",report_.value("elapsed_ms",0.0),counts.value("models",0),counts.value("instanced_triangles",0),report_.value("compiled_geometry_bytes",0));
             }
             if (ImGui::CollapsingHeader("Last compiler log")) ImGui::TextUnformatted(Tail(queue_/"compiler.log").c_str());
             if (ImGui::CollapsingHeader("Last ROM build log")) ImGui::TextUnformatted(Tail(queue_/"rom-build.log").c_str());

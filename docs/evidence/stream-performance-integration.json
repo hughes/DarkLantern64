@@ -1,0 +1,117 @@
+{
+  "accepted_functionality": true,
+  "accepted_measured_performance": true,
+  "platform": "Ares emulator, 8 MiB RDRAM; original N64/M64 remains unverified",
+  "menu_entry": "Bafford District",
+  "source_sha256": "16160232d3051ba95ca0d78fa66bf02522399aa06659199a3c0285c2832fdcbe",
+  "manifest_sha256": "2f6aeeb0911aaf4806d8a848f0609c2552621a659df66fb5e78b1125fbd329d0",
+  "package_sha256": "7e7243182bc47d4090d117596438fdd1c5c4dfae3faede6714407c90ac0f87c9",
+  "builds": {
+    "normal": {
+      "rom": "build/DarkLantern64-bundle-level_bundle-menu-t3d.z64",
+      "sha256": "86bfc28eddea3b37e341c5fb436e299330c2dfc307a0192412b5ca081bb4f060",
+      "bytes": 1622016,
+      "signature": "ec2d9e39aea724294d15d3efba76efe0fbf01d442b07f39b683f8e47d8c7d2fe"
+    },
+    "menu": {
+      "rom": "build/DarkLantern64-bundle-level_bundle-menu-menu-test-t3d.z64",
+      "sha256": "bb9878a2a4d1e01038fdbc594b8d7dc219e7e7fc0d1974820741d58e911c341b",
+      "bytes": 1622016,
+      "signature": "7c8954078a2ad216f012629438a3a6b3a680f90cff7575325a874cdce85fe6be"
+    },
+    "ordinary": {
+      "rom": "build/DarkLantern64-bundle-level_bundle-menu-bafford-district-test-t3d.z64",
+      "sha256": "a7279c266488ef6a4d0f6657f285f9f2cfad07dbbf0c61ed8203f6b3c9093190",
+      "bytes": 1622016,
+      "signature": "94cb7577715f95cb0111d75fef8f1b2f6a501576a1c2200bee583a69289f6b57"
+    },
+    "capture": {
+      "rom": "build/DarkLantern64-bundle-level_bundle-menu-bafford-district-test-capture-t3d.z64",
+      "sha256": "40c3895f997231799d3198fd8ec9739a35399d1af101cb68dddbeade1c519cf5",
+      "bytes": 1622016,
+      "signature": "865986edc0b14b07bc8969dc0899a11ae47198bb6fb914cb40dbc64c63d67126"
+    },
+    "performance": {
+      "rom": "build/DarkLantern64-bundle-level_bundle-menu-bafford-district-test-performance-t3d.z64",
+      "sha256": "570f679a1f60639b334a50b676fc9bd5d897305868f28fcd6b3e67d9a4c3cb89",
+      "bytes": 1622016,
+      "signature": "a1e1472c29457b14ffc1a4d0384db5066cd674d2a21809ac8140d168c76cfc57"
+    }
+  },
+  "scope": {
+    "source_cells": 201,
+    "regions": 10,
+    "source_entities": 843,
+    "static_triangles": 2537,
+    "source_boxes": 603,
+    "exact_floors": 118,
+    "global_lights": 16,
+    "textures": 48,
+    "bootstrap_triangles": 24,
+    "source_geometry_unchanged": true
+  },
+  "storage": {
+    "chunk_version": 4,
+    "mission_bytes": 367272,
+    "directory_bytes": 14288,
+    "largest_chunk_bytes": 54736,
+    "physical_slot_count": 5,
+    "physical_slot_allocated_bytes": 273680,
+    "pi_staging_bytes": 8208,
+    "mission_embedded_rgba_bytes": 121776,
+    "bootstrap_embedded_rgba_bytes": 1152,
+    "bootstrap_geometry_bytes": 624,
+    "bootstrap_known_array_bytes": 1776
+  },
+  "bounded_views": {
+    "checked_cases": 49,
+    "caps": {
+      "slots": 5,
+      "triangles": 1440,
+      "combined_contacts": 400,
+      "exact_floors": 128,
+      "region_material_groups": 64
+    },
+    "max_triangles": 1322,
+    "max_combined_contacts": 383,
+    "max_exact_floors": 64,
+    "max_groups": 50
+  },
+  "runtime": {
+    "measured_frames": 3458,
+    "max_frame_ms": 31.623082666666665,
+    "max_raw_interval_ms": 30.839189333333334,
+    "max_stream_service_cpu_ms": 7.528064,
+    "dropped_ticks": 0,
+    "suppressed_movement_ticks": 0,
+    "loading_interaction_frames": 0,
+    "music_underruns": 0,
+    "peak_measured_heap_bytes": 2059600,
+    "measured_heap_headroom_bytes": 5160048,
+    "memory_note": "Heap statistics are allocator totals, not a complete RDRAM map. Slots, scene banks and PI staging overlap the stream adapter allocation; do not add them again to the heap peak."
+  },
+  "checks": {
+    "strict_wall_time_route": true,
+    "ordinary_route": true,
+    "capture_route": true,
+    "all_menu_variants": true,
+    "legacy_probe": true,
+    "legacy_street": true,
+    "editor_authoring": true,
+    "editor_cook_report": true,
+    "portable_c": "All groups passed",
+    "python": {
+      "run": 477,
+      "passed": 474,
+      "skipped": 2,
+      "known_error": "Existing local Sponza parapet geometry/collider mismatch: sponza-collision-parapet-north"
+    }
+  },
+  "remaining_limits": [
+    "Original N64/M64 performance unverified",
+    "Capture export incurs extra diagnostic audio cost and is excluded from ordinary timing acceptance",
+    "Full source PVS, general triangle wall collision, original scripts/objectives/guards remain pending",
+    "New regions require manifest editing; streamed Native Play and GUI mesh cutting are unavailable",
+    "Independent combinations of multiple shadow-casting doors need a richer lighting-state representation"
+  ]
+}

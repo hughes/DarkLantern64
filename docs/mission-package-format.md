@@ -1,4 +1,4 @@
-# Mission directory v1 and region chunks v1/v2/v3
+# Mission directory v1 and region chunks v1/v2/v3/v4
 
 Status: first implementation contract, 2026-10-12. This is an experimental
 portable streaming foundation, not acceptance of the complete Bafford mission.
@@ -68,10 +68,10 @@ dependency set.
 | Header offset | Type | Meaning |
 | --- | --- | --- |
 | 0 | char[4] | `DLR1` |
-| 4 | u16 | Chunk version, 1, 2 or 3 |
+| 4 | u16 | Chunk version, 1, 2, 3 or 4 |
 | 6 | u16 | Header bytes, 32 |
 | 8 | u32 | Exact chunk bytes |
-| 12 | u32 | Section count, 1..3 (v1/v2), 1..4 (v3) |
+| 12 | u32 | Section count, 1..3 (v1/v2), 1..4 (v3/v4) |
 | 16 | f32[3] | World origin, metres |
 | 28 | u32 | Reserved, zero |
 
@@ -81,12 +81,12 @@ descriptors or each other, and their length is count times record bytes.
 
 | Section offset | Type | Meaning |
 | --- | --- | --- |
-| 0 | u16 | Kind: static triangles 1, upright colliders 2, entity IDs 3, floor triangles 4 (v3) |
+| 0 | u16 | Kind: static triangles 1, upright colliders 2, entity IDs 3, floor triangles 4 (v3/v4) |
 | 2 | u16 | Reserved, zero |
 | 4 | u32 | Chunk-relative payload offset |
 | 8 | u32 | Payload bytes |
 | 12 | u32 | Record count |
-| 16 | u32 | Record bytes: triangles 44 (v1) or 80 (v2/v3), colliders 32, entity IDs 4, floors 36 |
+| 16 | u32 | Record bytes: triangles 44 (v1), 80 (v2/v3) or 128 (v4), colliders 32, entity IDs 4, floors 36 |
 | 20 | u32 | Reserved, zero |
 
 Version-1 triangle records contain three region-local XYZ positions (9 floats), a
@@ -114,8 +114,9 @@ its meshes retain optional UV and normal arrays. Material bootstraps use
 `texture_id=0` for untextured material and otherwise a one-based index into the
 bootstrap's ordinary `DlTexture` table. Texture pixels remain hash-addressed
 sprites packaged by the existing texture cooker. The directory layout remains
-v1 for all chunk versions. Tiny3D packing, baked colors, batch commands and
-texture pixels are not serialized into these triangle records. The debug
+v1 for all chunk versions. Tiny3D packing, batch commands and texture pixels
+are not serialized into these triangle records. Baked colors are present in
+version 4 as described below. The debug
 report maps material and surface IDs to canonical source IDs.
 
 Collider records contain region-local center (3 floats), positive half size
@@ -140,6 +141,67 @@ otherwise retains v2 triangle attributes.
 Target preflight rounds every footprint/gradient arithmetic operation to
 binary32, matching the C gameplay and adapter query. Checking only rounded
 vertices with host double intermediates can miss cancellation in thin floors.
+
+Version 4 retains all v3 geometry and attributes and appends two sets of baked
+night colors. Each set stores front-face corner 0/1/2 RGBA, followed by
+back-face corner 0/1/2 RGBA. Alpha must be 255 for every corner. Both faces are
+present even for a single-sided material, keeping the stride fixed.
+
+| Triangle offset | Type | Meaning |
+| --- | --- | --- |
+| 80 | u8[24] | Closed-door front/back corner RGBA |
+| 104 | u8[24] | Open-door front/back corner RGBA |
+
+An authored `environment` selects v4 automatically in both the command-line
+mission cooker and editor/bundle builds. Scalar missions retain v1, v2 or v3
+according to their attributes and floor records. The native host worker uses
+the shared `dl_static_lighting_model` C implementation, serialized binary32
+region-local vertices/origins and snorm8 normals. It shades the complete mission
+against every authored collider, every exact floor and all global lights;
+temporary unavailable-region barriers are excluded. The host collider limit is
+set to the complete scene's count without changing the target's 400-contact
+working-set bound.
+
+The same cook emits per-instance closed/open RGBA arrays for eligible persistent
+bootstrap visuals such as doors and loot. Shared mesh geometry does not imply
+shared colors. Moving guards, objectives and animated meshes retain live
+lighting. Runtime scene banks copy the chunk colors into fixed storage and
+attach them to model instances, so publishing a resident region does not shade
+its static triangles on the console.
+
+Native cook caches include the generated host header, compiler and math-library
+identities, shared C lighting sources and compiler/helper implementations.
+The lighting signature enters the DLM1 content identity. A failed worker or
+input change publishes no updated mission/header artifacts. The host full
+shadow scene can exceed target model, triangle and floor working-set limits.
+Its wire format supports 65535 models and 32-bit total triangle/payload counts;
+each grouped mesh retains the 4096-vertex limit. Host scratch holds only the
+largest eligible mesh's colors. Host collider/floor limits cover all authored
+blockers while the target's resident working-set limits remain unchanged.
+
+For the expanded district, 104 static groups plus two persistent cube instances
+cook 2537 static and 24 persistent triangles against 603 colliders, 118 floors
+and 16 lights. Its v4 package is 367272 bytes; the largest chunk is 54736 bytes,
+below the 65536-byte slot limit. Bootstrap colors occupy 1152 bytes. These are
+storage/cook measurements; transition timing is verified separately on the
+target renderer.
+
+The lighting report's compatible `bytes` field and `host_worker_bytes` describe
+the DLS1 host cache, including its header/table, rather than a packaged ROM
+asset. `storage=embedded` and `standalone_rom_asset_bytes=0` distinguish this
+from ordinary standalone lighting assets. `mission_embedded_rgba_bytes` is
+already included in mission package bytes. `bootstrap_embedded_rgba_bytes`
+counts constant arrays resident with the bootstrap; it is reported separately
+as `compiled_baked_color_bytes` and bundle `resident_baked_color_bytes`.
+Bundle `resident_known_array_bytes` adds geometry and constant baked colors
+only. For this district, 624 geometry bytes plus 1152 color bytes give 1776
+known resident array bytes. Descriptors, scene banks, slots, renderer caches,
+audio and display buffers require separate measurement.
+
+Prepared reports also record `mission_manifest_sha256` from the exact saved
+manifest bytes. The editor matches it and the source file SHA before showing
+saved ROM measurements; even whitespace-only partition edits invalidate that
+display proof until the matching report is rebuilt.
 
 Entity-ID sections contain the region's home entities exactly once. Region
 installation binds these IDs to mission-owned state and never initializes the

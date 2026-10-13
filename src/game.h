@@ -29,6 +29,43 @@ typedef struct {
  * The triangle supplies no artificial solid volume below its plane. */
 typedef struct { DlVec3 vertices[3]; } DlFloorTriangle;
 #define DL_MAX_FLOORS 256
+#define DL_QUERY_CACHE_COLLIDERS 400
+#define DL_QUERY_CACHE_FLOORS 128
+#define DL_QUERY_CACHE_CONTACTS (DL_QUERY_CACHE_COLLIDERS + DL_QUERY_CACHE_FLOORS)
+#define DL_QUERY_CACHE_WORDS ((DL_QUERY_CACHE_CONTACTS + 31) / 32)
+typedef struct {
+    float cosine, sine;
+    DlVec3 minimum, maximum;
+    bool valid;
+} DlBoxQuery;
+typedef struct {
+    DlVec3 origin, minimum, maximum;
+    float bx, bz, cx, cz, by, cy, determinant;
+    bool valid;
+} DlFloorQuery;
+typedef struct {
+    float min_x, max_x, min_z, max_z;
+    uint16_t left, right; /* high left bit identifies a leaf; right is its contact */
+} DlQueryNode;
+typedef struct { uint16_t first, count, node; } DlQueryBuildRange;
+/* Optional constants for immutable collision arrays. Broad bounds only reject
+ * separated candidates; the original narrowphase still decides every contact. */
+typedef struct {
+    const DlCollider *collider_source;
+    const DlFloorTriangle *floor_source;
+    int collider_count, floor_count;
+    DlBoxQuery boxes[DL_QUERY_CACHE_COLLIDERS];
+    DlFloorQuery floors[DL_QUERY_CACHE_FLOORS];
+    DlQueryNode nodes[DL_QUERY_CACHE_CONTACTS * 2];
+    uint32_t keys[DL_QUERY_CACHE_CONTACTS], always[DL_QUERY_CACHE_WORDS];
+    uint16_t order[DL_QUERY_CACHE_CONTACTS];
+    DlQueryBuildRange ranges[16];
+    float min_x, max_x, min_z, max_z;
+    uint16_t node_count, ordered_count, build_record;
+    uint8_t build_phase, range_count;
+    int indexed_colliders, indexed_floors;
+    bool index_ready;
+} DlQueryCache;
 
 typedef struct {
     const DlVec3 *vertices;
@@ -38,6 +75,7 @@ typedef struct {
     const DlVec2 *uvs; /* optional; one UV per vertex, including duplicated seams */
     const DlNormal *normals; /* optional authored normals; NULL retains flat faces */
     const struct DlAnimationAsset *animation; /* optional shared rigid skeleton/clips */
+    uint64_t stream_key; /* stable region/material/attribute identity; zero for shared assets */
 } DlMesh;
 
 typedef enum { DL_MODEL_STATIC, DL_MODEL_GUARD, DL_MODEL_DOOR,
@@ -53,6 +91,7 @@ typedef struct {
     bool double_sided;
     int16_t enemy_index; /* guard role: index in DlLevel.enemies; otherwise -1 */
     bool loot_highlight; /* opt-in presentation pulse; never a light or AI signal */
+    const uint8_t *baked_colors[2]; /* optional per-triangle front/back RGBA, closed/open */
 } DlModelInstance;
 
 typedef struct { const char *path; uint16_t width, height; } DlTexture;
@@ -133,6 +172,7 @@ typedef struct {
     const struct DlStreamDefinition *stream; /* optional bounded mission package bootstrap */
     const DlFloorTriangle *floors;
     int floor_count;
+    const DlQueryCache *query_cache; /* NULL retains scalar queries */
 } DlLevel;
 
 typedef enum { DL_PATROL, DL_INVESTIGATE, DL_SEARCH, DL_CHASE } DlGuardState;
@@ -192,6 +232,14 @@ void dl_game_update(DlGame *game, const DlInput *input, float dt);
 /* Select detailed simulation slots without resetting mission-owned guard state.
  * Inactive guards can still hear a conservative distance-only wake signal. */
 void dl_game_set_active_enemies(DlGame *game, uint16_t mask);
+void dl_query_cache_box(DlBoxQuery *out, const DlCollider *box);
+bool dl_query_cache_floor(DlFloorQuery *out, const DlFloorTriangle *floor);
+/* Caller keeps the source arrays immutable until re-preparing this cache. */
+bool dl_game_prepare_query_cache(DlQueryCache *out, const DlLevel *level);
+/* Each step performs one bounded build record; queries remain scalar until ready. */
+void dl_query_cache_index_begin(DlQueryCache *cache);
+bool dl_query_cache_index_step(DlQueryCache *cache);
+bool dl_game_query_cache_ready(const DlLevel *level);
 DlVec3 dl_player_eye(const DlGame *game);
 bool dl_position_clear(const DlGame *game, DlVec3 feet, float radius, float height);
 bool dl_line_of_sight(const DlGame *game, DlVec3 a, DlVec3 b);

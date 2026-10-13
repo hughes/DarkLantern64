@@ -365,7 +365,8 @@ static int authored_five_region_floor_views(void){
     CHECK(dl_stream_scene_region_at_preferred(&adapter,(DlVec3){5,0,0},1)==1);
     CHECK(dl_stream_scene_region_at_preferred(&adapter,(DlVec3){5,0,0},2)==2);
     CHECK(dl_stream_scene_region_at(&adapter,(DlVec3){19,0,0})==3);
-    CHECK(dl_stream_scene_demand(&adapter,(DlVec3){0,0,0},1)==1);
+    CHECK(dl_stream_scene_demand(&adapter,(DlVec3){-1,0,0},1)==1);
+    CHECK(dl_stream_scene_demand(&adapter,(DlVec3){.4f,0,0},1)==3); /* early bounded approach */
     CHECK(dl_stream_scene_demand(&adapter,(DlVec3){4,0,0},1)==3);
     CHECK(dl_stream_scene_demand(&adapter,(DlVec3){13,0,0},2)==6);
     CHECK(dl_stream_scene_transition_at(&adapter,1,2,(DlVec3){5.2f,0,0}));
@@ -379,7 +380,10 @@ static int authored_five_region_floor_views(void){
     gates[1].minimum.x=7.8f;gates[1].maximum.x=8.2f;gates[2].minimum.x=11.8f;gates[2].maximum.x=12.2f;
     policy_state=(DlStreamPolicyState){.current_region=2};
     CHECK(dl_stream_scene_policy_update(&adapter,(DlVec3){10,0,0},2,&policy_state)==3); /* stable tie by gate order */
-    CHECK(dl_stream_scene_policy_update(&adapter,(DlVec3){10.05f,0,0},2,&policy_state)==3); /* hysteresis */
+    CHECK(dl_stream_scene_policy_update(&adapter,(DlVec3){10,0,0},2,&policy_state)==3); /* stationary hysteresis */
+    CHECK(dl_stream_scene_policy_update(&adapter,(DlVec3){10.05f,0,0},2,&policy_state)==6); /* prefetch the approached gate */
+    CHECK(dl_stream_scene_policy_update(&adapter,(DlVec3){10.04f,0,0},2,&policy_state)==6); /* tiny landing correction retains approach */
+    CHECK(dl_stream_scene_policy_update(&adapter,(DlVec3){9.90f,0,0},2,&policy_state)==3); /* deliberate reversal selects return gate */
     CHECK(dl_stream_scene_policy_update(&adapter,(DlVec3){10.3f,0,0},2,&policy_state)==6);
     gates[1]=original_back;gates[2]=original_forward;
     policy[2].working_mask=12;def.max_resident_regions=3;
@@ -389,7 +393,7 @@ static int authored_five_region_floor_views(void){
     CHECK(policy_state.current_region==2); /* one published target chunk is insufficient */
     CHECK(dl_stream_scene_policy_update(&adapter,(DlVec3){15.2f,0,0},14,&policy_state)==14);
     CHECK(policy_state.current_region==3);
-    CHECK(dl_stream_scene_policy_update(&adapter,(DlVec3){20,0,0},14,&policy_state)==12);
+    CHECK(dl_stream_scene_policy_update(&adapter,(DlVec3){20.4f,0,0},14,&policy_state)==12);
     policy[2].working_mask=4;def.max_resident_regions=2;
     CHECK(dl_stream_scene_init(&adapter,&base,&parsed)==DL_STREAM_SCENE_OK);
     DlRegionSlot loaded[2]={{.buffer=data[0],.capacity=CHUNK},{.buffer=data[1],.capacity=CHUNK}};
@@ -522,7 +526,7 @@ static int authored_swept_gate_crossings(void){
     dl_stream_scene_policy_reset(&state);
     CHECK(!state.current_region&&!state.pending_transition&&!state.has_previous_position);
     CHECK(state.previous_position.x==0&&state.previous_position.y==0&&state.previous_position.z==0);
-    CHECK(dl_stream_scene_policy_update(&adapter,(DlVec3){-3.5f,0,0},1,&state)==1);
+    CHECK(dl_stream_scene_policy_update(&adapter,(DlVec3){-3.5f,0,0},1,&state)==3);
     CHECK(state.current_region==1&&state.previous_position.x==-3.5f); /* Restart locates fresh start. */
     return 0;
 }
@@ -543,8 +547,284 @@ static int authored_door_target(void){
     gates[0].door_entity_id=3;CHECK(dl_stream_scene_init(&adapter,&base,&parsed)==DL_STREAM_SCENE_ARGUMENT);
     return 0;
 }
+static int staged_publication(void){
+    CHECK(initialize()==0);CHECK(load(1)==0);
+    CHECK(dl_stream_scene_refresh(&scene,&stream,NULL)==DL_STREAM_SCENE_OK);
+    const DlLevel *published=dl_stream_scene_level(&scene);unsigned revision=scene.revision;
+    int models_before=published->model_count,contacts_before=published->collider_count;
+    uint64_t key=published->meshes[published->models[models_before-1].mesh].stream_key;
+    CHECK(key==((UINT64_C(1)<<40)|(UINT64_C(1)<<8)));
+    CHECK(load(2)==0);CHECK(dl_stream_scene_prepare(&scene,&stream,NULL)==DL_STREAM_SCENE_OK);
+    CHECK(dl_stream_scene_level(&scene)==published&&scene.revision==revision);
+    CHECK(published->model_count==models_before&&published->collider_count==contacts_before);
+    const DlLevel *pending=dl_stream_scene_pending(&scene);
+    CHECK(pending!=published&&pending->model_count>models_before);
+    dl_stream_scene_publish(&scene);
+    CHECK(dl_stream_scene_level(&scene)==pending&&scene.revision==revision+1);
+    bool found=false;
+    for(int i=0;i<pending->model_count;++i)if(pending->meshes[pending->models[i].mesh].stream_key==key)found=true;
+    CHECK(found);return 0;
+}
+static int stable_key_material_bits(void){
+    const uint32_t first=UINT32_C(0x02000001),second=UINT32_C(0x01000001);
+    DlStreamMaterial wide[]={ {.id=first,.color={128,192,255,255}}, {.id=second,.color={128,192,255,255}} };
+    DlStreamDefinition def=definition;def.materials=wide;def.material_count=2;
+    DlLevel base=bootstrap;base.stream=&def;
+    prepare();put32(package+FIRST+148,first);put32(package+SECOND+148,second);
+    put32(package+64+16,crc32(package+FIRST,CHUNK_BYTES));put32(package+128+16,crc32(package+SECOND,CHUNK_BYTES));
+    put32(package+28,0);put32(package+28,crc32(package,DIRECTORY));
+    CHECK(dl_mission_open(package,DIRECTORY,FILE_BYTES,&mission)==DL_MISSION_OK);
+    for(unsigned i=0;i<2;++i)slots[i]=(DlRegionSlot){.buffer=buffers[i],.capacity=CHUNK_BYTES};
+    CHECK(dl_world_stream_init(&stream,&mission,slots,2,read_memory,NULL)==DL_STREAM_OK);
+    CHECK(dl_stream_scene_init(&scene,&base,&mission)==DL_STREAM_SCENE_OK);
+    CHECK(load(1)==0&&load(2)==0&&dl_stream_scene_refresh(&scene,&stream,NULL)==DL_STREAM_SCENE_OK);
+    const DlLevel *level=dl_stream_scene_level(&scene);uint64_t keys[2]={0};unsigned count=0;
+    for(int i=0;i<level->model_count;++i)if(level->models[i].role==DL_MODEL_STATIC){
+        CHECK(count<2);keys[count++]=level->meshes[level->models[i].mesh].stream_key;
+    }
+    CHECK(count==2&&keys[0]!=keys[1]);
+    CHECK(keys[0]==((UINT64_C(1)<<40)|((uint64_t)first<<8)));
+    CHECK(keys[1]==((UINT64_C(2)<<40)|((uint64_t)second<<8)));
+    return 0;
+}
+static int incremental_assembly(void){
+    CHECK(initialize()==0);CHECK(load(1)==0);
+    CHECK(dl_stream_scene_refresh(&scene,&stream,NULL)==DL_STREAM_SCENE_OK);
+    const DlLevel *published=dl_stream_scene_level(&scene);unsigned revision=scene.revision;
+    int models_before=published->model_count,contacts_before=published->collider_count;
+    CHECK(load(2)==0);
+    DlGame guards={.enemy_count=1};guards.enemies[0].position=(DlVec3){2,0,0};
+    CHECK(dl_stream_scene_prepare_begin(&scene,&stream,&guards)==DL_STREAM_SCENE_OK);
+    CHECK(slots[0].cpu_pins==1&&slots[1].cpu_pins==1&&dl_stream_scene_pending(&scene)==NULL);
+    bool ready=true;
+    CHECK(dl_stream_scene_prepare_step(&scene,0,&ready)==DL_STREAM_SCENE_OK&&!ready);
+    CHECK(scene.assembly.record==0&&scene.assembly.phase==0);
+    dl_stream_scene_publish(&scene);CHECK(scene.revision==revision&&dl_stream_scene_level(&scene)==published);
+    CHECK(dl_stream_scene_prepare_step(&scene,1,&ready)==DL_STREAM_SCENE_OK&&!ready);
+    CHECK(dl_world_stream_retire(&stream,handles[1])==DL_STREAM_OK);
+    CHECK(slots[1].state==DL_STREAM_RETIRING&&slots[1].cpu_pins==1);
+    dl_stream_scene_prepare_cancel(&scene);
+    CHECK(slots[0].cpu_pins==0&&slots[1].cpu_pins==0&&slots[1].state==DL_STREAM_FREE);
+    CHECK(!scene.assembly.active&&dl_stream_scene_pending(&scene)==NULL&&scene.revision==revision);
+    CHECK(dl_stream_scene_prepare_step(&scene,1,&ready)==DL_STREAM_SCENE_NOT_READY);
+    CHECK(load(2)==0);
+    CHECK(dl_stream_scene_prepare_begin(&scene,&stream,&guards)==DL_STREAM_SCENE_OK);
+    /* Guard presentation uses the begin snapshot, not a mutable game pointer. */
+    guards.enemies[0].position=(DlVec3){100,100,100};
+    unsigned steps=0;
+    do{
+        CHECK(dl_stream_scene_prepare_step(&scene,1,&ready)==DL_STREAM_SCENE_OK);
+        CHECK(++steps<100&&scene.revision==revision&&dl_stream_scene_level(&scene)==published);
+        CHECK(published->model_count==models_before&&published->collider_count==contacts_before);
+    }while(!ready);
+    CHECK(steps>15&&slots[0].cpu_pins==0&&slots[1].cpu_pins==0);
+    const DlLevel *pending=dl_stream_scene_pending(&scene);CHECK(pending);
+    bool guard=false;for(int i=0;i<pending->model_count;++i)if(pending->models[i].role==DL_MODEL_GUARD)guard=true;
+    CHECK(guard);dl_stream_scene_publish(&scene);CHECK(scene.revision==revision+1&&dl_stream_scene_level(&scene)==pending);
+    published=pending;revision=scene.revision;
+    CHECK(dl_stream_scene_prepare_begin(&scene,&stream,NULL)==DL_STREAM_SCENE_OK);
+    CHECK(dl_stream_scene_prepare_step(&scene,2,&ready)==DL_STREAM_SCENE_OK&&!ready);
+    /* Lazy corruption after some valid records fails without publishing or
+     * leaking the long-lived borrows (real slots remain immutable in service). */
+    put32(buffers[0]+148,0);
+    CHECK(dl_stream_scene_prepare_step(&scene,1,&ready)==DL_STREAM_SCENE_CORRUPT&&!ready);
+    CHECK(!scene.assembly.active&&slots[0].cpu_pins==0&&slots[1].cpu_pins==0);
+    CHECK(scene.revision==revision&&dl_stream_scene_level(&scene)==published&&dl_stream_scene_pending(&scene)==NULL);
+    put32(buffers[0]+148,1);return 0;
+}
+static int pending_guard_membership(void){
+    CHECK(initialize()==0);CHECK(load(1)==0);
+    DlGame game={.enemy_count=1};game.enemies[0].position=(DlVec3){-2,0,0};
+    CHECK(!dl_stream_scene_pending_guards_match(&scene,&game));
+    CHECK(dl_stream_scene_prepare(&scene,&stream,&game)==DL_STREAM_SCENE_OK);
+    CHECK(model_by_id(dl_stream_scene_pending(&scene),"guard")&&dl_stream_scene_pending_guards_match(&scene,&game));
+    game.enemies[0].position=(DlVec3){-1,0,1};CHECK(dl_stream_scene_pending_guards_match(&scene,&game));
+    game.enemies[0].position=(DlVec3){100,100,100};CHECK(!dl_stream_scene_pending_guards_match(&scene,&game));
+    game.enemy_count=0;CHECK(!dl_stream_scene_pending_guards_match(&scene,&game));game.enemy_count=1;
+    dl_stream_scene_prepare_cancel(&scene);
+    game.enemies[0].position=(DlVec3){2,0,0};
+    CHECK(dl_stream_scene_prepare(&scene,&stream,&game)==DL_STREAM_SCENE_OK);
+    CHECK(!model_by_id(dl_stream_scene_pending(&scene),"guard")&&dl_stream_scene_pending_guards_match(&scene,&game));
+    game.enemies[0].position=(DlVec3){-2,0,0};CHECK(!dl_stream_scene_pending_guards_match(&scene,&game));
+    dl_stream_scene_prepare_cancel(&scene);
+    /* An enemy without an authored visual row needs no extra model capacity. */
+    const uint32_t visible_links[]={2,4};DlStreamDefinition def=definition;def.model_entity_ids=visible_links;
+    DlLevel base=bootstrap;base.models=models+1;base.model_count=2;base.stream=&def;static DlStreamScene invisible;
+    CHECK(dl_stream_scene_init(&invisible,&base,&mission)==DL_STREAM_SCENE_OK);
+    CHECK(dl_stream_scene_prepare(&invisible,&stream,&game)==DL_STREAM_SCENE_OK);
+    CHECK(dl_stream_scene_pending_guards_match(&invisible,&game));
+    game.enemies[0].position=(DlVec3){100,100,100};CHECK(dl_stream_scene_pending_guards_match(&invisible,&game));
+    dl_stream_scene_prepare_cancel(&invisible);CHECK(slots[0].cpu_pins==0);return 0;
+}
+static int masked_preparation(void){
+    CHECK(initialize()==0);CHECK(load(1)==0);CHECK(dl_stream_scene_refresh(&scene,&stream,NULL)==DL_STREAM_SCENE_OK);
+    const DlLevel *published=dl_stream_scene_level(&scene);unsigned revision=scene.revision;
+    DlGame game;dl_game_init(&game,published);game.loot_value=25;game.elapsed=7;game.door_open=true;
+    CHECK(dl_stream_scene_prepare_begin_mask(&scene,&stream,&game,2)==DL_STREAM_SCENE_NOT_READY);
+    CHECK(dl_stream_scene_prepare_begin_mask(&scene,&stream,&game,4)==DL_STREAM_SCENE_ARGUMENT);
+    CHECK(dl_stream_scene_prepare_begin_mask(&scene,&stream,&game,UINT32_C(0x80000000))==DL_STREAM_SCENE_ARGUMENT);
+    CHECK(dl_stream_scene_prepare_begin_mask(&scene,&stream,&game,UINT32_MAX)==DL_STREAM_SCENE_ARGUMENT);
+    CHECK(!scene.assembly.active&&!scene.pending_ready&&slots[0].cpu_pins==0&&slots[1].cpu_pins==0);
+    CHECK(scene.revision==revision&&dl_stream_scene_level(&scene)==published);
+    CHECK(dl_stream_scene_prepare_begin_mask(NULL,&stream,&game,1)==DL_STREAM_SCENE_ARGUMENT);
+    CHECK(load(2)==0);CHECK(dl_stream_scene_refresh(&scene,&stream,&game)==DL_STREAM_SCENE_OK);
+    published=dl_stream_scene_level(&scene);revision=scene.revision;int full_models=published->model_count;
+    CHECK(model_by_id(published,"guard")&&model_by_id(published,"loot")&&model_by_id(published,"door"));
+    CHECK(dl_stream_scene_prepare_begin_mask(&scene,&stream,&game,1)==DL_STREAM_SCENE_OK);
+    CHECK(scene.assembly.borrowed==1&&scene.assembly.resident_mask==1);
+    CHECK(slots[handles[0].slot].cpu_pins==1&&slots[handles[1].slot].cpu_pins==0);
+    bool ready=false;CHECK(dl_stream_scene_prepare_step(&scene,2,&ready)==DL_STREAM_SCENE_OK&&!ready);
+    dl_stream_scene_prepare_cancel(&scene);
+    CHECK(slots[0].cpu_pins==0&&slots[1].cpu_pins==0&&scene.revision==revision&&dl_stream_scene_level(&scene)==published);
+    CHECK(dl_stream_scene_prepare_begin_mask(&scene,&stream,&game,1)==DL_STREAM_SCENE_OK);
+    CHECK(dl_stream_scene_prepare_step(&scene,SIZE_MAX,&ready)==DL_STREAM_SCENE_OK&&ready);
+    const DlLevel *pending=dl_stream_scene_pending(&scene);
+    CHECK(pending&&pending!=published&&model_by_id(pending,"door")&&!model_by_id(pending,"guard")&&!model_by_id(pending,"loot"));
+    CHECK(pending->objects==objects&&pending->enemies==enemies&&pending->model_count==2&&pending->collider_count==2);
+    CHECK(scene.banks[scene.active_bank^1u].resident_count==1&&scene.banks[scene.active_bank^1u].resident_ids[0]==1);
+    CHECK(dl_stream_scene_pending_guards_match(&scene,&game));
+    CHECK(slots[0].state==DL_STREAM_RESIDENT&&slots[1].state==DL_STREAM_RESIDENT&&slots[0].cpu_pins==0&&slots[1].cpu_pins==0);
+    CHECK(game.elapsed==7&&game.loot_value==25&&game.door_open&&dl_stream_scene_level(&scene)==published);
+    dl_stream_scene_publish(&scene);CHECK(scene.revision==revision+1&&dl_stream_scene_region_resident(&scene,1)&&!dl_stream_scene_region_resident(&scene,2));
+    CHECK(dl_stream_scene_prepare_begin_mask(&scene,&stream,&game,2)==DL_STREAM_SCENE_OK);
+    CHECK(slots[handles[0].slot].cpu_pins==0&&slots[handles[1].slot].cpu_pins==1);
+    CHECK(dl_stream_scene_prepare_step(&scene,SIZE_MAX,&ready)==DL_STREAM_SCENE_OK&&ready);
+    pending=dl_stream_scene_pending(&scene);
+    CHECK(pending&&model_by_id(pending,"door")&&model_by_id(pending,"guard")&&model_by_id(pending,"loot"));
+    CHECK(scene.banks[scene.active_bank^1u].resident_count==1&&scene.banks[scene.active_bank^1u].resident_ids[0]==2);
+    CHECK(dl_stream_scene_pending_guards_match(&scene,&game));dl_stream_scene_prepare_cancel(&scene);
+    CHECK(dl_stream_scene_prepare_begin_mask(&scene,&stream,&game,0)==DL_STREAM_SCENE_OK);
+    CHECK(scene.assembly.borrowed==0&&slots[0].cpu_pins==0&&slots[1].cpu_pins==0);
+    CHECK(dl_stream_scene_prepare_step(&scene,SIZE_MAX,&ready)==DL_STREAM_SCENE_OK&&ready);
+    pending=dl_stream_scene_pending(&scene);
+    CHECK(pending&&pending->model_count==1&&model_by_id(pending,"door")&&pending->collider_count==2);
+    CHECK(scene.banks[scene.active_bank^1u].resident_count==0&&dl_stream_scene_pending_guards_match(&scene,&game));
+    dl_stream_scene_publish(&scene);
+    /* Compatibility begin still includes both physical slots, independent of
+     * the smaller published view. Its explicit lifetime remains unchanged. */
+    CHECK(dl_stream_scene_prepare_begin(&scene,&stream,&game)==DL_STREAM_SCENE_OK);
+    CHECK(scene.assembly.resident_mask==3&&scene.assembly.borrowed==2&&slots[0].cpu_pins==1&&slots[1].cpu_pins==1);
+    CHECK(dl_stream_scene_prepare_step(&scene,SIZE_MAX,&ready)==DL_STREAM_SCENE_OK&&ready);
+    pending=dl_stream_scene_pending(&scene);CHECK(pending&&pending->model_count==full_models);
+    CHECK(model_by_id(pending,"door")&&model_by_id(pending,"guard")&&model_by_id(pending,"loot"));
+    dl_stream_scene_publish(&scene);CHECK(dl_stream_scene_region_resident(&scene,1)&&dl_stream_scene_region_resident(&scene,2));
+    CHECK(slots[0].cpu_pins==0&&slots[1].cpu_pins==0);return 0;
+}
+static int authored_door_barrier_interaction(void){
+    CHECK(initialize()==0);CHECK(load(1)==0);
+    DlStreamPolicyRegion policy[]={
+        {.activation_minimum={-4,-1,-2},.activation_maximum={0,3,2},.working_mask=1},
+        {.activation_minimum={0,-1,-2},.activation_maximum={4,3,2},.working_mask=2}};
+    DlStreamTransition gates[]={
+        {.from_region=1,.to_region=2,.minimum={-.1f,-1,-2},.maximum={.1f,3,2},.door_entity_id=2},
+        {.from_region=2,.to_region=1,.minimum={-.1f,-1,-2},.maximum={.1f,3,2},.door_entity_id=2}};
+    DlStreamDefinition def=definition;def.policy=DL_STREAM_POLICY_AUTHORED;def.policy_regions=policy;
+    def.transitions=gates;def.transition_count=2;def.max_resident_regions=2;
+    DlLevel base=bootstrap;base.stream=&def;static DlStreamScene adapter;
+    CHECK(dl_stream_scene_init(&adapter,&base,&mission)==DL_STREAM_SCENE_OK);
+    CHECK(dl_stream_scene_refresh(&adapter,&stream,NULL)==DL_STREAM_SCENE_OK);
+    const DlLevel *level=dl_stream_scene_level(&adapter);int barriers=0;
+    for(int i=0;i<level->collider_count;++i)if(!level->colliders[i].door&&level->collider_objects[i]==0)++barriers;
+    CHECK(barriers==1&&level->collider_count==2);
+    DlLevel uncached=*level;uncached.query_cache=NULL;
+    for(unsigned mode=0;mode<2;++mode){DlGame game={.level=mode?&uncached:level,.player={-1.1f,0,0},
+            .door_open=true,.open_objects=1,.enemy_count=1};
+        CHECK(!dl_line_of_sight(&game,dl_player_eye(&game),objects[0].position));
+        CHECK(!dl_position_clear(&game,(DlVec3){0,0,0},.18f,1.65f));
+        dl_game_update(&game,&(DlInput){.use=true},1.0f/60);
+        CHECK(!game.door_open&&game.object_revision==1&&game.event_count>0&&game.events[0].kind==DL_EVENT_DOOR);
+        dl_game_update(&game,&(DlInput){.use=true},1.0f/60);
+        CHECK(game.door_open&&game.object_revision==2);
+        CHECK(!dl_line_of_sight(&game,dl_player_eye(&game),objects[0].position));
+        CHECK(!dl_position_clear(&game,(DlVec3){0,0,0},.18f,1.65f));
+    }
+    /* Once the destination is published the synthetic barrier disappears;
+     * the open authored door then permits both movement and ordinary LOS. */
+    CHECK(load(2)==0&&dl_stream_scene_refresh(&adapter,&stream,NULL)==DL_STREAM_SCENE_OK);
+    level=dl_stream_scene_level(&adapter);DlGame game={.level=level,.player={-1.1f,0,0},.door_open=true,.open_objects=1,.enemy_count=1};
+    CHECK(level->collider_count==2&&dl_line_of_sight(&game,dl_player_eye(&game),objects[0].position));
+    CHECK(dl_position_clear(&game,(DlVec3){0,0,0},.18f,1.65f));return 0;
+}
+static int equal_geometry(const DlLevel *a,const DlLevel *b){
+    CHECK(a&&b&&a->mesh_count==b->mesh_count&&a->model_count==b->model_count&&a->collider_count==b->collider_count);
+    for(int i=0;i<a->mesh_count;++i){const DlMesh *x=&a->meshes[i],*y=&b->meshes[i];
+        CHECK(x->vertex_count==y->vertex_count&&x->index_count==y->index_count&&x->stream_key==y->stream_key);
+        CHECK(memcmp(x->vertices,y->vertices,(size_t)x->vertex_count*sizeof *x->vertices)==0);
+        CHECK(memcmp(x->indices,y->indices,(size_t)x->index_count*sizeof *x->indices)==0);
+        CHECK((x->uvs!=NULL)==(y->uvs!=NULL)&&(x->normals!=NULL)==(y->normals!=NULL));
+        if(x->uvs)CHECK(memcmp(x->uvs,y->uvs,(size_t)x->vertex_count*sizeof *x->uvs)==0);
+        if(x->normals)CHECK(memcmp(x->normals,y->normals,(size_t)x->vertex_count*sizeof *x->normals)==0);
+    }
+    for(int i=0;i<a->model_count;++i){const DlModelInstance *x=&a->models[i],*y=&b->models[i];
+        CHECK(x->mesh==y->mesh&&x->role==y->role&&x->texture==y->texture&&x->double_sided==y->double_sided);
+        CHECK(memcmp(&x->position,&y->position,sizeof x->position)==0&&memcmp(x->color,y->color,4)==0);
+        for(int state=0;state<2;++state){CHECK((x->baked_colors[state]!=NULL)==(y->baked_colors[state]!=NULL));
+            if(x->baked_colors[state])CHECK(memcmp(x->baked_colors[state],y->baked_colors[state],(size_t)a->meshes[x->mesh].index_count/3*24)==0);}
+    }
+    CHECK(dl_game_query_cache_ready(a)&&dl_game_query_cache_ready(b));return 0;
+}
+static int contiguous_validated_fill(void){
+    enum {TRIANGLES=5,TRIANGLE_OFFSET=112,COLLIDER_OFFSET=752,ENTITY_OFFSET=784,CHUNK=792,SECOND_OFFSET=1072,BYTES=1864};
+    static uint8_t bytes[2][BYTES],data[2][2][CHUNK];static DlStreamScene adapters[2];
+    DlMission parsed[2];DlWorldStream managers[2];DlRegionSlot loaded[2][2]={0};
+    DlStreamDefinition defs[2];DlLevel bases[2];unsigned steps[2]={0};
+    const uint8_t flags[]={3,3,1,2,2},orders[2][TRIANGLES]={{0,1,2,3,4},{0,2,3,1,4}};
+    const DlTexture texture={.path="rom:/test.sprite",.width=32,.height=32};
+    DlStreamMaterial palette[]={materials[0],{.id=2,.color={32,64,96,255},.texture_id=1}};
+    prepare();
+    for(unsigned variant=0;variant<2;++variant){memcpy(bytes[variant],package,DIRECTORY);put32(bytes[variant]+8,BYTES);
+        for(unsigned region=0;region<2;++region){uint8_t *chunk=bytes[variant]+(region?SECOND_OFFSET:FIRST);
+            memcpy(chunk,"DLR1",4);put16(chunk+4,4);put16(chunk+6,32);put32(chunk+8,CHUNK);put32(chunk+12,3);
+            if(region)putfloat(chunk+16,2);
+            section(chunk+32,1,TRIANGLE_OFFSET,TRIANGLES,128);section(chunk+56,2,COLLIDER_OFFSET,1,32);
+            section(chunk+80,3,ENTITY_OFFSET,2,4);
+            memcpy(chunk+COLLIDER_OFFSET,package+(region?SECOND:FIRST)+160,32);
+            memcpy(chunk+ENTITY_OFFSET,package+(region?SECOND:FIRST)+192,8);
+            for(unsigned record=0;record<TRIANGLES;++record){unsigned face=orders[variant][record];uint8_t *row=chunk+TRIANGLE_OFFSET+record*128;
+                for(unsigned corner=0;corner<3;++corner){putfloat(row+corner*12,-3+(float)face*.25f+(float)corner*.125f);
+                    putfloat(row+corner*12+4,(float)corner*.1f);putfloat(row+corner*12+8,(float)face*.2f);
+                    putfloat(row+44+corner*8,-(float)face-.25f);putfloat(row+48+corner*8,(float)corner+.75f);row[69+corner*3]=127;}
+                put32(row+36,face==2?2:1);put32(row+40,region*TRIANGLES+face+1);row[77]=flags[face];
+                for(unsigned state=0;state<2;++state)for(unsigned corner=0;corner<6;++corner){uint8_t *color=row+80+state*24+corner*4;
+                    color[0]=(uint8_t)(32+face);color[1]=(uint8_t)(64+state);color[2]=(uint8_t)(96+corner);color[3]=255;}
+            }
+            uint8_t *directory=bytes[variant]+64+region*64;put32(directory+4,region?SECOND_OFFSET:FIRST);
+            put32(directory+8,CHUNK);put32(directory+12,CHUNK);put32(directory+16,crc32(chunk,CHUNK));
+        }
+        put32(bytes[variant]+28,0);put32(bytes[variant]+28,crc32(bytes[variant],DIRECTORY));
+        CHECK(dl_mission_open(bytes[variant],DIRECTORY,BYTES,&parsed[variant])==DL_MISSION_OK);
+        defs[variant]=definition;defs[variant].file_bytes=BYTES;defs[variant].max_region_bytes=CHUNK;
+        defs[variant].materials=palette;defs[variant].material_count=2;
+        bases[variant]=bootstrap;bases[variant].stream=&defs[variant];bases[variant].textures=&texture;bases[variant].texture_count=1;
+        CHECK(dl_stream_scene_init(&adapters[variant],&bases[variant],&parsed[variant])==DL_STREAM_SCENE_OK);
+        for(unsigned slot=0;slot<2;++slot)loaded[variant][slot]=(DlRegionSlot){.buffer=data[variant][slot],.capacity=CHUNK};
+        LargeReader reader={bytes[variant],BYTES};
+        CHECK(dl_world_stream_init(&managers[variant],&parsed[variant],loaded[variant],2,read_large,&reader)==DL_STREAM_OK);
+        for(unsigned region=1;region<=2;++region){DlRegionHandle handle;
+            CHECK(dl_world_stream_request(&managers[variant],region,&handle)==DL_STREAM_OK);}
+        while(loaded[variant][0].state!=DL_STREAM_RESIDENT||loaded[variant][1].state!=DL_STREAM_RESIDENT)dl_world_stream_pump(&managers[variant],256);
+        CHECK(dl_stream_scene_prepare_begin(&adapters[variant],&managers[variant],NULL)==DL_STREAM_SCENE_OK);
+        bool ready=false,fallback=false;
+        while(!ready){CHECK(dl_stream_scene_prepare_step(&adapters[variant],1,&ready)==DL_STREAM_SCENE_OK);
+            if(adapters[variant].assembly.active&&!adapters[variant].assembly.contiguous_groups)fallback=true;
+            CHECK(++steps[variant]<256&&adapters[variant].revision==0);}
+        CHECK(fallback==(variant!=0)&&loaded[variant][0].cpu_pins==0&&loaded[variant][1].cpu_pins==0);
+    }
+    CHECK(steps[1]==steps[0]+TRIANGLES*2);
+    CHECK(equal_geometry(dl_stream_scene_pending(&adapters[0]),dl_stream_scene_pending(&adapters[1]))==0);
+    for(unsigned variant=0;variant<2;++variant)dl_stream_scene_publish(&adapters[variant]);
+    /* A later malformed record still aborts during SCAN and preserves the
+     * active geometry, including the v4 alpha validation in the direct path. */
+    const DlLevel *published=dl_stream_scene_level(&adapters[0]);unsigned revision=adapters[0].revision;
+    CHECK(dl_stream_scene_prepare_begin(&adapters[0],&managers[0],NULL)==DL_STREAM_SCENE_OK);bool ready=false;
+    CHECK(dl_stream_scene_prepare_step(&adapters[0],3,&ready)==DL_STREAM_SCENE_OK&&!ready);
+    data[0][0][TRIANGLE_OFFSET+128+83]=0;
+    CHECK(dl_stream_scene_prepare_step(&adapters[0],1,&ready)==DL_STREAM_SCENE_CORRUPT&&!ready);
+    CHECK(dl_stream_scene_level(&adapters[0])==published&&adapters[0].revision==revision&&!dl_stream_scene_pending(&adapters[0]));
+    CHECK(loaded[0][0].cpu_pins==0&&loaded[0][1].cpu_pins==0);return 0;
+}
 int main(int argc,char **argv){
-    if(working_views()||atomic_failures()||initialization_limits()||refresh_capacity()||textured_v2_scene()||authored_five_region_floor_views()||authored_swept_gate_crossings()||authored_door_target())return 1;
+    if(working_views()||atomic_failures()||initialization_limits()||refresh_capacity()||textured_v2_scene()||authored_five_region_floor_views()||authored_swept_gate_crossings()||authored_door_target()||staged_publication()||stable_key_material_bits()||incremental_assembly()||pending_guard_membership()||masked_preparation()||authored_door_barrier_interaction()||contiguous_validated_fill())return 1;
 #ifdef DL_STREAM_SCENE_INTEGRATION
     if(argc>1&&cooked_fixture(argv[1]))return 1;
 #else

@@ -17,6 +17,11 @@
 #include <t3d/t3d.h>
 #include <malloc.h>
 static void gpu_prepare(const DlGame *g);
+static void gpu_prepare_begin(const DlGame *g);
+static bool gpu_prepare_step(const DlGame *g,uint32_t tick_budget);
+static bool gpu_pending_bounds(unsigned index,DlVec3 *minimum,DlVec3 *maximum);
+static void gpu_prepare_commit(const DlGame *g);
+static void gpu_cancel_pending(void);
 static void gpu_release(void);
 static void gpu_report(void);
 #endif
@@ -54,6 +59,8 @@ typedef struct { color_t front,back; } VertexColors;
 typedef struct { DlVec3 position; DlVec2 uv; DlVec3 color; } ClipVertex;
 typedef struct { DlVec3 eye,right,up,forward; } Camera;
 static ModelCache models[MAX_MODELS];
+static ModelCache previous_models[MAX_MODELS];
+static uint64_t previous_stream_keys[MAX_MODELS];
 static DlVec3 world_vertices[MAX_VERTICES];
 #ifndef DL_RENDER_T3D
 static DlVec3 camera_vertices[MAX_VERTICES];
@@ -74,12 +81,32 @@ static bool multiple_doors;
 static surface_t depth_buffer;
 static sprite_t *textures[64];
 static const DlLevel *texture_level;
+static const DlTexture *texture_assets;
+static int texture_asset_count;
+static bool staged_gpu_ready;
 static int texture_uploads;
 static int visible_models,transformed_vertices;
 static DlRenderFrustum frustum;
 static DlAnimMatrix animation_skin[DL_ANIMATION_MAX_BONES]; /* reused per model */
 static DlVec3 *animation_normals;
 static int animation_normal_count,animation_model_count;
+static bool inline_lighting(const DlGame *g,int index){
+#ifdef DL_DISABLE_LIGHTING_BAKE
+    (void)g;(void)index;return false;
+#else
+    const DlModelInstance *model=&g->level->models[index];
+    return g->level->environment.enabled&&!multiple_doors&&model->baked_colors[0]&&model->baked_colors[1];
+#endif
+}
+#ifndef DL_RENDER_T3D
+static const NightColors *model_night_colors(const DlGame *g,int index,int triangle,NightColors *storage){
+    if(inline_lighting(g,index)){
+        memcpy(storage,g->level->models[index].baked_colors[g->door_open]+triangle*24,sizeof *storage);
+        return storage;
+    }
+    return night_colors[g->door_open]+models[index].triangle_start+triangle;
+}
+#endif
 static uint64_t animation_sample_ticks,animation_skin_ticks;
 static uint32_t animation_frames,animation_poses,animation_sample_max,animation_skin_max;
 #ifdef DL_VERIFY_LIGHTING_BAKE
@@ -171,6 +198,10 @@ static void model_placement(const DlGame *g,int index,DlVec3 *position,DlVec3 *r
 }
 static ModelPose update_model_pose(const DlGame *g,int index){
     const DlModelInstance *model=&g->level->models[index];
+    if(g->level->meshes[model->mesh].stream_key){
+        models[index].bounds_center=add(models[index].scaled_center,model->position);
+        return (ModelPose){model->position,{0,0,0},{1,1,1},false};
+    }
     DlVec3 position,rotation;model_placement(g,index,&position,&rotation);
     ModelPose pose={position,{sinf(rotation.x),sinf(rotation.y),sinf(rotation.z)},
         {cosf(rotation.x),cosf(rotation.y),cosf(rotation.z)},dl_game_model_open(g,model)};
@@ -200,6 +231,14 @@ static void transform_model_vertices(const DlGame *g,int index,const ModelPose *
     const DlModelInstance *model=&g->level->models[index];
     const DlMesh *mesh=&g->level->meshes[model->mesh];
     const ModelCache *cache=&models[index];
+    if(mesh->stream_key){
+        DlVec3 *target=world_vertices+cache->vertex_start;const DlVec3 *source=mesh->vertices;
+        float x=model->position.x,y=model->position.y,z=model->position.z;
+        for(int i=0;i<mesh->vertex_count;++i){
+            target[i].x=source[i].x+x;target[i].y=source[i].y+y;target[i].z=source[i].z+z;
+        }
+        return;
+    }
     DlProfileMark animation_mark={0};
     if(mesh->animation){
         animation_mark=dl_profile_mark();
@@ -233,8 +272,8 @@ static void transform_model(const DlGame *g,int index){
     transform_model_vertices(g,index,&pose);
 }
 
-/* Stream scene changes can spend seconds rebuilding CPU lighting in Ares.
- * Refill audio between bounded CPU batches, with no live world PI transfer.
+/* Refill audio between background packing jobs and initial scene warmup,
+ * with no live world PI transfer.
  * These calls are outside Tiny3D command-block recording and IRQ context. */
 static void prepare_audio(const DlGame *g){
     if(g->level->stream&&dl_stream_rom_music_ready())dl_music_service();
@@ -260,6 +299,11 @@ static color_t night_color(const DlGame *g,const DlModelInstance *model,DlVec3 l
 }
 static void light_model(const DlGame *g,int index,bool illuminate){
     const DlModelInstance *model=&g->level->models[index];
+#ifdef DL_RENDER_T3D
+    /* Cooked night colors are already per corner. Tiny3D needs no CPU face
+     * normal/center pass for these immutable meshes, including door leaves. */
+    if(!illuminate&&inline_lighting(g,index))return;
+#endif
     const DlMesh *mesh=&g->level->meshes[model->mesh];
     const ModelCache *cache=&models[index];
     float model_light=-1;
@@ -428,7 +472,7 @@ static void verify_baked_lighting(const DlGame *g){
 }
 #endif
 static void load_textures(const DlGame *g){
-    if(texture_level==g->level)return;
+    if(texture_level&&texture_assets==g->level->textures&&texture_asset_count==g->level->texture_count){texture_level=g->level;return;}
     rspq_wait();
     for(int i=0;i<64;++i){if(textures[i])sprite_free(textures[i]);textures[i]=NULL;}
     assertf(g->level->texture_count<=64,"Too many scene textures");
@@ -438,12 +482,19 @@ static void load_textures(const DlGame *g){
         prepare_audio(g);
     }
     texture_level=g->level;
+    texture_assets=g->level->textures;texture_asset_count=g->level->texture_count;
 }
 static uint32_t scene_load_lap(uint32_t *previous){
     uint32_t now=TICKS_READ(),elapsed=now-*previous;
     *previous=now;return elapsed;
 }
 static void build_cache(const DlGame *g){
+    int previous_count=cached_level&&cached_level->stream==g->level->stream?cached_level->model_count:0;
+    if(previous_count){
+        memcpy(previous_models,models,sizeof models);
+        for(int i=0;i<previous_count;++i)
+            previous_stream_keys[i]=cached_level->meshes[cached_level->models[i].mesh].stream_key;
+    }
     int doors=0;for(int i=0;i<g->level->object_count;++i)if(g->level->objects[i].kind==DL_OBJECT_DOOR)++doors;
     multiple_doors=doors>1;
     /* Loading is user-visible elapsed time, including audio/VI interrupts.
@@ -453,7 +504,7 @@ static void build_cache(const DlGame *g){
     load_textures(g);
     uint32_t texture_ticks=scene_load_lap(&load_mark);
 #ifdef DL_RENDER_T3D
-    gpu_release();
+    if(!staged_gpu_ready)gpu_release();
 #endif
     uint32_t retire_ticks=scene_load_lap(&load_mark);
     vertex_count=triangle_count=smooth_vertex_count=0;
@@ -502,37 +553,62 @@ static void build_cache(const DlGame *g){
         assertf(mesh->vertex_count>0&&mesh->vertex_count<=MAX_MESH_VERTICES&&mesh->index_count%3==0,"Invalid mesh geometry");
         assertf(vertex_count+mesh->vertex_count<=MAX_VERTICES,"Scene exceeds %d instanced vertices",MAX_VERTICES);
         assertf(triangle_count+mesh->index_count/3<=MAX_TRIANGLES,"Scene exceeds %d instanced triangles",MAX_TRIANGLES);
+        bool reuse=false;
+        if(mesh->stream_key)for(int j=0;j<previous_count;++j)if(previous_stream_keys[j]==mesh->stream_key){
+            models[i]=previous_models[j];reuse=true;break;
+        }
         models[i].vertex_start=vertex_count;models[i].triangle_start=triangle_count;
         models[i].smooth_start=-1;
         if(mesh->normals){models[i].smooth_start=smooth_vertex_count;smooth_vertex_count+=mesh->vertex_count;}
-        DlVec3 minimum=mesh->vertices[0],maximum=minimum;
-        for(int v=1;v<mesh->vertex_count;++v){
-            DlVec3 p=mesh->vertices[v];
-            minimum=(DlVec3){fminf(minimum.x,p.x),fminf(minimum.y,p.y),fminf(minimum.z,p.z)};
-            maximum=(DlVec3){fmaxf(maximum.x,p.x),fmaxf(maximum.y,p.y),fmaxf(maximum.z,p.z)};
-        }
-        for(int j=0;j<mesh->index_count;++j)assertf(mesh->indices[j]<mesh->vertex_count,"Mesh index outside vertices");
-        models[i].hinge_x=minimum.x*model->scale.x;models[i].hinge_z=(minimum.z+maximum.z)*0.5f*model->scale.z;
-        DlVec3 center=mul(add(minimum,maximum),0.5f),half=mul(sub(maximum,minimum),0.5f);
-        models[i].scaled_center=(DlVec3){center.x*model->scale.x,center.y*model->scale.y,center.z*model->scale.z};
-        half=(DlVec3){half.x*model->scale.x,half.y*model->scale.y,half.z*model->scale.z};
-        models[i].bounds_radius=sqrtf(dot(half,half));
-        if(mesh->animation){
-            DlVec3 c=mesh->animation->bounds_center;
-            models[i].scaled_center=(DlVec3){c.x*model->scale.x,c.y*model->scale.y,c.z*model->scale.z};
-            models[i].bounds_radius=mesh->animation->bounds_radius*fmaxf(fabsf(model->scale.x),fmaxf(fabsf(model->scale.y),fabsf(model->scale.z)));
+        if(!reuse){
+            DlVec3 minimum=mesh->vertices[0],maximum=minimum;
+#ifdef DL_RENDER_T3D
+            bool staged_bounds=staged_gpu_ready&&gpu_pending_bounds((unsigned)i,&minimum,&maximum);
+#else
+            bool staged_bounds=false;
+#endif
+            if(!staged_bounds){
+            for(int v=1;v<mesh->vertex_count;++v){
+                DlVec3 p=mesh->vertices[v];
+                if(p.x<minimum.x)minimum.x=p.x;
+                if(p.y<minimum.y)minimum.y=p.y;
+                if(p.z<minimum.z)minimum.z=p.z;
+                if(p.x>maximum.x)maximum.x=p.x;
+                if(p.y>maximum.y)maximum.y=p.y;
+                if(p.z>maximum.z)maximum.z=p.z;
+            }
+            for(int j=0;j<mesh->index_count;++j)assertf(mesh->indices[j]<mesh->vertex_count,"Mesh index outside vertices");
+            }
+            models[i].hinge_x=minimum.x*model->scale.x;models[i].hinge_z=(minimum.z+maximum.z)*0.5f*model->scale.z;
+            DlVec3 center=mul(add(minimum,maximum),0.5f),half=mul(sub(maximum,minimum),0.5f);
+            models[i].scaled_center=(DlVec3){center.x*model->scale.x,center.y*model->scale.y,center.z*model->scale.z};
+            half=(DlVec3){half.x*model->scale.x,half.y*model->scale.y,half.z*model->scale.z};
+            models[i].bounds_radius=sqrtf(dot(half,half));
+            if(mesh->animation){
+                DlVec3 c=mesh->animation->bounds_center;
+                models[i].scaled_center=(DlVec3){c.x*model->scale.x,c.y*model->scale.y,c.z*model->scale.z};
+                models[i].bounds_radius=mesh->animation->bounds_radius*fmaxf(fabsf(model->scale.x),fmaxf(fabsf(model->scale.y),fabsf(model->scale.z)));
+            }
         }
         vertex_count+=mesh->vertex_count;triangle_count+=mesh->index_count/3;
+#ifdef DL_RENDER_T3D
+        if(mesh->stream_key&&inline_lighting(g,i))update_model_pose(g,i);
+        else transform_model(g,i);
+#else
         transform_model(g,i);
+#endif
     }
     free(smooth_colors);smooth_colors=NULL;
     if(!g->level->environment.enabled&&smooth_vertex_count){
         smooth_colors=malloc(sizeof(VertexColors)*smooth_vertex_count);
         assertf(smooth_colors,"Cannot allocate smooth vertex lighting cache");
     }
+    bool needs_night_cache=g->level->environment.enabled&&g->level->baked_lighting;
+    if(g->level->environment.enabled)for(int i=0;i<g->level->model_count;++i)
+        if(!inline_lighting(g,i))needs_night_cache=true;
     for(int state=0;state<2;++state){
         free(night_colors[state]);night_colors[state]=NULL;
-        if(g->level->environment.enabled){
+        if(needs_night_cache){
             night_colors[state]=malloc(sizeof(NightColors)*triangle_count);
             assertf(night_colors[state],"Cannot allocate night lighting cache");
         }
@@ -545,14 +621,16 @@ static void build_cache(const DlGame *g){
 #endif
     uint32_t bake_verify_ticks=scene_load_lap(&load_mark);
     /* Any failed partial decode is discarded by recomputing BOTH states. */
-    for(int i=0;i<g->level->model_count;++i)
-        light_model(g,i,!baked||!dl_static_lighting_eligible(g->level,i));
+    for(int i=0;i<g->level->model_count;++i){
+        bool precomputed=baked||inline_lighting(g,i);
+        light_model(g,i,!precomputed||!dl_static_lighting_eligible(g->level,i));
+    }
     uint32_t lighting_ticks=scene_load_lap(&load_mark),alternate_ticks=0,restore_ticks=0;
     if(g->level->environment.enabled){
         DlGame alternate=*g;alternate.door_open=!g->door_open;
         for(int i=0;i<g->level->model_count;++i){
             if(g->level->models[i].role==DL_MODEL_DOOR)transform_model(&alternate,i);
-            bool precomputed=baked&&dl_static_lighting_eligible(g->level,i);
+            bool precomputed=(baked||inline_lighting(g,i))&&dl_static_lighting_eligible(g->level,i);
             if(!precomputed||g->level->models[i].role==DL_MODEL_DOOR)light_model(&alternate,i,!precomputed);
         }
         alternate_ticks=scene_load_lap(&load_mark);
@@ -566,7 +644,7 @@ static void build_cache(const DlGame *g){
         g->level->model_count,g->level->mesh_count,vertex_count,triangle_count);
     debugf("DL64 scene_prepared ms=%.2f night_cache_bytes=%d door_states=%d textures=%d\n",
         (float)(uint32_t)(TICKS_READ()-start)*(1000.0f/TICKS_PER_SECOND),
-        g->level->environment.enabled?(int)(2*sizeof(NightColors)*triangle_count):0,
+        night_colors[0]?(int)(2*sizeof(NightColors)*triangle_count):0,
         g->level->environment.enabled?2:1,g->level->texture_count);
     debugf("DL64 shading_ready smooth_vertices=%d scalar_smooth_cache_bytes=%d normal_format=snorm8\n",
         smooth_vertex_count,smooth_colors?(int)(sizeof(VertexColors)*smooth_vertex_count):0);
@@ -577,7 +655,7 @@ static void build_cache(const DlGame *g){
     animation_frames=animation_poses=animation_sample_max=animation_skin_max=0;
     uint32_t report_ticks=scene_load_lap(&load_mark);
 #ifdef DL_RENDER_T3D
-    gpu_prepare(g);
+    if(staged_gpu_ready)gpu_prepare_commit(g);else gpu_prepare(g);
 #endif
     uint32_t gpu_ticks=scene_load_lap(&load_mark);
     hud_cache_prepare(g);
@@ -589,6 +667,28 @@ static void build_cache(const DlGame *g){
         (unsigned long)hud_ticks,(unsigned long)TICKS_PER_SECOND);
 }
 void dl_render_prepare_scene(const DlGame *game){if(cached_level!=game->level)build_cache(game);}
+void dl_render_stage_scene(const DlGame *game){
+#ifdef DL_RENDER_T3D
+    gpu_prepare_begin(game);
+#else
+    (void)game;
+#endif
+}
+bool dl_render_stage_step(const DlGame *game,uint32_t tick_budget){
+#ifdef DL_RENDER_T3D
+    return gpu_prepare_step(game,tick_budget);
+#else
+    (void)game;(void)tick_budget;return true;
+#endif
+}
+void dl_render_commit_scene(const DlGame *game){
+    staged_gpu_ready=true;build_cache(game);staged_gpu_ready=false;
+}
+void dl_render_cancel_scene(void){
+#ifdef DL_RENDER_T3D
+    gpu_cancel_pending();
+#endif
+}
 void dl_render_release_scene(void){
     /* A preceding detach_show queued SYNC_FULL. Wait before freeing texture
      * memory still referenced by the RSP/RDP; never keep both levels' caches. */
@@ -603,7 +703,7 @@ void dl_render_release_scene(void){
     free(smooth_colors);smooth_colors=NULL;smooth_vertex_count=0;
     dl_render_report_animation();
     free(animation_normals);animation_normals=NULL;animation_normal_count=animation_model_count=0;
-    cached_level=texture_level=NULL;
+    cached_level=texture_level=NULL;texture_assets=NULL;texture_asset_count=0;staged_gpu_ready=false;
     cached_door=false;
     vertex_count=triangle_count=submitted_triangles=texture_uploads=0;
     visible_models=transformed_vertices=0;
@@ -805,7 +905,8 @@ static void geometry(const DlGame *g){
         int previous_triangles=submitted_triangles;
         for(int t=0;t<mesh->index_count/3;++t){
             const FaceCache *face=&faces[cache->triangle_start+t];
-            const NightColors *colors=g->level->environment.enabled?&night_colors[g->door_open][cache->triangle_start+t]:NULL;
+            NightColors inline_colors;
+            const NightColors *colors=g->level->environment.enabled?model_night_colors(g,i,t,&inline_colors):NULL;
             bool front=dot(face->normal,sub(camera.eye,face->center))>=0;
             if(!model->double_sided&&!front)continue;
             unsigned code[3];

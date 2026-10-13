@@ -179,8 +179,8 @@ def verify_build(rom, metadata=None, expanded=False):
     regions = content["mission"]["report"]["regions"]
     require(content["mission"]["report"].get("visibility") == "all-regions",
             "Open source street lacks the conservative visibility policy")
-    require(content["mission"]["report"].get("chunk_version") == 2,
-            "Derived terrain lacks the UV/normal payload version")
+    require(content["mission"]["report"].get("chunk_version") == 4 and content["mission"]["report"].get("lighting"),
+            "Derived terrain lacks the UV/normal/precomputed-color payload version")
     require(content.get("textures", {}).get("textures"), "Derived terrain lost its packed textures")
     if expanded:
         canonical = json.loads(Path(entry["source"]).read_text(encoding="utf-8"))

@@ -5,6 +5,11 @@ bool dl_render_pose_cache_update(DlRenderPoseCache *cache,bool dynamic,
     const DlVec3 *position,const DlVec3 *rotation,const DlVec3 *scale,
     bool door_open,float hinge_x,float hinge_z){
     if(cache->valid&&!dynamic&&cache->pose.door_open==door_open)return false;
+    if(!door_open&&rotation->x==0&&rotation->y==0&&rotation->z==0){
+        cache->pose=(DlRenderPose){*position,{0,0,0},{1,1,1},false};
+        cache->world=(DlAnimMatrix){{scale->x,0,0,position->x,0,scale->y,0,position->y,0,0,scale->z,position->z}};
+        cache->valid=true;return true;
+    }
     cache->pose=(DlRenderPose){*position,
         {sinf(rotation->x),sinf(rotation->y),sinf(rotation->z)},
         {cosf(rotation->x),cosf(rotation->y),cosf(rotation->z)},door_open};

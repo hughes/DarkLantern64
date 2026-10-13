@@ -111,7 +111,8 @@ size_t dl_world_stream_pump(DlWorldStream *s, size_t budget) {
         if (slot->state == DL_STREAM_REQUESTED) slot->state = DL_STREAM_READING;
         if (slot->state == DL_STREAM_READING && processed < budget) {
             size_t wanted = slot->region.chunk_bytes - slot->bytes_read;
-            if (wanted > 256) wanted = 256;
+            size_t slice=s->read_slice?s->read_slice:256;
+            if (wanted > slice) wanted = slice;
             if (wanted > budget - processed) wanted = budget - processed;
             size_t n = s->read(s->read_context, slot->region.chunk_offset + (uint32_t)slot->bytes_read,
                 slot->buffer + slot->bytes_read, wanted);

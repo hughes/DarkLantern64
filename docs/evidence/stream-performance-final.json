@@ -1,0 +1,3452 @@
+{
+  "passed": true,
+  "accepted": true,
+  "platform": "Ares emulator",
+  "rom": "C:\\Users\\hughe\\dev\\DarkLantern64\\build\\DarkLantern64-bundle-level_bundle-menu-bafford-district-test-performance-t3d.z64",
+  "rom_sha256": "570f679a1f60639b334a50b676fc9bd5d897305868f28fcd6b3e67d9a4c3cb89",
+  "build_signature": "a1e1472c29457b14ffc1a4d0384db5066cd674d2a21809ac8140d168c76cfc57",
+  "baseline": false,
+  "run": {
+    "name": "bafford-district-performance",
+    "passed": true,
+    "log": ".dev\\ares\\runs\\9dc85ef9d9864a4a9ff6e7d56ceadb01\\bafford-district-performance.log",
+    "tested_rom": ".dev\\ares\\runs\\9dc85ef9d9864a4a9ff6e7d56ceadb01\\DarkLantern64-bundle-level_bundle-menu-bafford-district-test-performance-t3d.z64",
+    "rom_sha256": "570f679a1f60639b334a50b676fc9bd5d897305868f28fcd6b3e67d9a4c3cb89",
+    "rom_bytes": 1622016,
+    "settings": ".dev\\ares\\runs\\9dc85ef9d9864a4a9ff6e7d56ceadb01\\settings.bml",
+    "settings_source_sha256": "d3917400079a47105fa6bd7df53e4f530915aa3b4b70e79769f1b389bc2b196a",
+    "profile_report": null,
+    "elapsed_seconds": 63.062,
+    "peak_sampled_heap_bytes": 2059600,
+    "max_reported_cpu_ms": 25.81,
+    "boot": "DL64 boot_ok memory=8388608 scene=\"Bafford District\" meshes=32 models=32 colliders=166 version=2 world=3d renderer=rsp-tiny3d depth=hardware",
+    "terminal_event": "DL64 bafford_district_test_complete passed=1 input_only=1 coverage=1 collision_clear=1 stair_jumps=2 visited_regions=9 loot_persist=1 restart_reload=1 pre_restart_loads=32 audio_calls=1476"
+  },
+  "mission_sha256": "7e7243182bc47d4090d117596438fdd1c5c4dfae3faede6714407c90ac0f87c9",
+  "log": "C:\\Users\\hughe\\dev\\DarkLantern64\\.dev\\ares\\runs\\9dc85ef9d9864a4a9ff6e7d56ceadb01\\bafford-district-performance.log",
+  "log_sha256": "1bf9d500e5115ea69949366ea21000fae186cc54b1d6dd5f0fef2337eff9cae1",
+  "schema_version": 1,
+  "timing_passed": true,
+  "simulation_passed": true,
+  "limits": {
+    "frame_ms": 33.333333333333336,
+    "service_cpu_ms": 8
+  },
+  "renderer_preparations": {
+    "initial_start": {
+      "count": 1,
+      "total_seconds": 0.07436533333333334,
+      "elapsed": {
+        "samples": 1,
+        "average_ms": 74.36533333333334,
+        "min_ms": 74.36533333333334,
+        "max_ms": 74.36533333333334,
+        "p50_ms": 74.36533333333334,
+        "p95_ms": 74.36533333333334,
+        "p99_ms": 74.36533333333334,
+        "over_budget_samples": 1,
+        "quantile_method": "nearest rank; acceptance uses every sample and the maximum"
+      },
+      "lighting": {
+        "samples": 1,
+        "average_ms": 0.61056,
+        "min_ms": 0.61056,
+        "max_ms": 0.61056,
+        "p50_ms": 0.61056,
+        "p95_ms": 0.61056,
+        "p99_ms": 0.61056,
+        "over_budget_samples": 0,
+        "quantile_method": "nearest rank; acceptance uses every sample and the maximum"
+      },
+      "gpu_prepare": {
+        "samples": 1,
+        "average_ms": 38.443968,
+        "min_ms": 38.443968,
+        "max_ms": 38.443968,
+        "p50_ms": 38.443968,
+        "p95_ms": 38.443968,
+        "p99_ms": 38.443968,
+        "over_budget_samples": 1,
+        "quantile_method": "nearest rank; acceptance uses every sample and the maximum"
+      },
+      "lighting_fraction": 0.008210277190088572
+    },
+    "restart": {
+      "count": 1,
+      "total_seconds": 0.07519970133333333,
+      "elapsed": {
+        "samples": 1,
+        "average_ms": 75.19970133333334,
+        "min_ms": 75.19970133333334,
+        "max_ms": 75.19970133333334,
+        "p50_ms": 75.19970133333334,
+        "p95_ms": 75.19970133333334,
+        "p99_ms": 75.19970133333334,
+        "over_budget_samples": 1,
+        "quantile_method": "nearest rank; acceptance uses every sample and the maximum"
+      },
+      "lighting": {
+        "samples": 1,
+        "average_ms": 0.6833066666666666,
+        "min_ms": 0.6833066666666666,
+        "max_ms": 0.6833066666666666,
+        "p50_ms": 0.6833066666666666,
+        "p95_ms": 0.6833066666666666,
+        "p99_ms": 0.6833066666666666,
+        "over_budget_samples": 0,
+        "quantile_method": "nearest rank; acceptance uses every sample and the maximum"
+      },
+      "gpu_prepare": {
+        "samples": 1,
+        "average_ms": 38.70190933333333,
+        "min_ms": 38.70190933333333,
+        "max_ms": 38.70190933333333,
+        "p50_ms": 38.70190933333333,
+        "p95_ms": 38.70190933333333,
+        "p99_ms": 38.70190933333333,
+        "over_budget_samples": 1,
+        "quantile_method": "nearest rank; acceptance uses every sample and the maximum"
+      },
+      "lighting_fraction": 0.009086560911163902
+    },
+    "transition": {
+      "count": 33,
+      "total_seconds": 0.1584864,
+      "elapsed": {
+        "samples": 33,
+        "average_ms": 4.802618181818182,
+        "min_ms": 3.195904,
+        "max_ms": 7.572842666666666,
+        "p50_ms": 4.8988586666666665,
+        "p95_ms": 7.0869333333333335,
+        "p99_ms": 7.572842666666666,
+        "over_budget_samples": 0,
+        "quantile_method": "nearest rank; acceptance uses every sample and the maximum"
+      },
+      "lighting": {
+        "samples": 33,
+        "average_ms": 0.6551641212121212,
+        "min_ms": 0.5232426666666666,
+        "max_ms": 0.7701973333333333,
+        "p50_ms": 0.654912,
+        "p95_ms": 0.754624,
+        "p99_ms": 0.7701973333333333,
+        "over_budget_samples": 0,
+        "quantile_method": "nearest rank; acceptance uses every sample and the maximum"
+      },
+      "gpu_prepare": {
+        "samples": 33,
+        "average_ms": 2.288627070707071,
+        "min_ms": 1.155008,
+        "max_ms": 3.8350293333333334,
+        "p50_ms": 2.1266773333333333,
+        "p95_ms": 3.8349226666666665,
+        "p99_ms": 3.8350293333333334,
+        "over_budget_samples": 0,
+        "quantile_method": "nearest rank; acceptance uses every sample and the maximum"
+      },
+      "lighting_fraction": 0.13641811537141357
+    }
+  },
+  "limitations": [
+    "Emulated CP0 elapsed ticks; original N64 performance remains unverified.",
+    "Render elapsed includes display/queue waits; it is not direct RSP/RDP execution timing.",
+    "Service CPU excludes audio callbacks; other interrupts and internal waits remain included.",
+    "Instrumentation output overhead remains in following raw frame intervals."
+  ],
+  "legacy_profile": {
+    "windows": 60,
+    "partial": false,
+    "exact_samples": true,
+    "elapsed": {
+      "samples": 3465,
+      "average_ms": 16.75939674997595,
+      "min_ms": 0.08503466666666666,
+      "max_ms": 32.675648,
+      "p50_ms": 16.715157333333334,
+      "p95_ms": 18.992128,
+      "p99_ms": 22.50912,
+      "over_budget_samples": 0,
+      "quantile_method": "nearest rank; acceptance uses every sample and the maximum"
+    },
+    "work": {
+      "samples": 3465,
+      "average_ms": 10.976757465704665,
+      "min_ms": 0.08503466666666666,
+      "max_ms": 32.652821333333335,
+      "p50_ms": 10.562730666666667,
+      "p95_ms": 17.544810666666667,
+      "p99_ms": 21.969173333333334,
+      "over_budget_samples": 0,
+      "quantile_method": "nearest rank; acceptance uses every sample and the maximum"
+    }
+  },
+  "configuration": {
+    "version": "2",
+    "ticks_per_second": "46875000",
+    "sim_rate": "60",
+    "dt": "wall",
+    "route": "continuous",
+    "frame_budget_hz": "30",
+    "service_budget_us": "8000"
+  },
+  "complete": true,
+  "frame_count": 3458,
+  "simulated_ticks": 3479,
+  "terminal": {
+    "frames": 3458,
+    "epochs": 2,
+    "dropped_ticks": 0
+  },
+  "observed_summary": {
+    "frames": 3458,
+    "epochs": 2,
+    "dropped_ticks": 0
+  },
+  "frames": {
+    "frame_ticks": {
+      "samples": 3458,
+      "average_ms": 16.468079700790437,
+      "min_ms": 6.415104,
+      "max_ms": 31.623082666666665,
+      "p50_ms": 16.411989333333334,
+      "p95_ms": 18.720469333333334,
+      "p99_ms": 22.228821333333332,
+      "over_budget_samples": 0,
+      "quantile_method": "nearest rank; acceptance uses every sample and the maximum"
+    },
+    "interval_ticks": {
+      "samples": 3458,
+      "average_ms": 16.772371501060345,
+      "min_ms": 0.014229333333333333,
+      "max_ms": 30.839189333333334,
+      "p50_ms": 16.676736,
+      "p95_ms": 22.394346666666667,
+      "p99_ms": 24.907776,
+      "over_budget_samples": 0,
+      "quantile_method": "nearest rank; acceptance uses every sample and the maximum"
+    },
+    "service_ticks": {
+      "samples": 3458,
+      "average_ms": 1.201386123770966,
+      "min_ms": 0.198912,
+      "max_ms": 9.161877333333333,
+      "p50_ms": 0.3207253333333333,
+      "p95_ms": 5.815850666666667,
+      "p99_ms": 6.129514666666666,
+      "over_budget_samples": 0,
+      "quantile_method": "nearest rank; acceptance uses every sample and the maximum"
+    },
+    "service_cpu_ticks": {
+      "samples": 3458,
+      "average_ms": 1.166653945633314,
+      "min_ms": 0.198912,
+      "max_ms": 7.528064,
+      "p50_ms": 0.32066133333333335,
+      "p95_ms": 5.800448,
+      "p99_ms": 5.884629333333334,
+      "over_budget_samples": 0,
+      "quantile_method": "nearest rank; acceptance uses every sample and the maximum"
+    },
+    "render_ticks": {
+      "samples": 3458,
+      "average_ms": 10.051018487757855,
+      "min_ms": 2.3392,
+      "max_ms": 19.133504,
+      "p50_ms": 9.884650666666667,
+      "p95_ms": 15.384277333333333,
+      "p99_ms": 16.346688,
+      "over_budget_samples": 0,
+      "quantile_method": "nearest rank; acceptance uses every sample and the maximum"
+    }
+  },
+  "stages": {
+    "idle_or_read": {
+      "frames": 2865,
+      "elapsed": {
+        "samples": 2865,
+        "average_ms": 0.43267282280395575,
+        "min_ms": 0.198912,
+        "max_ms": 5.983957333333334,
+        "p50_ms": 0.31012266666666666,
+        "p95_ms": 0.9999573333333334,
+        "p99_ms": 3.1686186666666667,
+        "over_budget_samples": 0,
+        "quantile_method": "nearest rank; acceptance uses every sample and the maximum"
+      },
+      "cpu": {
+        "samples": 2865,
+        "average_ms": 0.4191358212914485,
+        "min_ms": 0.198912,
+        "max_ms": 3.268672,
+        "p50_ms": 0.3099093333333333,
+        "p95_ms": 0.4315733333333333,
+        "p99_ms": 3.154304,
+        "over_budget_samples": 0,
+        "quantile_method": "nearest rank; acceptance uses every sample and the maximum"
+      }
+    },
+    "assemble": {
+      "frames": 434,
+      "elapsed": {
+        "samples": 434,
+        "average_ms": 5.198155748079877,
+        "min_ms": 0.5474986666666667,
+        "max_ms": 9.100010666666666,
+        "p50_ms": 5.77248,
+        "p95_ms": 5.869504,
+        "p99_ms": 6.405205333333333,
+        "over_budget_samples": 0,
+        "quantile_method": "nearest rank; acceptance uses every sample and the maximum"
+      },
+      "cpu": {
+        "samples": 434,
+        "average_ms": 5.0604862918586795,
+        "min_ms": 0.5474986666666667,
+        "max_ms": 6.134784,
+        "p50_ms": 5.764074666666667,
+        "p95_ms": 5.85568,
+        "p99_ms": 5.877162666666667,
+        "over_budget_samples": 0,
+        "quantile_method": "nearest rank; acceptance uses every sample and the maximum"
+      }
+    },
+    "gpu_prepare": {
+      "frames": 126,
+      "elapsed": {
+        "samples": 126,
+        "average_ms": 3.545893417989418,
+        "min_ms": 0.24354133333333333,
+        "max_ms": 8.013525333333334,
+        "p50_ms": 4.283712,
+        "p95_ms": 5.996010666666667,
+        "p99_ms": 7.947968,
+        "over_budget_samples": 0,
+        "quantile_method": "nearest rank; acceptance uses every sample and the maximum"
+      },
+      "cpu": {
+        "samples": 126,
+        "average_ms": 3.4226536296296297,
+        "min_ms": 0.24354133333333333,
+        "max_ms": 6.091008,
+        "p50_ms": 3.5775573333333335,
+        "p95_ms": 5.93312,
+        "p99_ms": 6.055637333333333,
+        "over_budget_samples": 0,
+        "quantile_method": "nearest rank; acceptance uses every sample and the maximum"
+      }
+    },
+    "publication": {
+      "frames": 33,
+      "elapsed": {
+        "samples": 33,
+        "average_ms": 6.424345858585858,
+        "min_ms": 4.75392,
+        "max_ms": 9.161877333333333,
+        "p50_ms": 6.531285333333333,
+        "p95_ms": 8.738730666666667,
+        "p99_ms": 9.161877333333333,
+        "over_budget_samples": 0,
+        "quantile_method": "nearest rank; acceptance uses every sample and the maximum"
+      },
+      "cpu": {
+        "samples": 33,
+        "average_ms": 6.241206303030303,
+        "min_ms": 4.75392,
+        "max_ms": 7.528064,
+        "p50_ms": 6.464405333333334,
+        "p95_ms": 7.504810666666667,
+        "p99_ms": 7.528064,
+        "over_budget_samples": 0,
+        "quantile_method": "nearest rank; acceptance uses every sample and the maximum"
+      }
+    }
+  },
+  "worst_frames": [
+    {
+      "frame_ticks": 1482332,
+      "interval_ticks": 1441199,
+      "service_ticks": 269436,
+      "service_cpu_ticks": 269436,
+      "render_ticks": 252633,
+      "dt_ticks": 1441199,
+      "sim_before": 2720,
+      "sim_after": 2722,
+      "accumulator_ticks": 42078,
+      "dropped_ticks": 0,
+      "stage": 1,
+      "resident_mask": 353,
+      "heap_used": 2011784,
+      "blocked_ticks": 0,
+      "route_wait": 0,
+      "seq": 2706,
+      "epoch": 0,
+      "simulation_steps": 2,
+      "dropped_delta_ticks": 0,
+      "latest_checkpoint": "door_closed",
+      "dt_matches_wall": true
+    },
+    {
+      "frame_ticks": 1472907,
+      "interval_ticks": 1165152,
+      "service_ticks": 270922,
+      "service_cpu_ticks": 270922,
+      "render_ticks": 343617,
+      "dt_ticks": 1165152,
+      "sim_before": 348,
+      "sim_after": 350,
+      "accumulator_ticks": 137554,
+      "dropped_ticks": 0,
+      "stage": 1,
+      "resident_mask": 357,
+      "heap_used": 1963696,
+      "blocked_ticks": 0,
+      "route_wait": 0,
+      "seq": 350,
+      "epoch": 0,
+      "simulation_steps": 2,
+      "dropped_delta_ticks": 0,
+      "latest_checkpoint": "street_center",
+      "dt_matches_wall": true
+    },
+    {
+      "frame_ticks": 1344744,
+      "interval_ticks": 1445587,
+      "service_ticks": 269210,
+      "service_cpu_ticks": 269210,
+      "render_ticks": 229534,
+      "dt_ticks": 1445587,
+      "sim_before": 350,
+      "sim_after": 352,
+      "accumulator_ticks": 20641,
+      "dropped_ticks": 0,
+      "stage": 1,
+      "resident_mask": 357,
+      "heap_used": 1963696,
+      "blocked_ticks": 0,
+      "route_wait": 0,
+      "seq": 351,
+      "epoch": 0,
+      "simulation_steps": 2,
+      "dropped_delta_ticks": 0,
+      "latest_checkpoint": "ramp_start",
+      "dt_matches_wall": true
+    },
+    {
+      "frame_ticks": 992580,
+      "interval_ticks": 1431643,
+      "service_ticks": 272396,
+      "service_cpu_ticks": 272396,
+      "render_ticks": 238072,
+      "dt_ticks": 1431643,
+      "sim_before": 484,
+      "sim_after": 485,
+      "accumulator_ticks": 747245,
+      "dropped_ticks": 0,
+      "stage": 1,
+      "resident_mask": 101,
+      "heap_used": 2011584,
+      "blocked_ticks": 0,
+      "route_wait": 0,
+      "seq": 478,
+      "epoch": 0,
+      "simulation_steps": 1,
+      "dropped_delta_ticks": 0,
+      "latest_checkpoint": "ramp_start",
+      "dt_matches_wall": true
+    },
+    {
+      "frame_ticks": 1430713,
+      "interval_ticks": 1109070,
+      "service_ticks": 269773,
+      "service_cpu_ticks": 269773,
+      "render_ticks": 258922,
+      "dt_ticks": 1109070,
+      "sim_before": 2723,
+      "sim_after": 2725,
+      "accumulator_ticks": 140568,
+      "dropped_ticks": 0,
+      "stage": 1,
+      "resident_mask": 353,
+      "heap_used": 2011784,
+      "blocked_ticks": 0,
+      "route_wait": 0,
+      "seq": 2708,
+      "epoch": 0,
+      "simulation_steps": 2,
+      "dropped_delta_ticks": 0,
+      "latest_checkpoint": "door_closed",
+      "dt_matches_wall": true
+    },
+    {
+      "frame_ticks": 1370350,
+      "interval_ticks": 1430356,
+      "service_ticks": 269688,
+      "service_cpu_ticks": 269688,
+      "render_ticks": 220342,
+      "dt_ticks": 1430356,
+      "sim_before": 2725,
+      "sim_after": 2727,
+      "accumulator_ticks": 8424,
+      "dropped_ticks": 0,
+      "stage": 1,
+      "resident_mask": 353,
+      "heap_used": 2011784,
+      "blocked_ticks": 0,
+      "route_wait": 0,
+      "seq": 2709,
+      "epoch": 0,
+      "simulation_steps": 2,
+      "dropped_delta_ticks": 0,
+      "latest_checkpoint": "door_closed",
+      "dt_matches_wall": true
+    },
+    {
+      "frame_ticks": 1335585,
+      "interval_ticks": 1417206,
+      "service_ticks": 13784,
+      "service_cpu_ticks": 13784,
+      "render_ticks": 520033,
+      "dt_ticks": 1417206,
+      "sim_before": 369,
+      "sim_after": 371,
+      "accumulator_ticks": 86982,
+      "dropped_ticks": 0,
+      "stage": 0,
+      "resident_mask": 357,
+      "heap_used": 2011584,
+      "blocked_ticks": 0,
+      "route_wait": 0,
+      "seq": 365,
+      "epoch": 0,
+      "simulation_steps": 2,
+      "dropped_delta_ticks": 0,
+      "latest_checkpoint": "ramp_start",
+      "dt_matches_wall": true
+    },
+    {
+      "frame_ticks": 1408041,
+      "interval_ticks": 1167552,
+      "service_ticks": 270160,
+      "service_cpu_ticks": 270160,
+      "render_ticks": 270892,
+      "dt_ticks": 1167552,
+      "sim_before": 2732,
+      "sim_after": 2734,
+      "accumulator_ticks": 275146,
+      "dropped_ticks": 0,
+      "stage": 1,
+      "resident_mask": 353,
+      "heap_used": 2011784,
+      "blocked_ticks": 0,
+      "route_wait": 0,
+      "seq": 2714,
+      "epoch": 0,
+      "simulation_steps": 2,
+      "dropped_delta_ticks": 0,
+      "latest_checkpoint": "door_closed",
+      "dt_matches_wall": true
+    },
+    {
+      "frame_ticks": 1400964,
+      "interval_ticks": 1393391,
+      "service_ticks": 13655,
+      "service_cpu_ticks": 13655,
+      "render_ticks": 558528,
+      "dt_ticks": 1393391,
+      "sim_before": 367,
+      "sim_after": 369,
+      "accumulator_ticks": 232276,
+      "dropped_ticks": 0,
+      "stage": 0,
+      "resident_mask": 357,
+      "heap_used": 2011584,
+      "blocked_ticks": 0,
+      "route_wait": 0,
+      "seq": 364,
+      "epoch": 0,
+      "simulation_steps": 2,
+      "dropped_delta_ticks": 0,
+      "latest_checkpoint": "ramp_start",
+      "dt_matches_wall": true
+    },
+    {
+      "frame_ticks": 1398341,
+      "interval_ticks": 1091586,
+      "service_ticks": 271799,
+      "service_cpu_ticks": 271799,
+      "render_ticks": 414644,
+      "dt_ticks": 1091586,
+      "sim_before": 482,
+      "sim_after": 484,
+      "accumulator_ticks": 96852,
+      "dropped_ticks": 0,
+      "stage": 1,
+      "resident_mask": 101,
+      "heap_used": 2011584,
+      "blocked_ticks": 0,
+      "route_wait": 0,
+      "seq": 477,
+      "epoch": 0,
+      "simulation_steps": 2,
+      "dropped_delta_ticks": 0,
+      "latest_checkpoint": "ramp_start",
+      "dt_matches_wall": true
+    },
+    {
+      "frame_ticks": 1394294,
+      "interval_ticks": 947858,
+      "service_ticks": 270040,
+      "service_cpu_ticks": 270040,
+      "render_ticks": 225648,
+      "dt_ticks": 947858,
+      "sim_before": 2718,
+      "sim_after": 2720,
+      "accumulator_ticks": 163379,
+      "dropped_ticks": 0,
+      "stage": 1,
+      "resident_mask": 353,
+      "heap_used": 2011784,
+      "blocked_ticks": 0,
+      "route_wait": 0,
+      "seq": 2705,
+      "epoch": 0,
+      "simulation_steps": 2,
+      "dropped_delta_ticks": 0,
+      "latest_checkpoint": "door_closed",
+      "dt_matches_wall": true
+    },
+    {
+      "frame_ticks": 1156489,
+      "interval_ticks": 1391697,
+      "service_ticks": 269049,
+      "service_cpu_ticks": 269049,
+      "render_ticks": 356653,
+      "dt_ticks": 1391697,
+      "sim_before": 2731,
+      "sim_after": 2732,
+      "accumulator_ticks": 670094,
+      "dropped_ticks": 0,
+      "stage": 1,
+      "resident_mask": 353,
+      "heap_used": 2011784,
+      "blocked_ticks": 0,
+      "route_wait": 0,
+      "seq": 2713,
+      "epoch": 0,
+      "simulation_steps": 1,
+      "dropped_delta_ticks": 0,
+      "latest_checkpoint": "door_closed",
+      "dt_matches_wall": true
+    }
+  ],
+  "worst_service_frames": [
+    {
+      "frame_ticks": 892744,
+      "interval_ticks": 983999,
+      "service_ticks": 352878,
+      "service_cpu_ticks": 352878,
+      "render_ticks": 253159,
+      "dt_ticks": 983999,
+      "sim_before": 2294,
+      "sim_after": 2295,
+      "accumulator_ticks": 737682,
+      "dropped_ticks": 0,
+      "stage": 3,
+      "resident_mask": 140,
+      "heap_used": 1925320,
+      "blocked_ticks": 0,
+      "route_wait": 0,
+      "seq": 2282,
+      "epoch": 0,
+      "simulation_steps": 1,
+      "dropped_delta_ticks": 0,
+      "latest_checkpoint": "west_return",
+      "dt_matches_wall": true
+    },
+    {
+      "frame_ticks": 908107,
+      "interval_ticks": 557335,
+      "service_ticks": 351788,
+      "service_cpu_ticks": 351788,
+      "render_ticks": 440857,
+      "dt_ticks": 557335,
+      "sim_before": 1508,
+      "sim_after": 1509,
+      "accumulator_ticks": 300540,
+      "dropped_ticks": 0,
+      "stage": 3,
+      "resident_mask": 140,
+      "heap_used": 1925400,
+      "blocked_ticks": 0,
+      "route_wait": 0,
+      "seq": 1498,
+      "epoch": 0,
+      "simulation_steps": 1,
+      "dropped_delta_ticks": 0,
+      "latest_checkpoint": "courtyard_after_east",
+      "dt_matches_wall": true
+    },
+    {
+      "frame_ticks": 859449,
+      "interval_ticks": 612779,
+      "service_ticks": 350779,
+      "service_cpu_ticks": 350779,
+      "render_ticks": 420181,
+      "dt_ticks": 612779,
+      "sim_before": 1401,
+      "sim_after": 1402,
+      "accumulator_ticks": 71638,
+      "dropped_ticks": 0,
+      "stage": 3,
+      "resident_mask": 140,
+      "heap_used": 1925400,
+      "blocked_ticks": 0,
+      "route_wait": 0,
+      "seq": 1391,
+      "epoch": 0,
+      "simulation_steps": 1,
+      "dropped_delta_ticks": 0,
+      "latest_checkpoint": "courtyard_east_back",
+      "dt_matches_wall": true
+    },
+    {
+      "frame_ticks": 990485,
+      "interval_ticks": 635083,
+      "service_ticks": 347693,
+      "service_cpu_ticks": 347693,
+      "render_ticks": 491097,
+      "dt_ticks": 635083,
+      "sim_before": 3225,
+      "sim_after": 3226,
+      "accumulator_ticks": 351361,
+      "dropped_ticks": 0,
+      "stage": 3,
+      "resident_mask": 3,
+      "heap_used": 1906128,
+      "blocked_ticks": 0,
+      "route_wait": 0,
+      "seq": 3203,
+      "epoch": 0,
+      "simulation_steps": 1,
+      "dropped_delta_ticks": 0,
+      "latest_checkpoint": "east_street",
+      "dt_matches_wall": true
+    },
+    {
+      "frame_ticks": 960884,
+      "interval_ticks": 537707,
+      "service_ticks": 340673,
+      "service_cpu_ticks": 340673,
+      "render_ticks": 359343,
+      "dt_ticks": 537707,
+      "sim_before": 495,
+      "sim_after": 496,
+      "accumulator_ticks": 202573,
+      "dropped_ticks": 0,
+      "stage": 3,
+      "resident_mask": 101,
+      "heap_used": 1924224,
+      "blocked_ticks": 0,
+      "route_wait": 0,
+      "seq": 487,
+      "epoch": 0,
+      "simulation_steps": 1,
+      "dropped_delta_ticks": 0,
+      "latest_checkpoint": "ramp_top",
+      "dt_matches_wall": true
+    },
+    {
+      "frame_ticks": 1199610,
+      "interval_ticks": 858699,
+      "service_ticks": 334815,
+      "service_cpu_ticks": 334815,
+      "render_ticks": 367482,
+      "dt_ticks": 858699,
+      "sim_before": 2740,
+      "sim_after": 2741,
+      "accumulator_ticks": 347174,
+      "dropped_ticks": 0,
+      "stage": 3,
+      "resident_mask": 353,
+      "heap_used": 1963976,
+      "blocked_ticks": 0,
+      "route_wait": 0,
+      "seq": 2719,
+      "epoch": 0,
+      "simulation_steps": 1,
+      "dropped_delta_ticks": 0,
+      "latest_checkpoint": "door_closed",
+      "dt_matches_wall": true
+    },
+    {
+      "frame_ticks": 849702,
+      "interval_ticks": 1048841,
+      "service_ticks": 331200,
+      "service_cpu_ticks": 331200,
+      "render_ticks": 248513,
+      "dt_ticks": 1048841,
+      "sim_before": 1867,
+      "sim_after": 1868,
+      "accumulator_ticks": 592050,
+      "dropped_ticks": 0,
+      "stage": 3,
+      "resident_mask": 136,
+      "heap_used": 1877512,
+      "blocked_ticks": 0,
+      "route_wait": 0,
+      "seq": 1856,
+      "epoch": 0,
+      "simulation_steps": 1,
+      "dropped_delta_ticks": 0,
+      "latest_checkpoint": "next_west_crossed",
+      "dt_matches_wall": true
+    },
+    {
+      "frame_ticks": 984826,
+      "interval_ticks": 792546,
+      "service_ticks": 325156,
+      "service_cpu_ticks": 325156,
+      "render_ticks": 304714,
+      "dt_ticks": 792546,
+      "sim_before": 2929,
+      "sim_after": 2930,
+      "accumulator_ticks": 65310,
+      "dropped_ticks": 0,
+      "stage": 3,
+      "resident_mask": 257,
+      "heap_used": 1908872,
+      "blocked_ticks": 0,
+      "route_wait": 0,
+      "seq": 2907,
+      "epoch": 0,
+      "simulation_steps": 1,
+      "dropped_delta_ticks": 0,
+      "latest_checkpoint": "street_return",
+      "dt_matches_wall": true
+    },
+    {
+      "frame_ticks": 1258509,
+      "interval_ticks": 638943,
+      "service_ticks": 322457,
+      "service_cpu_ticks": 322457,
+      "render_ticks": 526268,
+      "dt_ticks": 638943,
+      "sim_before": 366,
+      "sim_after": 367,
+      "accumulator_ticks": 401385,
+      "dropped_ticks": 0,
+      "stage": 3,
+      "resident_mask": 357,
+      "heap_used": 2011584,
+      "blocked_ticks": 0,
+      "route_wait": 0,
+      "seq": 363,
+      "epoch": 0,
+      "simulation_steps": 1,
+      "dropped_delta_ticks": 0,
+      "latest_checkpoint": "ramp_start",
+      "dt_matches_wall": true
+    },
+    {
+      "frame_ticks": 1161036,
+      "interval_ticks": 561701,
+      "service_ticks": 321682,
+      "service_cpu_ticks": 321682,
+      "render_ticks": 677900,
+      "dt_ticks": 561701,
+      "sim_before": 2960,
+      "sim_after": 2961,
+      "accumulator_ticks": 473576,
+      "dropped_ticks": 0,
+      "stage": 3,
+      "resident_mask": 259,
+      "heap_used": 1993568,
+      "blocked_ticks": 0,
+      "route_wait": 0,
+      "seq": 2939,
+      "epoch": 0,
+      "simulation_steps": 1,
+      "dropped_delta_ticks": 0,
+      "latest_checkpoint": "street_return",
+      "dt_matches_wall": true
+    },
+    {
+      "frame_ticks": 947130,
+      "interval_ticks": 594096,
+      "service_ticks": 320361,
+      "service_cpu_ticks": 320361,
+      "render_ticks": 506229,
+      "dt_ticks": 594096,
+      "sim_before": 2100,
+      "sim_after": 2101,
+      "accumulator_ticks": 93733,
+      "dropped_ticks": 0,
+      "stage": 3,
+      "resident_mask": 904,
+      "heap_used": 2011720,
+      "blocked_ticks": 0,
+      "route_wait": 0,
+      "seq": 2088,
+      "epoch": 0,
+      "simulation_steps": 1,
+      "dropped_delta_ticks": 0,
+      "latest_checkpoint": "west_approach",
+      "dt_matches_wall": true
+    },
+    {
+      "frame_ticks": 990335,
+      "interval_ticks": 540872,
+      "service_ticks": 429463,
+      "service_cpu_ticks": 319812,
+      "render_ticks": 529526,
+      "dt_ticks": 540872,
+      "sim_before": 2666,
+      "sim_after": 2666,
+      "accumulator_ticks": 661994,
+      "dropped_ticks": 0,
+      "stage": 3,
+      "resident_mask": 357,
+      "heap_used": 2011784,
+      "blocked_ticks": 0,
+      "route_wait": 0,
+      "seq": 2652,
+      "epoch": 0,
+      "simulation_steps": 0,
+      "dropped_delta_ticks": 0,
+      "latest_checkpoint": "door_closed",
+      "dt_matches_wall": true
+    }
+  ],
+  "peak_heap_bytes": 2059600,
+  "dt_mismatch_frames": 0,
+  "dropped_ticks": 0,
+  "loading_barriers": {
+    "blocked_ticks": 0,
+    "blocked_frames": 0,
+    "episodes": [],
+    "max_episode_wall_ms": 0,
+    "max_frame_blocked_ticks": 0,
+    "scope": "Requested movement/jump suppressed by stream filtering; zero-step frames between blocked ticks remain in the same episode; physical walls and route holds are separate"
+  },
+  "route_waits": {
+    "admission_frames": 178,
+    "loading_frames": 0,
+    "loading_wall_ms": 0.0,
+    "loading_episodes": [],
+    "max_loading_episode_ms": 0,
+    "interaction_frames": 0,
+    "scope": "Initial/restart admission reported separately; ordinary walking has no readiness waits or waypoint dwell"
+  },
+  "heap_headroom_bytes": 5160048,
+  "failures": [],
+  "functional": {
+    "passed": true,
+    "functional_passed": true,
+    "checkpoints": [
+      {
+        "checkpoint": "start",
+        "epoch": 0,
+        "tick": 86,
+        "elapsed": 1.4333,
+        "player": [
+          -6.522,
+          -2.4384,
+          49.8253
+        ],
+        "grounded": 1,
+        "vertical_velocity": 0.0,
+        "jump_inputs": 0,
+        "collision_clear": 1,
+        "heap_used": 1908416,
+        "models": 32,
+        "triangles": 593,
+        "colliders": 166,
+        "floors": 8,
+        "textures": 48,
+        "door_index": 0,
+        "door_open": 0,
+        "loot_index": 1,
+        "loot_home": 3,
+        "loot_value": 0,
+        "collected_objects": 0,
+        "loot_retired": 0,
+        "loot_reloaded": 0,
+        "stream": {
+          "current": 9,
+          "resident": [
+            1,
+            9
+          ],
+          "view": [
+            1,
+            9
+          ],
+          "slots": 5,
+          "settled": 1,
+          "reserved": 82524,
+          "allocated": 273680,
+          "completed_loads": 2,
+          "retired": 0,
+          "readbytes": 82524,
+          "stalls": 2480
+        }
+      },
+      {
+        "checkpoint": "street_center",
+        "epoch": 0,
+        "tick": 276,
+        "elapsed": 4.6,
+        "player": [
+          -0.0052,
+          -2.4384,
+          48.5011
+        ],
+        "grounded": 1,
+        "vertical_velocity": 0.0,
+        "jump_inputs": 0,
+        "collision_clear": 1,
+        "heap_used": 1908416,
+        "models": 32,
+        "triangles": 593,
+        "colliders": 166,
+        "floors": 8,
+        "textures": 48,
+        "door_index": 0,
+        "door_open": 0,
+        "loot_index": 1,
+        "loot_home": 3,
+        "loot_value": 0,
+        "collected_objects": 0,
+        "loot_retired": 0,
+        "loot_reloaded": 0,
+        "stream": {
+          "current": 1,
+          "resident": [
+            1,
+            9,
+            2
+          ],
+          "view": [
+            1,
+            9
+          ],
+          "slots": 5,
+          "settled": 0,
+          "reserved": 136652,
+          "allocated": 273680,
+          "completed_loads": 5,
+          "retired": 2,
+          "readbytes": 173580,
+          "stalls": 2494
+        }
+      },
+      {
+        "checkpoint": "ramp_start",
+        "epoch": 0,
+        "tick": 350,
+        "elapsed": 5.8333,
+        "player": [
+          0.0,
+          -2.351,
+          45.98
+        ],
+        "grounded": 1,
+        "vertical_velocity": 0.0,
+        "jump_inputs": 0,
+        "collision_clear": 1,
+        "heap_used": 1963696,
+        "models": 43,
+        "triangles": 855,
+        "colliders": 235,
+        "floors": 24,
+        "textures": 48,
+        "door_index": 0,
+        "door_open": 0,
+        "loot_index": 1,
+        "loot_home": 3,
+        "loot_value": 0,
+        "collected_objects": 0,
+        "loot_retired": 0,
+        "loot_reloaded": 0,
+        "stream": {
+          "current": 6,
+          "resident": [
+            1,
+            9,
+            3,
+            6,
+            7
+          ],
+          "view": [
+            1,
+            6,
+            7,
+            9
+          ],
+          "slots": 5,
+          "settled": 0,
+          "reserved": 149924,
+          "allocated": 273680,
+          "completed_loads": 8,
+          "retired": 3,
+          "readbytes": 240980,
+          "stalls": 2511
+        }
+      },
+      {
+        "checkpoint": "ramp_top",
+        "epoch": 0,
+        "tick": 495,
+        "elapsed": 8.25,
+        "player": [
+          0.0,
+          -1.0996,
+          40.9745
+        ],
+        "grounded": 1,
+        "vertical_velocity": 0.0,
+        "jump_inputs": 0,
+        "collision_clear": 1,
+        "heap_used": 2011584,
+        "models": 49,
+        "triangles": 1077,
+        "colliders": 259,
+        "floors": 50,
+        "textures": 48,
+        "door_index": 0,
+        "door_open": 0,
+        "loot_index": 1,
+        "loot_home": 3,
+        "loot_value": 0,
+        "collected_objects": 0,
+        "loot_retired": 0,
+        "loot_reloaded": 0,
+        "stream": {
+          "current": 7,
+          "resident": [
+            1,
+            3,
+            6,
+            7
+          ],
+          "view": [
+            1,
+            3,
+            6,
+            7,
+            9
+          ],
+          "slots": 5,
+          "settled": 0,
+          "reserved": 95188,
+          "allocated": 273680,
+          "completed_loads": 8,
+          "retired": 4,
+          "readbytes": 240980,
+          "stalls": 2511
+        }
+      },
+      {
+        "checkpoint": "jump1_takeoff",
+        "epoch": 0,
+        "tick": 496,
+        "elapsed": 8.2666,
+        "player": [
+          0.0,
+          -1.0935,
+          40.95
+        ],
+        "grounded": 1,
+        "vertical_velocity": 0.0,
+        "jump_inputs": 1,
+        "collision_clear": 1,
+        "heap_used": 1924224,
+        "models": 30,
+        "triangles": 679,
+        "colliders": 172,
+        "floors": 42,
+        "textures": 48,
+        "door_index": 0,
+        "door_open": 0,
+        "loot_index": 1,
+        "loot_home": 3,
+        "loot_value": 0,
+        "collected_objects": 0,
+        "loot_retired": 0,
+        "loot_reloaded": 0,
+        "stream": {
+          "current": 7,
+          "resident": [
+            1,
+            3,
+            6,
+            7
+          ],
+          "view": [
+            1,
+            3,
+            6,
+            7
+          ],
+          "slots": 5,
+          "settled": 0,
+          "reserved": 95188,
+          "allocated": 273680,
+          "completed_loads": 8,
+          "retired": 4,
+          "readbytes": 240980,
+          "stalls": 2511
+        }
+      },
+      {
+        "checkpoint": "jump1_air",
+        "epoch": 0,
+        "tick": 497,
+        "elapsed": 8.2833,
+        "player": [
+          0.0,
+          -1.0193,
+          40.9325
+        ],
+        "grounded": 0,
+        "vertical_velocity": 4.4,
+        "jump_inputs": 1,
+        "collision_clear": 1,
+        "heap_used": 1924224,
+        "models": 30,
+        "triangles": 679,
+        "colliders": 172,
+        "floors": 42,
+        "textures": 48,
+        "door_index": 0,
+        "door_open": 0,
+        "loot_index": 1,
+        "loot_home": 3,
+        "loot_value": 0,
+        "collected_objects": 0,
+        "loot_retired": 0,
+        "loot_reloaded": 0,
+        "stream": {
+          "current": 7,
+          "resident": [
+            1,
+            3,
+            6,
+            7
+          ],
+          "view": [
+            1,
+            3,
+            6,
+            7
+          ],
+          "slots": 5,
+          "settled": 0,
+          "reserved": 129124,
+          "allocated": 273680,
+          "completed_loads": 8,
+          "retired": 4,
+          "readbytes": 240980,
+          "stalls": 2512
+        }
+      },
+      {
+        "checkpoint": "first_stair",
+        "epoch": 0,
+        "tick": 534,
+        "elapsed": 8.9,
+        "player": [
+          0.0,
+          -0.6096,
+          40.4684
+        ],
+        "grounded": 1,
+        "vertical_velocity": 0.0,
+        "jump_inputs": 1,
+        "collision_clear": 1,
+        "heap_used": 1974176,
+        "models": 34,
+        "triangles": 927,
+        "colliders": 214,
+        "floors": 58,
+        "textures": 48,
+        "door_index": 0,
+        "door_open": 0,
+        "loot_index": 1,
+        "loot_home": 3,
+        "loot_value": 0,
+        "collected_objects": 0,
+        "loot_retired": 0,
+        "loot_reloaded": 0,
+        "stream": {
+          "current": 7,
+          "resident": [
+            1,
+            8,
+            3,
+            6,
+            7
+          ],
+          "view": [
+            1,
+            3,
+            6,
+            7,
+            8
+          ],
+          "slots": 5,
+          "settled": 1,
+          "reserved": 129124,
+          "allocated": 273680,
+          "completed_loads": 9,
+          "retired": 4,
+          "readbytes": 274916,
+          "stalls": 2516
+        }
+      },
+      {
+        "checkpoint": "door_open",
+        "epoch": 0,
+        "tick": 536,
+        "elapsed": 8.9333,
+        "player": [
+          0.0,
+          -0.6096,
+          40.4684
+        ],
+        "grounded": 1,
+        "vertical_velocity": 0.0,
+        "jump_inputs": 1,
+        "collision_clear": 1,
+        "heap_used": 1974176,
+        "models": 34,
+        "triangles": 927,
+        "colliders": 214,
+        "floors": 58,
+        "textures": 48,
+        "door_index": 0,
+        "door_open": 1,
+        "loot_index": 1,
+        "loot_home": 3,
+        "loot_value": 0,
+        "collected_objects": 0,
+        "loot_retired": 0,
+        "loot_reloaded": 0,
+        "stream": {
+          "current": 7,
+          "resident": [
+            1,
+            8,
+            3,
+            6,
+            7
+          ],
+          "view": [
+            1,
+            3,
+            6,
+            7,
+            8
+          ],
+          "slots": 5,
+          "settled": 1,
+          "reserved": 129124,
+          "allocated": 273680,
+          "completed_loads": 9,
+          "retired": 4,
+          "readbytes": 274916,
+          "stalls": 2516
+        }
+      },
+      {
+        "checkpoint": "jump2_takeoff",
+        "epoch": 0,
+        "tick": 538,
+        "elapsed": 8.9666,
+        "player": [
+          0.0,
+          -0.6096,
+          40.4684
+        ],
+        "grounded": 1,
+        "vertical_velocity": 0.0,
+        "jump_inputs": 2,
+        "collision_clear": 1,
+        "heap_used": 1974176,
+        "models": 34,
+        "triangles": 927,
+        "colliders": 214,
+        "floors": 58,
+        "textures": 48,
+        "door_index": 0,
+        "door_open": 1,
+        "loot_index": 1,
+        "loot_home": 3,
+        "loot_value": 0,
+        "collected_objects": 0,
+        "loot_retired": 0,
+        "loot_reloaded": 0,
+        "stream": {
+          "current": 7,
+          "resident": [
+            1,
+            8,
+            3,
+            6,
+            7
+          ],
+          "view": [
+            1,
+            3,
+            6,
+            7,
+            8
+          ],
+          "slots": 5,
+          "settled": 1,
+          "reserved": 129124,
+          "allocated": 273680,
+          "completed_loads": 9,
+          "retired": 4,
+          "readbytes": 274916,
+          "stalls": 2516
+        }
+      },
+      {
+        "checkpoint": "jump2_air",
+        "epoch": 0,
+        "tick": 539,
+        "elapsed": 8.9833,
+        "player": [
+          0.0,
+          -0.5354,
+          40.4334
+        ],
+        "grounded": 0,
+        "vertical_velocity": 4.4,
+        "jump_inputs": 2,
+        "collision_clear": 1,
+        "heap_used": 1974176,
+        "models": 34,
+        "triangles": 927,
+        "colliders": 214,
+        "floors": 58,
+        "textures": 48,
+        "door_index": 0,
+        "door_open": 1,
+        "loot_index": 1,
+        "loot_home": 3,
+        "loot_value": 0,
+        "collected_objects": 0,
+        "loot_retired": 0,
+        "loot_reloaded": 0,
+        "stream": {
+          "current": 7,
+          "resident": [
+            1,
+            8,
+            3,
+            6,
+            7
+          ],
+          "view": [
+            1,
+            3,
+            6,
+            7,
+            8
+          ],
+          "slots": 5,
+          "settled": 1,
+          "reserved": 129124,
+          "allocated": 273680,
+          "completed_loads": 9,
+          "retired": 4,
+          "readbytes": 274916,
+          "stalls": 2516
+        }
+      },
+      {
+        "checkpoint": "entrance",
+        "epoch": 0,
+        "tick": 574,
+        "elapsed": 9.5666,
+        "player": [
+          0.0,
+          0.0,
+          39.3111
+        ],
+        "grounded": 1,
+        "vertical_velocity": 0.0,
+        "jump_inputs": 2,
+        "collision_clear": 1,
+        "heap_used": 1974176,
+        "models": 34,
+        "triangles": 927,
+        "colliders": 214,
+        "floors": 58,
+        "textures": 48,
+        "door_index": 0,
+        "door_open": 1,
+        "loot_index": 1,
+        "loot_home": 3,
+        "loot_value": 0,
+        "collected_objects": 0,
+        "loot_retired": 0,
+        "loot_reloaded": 0,
+        "stream": {
+          "current": 7,
+          "resident": [
+            1,
+            8,
+            3,
+            6,
+            7
+          ],
+          "view": [
+            1,
+            3,
+            6,
+            7,
+            8
+          ],
+          "slots": 5,
+          "settled": 1,
+          "reserved": 129124,
+          "allocated": 273680,
+          "completed_loads": 9,
+          "retired": 4,
+          "readbytes": 274916,
+          "stalls": 2516
+        }
+      },
+      {
+        "checkpoint": "main_room",
+        "epoch": 0,
+        "tick": 708,
+        "elapsed": 11.7999,
+        "player": [
+          0.0,
+          0.0,
+          34.6206
+        ],
+        "grounded": 1,
+        "vertical_velocity": 0.0,
+        "jump_inputs": 2,
+        "collision_clear": 1,
+        "heap_used": 1964376,
+        "models": 20,
+        "triangles": 907,
+        "colliders": 174,
+        "floors": 54,
+        "textures": 48,
+        "door_index": 0,
+        "door_open": 1,
+        "loot_index": 1,
+        "loot_home": 3,
+        "loot_value": 0,
+        "collected_objects": 0,
+        "loot_retired": 0,
+        "loot_reloaded": 0,
+        "stream": {
+          "current": 3,
+          "resident": [
+            4,
+            8,
+            3,
+            7
+          ],
+          "view": [
+            3,
+            4,
+            7,
+            8
+          ],
+          "slots": 5,
+          "settled": 1,
+          "reserved": 124904,
+          "allocated": 273680,
+          "completed_loads": 10,
+          "retired": 6,
+          "readbytes": 309100,
+          "stalls": 2521
+        }
+      },
+      {
+        "checkpoint": "loot_collected",
+        "epoch": 0,
+        "tick": 710,
+        "elapsed": 11.8332,
+        "player": [
+          0.0,
+          0.0,
+          34.6
+        ],
+        "grounded": 1,
+        "vertical_velocity": 0.0,
+        "jump_inputs": 2,
+        "collision_clear": 1,
+        "heap_used": 1964376,
+        "models": 20,
+        "triangles": 907,
+        "colliders": 174,
+        "floors": 54,
+        "textures": 48,
+        "door_index": 0,
+        "door_open": 1,
+        "loot_index": 1,
+        "loot_home": 3,
+        "loot_value": 25,
+        "collected_objects": 2,
+        "loot_retired": 0,
+        "loot_reloaded": 0,
+        "stream": {
+          "current": 3,
+          "resident": [
+            4,
+            8,
+            3,
+            7
+          ],
+          "view": [
+            3,
+            4,
+            7,
+            8
+          ],
+          "slots": 5,
+          "settled": 1,
+          "reserved": 124904,
+          "allocated": 273680,
+          "completed_loads": 10,
+          "retired": 6,
+          "readbytes": 309100,
+          "stalls": 2521
+        }
+      },
+      {
+        "checkpoint": "west_exit",
+        "epoch": 0,
+        "tick": 785,
+        "elapsed": 13.0832,
+        "player": [
+          -2.2426,
+          0.0,
+          33.3043
+        ],
+        "grounded": 1,
+        "vertical_velocity": 0.0,
+        "jump_inputs": 2,
+        "collision_clear": 1,
+        "heap_used": 1964376,
+        "models": 20,
+        "triangles": 907,
+        "colliders": 174,
+        "floors": 54,
+        "textures": 48,
+        "door_index": 0,
+        "door_open": 1,
+        "loot_index": 1,
+        "loot_home": 3,
+        "loot_value": 25,
+        "collected_objects": 2,
+        "loot_retired": 0,
+        "loot_reloaded": 0,
+        "stream": {
+          "current": 3,
+          "resident": [
+            4,
+            8,
+            3,
+            7
+          ],
+          "view": [
+            3,
+            4,
+            7,
+            8
+          ],
+          "slots": 5,
+          "settled": 1,
+          "reserved": 124904,
+          "allocated": 273680,
+          "completed_loads": 10,
+          "retired": 6,
+          "readbytes": 309100,
+          "stalls": 2521
+        }
+      },
+      {
+        "checkpoint": "rear_entry",
+        "epoch": 0,
+        "tick": 817,
+        "elapsed": 13.6165,
+        "player": [
+          -2.25,
+          0.0,
+          32.2149
+        ],
+        "grounded": 1,
+        "vertical_velocity": 0.0,
+        "jump_inputs": 2,
+        "collision_clear": 1,
+        "heap_used": 1964376,
+        "models": 20,
+        "triangles": 907,
+        "colliders": 174,
+        "floors": 54,
+        "textures": 48,
+        "door_index": 0,
+        "door_open": 1,
+        "loot_index": 1,
+        "loot_home": 3,
+        "loot_value": 25,
+        "collected_objects": 2,
+        "loot_retired": 0,
+        "loot_reloaded": 0,
+        "stream": {
+          "current": 8,
+          "resident": [
+            4,
+            8,
+            3,
+            7
+          ],
+          "view": [
+            3,
+            4,
+            7,
+            8
+          ],
+          "slots": 5,
+          "settled": 1,
+          "reserved": 124904,
+          "allocated": 273680,
+          "completed_loads": 10,
+          "retired": 6,
+          "readbytes": 309100,
+          "stalls": 2521
+        }
+      },
+      {
+        "checkpoint": "courtyard",
+        "epoch": 0,
+        "tick": 886,
+        "elapsed": 14.7665,
+        "player": [
+          -2.25,
+          0.0,
+          29.82
+        ],
+        "grounded": 1,
+        "vertical_velocity": 0.0,
+        "jump_inputs": 2,
+        "collision_clear": 1,
+        "heap_used": 1925400,
+        "models": 14,
+        "triangles": 718,
+        "colliders": 126,
+        "floors": 48,
+        "textures": 48,
+        "door_index": 0,
+        "door_open": 1,
+        "loot_index": 1,
+        "loot_home": 3,
+        "loot_value": 25,
+        "collected_objects": 2,
+        "loot_retired": 0,
+        "loot_reloaded": 0,
+        "stream": {
+          "current": 8,
+          "resident": [
+            4,
+            8,
+            3
+          ],
+          "view": [
+            3,
+            4,
+            8
+          ],
+          "slots": 5,
+          "settled": 1,
+          "reserved": 98592,
+          "allocated": 273680,
+          "completed_loads": 10,
+          "retired": 7,
+          "readbytes": 309100,
+          "stalls": 2521
+        }
+      },
+      {
+        "checkpoint": "courtyard_east_approach",
+        "epoch": 0,
+        "tick": 1094,
+        "elapsed": 18.2331,
+        "player": [
+          4.995,
+          0.0,
+          29.8
+        ],
+        "grounded": 1,
+        "vertical_velocity": 0.0,
+        "jump_inputs": 2,
+        "collision_clear": 1,
+        "heap_used": 2054272,
+        "models": 45,
+        "triangles": 1296,
+        "colliders": 319,
+        "floors": 64,
+        "textures": 48,
+        "door_index": 0,
+        "door_open": 1,
+        "loot_index": 1,
+        "loot_home": 3,
+        "loot_value": 25,
+        "collected_objects": 2,
+        "loot_retired": 0,
+        "loot_reloaded": 0,
+        "stream": {
+          "current": 8,
+          "resident": [
+            4,
+            8,
+            3,
+            1,
+            2
+          ],
+          "view": [
+            1,
+            2,
+            3,
+            4,
+            8
+          ],
+          "slots": 5,
+          "settled": 1,
+          "reserved": 180508,
+          "allocated": 273680,
+          "completed_loads": 14,
+          "retired": 9,
+          "readbytes": 474576,
+          "stalls": 2564
+        }
+      },
+      {
+        "checkpoint": "courtyard_east_crossed",
+        "epoch": 0,
+        "tick": 1189,
+        "elapsed": 19.8165,
+        "player": [
+          5.0,
+          0.0,
+          33.0901
+        ],
+        "grounded": 1,
+        "vertical_velocity": 0.0,
+        "jump_inputs": 2,
+        "collision_clear": 1,
+        "heap_used": 2054272,
+        "models": 45,
+        "triangles": 1296,
+        "colliders": 319,
+        "floors": 64,
+        "textures": 48,
+        "door_index": 0,
+        "door_open": 1,
+        "loot_index": 1,
+        "loot_home": 3,
+        "loot_value": 25,
+        "collected_objects": 2,
+        "loot_retired": 0,
+        "loot_reloaded": 0,
+        "stream": {
+          "current": 2,
+          "resident": [
+            4,
+            8,
+            3,
+            1,
+            2
+          ],
+          "view": [
+            1,
+            2,
+            3,
+            4,
+            8
+          ],
+          "slots": 5,
+          "settled": 1,
+          "reserved": 180508,
+          "allocated": 273680,
+          "completed_loads": 14,
+          "retired": 9,
+          "readbytes": 474576,
+          "stalls": 2564
+        }
+      },
+      {
+        "checkpoint": "courtyard_east_back",
+        "epoch": 0,
+        "tick": 1285,
+        "elapsed": 21.4164,
+        "player": [
+          5.0,
+          0.0,
+          29.8
+        ],
+        "grounded": 1,
+        "vertical_velocity": 0.0,
+        "jump_inputs": 2,
+        "collision_clear": 1,
+        "heap_used": 2054272,
+        "models": 45,
+        "triangles": 1296,
+        "colliders": 319,
+        "floors": 64,
+        "textures": 48,
+        "door_index": 0,
+        "door_open": 1,
+        "loot_index": 1,
+        "loot_home": 3,
+        "loot_value": 25,
+        "collected_objects": 2,
+        "loot_retired": 0,
+        "loot_reloaded": 0,
+        "stream": {
+          "current": 2,
+          "resident": [
+            4,
+            8,
+            3,
+            1,
+            2
+          ],
+          "view": [
+            1,
+            2,
+            3,
+            4,
+            8
+          ],
+          "slots": 5,
+          "settled": 1,
+          "reserved": 180508,
+          "allocated": 273680,
+          "completed_loads": 14,
+          "retired": 9,
+          "readbytes": 474576,
+          "stalls": 2564
+        }
+      },
+      {
+        "checkpoint": "courtyard_after_east",
+        "epoch": 0,
+        "tick": 1492,
+        "elapsed": 24.8664,
+        "player": [
+          -2.245,
+          0.0,
+          29.8
+        ],
+        "grounded": 1,
+        "vertical_velocity": 0.0,
+        "jump_inputs": 2,
+        "collision_clear": 1,
+        "heap_used": 2059600,
+        "models": 46,
+        "triangles": 1322,
+        "colliders": 277,
+        "floors": 58,
+        "textures": 48,
+        "door_index": 0,
+        "door_open": 1,
+        "loot_index": 1,
+        "loot_home": 3,
+        "loot_value": 25,
+        "collected_objects": 2,
+        "loot_retired": 0,
+        "loot_reloaded": 0,
+        "stream": {
+          "current": 8,
+          "resident": [
+            4,
+            8,
+            3,
+            9,
+            10
+          ],
+          "view": [
+            3,
+            4,
+            8,
+            9,
+            10
+          ],
+          "slots": 5,
+          "settled": 1,
+          "reserved": 182152,
+          "allocated": 273680,
+          "completed_loads": 16,
+          "retired": 11,
+          "readbytes": 558136,
+          "stalls": 2583
+        }
+      },
+      {
+        "checkpoint": "next_approach",
+        "epoch": 0,
+        "tick": 1597,
+        "elapsed": 26.6163,
+        "player": [
+          -1.2041,
+          0.0,
+          26.3135
+        ],
+        "grounded": 1,
+        "vertical_velocity": 0.0,
+        "jump_inputs": 2,
+        "collision_clear": 1,
+        "heap_used": 1925400,
+        "models": 14,
+        "triangles": 718,
+        "colliders": 126,
+        "floors": 48,
+        "textures": 48,
+        "door_index": 0,
+        "door_open": 1,
+        "loot_index": 1,
+        "loot_home": 3,
+        "loot_value": 25,
+        "collected_objects": 2,
+        "loot_retired": 0,
+        "loot_reloaded": 0,
+        "stream": {
+          "current": 4,
+          "resident": [
+            4,
+            8,
+            3
+          ],
+          "view": [
+            3,
+            4,
+            8
+          ],
+          "slots": 5,
+          "settled": 1,
+          "reserved": 98592,
+          "allocated": 273680,
+          "completed_loads": 16,
+          "retired": 13,
+          "readbytes": 558136,
+          "stalls": 2583
+        }
+      },
+      {
+        "checkpoint": "next_deep",
+        "epoch": 0,
+        "tick": 1666,
+        "elapsed": 27.7663,
+        "player": [
+          -1.2,
+          0.0,
+          23.92
+        ],
+        "grounded": 1,
+        "vertical_velocity": 0.0,
+        "jump_inputs": 2,
+        "collision_clear": 1,
+        "heap_used": 1925400,
+        "models": 14,
+        "triangles": 718,
+        "colliders": 126,
+        "floors": 48,
+        "textures": 48,
+        "door_index": 0,
+        "door_open": 1,
+        "loot_index": 1,
+        "loot_home": 3,
+        "loot_value": 25,
+        "collected_objects": 2,
+        "loot_retired": 1,
+        "loot_reloaded": 0,
+        "stream": {
+          "current": 4,
+          "resident": [
+            4,
+            8
+          ],
+          "view": [
+            3,
+            4,
+            8
+          ],
+          "slots": 5,
+          "settled": 0,
+          "reserved": 151680,
+          "allocated": 273680,
+          "completed_loads": 16,
+          "retired": 14,
+          "readbytes": 558136,
+          "stalls": 2585
+        }
+      },
+      {
+        "checkpoint": "next_west_approach",
+        "epoch": 0,
+        "tick": 1740,
+        "elapsed": 28.9996,
+        "player": [
+          -1.2,
+          0.0,
+          26.5
+        ],
+        "grounded": 1,
+        "vertical_velocity": 0.0,
+        "jump_inputs": 2,
+        "collision_clear": 1,
+        "heap_used": 1925320,
+        "models": 14,
+        "triangles": 718,
+        "colliders": 126,
+        "floors": 48,
+        "textures": 48,
+        "door_index": 0,
+        "door_open": 1,
+        "loot_index": 1,
+        "loot_home": 3,
+        "loot_value": 25,
+        "collected_objects": 2,
+        "loot_retired": 1,
+        "loot_reloaded": 1,
+        "stream": {
+          "current": 4,
+          "resident": [
+            4,
+            8,
+            3
+          ],
+          "view": [
+            3,
+            4,
+            8
+          ],
+          "slots": 5,
+          "settled": 1,
+          "reserved": 98592,
+          "allocated": 273680,
+          "completed_loads": 17,
+          "retired": 14,
+          "readbytes": 604992,
+          "stalls": 2593
+        }
+      },
+      {
+        "checkpoint": "next_west_crossed",
+        "epoch": 0,
+        "tick": 1827,
+        "elapsed": 30.4496,
+        "player": [
+          -4.2,
+          0.0,
+          26.5
+        ],
+        "grounded": 1,
+        "vertical_velocity": 0.0,
+        "jump_inputs": 2,
+        "collision_clear": 1,
+        "heap_used": 2011696,
+        "models": 40,
+        "triangles": 1100,
+        "colliders": 254,
+        "floors": 32,
+        "textures": 48,
+        "door_index": 0,
+        "door_open": 1,
+        "loot_index": 1,
+        "loot_home": 3,
+        "loot_value": 25,
+        "collected_objects": 2,
+        "loot_retired": 1,
+        "loot_reloaded": 1,
+        "stream": {
+          "current": 10,
+          "resident": [
+            4,
+            8,
+            9,
+            10
+          ],
+          "view": [
+            4,
+            8,
+            9,
+            10
+          ],
+          "slots": 5,
+          "settled": 1,
+          "reserved": 151680,
+          "allocated": 273680,
+          "completed_loads": 19,
+          "retired": 15,
+          "readbytes": 688552,
+          "stalls": 2612
+        }
+      },
+      {
+        "checkpoint": "next_west_return",
+        "epoch": 0,
+        "tick": 1914,
+        "elapsed": 31.8996,
+        "player": [
+          -1.2,
+          0.0,
+          26.5
+        ],
+        "grounded": 1,
+        "vertical_velocity": 0.0,
+        "jump_inputs": 2,
+        "collision_clear": 1,
+        "heap_used": 1925320,
+        "models": 14,
+        "triangles": 718,
+        "colliders": 126,
+        "floors": 48,
+        "textures": 48,
+        "door_index": 0,
+        "door_open": 1,
+        "loot_index": 1,
+        "loot_home": 3,
+        "loot_value": 25,
+        "collected_objects": 2,
+        "loot_retired": 1,
+        "loot_reloaded": 1,
+        "stream": {
+          "current": 4,
+          "resident": [
+            4,
+            8,
+            3
+          ],
+          "view": [
+            3,
+            4,
+            8
+          ],
+          "slots": 5,
+          "settled": 1,
+          "reserved": 98592,
+          "allocated": 273680,
+          "completed_loads": 20,
+          "retired": 17,
+          "readbytes": 719024,
+          "stalls": 2616
+        }
+      },
+      {
+        "checkpoint": "courtyard_after_next",
+        "epoch": 0,
+        "tick": 1972,
+        "elapsed": 32.8664,
+        "player": [
+          -1.2,
+          0.0,
+          28.495
+        ],
+        "grounded": 1,
+        "vertical_velocity": 0.0,
+        "jump_inputs": 2,
+        "collision_clear": 1,
+        "heap_used": 1964200,
+        "models": 20,
+        "triangles": 907,
+        "colliders": 174,
+        "floors": 54,
+        "textures": 48,
+        "door_index": 0,
+        "door_open": 1,
+        "loot_index": 1,
+        "loot_home": 3,
+        "loot_value": 25,
+        "collected_objects": 2,
+        "loot_retired": 1,
+        "loot_reloaded": 1,
+        "stream": {
+          "current": 8,
+          "resident": [
+            4,
+            8,
+            3,
+            7
+          ],
+          "view": [
+            3,
+            4,
+            7,
+            8
+          ],
+          "slots": 5,
+          "settled": 1,
+          "reserved": 124904,
+          "allocated": 273680,
+          "completed_loads": 21,
+          "retired": 17,
+          "readbytes": 745336,
+          "stalls": 2620
+        }
+      },
+      {
+        "checkpoint": "west_approach",
+        "epoch": 0,
+        "tick": 2081,
+        "elapsed": 34.6835,
+        "player": [
+          -4.98,
+          0.0,
+          28.5
+        ],
+        "grounded": 1,
+        "vertical_velocity": 0.0,
+        "jump_inputs": 2,
+        "collision_clear": 1,
+        "heap_used": 2059528,
+        "models": 46,
+        "triangles": 1322,
+        "colliders": 277,
+        "floors": 58,
+        "textures": 48,
+        "door_index": 0,
+        "door_open": 1,
+        "loot_index": 1,
+        "loot_home": 3,
+        "loot_value": 25,
+        "collected_objects": 2,
+        "loot_retired": 1,
+        "loot_reloaded": 1,
+        "stream": {
+          "current": 10,
+          "resident": [
+            4,
+            8,
+            3,
+            10,
+            9
+          ],
+          "view": [
+            3,
+            4,
+            8,
+            9,
+            10
+          ],
+          "slots": 5,
+          "settled": 1,
+          "reserved": 182152,
+          "allocated": 273680,
+          "completed_loads": 23,
+          "retired": 18,
+          "readbytes": 828896,
+          "stalls": 2641
+        }
+      },
+      {
+        "checkpoint": "west_deep",
+        "epoch": 0,
+        "tick": 2145,
+        "elapsed": 35.7504,
+        "player": [
+          -5.0,
+          0.0,
+          26.3
+        ],
+        "grounded": 1,
+        "vertical_velocity": 0.0,
+        "jump_inputs": 2,
+        "collision_clear": 1,
+        "heap_used": 2011720,
+        "models": 40,
+        "triangles": 1100,
+        "colliders": 254,
+        "floors": 32,
+        "textures": 48,
+        "door_index": 0,
+        "door_open": 1,
+        "loot_index": 1,
+        "loot_home": 3,
+        "loot_value": 25,
+        "collected_objects": 2,
+        "loot_retired": 1,
+        "loot_reloaded": 1,
+        "stream": {
+          "current": 10,
+          "resident": [
+            4,
+            8,
+            10,
+            9
+          ],
+          "view": [
+            4,
+            8,
+            9,
+            10
+          ],
+          "slots": 5,
+          "settled": 1,
+          "reserved": 151680,
+          "allocated": 273680,
+          "completed_loads": 23,
+          "retired": 19,
+          "readbytes": 828896,
+          "stalls": 2641
+        }
+      },
+      {
+        "checkpoint": "west_return",
+        "epoch": 0,
+        "tick": 2209,
+        "elapsed": 36.8173,
+        "player": [
+          -5.0,
+          0.0,
+          28.5
+        ],
+        "grounded": 1,
+        "vertical_velocity": 0.0,
+        "jump_inputs": 2,
+        "collision_clear": 1,
+        "heap_used": 2011720,
+        "models": 40,
+        "triangles": 1100,
+        "colliders": 254,
+        "floors": 32,
+        "textures": 48,
+        "door_index": 0,
+        "door_open": 1,
+        "loot_index": 1,
+        "loot_home": 3,
+        "loot_value": 25,
+        "collected_objects": 2,
+        "loot_retired": 1,
+        "loot_reloaded": 1,
+        "stream": {
+          "current": 10,
+          "resident": [
+            4,
+            8,
+            10,
+            9
+          ],
+          "view": [
+            4,
+            8,
+            9,
+            10
+          ],
+          "slots": 5,
+          "settled": 0,
+          "reserved": 182152,
+          "allocated": 273680,
+          "completed_loads": 23,
+          "retired": 19,
+          "readbytes": 859368,
+          "stalls": 2645
+        }
+      },
+      {
+        "checkpoint": "courtyard_after_west",
+        "epoch": 0,
+        "tick": 2298,
+        "elapsed": 38.3009,
+        "player": [
+          -2.25,
+          0.0,
+          29.8
+        ],
+        "grounded": 1,
+        "vertical_velocity": 0.0,
+        "jump_inputs": 2,
+        "collision_clear": 1,
+        "heap_used": 1925320,
+        "models": 14,
+        "triangles": 718,
+        "colliders": 126,
+        "floors": 48,
+        "textures": 48,
+        "door_index": 0,
+        "door_open": 1,
+        "loot_index": 1,
+        "loot_home": 3,
+        "loot_value": 25,
+        "collected_objects": 2,
+        "loot_retired": 1,
+        "loot_reloaded": 1,
+        "stream": {
+          "current": 8,
+          "resident": [
+            4,
+            8,
+            3
+          ],
+          "view": [
+            3,
+            4,
+            8
+          ],
+          "slots": 5,
+          "settled": 0,
+          "reserved": 124904,
+          "allocated": 273680,
+          "completed_loads": 24,
+          "retired": 21,
+          "readbytes": 867560,
+          "stalls": 2646
+        }
+      },
+      {
+        "checkpoint": "west_corner_return",
+        "epoch": 0,
+        "tick": 2367,
+        "elapsed": 39.4512,
+        "player": [
+          -2.25,
+          0.0,
+          32.2
+        ],
+        "grounded": 1,
+        "vertical_velocity": 0.0,
+        "jump_inputs": 2,
+        "collision_clear": 1,
+        "heap_used": 1964192,
+        "models": 20,
+        "triangles": 907,
+        "colliders": 174,
+        "floors": 54,
+        "textures": 48,
+        "door_index": 0,
+        "door_open": 1,
+        "loot_index": 1,
+        "loot_home": 3,
+        "loot_value": 25,
+        "collected_objects": 2,
+        "loot_retired": 1,
+        "loot_reloaded": 1,
+        "stream": {
+          "current": 8,
+          "resident": [
+            4,
+            8,
+            3,
+            7
+          ],
+          "view": [
+            3,
+            4,
+            7,
+            8
+          ],
+          "slots": 5,
+          "settled": 1,
+          "reserved": 124904,
+          "allocated": 273680,
+          "completed_loads": 25,
+          "retired": 21,
+          "readbytes": 885680,
+          "stalls": 2649
+        }
+      },
+      {
+        "checkpoint": "west_exit_return",
+        "epoch": 0,
+        "tick": 2398,
+        "elapsed": 39.968,
+        "player": [
+          -2.25,
+          0.0,
+          33.2851
+        ],
+        "grounded": 1,
+        "vertical_velocity": 0.0,
+        "jump_inputs": 2,
+        "collision_clear": 1,
+        "heap_used": 1964192,
+        "models": 20,
+        "triangles": 907,
+        "colliders": 174,
+        "floors": 54,
+        "textures": 48,
+        "door_index": 0,
+        "door_open": 1,
+        "loot_index": 1,
+        "loot_home": 3,
+        "loot_value": 25,
+        "collected_objects": 2,
+        "loot_retired": 1,
+        "loot_reloaded": 1,
+        "stream": {
+          "current": 3,
+          "resident": [
+            4,
+            8,
+            3,
+            7
+          ],
+          "view": [
+            3,
+            4,
+            7,
+            8
+          ],
+          "slots": 5,
+          "settled": 1,
+          "reserved": 124904,
+          "allocated": 273680,
+          "completed_loads": 25,
+          "retired": 21,
+          "readbytes": 885680,
+          "stalls": 2649
+        }
+      },
+      {
+        "checkpoint": "main_room_reloaded",
+        "epoch": 0,
+        "tick": 2472,
+        "elapsed": 41.2016,
+        "player": [
+          -0.0138,
+          0.0,
+          34.5919
+        ],
+        "grounded": 1,
+        "vertical_velocity": 0.0,
+        "jump_inputs": 2,
+        "collision_clear": 1,
+        "heap_used": 1964192,
+        "models": 20,
+        "triangles": 907,
+        "colliders": 174,
+        "floors": 54,
+        "textures": 48,
+        "door_index": 0,
+        "door_open": 1,
+        "loot_index": 1,
+        "loot_home": 3,
+        "loot_value": 25,
+        "collected_objects": 2,
+        "loot_retired": 1,
+        "loot_reloaded": 1,
+        "stream": {
+          "current": 3,
+          "resident": [
+            4,
+            8,
+            3,
+            7
+          ],
+          "view": [
+            3,
+            4,
+            7,
+            8
+          ],
+          "slots": 5,
+          "settled": 1,
+          "reserved": 124904,
+          "allocated": 273680,
+          "completed_loads": 25,
+          "retired": 21,
+          "readbytes": 885680,
+          "stalls": 2649
+        }
+      },
+      {
+        "checkpoint": "door_return",
+        "epoch": 0,
+        "tick": 2607,
+        "elapsed": 43.452,
+        "player": [
+          0.0,
+          0.0,
+          39.2905
+        ],
+        "grounded": 1,
+        "vertical_velocity": 0.0,
+        "jump_inputs": 2,
+        "collision_clear": 1,
+        "heap_used": 1974216,
+        "models": 34,
+        "triangles": 927,
+        "colliders": 214,
+        "floors": 58,
+        "textures": 48,
+        "door_index": 0,
+        "door_open": 1,
+        "loot_index": 1,
+        "loot_home": 3,
+        "loot_value": 25,
+        "collected_objects": 2,
+        "loot_retired": 1,
+        "loot_reloaded": 1,
+        "stream": {
+          "current": 3,
+          "resident": [
+            6,
+            8,
+            3,
+            7,
+            1
+          ],
+          "view": [
+            1,
+            3,
+            6,
+            7,
+            8
+          ],
+          "slots": 5,
+          "settled": 1,
+          "reserved": 129124,
+          "allocated": 273680,
+          "completed_loads": 27,
+          "retired": 22,
+          "readbytes": 924084,
+          "stalls": 2656
+        }
+      },
+      {
+        "checkpoint": "door_closed",
+        "epoch": 0,
+        "tick": 2639,
+        "elapsed": 43.9855,
+        "player": [
+          0.0,
+          -0.3048,
+          40.3352
+        ],
+        "grounded": 1,
+        "vertical_velocity": 0.0,
+        "jump_inputs": 2,
+        "collision_clear": 1,
+        "heap_used": 1924264,
+        "models": 30,
+        "triangles": 679,
+        "colliders": 172,
+        "floors": 42,
+        "textures": 48,
+        "door_index": 0,
+        "door_open": 0,
+        "loot_index": 1,
+        "loot_home": 3,
+        "loot_value": 25,
+        "collected_objects": 2,
+        "loot_retired": 1,
+        "loot_reloaded": 1,
+        "stream": {
+          "current": 7,
+          "resident": [
+            6,
+            3,
+            7,
+            1
+          ],
+          "view": [
+            1,
+            3,
+            6,
+            7
+          ],
+          "slots": 5,
+          "settled": 0,
+          "reserved": 149924,
+          "allocated": 273680,
+          "completed_loads": 27,
+          "retired": 23,
+          "readbytes": 973236,
+          "stalls": 2662
+        }
+      },
+      {
+        "checkpoint": "ramp_return",
+        "epoch": 0,
+        "tick": 2802,
+        "elapsed": 46.7027,
+        "player": [
+          0.0,
+          -2.3487,
+          45.9708
+        ],
+        "grounded": 1,
+        "vertical_velocity": 0.0,
+        "jump_inputs": 2,
+        "collision_clear": 1,
+        "heap_used": 1963976,
+        "models": 43,
+        "triangles": 855,
+        "colliders": 235,
+        "floors": 24,
+        "textures": 48,
+        "door_index": 0,
+        "door_open": 0,
+        "loot_index": 1,
+        "loot_home": 3,
+        "loot_value": 25,
+        "collected_objects": 2,
+        "loot_retired": 1,
+        "loot_reloaded": 1,
+        "stream": {
+          "current": 6,
+          "resident": [
+            6,
+            9,
+            7,
+            1
+          ],
+          "view": [
+            1,
+            6,
+            7,
+            9
+          ],
+          "slots": 5,
+          "settled": 1,
+          "reserved": 119452,
+          "allocated": 273680,
+          "completed_loads": 28,
+          "retired": 24,
+          "readbytes": 978820,
+          "stalls": 2663
+        }
+      },
+      {
+        "checkpoint": "street_return",
+        "epoch": 0,
+        "tick": 2875,
+        "elapsed": 47.9197,
+        "player": [
+          -0.0,
+          -2.4384,
+          48.5
+        ],
+        "grounded": 1,
+        "vertical_velocity": 0.0,
+        "jump_inputs": 2,
+        "collision_clear": 1,
+        "heap_used": 1963976,
+        "models": 43,
+        "triangles": 855,
+        "colliders": 235,
+        "floors": 24,
+        "textures": 48,
+        "door_index": 0,
+        "door_open": 0,
+        "loot_index": 1,
+        "loot_home": 3,
+        "loot_value": 25,
+        "collected_objects": 2,
+        "loot_retired": 1,
+        "loot_reloaded": 1,
+        "stream": {
+          "current": 1,
+          "resident": [
+            6,
+            9,
+            7,
+            1
+          ],
+          "view": [
+            1,
+            6,
+            7,
+            9
+          ],
+          "slots": 5,
+          "settled": 1,
+          "reserved": 119452,
+          "allocated": 273680,
+          "completed_loads": 28,
+          "retired": 24,
+          "readbytes": 978820,
+          "stalls": 2663
+        }
+      },
+      {
+        "checkpoint": "east_street",
+        "epoch": 0,
+        "tick": 3020,
+        "elapsed": 50.3368,
+        "player": [
+          5.0,
+          -2.4384,
+          48.5
+        ],
+        "grounded": 1,
+        "vertical_velocity": 0.0,
+        "jump_inputs": 2,
+        "collision_clear": 1,
+        "heap_used": 1993568,
+        "models": 51,
+        "triangles": 976,
+        "colliders": 286,
+        "floors": 24,
+        "textures": 48,
+        "door_index": 0,
+        "door_open": 0,
+        "loot_index": 1,
+        "loot_home": 3,
+        "loot_value": 25,
+        "collected_objects": 2,
+        "loot_retired": 1,
+        "loot_reloaded": 1,
+        "stream": {
+          "current": 1,
+          "resident": [
+            2,
+            9,
+            1
+          ],
+          "view": [
+            1,
+            2,
+            9
+          ],
+          "slots": 5,
+          "settled": 1,
+          "reserved": 136652,
+          "allocated": 273680,
+          "completed_loads": 29,
+          "retired": 26,
+          "readbytes": 1032948,
+          "stalls": 2670
+        }
+      },
+      {
+        "checkpoint": "east_ramp_top",
+        "epoch": 0,
+        "tick": 3354,
+        "elapsed": 55.9047,
+        "player": [
+          5.0,
+          -0.0582,
+          36.8088
+        ],
+        "grounded": 1,
+        "vertical_velocity": 0.0,
+        "jump_inputs": 2,
+        "collision_clear": 1,
+        "heap_used": 1906128,
+        "models": 32,
+        "triangles": 578,
+        "colliders": 197,
+        "floors": 16,
+        "textures": 48,
+        "door_index": 0,
+        "door_open": 0,
+        "loot_index": 1,
+        "loot_home": 3,
+        "loot_value": 25,
+        "collected_objects": 2,
+        "loot_retired": 1,
+        "loot_reloaded": 1,
+        "stream": {
+          "current": 2,
+          "resident": [
+            2,
+            1
+          ],
+          "view": [
+            1,
+            2
+          ],
+          "slots": 5,
+          "settled": 0,
+          "reserved": 180508,
+          "allocated": 273680,
+          "completed_loads": 29,
+          "retired": 27,
+          "readbytes": 1106676,
+          "stalls": 2697
+        }
+      },
+      {
+        "checkpoint": "east_interior",
+        "epoch": 0,
+        "tick": 3391,
+        "elapsed": 56.5215,
+        "player": [
+          5.0,
+          0.0,
+          35.5136
+        ],
+        "grounded": 1,
+        "vertical_velocity": 0.0,
+        "jump_inputs": 2,
+        "collision_clear": 1,
+        "heap_used": 2054352,
+        "models": 45,
+        "triangles": 1296,
+        "colliders": 319,
+        "floors": 64,
+        "textures": 48,
+        "door_index": 0,
+        "door_open": 0,
+        "loot_index": 1,
+        "loot_home": 3,
+        "loot_value": 25,
+        "collected_objects": 2,
+        "loot_retired": 1,
+        "loot_reloaded": 1,
+        "stream": {
+          "current": 2,
+          "resident": [
+            2,
+            3,
+            4,
+            8,
+            1
+          ],
+          "view": [
+            1,
+            2,
+            3,
+            4,
+            8
+          ],
+          "slots": 5,
+          "settled": 1,
+          "reserved": 180508,
+          "allocated": 273680,
+          "completed_loads": 32,
+          "retired": 27,
+          "readbytes": 1131540,
+          "stalls": 2703
+        }
+      },
+      {
+        "checkpoint": "restart_loaded",
+        "epoch": 1,
+        "tick": 3479,
+        "elapsed": 1.45,
+        "player": [
+          -6.522,
+          -2.4384,
+          49.8253
+        ],
+        "grounded": 1,
+        "vertical_velocity": 0.0,
+        "jump_inputs": 2,
+        "collision_clear": 1,
+        "heap_used": 1908624,
+        "models": 32,
+        "triangles": 593,
+        "colliders": 166,
+        "floors": 8,
+        "textures": 48,
+        "door_index": 0,
+        "door_open": 0,
+        "loot_index": 1,
+        "loot_home": 3,
+        "loot_value": 0,
+        "collected_objects": 0,
+        "loot_retired": 1,
+        "loot_reloaded": 1,
+        "stream": {
+          "current": 9,
+          "resident": [
+            1,
+            9
+          ],
+          "view": [
+            1,
+            9
+          ],
+          "slots": 5,
+          "settled": 1,
+          "reserved": 82524,
+          "allocated": 273680,
+          "completed_loads": 2,
+          "retired": 0,
+          "readbytes": 82524,
+          "stalls": 2488
+        }
+      }
+    ],
+    "terminal": {
+      "passed": "1",
+      "input_only": "1",
+      "coverage": "1",
+      "collision_clear": "1",
+      "stair_jumps": "2",
+      "visited_regions": "9",
+      "loot_persist": "1",
+      "restart_reload": "1",
+      "pre_restart_loads": "32",
+      "audio_calls": "1476"
+    },
+    "visited_regions": [
+      1,
+      2,
+      3,
+      4,
+      6,
+      7,
+      8,
+      9,
+      10
+    ],
+    "pre_restart_loads": 32,
+    "retirements": 27,
+    "allocated_slot_bytes": 273680,
+    "peak_heap_bytes": 2059600,
+    "working_views": [
+      {
+        "resident": [
+          1,
+          9
+        ],
+        "triangles": 593,
+        "colliders": 166
+      },
+      {
+        "resident": [
+          1,
+          6,
+          7,
+          9
+        ],
+        "triangles": 855,
+        "colliders": 235
+      },
+      {
+        "resident": [
+          1,
+          3,
+          6,
+          7,
+          9
+        ],
+        "triangles": 1077,
+        "colliders": 259
+      },
+      {
+        "resident": [
+          1,
+          3,
+          6,
+          7
+        ],
+        "triangles": 679,
+        "colliders": 172
+      },
+      {
+        "resident": [
+          1,
+          3,
+          6,
+          7,
+          8
+        ],
+        "triangles": 927,
+        "colliders": 214
+      },
+      {
+        "resident": [
+          3,
+          7,
+          8
+        ],
+        "triangles": 659,
+        "colliders": 118
+      },
+      {
+        "resident": [
+          3,
+          4,
+          7,
+          8
+        ],
+        "triangles": 907,
+        "colliders": 174
+      },
+      {
+        "resident": [
+          3,
+          4,
+          8
+        ],
+        "triangles": 718,
+        "colliders": 126
+      },
+      {
+        "resident": [
+          1,
+          2,
+          3,
+          4,
+          8
+        ],
+        "triangles": 1296,
+        "colliders": 319
+      },
+      {
+        "resident": [
+          3,
+          4,
+          8
+        ],
+        "triangles": 718,
+        "colliders": 126
+      },
+      {
+        "resident": [
+          3,
+          4,
+          8,
+          9,
+          10
+        ],
+        "triangles": 1322,
+        "colliders": 277
+      },
+      {
+        "resident": [
+          3,
+          4,
+          8
+        ],
+        "triangles": 718,
+        "colliders": 126
+      },
+      {
+        "resident": [
+          4,
+          8
+        ],
+        "triangles": 496,
+        "colliders": 102
+      },
+      {
+        "resident": [
+          3,
+          4,
+          8
+        ],
+        "triangles": 718,
+        "colliders": 126
+      },
+      {
+        "resident": [
+          4,
+          8
+        ],
+        "triangles": 496,
+        "colliders": 102
+      },
+      {
+        "resident": [
+          4,
+          8,
+          9,
+          10
+        ],
+        "triangles": 1100,
+        "colliders": 254
+      },
+      {
+        "resident": [
+          4,
+          8
+        ],
+        "triangles": 496,
+        "colliders": 102
+      },
+      {
+        "resident": [
+          3,
+          4,
+          8
+        ],
+        "triangles": 718,
+        "colliders": 126
+      },
+      {
+        "resident": [
+          3,
+          4,
+          7,
+          8
+        ],
+        "triangles": 907,
+        "colliders": 174
+      },
+      {
+        "resident": [
+          3,
+          4,
+          8
+        ],
+        "triangles": 718,
+        "colliders": 126
+      },
+      {
+        "resident": [
+          3,
+          4,
+          8,
+          9,
+          10
+        ],
+        "triangles": 1322,
+        "colliders": 277
+      },
+      {
+        "resident": [
+          4,
+          8,
+          9,
+          10
+        ],
+        "triangles": 1100,
+        "colliders": 254
+      },
+      {
+        "resident": [
+          3,
+          4,
+          8,
+          9,
+          10
+        ],
+        "triangles": 1322,
+        "colliders": 277
+      },
+      {
+        "resident": [
+          3,
+          4,
+          8
+        ],
+        "triangles": 718,
+        "colliders": 126
+      },
+      {
+        "resident": [
+          3,
+          4,
+          7,
+          8
+        ],
+        "triangles": 907,
+        "colliders": 174
+      },
+      {
+        "resident": [
+          3,
+          7,
+          8
+        ],
+        "triangles": 659,
+        "colliders": 118
+      },
+      {
+        "resident": [
+          1,
+          3,
+          6,
+          7,
+          8
+        ],
+        "triangles": 927,
+        "colliders": 214
+      },
+      {
+        "resident": [
+          1,
+          3,
+          6,
+          7
+        ],
+        "triangles": 679,
+        "colliders": 172
+      },
+      {
+        "resident": [
+          1,
+          3,
+          6,
+          7,
+          9
+        ],
+        "triangles": 1077,
+        "colliders": 259
+      },
+      {
+        "resident": [
+          1,
+          6,
+          7,
+          9
+        ],
+        "triangles": 855,
+        "colliders": 235
+      },
+      {
+        "resident": [
+          1,
+          9
+        ],
+        "triangles": 593,
+        "colliders": 166
+      },
+      {
+        "resident": [
+          1,
+          2,
+          9
+        ],
+        "triangles": 976,
+        "colliders": 286
+      },
+      {
+        "resident": [
+          1,
+          2
+        ],
+        "triangles": 578,
+        "colliders": 197
+      },
+      {
+        "resident": [
+          1,
+          2,
+          3,
+          4,
+          8
+        ],
+        "triangles": 1296,
+        "colliders": 319
+      },
+      {
+        "resident": [
+          1,
+          9
+        ],
+        "triangles": 593,
+        "colliders": 166
+      }
+    ],
+    "capture_diagnostic": false,
+    "music": {
+      "cue": "lanterns_below",
+      "consumed_frames": 1810056,
+      "generated_blocks": 1427,
+      "max_underruns": 0,
+      "sample_count": 61
+    },
+    "audio_continuity_passed": true,
+    "checkpoint_scope": "Pre-update observations; queued input is not executed until a later fixed tick",
+    "timing_scope": "Continuous wall-time input tour on Ares; original N64 performance remains unverified"
+  }
+}

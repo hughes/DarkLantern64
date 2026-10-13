@@ -71,7 +71,7 @@ class CharacterAssetTests(unittest.TestCase):
                                   'printf("%.9g %.9g %.9g\\n",p.x,p.y,p.z);')
             main = root/"check.c"
             main.write_text('#include <stdio.h>\n#include "animation.h"\n'+character.emit_c(result)+
-                            f'\nstatic const DlMesh mesh = {{{symbol}_vertices,{len(result["mesh"]["vertices"])},{symbol}_indices,{len(result["mesh"]["indices"])},{symbol}_uvs,{symbol}_normals,&{symbol}}};\n'+
+                            f'\nstatic const DlMesh mesh = {{{symbol}_vertices,{len(result["mesh"]["vertices"])},{symbol}_indices,{len(result["mesh"]["indices"])},{symbol}_uvs,{symbol}_normals,&{symbol},0}};\n'+
                             '\nint main(void) { if(!dl_animation_validate(mesh.animation,mesh.vertex_count))return 1; DlAnimMatrix pose[32]; DlVec3 p;\n'+
                             "\n".join(statements)+'\nreturn 0; }\n', encoding="utf-8")
             env = dict(os.environ, PATH=str(Path(gcc).parent)+os.pathsep+os.environ.get("PATH", ""))

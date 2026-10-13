@@ -1,22 +1,13 @@
 #include "stream_scene.h"
 #include <math.h>
 #include <string.h>
+static const float approach_distance=5.f;
 
 static bool valid(const DlStreamScene *scene){
     return scene&&scene->bootstrap&&scene->bootstrap->stream&&scene->mission&&scene->mission->directory;
 }
 static DlVec3 vec(DlMissionVec3 p){return (DlVec3){p.x,p.y,p.z};}
 static bool finite_vec(DlVec3 p){return isfinite(p.x)&&isfinite(p.y)&&isfinite(p.z);}
-/* Match the gameplay query after adding the chunk origin: an otherwise valid
- * local plane can lose its footprint or usable grade at world f32 precision. */
-static bool valid_floor(const DlFloorTriangle *floor){
-    DlVec3 a=floor->vertices[0],b=floor->vertices[1],c=floor->vertices[2];
-    float bx=b.x-a.x,bz=b.z-a.z,by=b.y-a.y,cx=c.x-a.x,cz=c.z-a.z,cy=c.y-a.y;
-    float determinant=bx*cz-bz*cx;
-    if(!isfinite(determinant)||fabsf(determinant)<=1e-8f)return false;
-    float gx=(by*cz-bz*cy)/determinant,gz=(bx*cy-by*cx)/determinant;
-    return isfinite(gx)&&isfinite(gz)&&gx*gx+gz*gz<=1.000001f;
-}
 static bool contains(const DlMissionRegion *region,DlVec3 p){
     return p.x>=region->minimum.x&&p.x<=region->maximum.x&&
         p.y>=region->minimum.y&&p.y<=region->maximum.y&&p.z>=region->minimum.z&&p.z<=region->maximum.z;
@@ -58,6 +49,7 @@ static int object_index(const DlStreamScene *scene,uint32_t entity_id){
 }
 static const DlStreamMaterial *material(const DlStreamScene *scene,uint32_t id){
     const DlStreamDefinition *definition=scene->bootstrap->stream;
+    if(id&&id<=definition->material_count&&definition->materials[id-1].id==id)return &definition->materials[id-1];
     for(uint32_t i=0;i<definition->material_count;++i)if(definition->materials[i].id==id)return &definition->materials[i];
     return NULL;
 }
@@ -170,199 +162,289 @@ DlStreamSceneStatus dl_stream_scene_init(DlStreamScene *scene,const DlLevel *boo
 static DlStreamSceneStatus add_collider(DlStreamSceneBank *bank,DlCollider box,int object){
     if(bank->level.collider_count+bank->level.floor_count>=DL_STREAM_SCENE_MAX_COLLIDERS)return DL_STREAM_SCENE_CAPACITY;
     int index=bank->level.collider_count++;
-    bank->colliders[index]=box;bank->collider_objects[index]=(int16_t)object;return DL_STREAM_SCENE_OK;
+    bank->colliders[index]=box;bank->collider_objects[index]=(int16_t)object;
+    dl_query_cache_box(&bank->query_cache.boxes[index],&bank->colliders[index]);
+    bank->query_cache.collider_count=bank->level.collider_count;return DL_STREAM_SCENE_OK;
 }
-static DlStreamSceneStatus scan_chunk(DlStreamScene *scene,DlStreamSceneBank *bank,
-    const DlMissionChunk *chunk,uint32_t region_id,bool *entities){
-    DlMissionSection section;
-    if(dl_mission_section(chunk,DL_MISSION_SECTION_ENTITIES,&section)==DL_MISSION_OK){
-        if(section.count>scene->mission->entity_count)return DL_STREAM_SCENE_CORRUPT;
-        for(uint32_t i=0;i<section.count;++i){
-            uint32_t id;
-            if(dl_mission_entity_id(chunk,scene->mission,region_id,i,&id)!=DL_MISSION_OK||entities[id-1])
-                return DL_STREAM_SCENE_CORRUPT;
-            entities[id-1]=true;
-        }
-    }
-    if(dl_mission_section(chunk,DL_MISSION_SECTION_TRIANGLES,&section)==DL_MISSION_OK){
-        if(section.count>(uint32_t)(DL_STREAM_SCENE_MAX_TRIANGLES-bank->triangle_count))return DL_STREAM_SCENE_CAPACITY;
-        for(uint32_t i=0;i<section.count;++i){
-            DlMissionTriangle triangle;
-            if(dl_mission_triangle(chunk,i,&triangle)!=DL_MISSION_OK||!material(scene,triangle.material_id))
-                return DL_STREAM_SCENE_CORRUPT;
-            const DlStreamMaterial *source=material(scene,triangle.material_id);
-            if(source->texture_id&&!(triangle.attribute_flags&DL_MISSION_TRIANGLE_UV))return DL_STREAM_SCENE_CORRUPT;
-            for(int v=0;v<3;++v){
-                DlVec3 world={triangle.positions[v].x+chunk->origin.x,triangle.positions[v].y+chunk->origin.y,
-                    triangle.positions[v].z+chunk->origin.z};
-                if(!finite_vec(world))return DL_STREAM_SCENE_CORRUPT;
-            }
-            int group=0;
-            while(group<bank->group_count&&(bank->groups[group].region_id!=region_id||
-                bank->groups[group].material_id!=triangle.material_id||
-                bank->groups[group].attribute_flags!=triangle.attribute_flags))++group;
-            if(group==bank->group_count){
-                if(group>=DL_STREAM_SCENE_MAX_GROUPS)return DL_STREAM_SCENE_CAPACITY;
-                bank->groups[group]=(DlStreamSceneGroup){.region_id=region_id,.material_id=triangle.material_id,
-                    .origin=vec(chunk->origin),.attribute_flags=triangle.attribute_flags};++bank->group_count;
-            }
-            ++bank->groups[group].triangle_count;++bank->triangle_count;
-        }
-    }
-    if(dl_mission_section(chunk,DL_MISSION_SECTION_COLLIDERS,&section)==DL_MISSION_OK){
-        if(section.count>(uint32_t)(DL_STREAM_SCENE_MAX_COLLIDERS-bank->level.collider_count))return DL_STREAM_SCENE_CAPACITY;
-        for(uint32_t i=0;i<section.count;++i){
-            DlMissionCollider collider;
-            if(dl_mission_collider(chunk,scene->mission,i,&collider)!=DL_MISSION_OK)return DL_STREAM_SCENE_CORRUPT;
-            DlCollider box={.center={collider.center.x+chunk->origin.x,collider.center.y+chunk->origin.y,
-                collider.center.z+chunk->origin.z},.half_size=vec(collider.half_size),.yaw=collider.yaw};
-            if(!finite_vec(box.center))return DL_STREAM_SCENE_CORRUPT;
-            int object=-1;
-            if(collider.entity_id){
-                DlMissionEntity entity;dl_mission_entity(scene->mission,collider.entity_id,&entity);
-                if(entity.kind==DL_MISSION_ENTITY_DOOR){
-                    object=object_index(scene,entity.id);
-                    if(object<0)return DL_STREAM_SCENE_CORRUPT;
-                    box.door=true;
-                }
-            }
-            DlStreamSceneStatus status=add_collider(bank,box,object);
-            if(status!=DL_STREAM_SCENE_OK)return status;
-        }
-    }
-    if(dl_mission_section(chunk,DL_MISSION_SECTION_FLOORS,&section)==DL_MISSION_OK){
-        if(section.count>(uint32_t)(DL_STREAM_SCENE_MAX_FLOORS-bank->level.floor_count)||
-            section.count>(uint32_t)(DL_STREAM_SCENE_MAX_COLLIDERS-bank->level.collider_count-bank->level.floor_count))return DL_STREAM_SCENE_CAPACITY;
-        for(uint32_t i=0;i<section.count;++i){
-            DlMissionFloorTriangle floor;
-            if(dl_mission_floor(chunk,i,&floor)!=DL_MISSION_OK)return DL_STREAM_SCENE_CORRUPT;
-            DlFloorTriangle value;
-            for(int vertex=0;vertex<3;++vertex){
-                value.vertices[vertex]=(DlVec3){floor.vertices[vertex].x+chunk->origin.x,
-                    floor.vertices[vertex].y+chunk->origin.y,floor.vertices[vertex].z+chunk->origin.z};
-                if(!finite_vec(value.vertices[vertex]))return DL_STREAM_SCENE_CORRUPT;
-            }
-            if(!valid_floor(&value))return DL_STREAM_SCENE_CORRUPT;
-            bank->floors[bank->level.floor_count++]=value;
-        }
+static int triangle_group(DlStreamSceneBank *bank,uint32_t region,const DlMissionTriangle *triangle){
+    int group=bank->last_group;
+    if(group>=0&&group<bank->group_count&&bank->groups[group].region_id==region&&
+        bank->groups[group].material_id==triangle->material_id&&bank->groups[group].attribute_flags==triangle->attribute_flags)return group;
+    group=0;
+    while(group<bank->group_count&&(bank->groups[group].region_id!=region||
+        bank->groups[group].material_id!=triangle->material_id||bank->groups[group].attribute_flags!=triangle->attribute_flags))++group;
+    bank->last_group=group;return group;
+}
+static DlStreamSceneStatus write_triangle(DlStreamSceneBank *bank,DlStreamSceneGroup *target,const DlMissionTriangle *triangle){
+    if(target->written_triangles>=target->triangle_count)return DL_STREAM_SCENE_CORRUPT;
+    int local=target->written_triangles++*3;
+    if(target->baked)for(int state=0;state<2;++state)
+        memcpy(bank->baked_colors[state][target->first_vertex/3+local/3],triangle->baked_colors[state],24);
+    for(int v=0;v<3;++v){
+        bank->vertices[target->first_vertex+local+v]=vec(triangle->positions[v]);
+        bank->indices[target->first_vertex+local+v]=(uint16_t)(local+v);
+        bank->uvs[target->first_vertex+local+v]=(DlVec2){triangle->uvs[v*2],triangle->uvs[v*2+1]};
+        bank->normals[target->first_vertex+local+v]=(DlNormal){triangle->normals[v*3],triangle->normals[v*3+1],triangle->normals[v*3+2]};
     }
     return DL_STREAM_SCENE_OK;
 }
-static DlStreamSceneStatus fill_chunk(DlStreamSceneBank *bank,const DlMissionChunk *chunk,uint32_t region_id){
-    DlMissionSection section;
-    if(dl_mission_section(chunk,DL_MISSION_SECTION_TRIANGLES,&section)!=DL_MISSION_OK)return DL_STREAM_SCENE_OK;
-    for(uint32_t i=0;i<section.count;++i){
+static DlStreamSceneStatus scan_record(DlStreamScene *scene,DlStreamSceneBank *bank,
+    const DlMissionChunk *chunk,uint32_t region_id,uint32_t kind,uint32_t index,bool *entities){
+    if(kind==DL_MISSION_SECTION_ENTITIES){
+        uint32_t id;
+        if(dl_mission_entity_id(chunk,scene->mission,region_id,index,&id)!=DL_MISSION_OK||entities[id-1])return DL_STREAM_SCENE_CORRUPT;
+        entities[id-1]=true;
+    }else if(kind==DL_MISSION_SECTION_TRIANGLES){
         DlMissionTriangle triangle;
-        if(dl_mission_triangle(chunk,i,&triangle)!=DL_MISSION_OK)return DL_STREAM_SCENE_CORRUPT;
-        int group=0;
-        while(group<bank->group_count&&(bank->groups[group].region_id!=region_id||
-            bank->groups[group].material_id!=triangle.material_id||
-            bank->groups[group].attribute_flags!=triangle.attribute_flags))++group;
-        if(group==bank->group_count)return DL_STREAM_SCENE_CORRUPT;
-        DlStreamSceneGroup *target=&bank->groups[group];
-        int local=target->written_triangles++*3;
-        for(int v=0;v<3;++v){
-            bank->vertices[target->first_vertex+local+v]=vec(triangle.positions[v]);
-            bank->indices[target->first_vertex+local+v]=(uint16_t)(local+v);
-            bank->uvs[target->first_vertex+local+v]=(DlVec2){triangle.uvs[v*2],triangle.uvs[v*2+1]};
-            bank->normals[target->first_vertex+local+v]=(DlNormal){triangle.normals[v*3],triangle.normals[v*3+1],triangle.normals[v*3+2]};
+        if(dl_mission_triangle(chunk,index,&triangle)!=DL_MISSION_OK)return DL_STREAM_SCENE_CORRUPT;
+        const DlStreamMaterial *source=material(scene,triangle.material_id);
+        if(!source||(source->texture_id&&!(triangle.attribute_flags&DL_MISSION_TRIANGLE_UV)))return DL_STREAM_SCENE_CORRUPT;
+        for(int v=0;v<3;++v){DlVec3 world={triangle.positions[v].x+chunk->origin.x,triangle.positions[v].y+chunk->origin.y,triangle.positions[v].z+chunk->origin.z};
+            if(!finite_vec(world))return DL_STREAM_SCENE_CORRUPT;}
+        int group=triangle_group(bank,region_id,&triangle);
+        if(group==bank->group_count){
+            if(group>=DL_STREAM_SCENE_MAX_GROUPS)return DL_STREAM_SCENE_CAPACITY;
+            bank->groups[group]=(DlStreamSceneGroup){.region_id=region_id,.material_id=triangle.material_id,
+                .first_vertex=bank->triangle_count*3,.origin=vec(chunk->origin),
+                .attribute_flags=triangle.attribute_flags,.baked=chunk->version==4};++bank->group_count;
         }
+        if(group!=bank->group_count-1)scene->assembly.contiguous_groups=false;
+        ++bank->groups[group].triangle_count;++bank->triangle_count;
+        /* Cooked groups normally arrive contiguously. Write the exact decoded
+         * record while it is validated, avoiding a second decode/copy pass.
+         * Borrowed chunks are immutable for the complete assembly lifetime.
+         * Interleaved groups retain the general offset/fill path below. */
+        if(scene->assembly.contiguous_groups)return write_triangle(bank,&bank->groups[group],&triangle);
+    }else if(kind==DL_MISSION_SECTION_COLLIDERS){
+        DlMissionCollider collider;if(dl_mission_collider(chunk,scene->mission,index,&collider)!=DL_MISSION_OK)return DL_STREAM_SCENE_CORRUPT;
+        DlCollider box={.center={collider.center.x+chunk->origin.x,collider.center.y+chunk->origin.y,collider.center.z+chunk->origin.z},
+            .half_size=vec(collider.half_size),.yaw=collider.yaw};
+        if(!finite_vec(box.center))return DL_STREAM_SCENE_CORRUPT;
+        int object=-1;
+        if(collider.entity_id){DlMissionEntity entity;dl_mission_entity(scene->mission,collider.entity_id,&entity);
+            if(entity.kind==DL_MISSION_ENTITY_DOOR){object=object_index(scene,entity.id);if(object<0)return DL_STREAM_SCENE_CORRUPT;box.door=true;}}
+        return add_collider(bank,box,object);
+    }else if(kind==DL_MISSION_SECTION_FLOORS){
+        DlMissionFloorTriangle floor;if(dl_mission_floor(chunk,index,&floor)!=DL_MISSION_OK)return DL_STREAM_SCENE_CORRUPT;
+        DlFloorTriangle value;
+        for(int vertex=0;vertex<3;++vertex){value.vertices[vertex]=(DlVec3){floor.vertices[vertex].x+chunk->origin.x,
+            floor.vertices[vertex].y+chunk->origin.y,floor.vertices[vertex].z+chunk->origin.z};
+            if(!finite_vec(value.vertices[vertex]))return DL_STREAM_SCENE_CORRUPT;}
+        int index=bank->level.floor_count;
+        if(!dl_query_cache_floor(&bank->query_cache.floors[index],&value))return DL_STREAM_SCENE_CORRUPT;
+        bank->floors[bank->level.floor_count++]=value;bank->query_cache.floor_count=bank->level.floor_count;
     }
     return DL_STREAM_SCENE_OK;
 }
-DlStreamSceneStatus dl_stream_scene_refresh(DlStreamScene *scene,DlWorldStream *stream,const DlGame *game){
-    if(!valid(scene)||!stream||stream->mission!=scene->mission||!stream->slots||
-        (game&&game->enemy_count!=scene->bootstrap->enemy_count))return DL_STREAM_SCENE_ARGUMENT;
+static DlStreamSceneStatus fill_record(DlStreamSceneBank *bank,const DlMissionChunk *chunk,uint32_t region_id,uint32_t index){
+    DlMissionTriangle triangle;if(dl_mission_triangle(chunk,index,&triangle)!=DL_MISSION_OK)return DL_STREAM_SCENE_CORRUPT;
+    int group=triangle_group(bank,region_id,&triangle);
+    if(group==bank->group_count)return DL_STREAM_SCENE_CORRUPT;
+    return write_triangle(bank,&bank->groups[group],&triangle);
+}
+static void assembly_release(DlStreamScene *scene){
+    DlStreamSceneAssembly *job=&scene->assembly;
+    for(size_t i=0;i<job->borrowed;++i)dl_world_stream_release(job->stream,job->handles[i]);
+    memset(job,0,sizeof *job);
+}
+void dl_stream_scene_prepare_cancel(DlStreamScene *scene){
+    if(!scene)return;
+    assembly_release(scene);scene->pending_ready=false;
+}
+static bool prepare_arguments(const DlStreamScene *scene,const DlWorldStream *stream,const DlGame *game){
+    return valid(scene)&&stream&&stream->mission==scene->mission&&stream->slots&&
+        (!game||game->enemy_count==scene->bootstrap->enemy_count);
+}
+static uint32_t physical_resident_mask(const DlWorldStream *stream){
+    uint32_t result=0;
+    for(size_t i=0;i<stream->slot_count;++i){const DlRegionSlot *slot=&stream->slots[i];
+        if(slot->state==DL_STREAM_RESIDENT&&slot->region_id&&slot->region_id<=32)
+            result|=UINT32_C(1)<<(slot->region_id-1);
+    }
+    return result;
+}
+DlStreamSceneStatus dl_stream_scene_prepare_begin(DlStreamScene *scene,DlWorldStream *stream,const DlGame *game){
+    if(!prepare_arguments(scene,stream,game))return DL_STREAM_SCENE_ARGUMENT;
+    return dl_stream_scene_prepare_begin_mask(scene,stream,game,physical_resident_mask(stream));
+}
+DlStreamSceneStatus dl_stream_scene_prepare_begin_mask(DlStreamScene *scene,DlWorldStream *stream,const DlGame *game,uint32_t resident_mask){
+    if(!prepare_arguments(scene,stream,game))return DL_STREAM_SCENE_ARGUMENT;
+    if(resident_mask&~all_regions(scene->mission->region_count))return DL_STREAM_SCENE_ARGUMENT;
+    if(resident_mask&~physical_resident_mask(stream))return DL_STREAM_SCENE_NOT_READY;
     if(scene->revision==UINT32_MAX)return DL_STREAM_SCENE_CAPACITY;
+    if(scene->assembly.active||scene->pending_ready)return DL_STREAM_SCENE_NOT_READY;
     DlStreamSceneBank *bank=&scene->banks[scene->active_bank^1u];
-    memset(bank,0,sizeof *bank);bank->level=*scene->bootstrap;
+    /* Large geometry arrays are overwritten only where the new counts expose
+     * them. Clearing an entire bank here would defeat the incremental API. */
+    bank->level=*scene->bootstrap;bank->group_count=bank->triangle_count=bank->last_group=0;bank->resident_count=0;
     bank->level.meshes=bank->meshes;bank->level.models=bank->models;bank->level.model_count=0;
     bank->level.colliders=bank->colliders;bank->level.collider_count=0;bank->level.collider_objects=bank->collider_objects;
-    bank->level.floors=bank->floors;bank->level.floor_count=0;
-    bank->level.baked_lighting=NULL;
-    if(scene->bootstrap->mesh_count)memcpy(bank->meshes,scene->bootstrap->meshes,
-        (size_t)scene->bootstrap->mesh_count*sizeof(DlMesh));
-    DlRegionHandle handles[DL_STREAM_SCENE_MAX_RESIDENT_REGIONS];
-    const DlMissionChunk *chunks[DL_STREAM_SCENE_MAX_RESIDENT_REGIONS];
-    size_t borrowed=0;DlStreamSceneStatus result=DL_STREAM_SCENE_OK;
+    bank->level.floors=bank->floors;bank->level.floor_count=0;bank->level.baked_lighting=NULL;
+    bank->query_cache.collider_source=bank->colliders;bank->query_cache.floor_source=bank->floors;
+    bank->query_cache.collider_count=bank->query_cache.floor_count=0;bank->query_cache.index_ready=false;bank->level.query_cache=&bank->query_cache;
+    if(scene->bootstrap->mesh_count)memcpy(bank->meshes,scene->bootstrap->meshes,(size_t)scene->bootstrap->mesh_count*sizeof(DlMesh));
+    DlStreamSceneAssembly *job=&scene->assembly;memset(job,0,sizeof *job);job->stream=stream;job->active=true;job->has_game=game!=NULL;
+    job->contiguous_groups=true;
+    if(game)for(int i=0;i<game->enemy_count;++i)job->enemy_positions[i]=game->enemies[i].position;
+    DlStreamSceneStatus result=DL_STREAM_SCENE_OK;
     for(size_t i=0;i<stream->slot_count;++i){
-        const DlRegionSlot *slot=&stream->slots[i];
-        if(slot->state!=DL_STREAM_RESIDENT)continue;
-        if(borrowed==DL_STREAM_SCENE_MAX_RESIDENT_REGIONS){result=DL_STREAM_SCENE_CAPACITY;goto finish;}
-        handles[borrowed]=(DlRegionHandle){(uint32_t)i,slot->generation};
-        if(dl_world_stream_borrow(stream,handles[borrowed],&chunks[borrowed])!=DL_STREAM_OK){
-            result=DL_STREAM_SCENE_NOT_READY;goto finish;
-        }
-        bank->resident_ids[borrowed]=slot->region_id;++borrowed;
+        const DlRegionSlot *slot=&stream->slots[i];if(slot->state!=DL_STREAM_RESIDENT||!slot->region_id||slot->region_id>32||
+            !(resident_mask&(UINT32_C(1)<<(slot->region_id-1))))continue;
+        if(job->borrowed==DL_STREAM_SCENE_MAX_RESIDENT_REGIONS){result=DL_STREAM_SCENE_CAPACITY;break;}
+        job->handles[job->borrowed]=(DlRegionHandle){(uint32_t)i,slot->generation};
+        if(dl_world_stream_borrow(stream,job->handles[job->borrowed],&job->chunks[job->borrowed])!=DL_STREAM_OK){result=DL_STREAM_SCENE_NOT_READY;break;}
+        bank->resident_ids[job->borrowed]=slot->region_id;job->resident_mask|=UINT32_C(1)<<(slot->region_id-1);++job->borrowed;
     }
-    bank->resident_count=(uint32_t)borrowed;
-    bool entities[DL_STREAM_SCENE_MAX_ENTITIES]={false};
-    for(size_t i=0;i<borrowed;++i){
-        result=scan_chunk(scene,bank,chunks[i],bank->resident_ids[i],entities);
-        if(result!=DL_STREAM_SCENE_OK)goto finish;
-    }
-    for(uint32_t id=1;id<=scene->mission->entity_count;++id){
-        DlMissionEntity entity;dl_mission_entity(scene->mission,id,&entity);
-        if(bank_resident(bank,entity.home_region_id)&&!entities[id-1]){result=DL_STREAM_SCENE_CORRUPT;goto finish;}
-    }
-    int vertex=0;
-    for(int i=0;i<bank->group_count;++i){
-        DlStreamSceneGroup *group=&bank->groups[i];group->first_vertex=vertex;vertex+=group->triangle_count*3;
-    }
-    for(size_t i=0;i<borrowed;++i){
-        result=fill_chunk(bank,chunks[i],bank->resident_ids[i]);if(result!=DL_STREAM_SCENE_OK)goto finish;
-    }
-    int instanced_vertices=vertex,instanced_triangles=bank->triangle_count;
-    for(int i=0;i<scene->bootstrap->model_count;++i){
-        const DlModelInstance *model=&scene->bootstrap->models[i];
-        DlMissionEntity entity;dl_mission_entity(scene->mission,scene->bootstrap->stream->model_entity_ids[i],&entity);
-        uint32_t region=entity.home_region_id;
-        if(model->role==DL_MODEL_GUARD&&game)region=locate(scene,bank,game->enemies[model->enemy_index].position);
-        /* Door leaves are small shared bootstrap assets. Keep their authoritative
-         * visual state from both sides even when the home architecture retires.
-         * The probe cooker supplies static wall closure on each region's side. */
-        if(model->role!=DL_MODEL_DOOR&&!bank_resident(bank,region))continue;
-        if(bank->level.model_count+bank->group_count>=DL_MAX_MODELS){result=DL_STREAM_SCENE_CAPACITY;goto finish;}
-        const DlMesh *mesh=&scene->bootstrap->meshes[model->mesh];
-        if(mesh->vertex_count>DL_MAX_SCENE_VERTICES-instanced_vertices||
-            mesh->index_count/3>DL_MAX_SCENE_TRIANGLES-instanced_triangles){result=DL_STREAM_SCENE_CAPACITY;goto finish;}
-        instanced_vertices+=mesh->vertex_count;instanced_triangles+=mesh->index_count/3;
-        bank->models[bank->level.model_count++]=*model;
-    }
-    for(int i=0;i<bank->group_count;++i){
-        const DlStreamSceneGroup *group=&bank->groups[i];
-        const DlStreamMaterial *source=material(scene,group->material_id);
-        int mesh=bank->level.mesh_count++;
-        bank->meshes[mesh]=(DlMesh){.vertices=bank->vertices+group->first_vertex,.vertex_count=group->triangle_count*3,
-            .indices=bank->indices+group->first_vertex,.index_count=group->triangle_count*3,
-            .uvs=group->attribute_flags&DL_MISSION_TRIANGLE_UV?bank->uvs+group->first_vertex:NULL,
-            .normals=group->attribute_flags&DL_MISSION_TRIANGLE_NORMAL?bank->normals+group->first_vertex:NULL};
-        DlModelInstance *model=&bank->models[bank->level.model_count++];
-        *model=(DlModelInstance){.mesh=(uint16_t)mesh,.position=group->origin,.scale={1,1,1},.role=DL_MODEL_STATIC,
-            .texture=source->texture_id?(int16_t)(source->texture_id-1):-1,.double_sided=source->double_sided,.enemy_index=-1};
-        memcpy(model->color,source->color,4);
-    }
+    if(result!=DL_STREAM_SCENE_OK){dl_stream_scene_prepare_cancel(scene);return result;}
+    bank->resident_count=(uint32_t)job->borrowed;return DL_STREAM_SCENE_OK;
+}
+enum { ASSEMBLY_SCAN,ASSEMBLY_COVERAGE,ASSEMBLY_OFFSETS,ASSEMBLY_FILL,ASSEMBLY_BOOTSTRAP,ASSEMBLY_GROUPS,ASSEMBLY_BARRIERS,ASSEMBLY_QUERY,ASSEMBLY_DONE };
+static DlStreamSceneStatus assembly_record(DlStreamScene *scene){
+    static const DlMissionSectionKind kinds[]={DL_MISSION_SECTION_ENTITIES,DL_MISSION_SECTION_TRIANGLES,
+        DL_MISSION_SECTION_COLLIDERS,DL_MISSION_SECTION_FLOORS};
+    DlStreamSceneAssembly *job=&scene->assembly;DlStreamSceneBank *bank=&scene->banks[scene->active_bank^1u];
     const DlStreamDefinition *definition=scene->bootstrap->stream;
-    if(definition->policy==DL_STREAM_POLICY_AUTHORED){
-        uint32_t mask=0;for(size_t i=0;i<borrowed;++i)mask|=UINT32_C(1)<<(bank->resident_ids[i]-1);
-        for(uint32_t i=0;i<definition->transition_count;++i){
-            const DlStreamTransition *gate=&definition->transitions[i];
-            if(!bank_resident(bank,gate->from_region)||
-                (mask&definition->policy_regions[gate->to_region-1].working_mask)==definition->policy_regions[gate->to_region-1].working_mask)continue;
-            DlCollider barrier={.center={(gate->minimum.x+gate->maximum.x)*.5f,(gate->minimum.y+gate->maximum.y)*.5f,(gate->minimum.z+gate->maximum.z)*.5f},
-                .half_size={(gate->maximum.x-gate->minimum.x)*.5f,(gate->maximum.y-gate->minimum.y)*.5f,(gate->maximum.z-gate->minimum.z)*.5f}};
-            result=add_collider(bank,barrier,-1);if(result!=DL_STREAM_SCENE_OK)goto finish;
+    /* Empty sections and phase boundaries consume no records, but this loop
+     * is bounded by the five borrowed chunks and fixed section count. */
+    for(;;){
+        if(job->phase==ASSEMBLY_SCAN){
+            if(job->chunk==job->borrowed){job->phase=ASSEMBLY_COVERAGE;job->entity=1;continue;}
+            if(job->section==4){++job->chunk;job->section=job->record=0;continue;}
+            const DlMissionChunk *chunk=job->chunks[job->chunk];DlMissionSection section;
+            DlMissionSectionKind kind=kinds[job->section];
+            if(dl_mission_section(chunk,kind,&section)!=DL_MISSION_OK||job->record==section.count){++job->section;job->record=0;continue;}
+            if(!job->record){
+                if(kind==DL_MISSION_SECTION_ENTITIES&&section.count>scene->mission->entity_count)return DL_STREAM_SCENE_CORRUPT;
+                if(kind==DL_MISSION_SECTION_TRIANGLES&&section.count>(uint32_t)(DL_STREAM_SCENE_MAX_TRIANGLES-bank->triangle_count))return DL_STREAM_SCENE_CAPACITY;
+                if(kind==DL_MISSION_SECTION_COLLIDERS&&section.count>(uint32_t)(DL_STREAM_SCENE_MAX_COLLIDERS-bank->level.collider_count-bank->level.floor_count))return DL_STREAM_SCENE_CAPACITY;
+                if(kind==DL_MISSION_SECTION_FLOORS&&(section.count>(uint32_t)(DL_STREAM_SCENE_MAX_FLOORS-bank->level.floor_count)||
+                    section.count>(uint32_t)(DL_STREAM_SCENE_MAX_COLLIDERS-bank->level.collider_count-bank->level.floor_count)))return DL_STREAM_SCENE_CAPACITY;
+            }
+            return scan_record(scene,bank,chunk,bank->resident_ids[job->chunk],kind,job->record++,job->entities);
         }
-    }else for(uint32_t id=1;id<=scene->mission->region_count;++id){
-        if(bank_resident(bank,id))continue;
-        DlMissionRegion region;dl_mission_region(scene->mission,id,&region);
-        DlCollider barrier={.center={region.minimum.x*.5f+region.maximum.x*.5f,region.minimum.y*.5f+region.maximum.y*.5f,region.minimum.z*.5f+region.maximum.z*.5f},
-            .half_size={(region.maximum.x-region.minimum.x)*.5f,(region.maximum.y-region.minimum.y)*.5f,(region.maximum.z-region.minimum.z)*.5f}};
-        result=add_collider(bank,barrier,-1);if(result!=DL_STREAM_SCENE_OK)goto finish;
+        if(job->phase==ASSEMBLY_COVERAGE){
+            if(job->entity>scene->mission->entity_count){job->phase=ASSEMBLY_OFFSETS;job->index=0;continue;}
+            DlMissionEntity entity;uint32_t id=job->entity++;
+            if(dl_mission_entity(scene->mission,id,&entity)!=DL_MISSION_OK||
+                (bank_resident(bank,entity.home_region_id)&&!job->entities[id-1]))return DL_STREAM_SCENE_CORRUPT;
+            return DL_STREAM_SCENE_OK;
+        }
+        if(job->phase==ASSEMBLY_OFFSETS){
+            if(job->index==(uint32_t)bank->group_count){
+                job->phase=job->contiguous_groups?ASSEMBLY_BOOTSTRAP:ASSEMBLY_FILL;job->chunk=job->record=job->index=0;
+                job->instanced_vertices=job->vertex;job->instanced_triangles=bank->triangle_count;continue;
+            }
+            DlStreamSceneGroup *group=&bank->groups[job->index++];group->first_vertex=job->vertex;job->vertex+=group->triangle_count*3;
+            if(!job->contiguous_groups)group->written_triangles=0;
+            return DL_STREAM_SCENE_OK;
+        }
+        if(job->phase==ASSEMBLY_FILL){
+            if(job->chunk==job->borrowed){job->phase=ASSEMBLY_BOOTSTRAP;job->index=0;
+                job->instanced_vertices=job->vertex;job->instanced_triangles=bank->triangle_count;continue;}
+            const DlMissionChunk *chunk=job->chunks[job->chunk];DlMissionSection section;
+            if(dl_mission_section(chunk,DL_MISSION_SECTION_TRIANGLES,&section)!=DL_MISSION_OK||job->record==section.count){++job->chunk;job->record=0;continue;}
+            return fill_record(bank,chunk,bank->resident_ids[job->chunk],job->record++);
+        }
+        if(job->phase==ASSEMBLY_BOOTSTRAP){
+            if(job->index==(uint32_t)scene->bootstrap->model_count){job->phase=ASSEMBLY_GROUPS;job->index=0;continue;}
+            uint32_t index=job->index++;const DlModelInstance *model=&scene->bootstrap->models[index];DlMissionEntity entity;
+            if(dl_mission_entity(scene->mission,definition->model_entity_ids[index],&entity)!=DL_MISSION_OK)return DL_STREAM_SCENE_CORRUPT;
+            uint32_t region=entity.home_region_id;
+            if(model->role==DL_MODEL_GUARD&&job->has_game)region=locate(scene,bank,job->enemy_positions[model->enemy_index]);
+            /* Small shared door leaves preserve their global visual state. */
+            if(model->role!=DL_MODEL_DOOR&&!bank_resident(bank,region))return DL_STREAM_SCENE_OK;
+            if(bank->level.model_count+bank->group_count>=DL_MAX_MODELS)return DL_STREAM_SCENE_CAPACITY;
+            const DlMesh *mesh=&scene->bootstrap->meshes[model->mesh];
+            if(mesh->vertex_count>DL_MAX_SCENE_VERTICES-job->instanced_vertices||
+                mesh->index_count/3>DL_MAX_SCENE_TRIANGLES-job->instanced_triangles)return DL_STREAM_SCENE_CAPACITY;
+            job->instanced_vertices+=mesh->vertex_count;job->instanced_triangles+=mesh->index_count/3;
+            bank->models[bank->level.model_count++]=*model;return DL_STREAM_SCENE_OK;
+        }
+        if(job->phase==ASSEMBLY_GROUPS){
+            if(job->index==(uint32_t)bank->group_count){job->phase=ASSEMBLY_BARRIERS;job->index=0;continue;}
+            const DlStreamSceneGroup *group=&bank->groups[job->index++];const DlStreamMaterial *source=material(scene,group->material_id);
+            if(!source||group->written_triangles!=group->triangle_count)return DL_STREAM_SCENE_CORRUPT;
+            int mesh=bank->level.mesh_count++;
+            bank->meshes[mesh]=(DlMesh){.vertices=bank->vertices+group->first_vertex,.vertex_count=group->triangle_count*3,
+                .indices=bank->indices+group->first_vertex,.index_count=group->triangle_count*3,
+                .uvs=group->attribute_flags&DL_MISSION_TRIANGLE_UV?bank->uvs+group->first_vertex:NULL,
+                .normals=group->attribute_flags&DL_MISSION_TRIANGLE_NORMAL?bank->normals+group->first_vertex:NULL,
+                .stream_key=((uint64_t)group->region_id<<40)|((uint64_t)group->material_id<<8)|group->attribute_flags};
+            DlModelInstance *model=&bank->models[bank->level.model_count++];
+            *model=(DlModelInstance){.mesh=(uint16_t)mesh,.position=group->origin,.scale={1,1,1},.role=DL_MODEL_STATIC,
+                .texture=source->texture_id?(int16_t)(source->texture_id-1):-1,.double_sided=source->double_sided,.enemy_index=-1};
+            memcpy(model->color,source->color,4);
+            if(group->baked)for(int state=0;state<2;++state)model->baked_colors[state]=bank->baked_colors[state][group->first_vertex/3];
+            return DL_STREAM_SCENE_OK;
+        }
+        if(job->phase==ASSEMBLY_BARRIERS){
+            if(definition->policy==DL_STREAM_POLICY_AUTHORED){
+                if(job->index==definition->transition_count){dl_query_cache_index_begin(&bank->query_cache);job->phase=ASSEMBLY_QUERY;continue;}
+                const DlStreamTransition *gate=&definition->transitions[job->index++];
+                if(!bank_resident(bank,gate->from_region)||
+                    (job->resident_mask&definition->policy_regions[gate->to_region-1].working_mask)==definition->policy_regions[gate->to_region-1].working_mask)return DL_STREAM_SCENE_OK;
+                DlCollider barrier={.center={(gate->minimum.x+gate->maximum.x)*.5f,(gate->minimum.y+gate->maximum.y)*.5f,(gate->minimum.z+gate->maximum.z)*.5f},
+                    .half_size={(gate->maximum.x-gate->minimum.x)*.5f,(gate->maximum.y-gate->minimum.y)*.5f,(gate->maximum.z-gate->minimum.z)*.5f}};
+                int object=gate->door_entity_id?object_index(scene,gate->door_entity_id):-1;
+                if(gate->door_entity_id&&object<0)return DL_STREAM_SCENE_CORRUPT;
+                return add_collider(bank,barrier,object);
+            }
+            if(job->index==scene->mission->region_count){dl_query_cache_index_begin(&bank->query_cache);job->phase=ASSEMBLY_QUERY;continue;}
+            uint32_t id=++job->index;if(bank_resident(bank,id))return DL_STREAM_SCENE_OK;
+            DlMissionRegion region;if(dl_mission_region(scene->mission,id,&region)!=DL_MISSION_OK)return DL_STREAM_SCENE_CORRUPT;
+            DlCollider barrier={.center={region.minimum.x*.5f+region.maximum.x*.5f,region.minimum.y*.5f+region.maximum.y*.5f,region.minimum.z*.5f+region.maximum.z*.5f},
+                .half_size={(region.maximum.x-region.minimum.x)*.5f,(region.maximum.y-region.minimum.y)*.5f,(region.maximum.z-region.minimum.z)*.5f}};
+            return add_collider(bank,barrier,-1);
+        }
+        if(job->phase==ASSEMBLY_QUERY){
+            if(dl_query_cache_index_step(&bank->query_cache))job->phase=ASSEMBLY_DONE;
+            return DL_STREAM_SCENE_OK;
+        }
+        return DL_STREAM_SCENE_OK;
     }
-finish:
-    for(size_t i=0;i<borrowed;++i)dl_world_stream_release(stream,handles[i]);
-    if(result==DL_STREAM_SCENE_OK){scene->active_bank^=1u;++scene->revision;}
+}
+DlStreamSceneStatus dl_stream_scene_prepare_step(DlStreamScene *scene,size_t record_budget,bool *ready){
+    if(!valid(scene)||!ready)return DL_STREAM_SCENE_ARGUMENT;
+    *ready=scene->pending_ready;
+    if(!scene->assembly.active)return scene->pending_ready?DL_STREAM_SCENE_OK:DL_STREAM_SCENE_NOT_READY;
+    while(record_budget--){
+        DlStreamSceneStatus status=assembly_record(scene);
+        if(status!=DL_STREAM_SCENE_OK){dl_stream_scene_prepare_cancel(scene);*ready=false;return status;}
+        if(scene->assembly.phase==ASSEMBLY_DONE){assembly_release(scene);scene->pending_ready=*ready=true;break;}
+    }
+    return DL_STREAM_SCENE_OK;
+}
+DlStreamSceneStatus dl_stream_scene_prepare(DlStreamScene *scene,DlWorldStream *stream,const DlGame *game){
+    if(!prepare_arguments(scene,stream,game))return DL_STREAM_SCENE_ARGUMENT;
+    /* The synchronous compatibility API replaces an older unpublished job. */
+    dl_stream_scene_prepare_cancel(scene);
+    DlStreamSceneStatus result=dl_stream_scene_prepare_begin(scene,stream,game);if(result!=DL_STREAM_SCENE_OK)return result;
+    bool ready=false;return dl_stream_scene_prepare_step(scene,SIZE_MAX,&ready);
+}
+const DlLevel *dl_stream_scene_pending(const DlStreamScene *scene){
+    return valid(scene)&&scene->pending_ready?&scene->banks[scene->active_bank^1u].level:NULL;
+}
+bool dl_stream_scene_pending_guards_match(const DlStreamScene *scene,const DlGame *game){
+    if(!dl_stream_scene_pending(scene)||!game||game->enemy_count!=scene->bootstrap->enemy_count)return false;
+    const DlStreamSceneBank *bank=&scene->banks[scene->active_bank^1u];
+    int expected[DL_MAX_ENEMIES]={0},actual[DL_MAX_ENEMIES]={0};
+    for(int i=0;i<scene->bootstrap->model_count;++i){const DlModelInstance *model=&scene->bootstrap->models[i];
+        if(model->role==DL_MODEL_GUARD&&bank_resident(bank,locate(scene,bank,game->enemies[model->enemy_index].position)))
+            ++expected[model->enemy_index];
+    }
+    for(int i=0;i<bank->level.model_count;++i){const DlModelInstance *model=&bank->models[i];
+        if(model->role==DL_MODEL_GUARD)++actual[model->enemy_index];
+    }
+    for(int i=0;i<game->enemy_count;++i)if(expected[i]!=actual[i])return false;
+    return true;
+}
+void dl_stream_scene_publish(DlStreamScene *scene){
+    if(!valid(scene)||!scene->pending_ready||scene->assembly.active||scene->revision==UINT32_MAX)return;
+    scene->active_bank^=1u;++scene->revision;scene->pending_ready=false;
+}
+DlStreamSceneStatus dl_stream_scene_refresh(DlStreamScene *scene,DlWorldStream *stream,const DlGame *game){
+    DlStreamSceneStatus result=dl_stream_scene_prepare(scene,stream,game);
+    if(result==DL_STREAM_SCENE_OK)dl_stream_scene_publish(scene);
     return result;
 }
 const DlLevel *dl_stream_scene_level(const DlStreamScene *scene){
@@ -405,6 +487,19 @@ static bool gate_crossed(const DlStreamTransition *gate,DlVec3 from,DlVec3 to){
     return true;
 }
 void dl_stream_scene_policy_reset(DlStreamPolicyState *state){if(state)memset(state,0,sizeof *state);}
+static float approach_score(const DlStreamTransition *gate,DlVec3 position,const DlStreamPolicyState *state){
+    float score=gate_distance(gate,position);
+    if(!state->has_approach_direction)return score;
+    DlVec3 end={position.x+state->approach_direction.x*approach_distance,position.y,
+        position.z+state->approach_direction.z*approach_distance};
+    if(gate_crossed(gate,position,end))return 0;
+    for(int i=1;i<=3;++i){float distance_ahead=approach_distance*i/3;
+        DlVec3 probe={position.x+state->approach_direction.x*distance_ahead,position.y,
+        position.z+state->approach_direction.z*distance_ahead};
+        float distance=gate_distance(gate,probe);if(distance<score)score=distance;
+    }
+    return score;
+}
 uint32_t dl_stream_scene_demand(const DlStreamScene *scene,DlVec3 position,uint32_t current){
     DlStreamPolicyState state={.current_region=current};
     return dl_stream_scene_policy_update(scene,position,0,&state);
@@ -413,7 +508,27 @@ uint32_t dl_stream_scene_policy_update(const DlStreamScene *scene,DlVec3 positio
     if(!valid(scene)||!state||!finite_vec(position))return 0;
     const DlStreamDefinition *definition=scene->bootstrap->stream;
     if(state->current_region>scene->mission->region_count||
-        (state->has_previous_position&&!finite_vec(state->previous_position)))return 0;
+        (state->has_previous_position&&!finite_vec(state->previous_position))||
+        (state->has_approach_position&&!finite_vec(state->approach_position))||
+        (state->has_approach_direction&&!finite_vec(state->approach_direction)))return 0;
+    if(state->has_approach_position){
+        float x=position.x-state->approach_position.x,z=position.z-state->approach_position.z;
+        float length2=x*x+z*z;
+        if(length2>1){state->has_approach_direction=false;state->approach_reverse_distance=0;} /* remote placement */
+        else if(length2>.000001f){float length=sqrtf(length2);
+            DlVec3 direction={x/length,0,z/length};
+            float alignment=direction.x*state->approach_direction.x+direction.z*state->approach_direction.z;
+            if(state->has_approach_direction&&alignment<-.2f)state->approach_reverse_distance+=length;
+            else state->approach_reverse_distance=0;
+            /* Landing and contact corrections must not reverse a prefetch.
+             * Deliberate return travel switches after ten centimetres; turns
+             * toward a different doorway continue to switch immediately. */
+            if(!state->has_approach_direction||alignment>=-.2f||state->approach_reverse_distance>=.1f){
+                state->approach_direction=direction;state->has_approach_direction=true;state->approach_reverse_distance=0;
+            }
+        }
+    }
+    state->approach_position=position;state->has_approach_position=true;
     uint32_t waiting=0;
     uint32_t candidate=dl_stream_scene_region_at_preferred(scene,position,state->current_region?state->current_region:scene->mission->entry_region_id);
     if(!state->current_region){if(!candidate)return 0;state->current_region=candidate;}
@@ -443,16 +558,18 @@ uint32_t dl_stream_scene_policy_update(const DlStreamScene *scene,DlVec3 positio
     if(!retain_sample||!state->has_previous_position){state->previous_position=position;state->has_previous_position=true;}
     uint32_t wanted=dl_stream_scene_working_mask(scene,state->current_region);
     if(definition->policy!=DL_STREAM_POLICY_AUTHORED)return wanted;
-    uint32_t best=waiting;float nearest=3.f;
+    /* At ordinary walking speed this gives preparation about two seconds of
+     * approach time while retaining only one bounded transition union. */
+    uint32_t best=waiting;float nearest=approach_distance;
     for(uint32_t i=0;i<definition->transition_count;++i){const DlStreamTransition *gate=&definition->transitions[i];
         if(gate->from_region!=state->current_region)continue;
-        float distance=gate_distance(gate,position);
-        if(!waiting&&distance<=nearest&&(!best||distance<nearest)){nearest=distance;best=i+1;}
+        float distance=gate_distance(gate,position),score=approach_score(gate,position,state);
+        if(!waiting&&distance<=approach_distance&&(!best||score<nearest)){nearest=score;best=i+1;}
     }
     if(!waiting&&state->pending_transition&&state->pending_transition<=definition->transition_count){
         const DlStreamTransition *pending=&definition->transitions[state->pending_transition-1];
-        float distance=gate_distance(pending,position);
-        if(pending->from_region==state->current_region&&distance<=3.f&&(!best||nearest+.15f>=distance))best=state->pending_transition;
+        float distance=gate_distance(pending,position),score=approach_score(pending,position,state);
+        if(pending->from_region==state->current_region&&distance<=approach_distance&&(!best||nearest+.15f>=score))best=state->pending_transition;
     }
     state->pending_transition=best;
     if(best)wanted|=dl_stream_scene_working_mask(scene,definition->transitions[best-1].to_region);

@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Cook a bounded version-2 scene and manual partitions into DLM1/DLR1 bytes.
 
-This experimental format contains static triangles, upright boxes and home IDs.
-It does not contain render resources or enough gameplay data to run a mission.
+Night missions use DLR1 v4 with native-cooked two-state triangle lighting.
+Persistent gameplay and shared dynamic visuals live in the stream bootstrap.
 """
 from __future__ import annotations
 
@@ -21,9 +21,11 @@ import zlib
 try:
     import compile_level as level
     from asset_pack import content_path
+    from cook_stream_lighting import prepare_stream_lighting
 except ModuleNotFoundError:
     from tools import compile_level as level
     from tools.asset_pack import content_path
+    from tools.cook_stream_lighting import prepare_stream_lighting
 
 ROOT = Path(__file__).resolve().parents[1]
 DIRECTORY_HEADER_BYTES = 64
@@ -33,6 +35,7 @@ CHUNK_HEADER_BYTES = 32
 SECTION_RECORD_BYTES = 24
 ENTITY_KINDS = {"guard": 1, "door": 2, "loot": 3, "objective": 4}
 RECORD_BYTES = {1: 44, 2: 32, 3: 4, 4: 36}
+COOK_VERSION = 2
 
 
 def canonical_json(value):
@@ -82,7 +85,7 @@ def read_source(manifest, content_root, source_document=None):
             level.require(isinstance(material["texture"], dict), "material.texture: expected an object")
             dependency = content_path(material["texture"].get("uri"), content_root, {".png", ".jpg", ".jpeg"})
             dependencies[dependency.relative_to(content_root).as_posix()] = hashlib.sha256(dependency.read_bytes()).hexdigest()
-    state = level.validate(document, content_root, streaming=True)
+    state = level.validate(canonical_source(document), content_root, streaming=True)
     for entity in state["models"]:
         if entity["kind"] == "static" and "texture" in state["materials"][entity["material"]]:
             level.require("uvs" in state["meshes"][entity["model"]],
@@ -248,11 +251,11 @@ def collider_corners(box):
 def make_chunk(origin, sections, version=1):
     """Section tuples are (kind, payload, count); empty sections are omitted."""
     sections = sorted((row for row in sections if row[2]), key=lambda row: row[0])
-    level.require(1 <= len(sections) <= (4 if version == 3 else 3), "Region requires at least one section")
+    level.require(1 <= len(sections) <= (4 if version >= 3 else 3), "Region requires at least one section")
     cursor = align16(CHUNK_HEADER_BYTES + SECTION_RECORD_BYTES * len(sections))
     descriptors, payloads = [], []
     for kind, payload, count in sections:
-        record_bytes = 80 if kind == 1 and version >= 2 else RECORD_BYTES[kind]
+        record_bytes = (128 if version >= 4 else 80) if kind == 1 and version >= 2 else RECORD_BYTES[kind]
         level.require(len(payload) == count * record_bytes, "Internal section length mismatch")
         descriptors.append(struct.pack(">HHIIIII", kind, 0, cursor, len(payload), count, record_bytes, 0))
         payloads.append((cursor, payload))
@@ -286,6 +289,92 @@ def triangle_attributes(mesh, corners, transform, positions):
     return struct.pack(">6f9bB2x", *uvs, *normals, 3)
 
 
+def target_float(value):
+    return struct.unpack(">f", struct.pack(">f", value))[0]
+
+
+def stream_lighting_scene(document, state, regions, payloads, material_ids):
+    """Emit the full shadow scene with exactly the stream's target geometry.
+
+    Static instances are flattened into the same region/material meshes that
+    the runtime publishes. Their vertices remain local to the serialized
+    origin; quantized normals are copied directly, without a second rotation.
+    """
+    full = dict(state, models=[], meshes={}, colliders=[], floors=[], streamed_source=False)
+    full.pop("baked_lighting", None)
+    full["materials"] = {ident: dict(material, emissive=[0, 0, 0]) for ident, material in state["materials"].items()}
+    material_names = {value: ident for ident, value in material_ids.items()}
+    groups = []
+    for region, payload in zip(regions, payloads):
+        origin = [target_float(value) for value in payload["origin"]]
+        grouped = {}
+        triangles = payload["triangles"]
+        for offset in range(0, len(triangles), 128):
+            material, = struct.unpack_from(">I", triangles, offset + 36)
+            grouped.setdefault(material, []).append(offset)
+        for material, offsets in grouped.items():
+            ident = f"stream-{region['id']}-material-{material}"
+            vertices, normals, uvs = [], [], []
+            for offset in offsets:
+                values = struct.unpack_from(">9f", triangles, offset)
+                vertices.extend([list(values[index:index + 3]) for index in range(0, 9, 3)])
+                values = struct.unpack_from(">6f", triangles, offset + 44)
+                uvs.extend([list(values[index:index + 2]) for index in range(0, 6, 2)])
+                values = struct.unpack_from(">9b", triangles, offset + 68)
+                normals.extend([[channel / 127 for channel in values[index:index + 3]] for index in range(0, 9, 3)])
+            level.require(len(vertices) <= 4096, ident + ": full lighting group exceeds 4096 mesh vertices")
+            full["meshes"][ident] = dict(vertices=vertices, indices=list(range(len(vertices))), normals=normals, uvs=uvs)
+            full["materials"][ident] = dict(state["materials"][material_names[material]], emissive=[0, 0, 0])
+            full["texture_indices"] = dict(full["texture_indices"])
+            if material_names[material] in full["texture_indices"]:
+                full["texture_indices"][ident] = full["texture_indices"][material_names[material]]
+            full["models"].append(dict(id=ident, kind="static", model=ident, material=ident,
+                                       transform=dict(position=origin, rotation=[0, 0, 0], scale=[1, 1, 1])))
+            groups.append((payload, offsets))
+        for offset in range(0, len(payload["colliders"]), 32):
+            values = struct.unpack_from(">7fI", payload["colliders"], offset)
+            ident = payload["collider_entities"][offset // 32]
+            full["colliders"].append(dict(id=ident,
+                center=[target_float(values[axis] + origin[axis]) for axis in range(3)],
+                half_size=list(values[3:6]), yaw=values[6], door=state["by_id"][ident]["kind"] == "door"))
+        for offset in range(0, len(payload["floors"]), 36):
+            values = struct.unpack_from(">9f", payload["floors"], offset)
+            full["floors"].append(dict(vertices=[[target_float(values[index * 3 + axis] + origin[axis])
+                                                  for axis in range(3)] for index in range(3)]))
+    bootstrap_models = [entity for entity in state["models"] if entity["kind"] != "static"]
+    for entity in bootstrap_models:
+        full["models"].append(entity)
+        full["meshes"][entity["model"]] = state["meshes"][entity["model"]]
+        # Persistent visuals retain the authored material, including emission.
+        full["materials"][entity["material"]] = state["materials"][entity["material"]]
+    level.require(len(full["models"]) <= 65535, "Full mission lighting worker supports at most 65535 models")
+    return level.header(document, full), groups, bootstrap_models
+
+
+def bake_stream_payloads(document, state, regions, payloads, material_ids):
+    header, groups, bootstrap_models = stream_lighting_scene(document, state, regions, payloads, material_ids)
+    report, colors = prepare_stream_lighting(header, collider_count=len(state["colliders"]), floor_count=len(state.get("floors", [])))
+    for model, (payload, offsets) in enumerate(groups):
+        closed, opened = colors[model]
+        level.require(len(closed) == len(offsets) * 24, "Stream lighting group size mismatch")
+        for triangle, offset in enumerate(offsets):
+            payload["triangles"][offset + 80:offset + 104] = closed[triangle * 24:triangle * 24 + 24]
+            payload["triangles"][offset + 104:offset + 128] = opened[triangle * 24:triangle * 24 + 24]
+    report["bootstrap_models"] = [dict(id=entity["id"], triangles=len(colors[index][0]) // 24,
+        closed_rgba=colors[index][0].hex(), open_rgba=colors[index][1].hex())
+        for index, entity in enumerate(bootstrap_models, len(groups)) if index in colors]
+    report.update(full_scene_colliders=len(state["colliders"]), full_scene_floors=len(state.get("floors", [])),
+                  global_lights=len(state["kinds"]["light"]), stream_groups=len(groups),
+                  stream_triangles=sum(len(offsets) for _, offsets in groups),
+                  storage="embedded", host_worker_format="DLS1", host_worker_bytes=report["bytes"],
+                  standalone_rom_asset_bytes=0,
+                  mission_embedded_rgba_bytes=sum(len(offsets) for _, offsets in groups) * 48,
+                  bootstrap_embedded_rgba_bytes=sum(len(bytes.fromhex(row[key])) for row in report["bootstrap_models"]
+                                                    for key in ("closed_rgba", "open_rgba")),
+                  storage_note="bytes and sha256 describe the host worker cache, including its header/table. Triangle RGBA is already included in mission package bytes; bootstrap RGBA is resident constant array data. No standalone lighting ROM asset is emitted.")
+    return report
+
+
 def cook_mission(manifest, content_root=ROOT / "content", *, source_document=None):
     """Validate all inputs before returning reproducible package bytes/report."""
     fields(manifest, {"version", "source", "entry_region", "regions"}, "Mission manifest", {"visibility", "transitions"})
@@ -293,8 +382,8 @@ def cook_mission(manifest, content_root=ROOT / "content", *, source_document=Non
     level.require(manifest.get("visibility", "door-distance") in ("door-distance", "all-regions", "authored-sets"), "Unsupported mission visibility policy")
     content_root = Path(content_root).resolve()
     document, state, source_raw, dependencies = read_source(manifest, content_root, source_document)
-    chunk_version = 3 if state.get("floors") else 2 if state["textures"] else 1
-    triangle_bytes = 80 if chunk_version >= 2 else 44
+    chunk_version = 4 if document.get("environment") is not None else 3 if state.get("floors") else 2 if state["textures"] else 1
+    triangle_bytes = 128 if chunk_version >= 4 else 80 if chunk_version >= 2 else 44
     regions, homes = validated_regions(manifest, state)
     policy = authored_policy(manifest, regions, state, homes)
     region_ids = {row["id"]: index + 1 for index, row in enumerate(regions)}
@@ -311,10 +400,11 @@ def cook_mission(manifest, content_root=ROOT / "content", *, source_document=Non
     surface_ids = {(row["entity"], row["triangle"]): index + 1 for index, row in enumerate(surface_rows)}
     boxes = {box["id"]: box for box in state["colliders"]}
     floors = {floor["id"]: floor for floor in state.get("floors", [])}
-    chunks, region_reports = [], []
+    chunks, region_reports, payloads = [], [], []
     for region in regions:
         origin = [(a + b) / 2 for a, b in zip(*region["bounds"])]
         triangle_payload, collider_payload, floor_payload = bytearray(), bytearray(), bytearray()
+        collider_entities = []
         region_materials = set()
         for ident in region["entities"]:
             entity = state["by_id"][ident]
@@ -329,12 +419,15 @@ def cook_mission(manifest, content_root=ROOT / "content", *, source_document=Non
                     triangle_payload.extend(struct.pack(">9fII", *local, material_ids[entity["material"]], surface_ids[(ident, triangle)]))
                     if chunk_version >= 2:
                         triangle_payload.extend(triangle_attributes(mesh, corners, entity["transform"], positions))
+                    if chunk_version >= 4:
+                        triangle_payload.extend(bytes(48))
                     region_materials.add(material_ids[entity["material"]])
             if ident in boxes:
                 box = boxes[ident]
                 assert_bounds(region, collider_corners(box), ident + " collider")
                 local = [box["center"][axis] - origin[axis] for axis in range(3)]
                 collider_payload.extend(struct.pack(">7fI", *local, *box["half_size"], box["yaw"], entity_ids[ident]))
+                collider_entities.append(ident)
             if ident in floors:
                 points = floors[ident]["vertices"]
                 assert_bounds(region, points, ident + " floor")
@@ -349,21 +442,27 @@ def cook_mission(manifest, content_root=ROOT / "content", *, source_document=Non
                 level.validate_floor_vertices(target_world, ident + " floor at target reconstructed float precision", target_float=True)
                 floor_payload.extend(payload)
         entity_payload = b"".join(struct.pack(">I", entity_ids[ident]) for ident in region["entities"])
-        sections = [(1, triangle_payload, len(triangle_payload) // triangle_bytes),
-                    (2, collider_payload, len(collider_payload) // 32), (3, entity_payload, len(region["entities"]))]
-        if chunk_version == 3:
-            sections.append((4, floor_payload, len(floor_payload)//36))
-        chunk = make_chunk(origin, sections, version=chunk_version)
-        chunks.append(chunk)
+        payloads.append(dict(origin=origin, triangles=triangle_payload, colliders=collider_payload,
+                             floors=floor_payload, entities=entity_payload, collider_entities=collider_entities))
         region_reports.append(dict(id=region_ids[region["id"]], source_id=region["id"], bounds=region["bounds"], origin=origin,
                                    chunk_version=chunk_version, triangle_count=len(triangle_payload) // triangle_bytes, collider_count=len(collider_payload) // 32,
                                    material_ids=sorted(region_materials), floor_count=len(floor_payload)//36,
-                                   entity_count=len(region["entities"]), chunk_bytes=len(chunk), crc32=f"{zlib.crc32(chunk):08x}"))
+                                   entity_count=len(region["entities"])))
+    lighting = bake_stream_payloads(document, state, regions, payloads, material_ids) if chunk_version >= 4 else None
+    for payload, region_report in zip(payloads, region_reports):
+        sections = [(1, payload["triangles"], len(payload["triangles"]) // triangle_bytes),
+                    (2, payload["colliders"], len(payload["colliders"]) // 32), (3, payload["entities"], len(payload["entities"]) // 4)]
+        if chunk_version >= 3:
+            sections.append((4, payload["floors"], len(payload["floors"]) // 36))
+        chunk = make_chunk(payload["origin"], sections, version=chunk_version)
+        chunks.append(chunk)
+        region_report.update(chunk_bytes=len(chunk), crc32=f"{zlib.crc32(chunk):08x}")
     canonical_manifest = dict(manifest, regions=regions)
     if policy:
         canonical_manifest["transitions"] = policy["transitions"]
     source_sha = hashlib.sha256(canonical_json(canonical_source(document))).hexdigest()
-    identity = hashlib.sha256(canonical_json(dict(format=f"DLM1/DLR1-v{chunk_version}", source_sha256=source_sha,
+    identity = hashlib.sha256(canonical_json(dict(format=f"DLM1/DLR1-v{chunk_version}", cook_version=COOK_VERSION,
+                                                 lighting_signature=lighting["signature"] if lighting else None, source_sha256=source_sha,
                                                  manifest=canonical_manifest, content_dependencies=dependencies))).digest()
     dependency_ids = [region_ids[neighbor] for region in regions for neighbor in region["neighbors"]]
     directory_bytes = DIRECTORY_HEADER_BYTES + len(regions) * REGION_RECORD_BYTES + len(entity_ids) * ENTITY_RECORD_BYTES + len(dependency_ids) * 4
@@ -397,7 +496,8 @@ def cook_mission(manifest, content_root=ROOT / "content", *, source_document=Non
                      decoded_chunk_bytes=sum(len(chunks[region_ids[name] - 1]) for name in [region["id"]] + region["neighbors"])) for region in regions]
     peak = max(overlaps, key=lambda row: (row["decoded_chunk_bytes"], row["region"]))
     omitted_models = [ident for ident in sorted(state["by_id"]) if "model" in state["by_id"][ident] and state["by_id"][ident]["kind"] != "static"]
-    report = dict(format="DLM1/DLR1", version=1, chunk_version=chunk_version, visibility=manifest.get("visibility", "door-distance"), experimental=True, source=manifest["source"],
+    report = dict(format="DLM1/DLR1", version=1, cook_version=COOK_VERSION, chunk_version=chunk_version, lighting=lighting,
+                  visibility=manifest.get("visibility", "door-distance"), experimental=True, source=manifest["source"],
                   source_sha256=source_sha, source_file_sha256=hashlib.sha256(source_raw).hexdigest(), content_identity_sha256=identity.hex(),
                   package_sha256=hashlib.sha256(result).hexdigest(), package_bytes=package_bytes, directory_bytes=directory_bytes,
                   directory_crc32=f"{struct.unpack_from('>I', result, 28)[0]:08x}",
@@ -412,7 +512,7 @@ def cook_mission(manifest, content_root=ROOT / "content", *, source_document=Non
                   renderer_bytes=None, audio_bytes=None, code_display_buffers_bytes=None, loader_slots_and_scratch_bytes=None,
                   unknown_costs=["renderer caches, packing and textures", "audio", "code and display/depth buffers", "loader slot padding and scratch", "visibility, navigation and richer collision"]),
                   omissions=dict(nonstatic_visual_entities=omitted_models,
-                  features=["dynamic model geometry and animation", "material colors in chunk payloads", "lighting and probes", "gameplay definitions, transforms and scripts", "visibility/PVS, navigation, BVHs and triangle sweeps"] + (["UVs and normals"] if chunk_version == 1 else []),
+                  features=["dynamic model geometry and animation", "material colors in chunk payloads", "gameplay definitions, transforms and scripts", "visibility/PVS, navigation, BVHs and triangle sweeps"] + (["lighting and probes"] if not lighting else ["lighting probes"]) + (["UVs and normals"] if chunk_version == 1 else []),
                   unsupported_inputs=["external-scale-study", "animated character assets", "linked asset packs"]),
                   acceptance="Portable package foundation only; neighbor overlap is authored adjacency, not a proven PVS or an 8 MiB runtime budget.")
     report["working_sets"], report["max_resident_regions"] = working_sets(policy, region_reports, state, homes)
@@ -450,6 +550,28 @@ def bootstrap_header(document, state, package_report, package_path):
     bootstrap["streamed_source"] = False
     bootstrap.pop("baked_lighting", None)
     text = level.header(document, bootstrap)
+    baked = {row["id"]: row for row in (package_report.get("lighting") or {}).get("bootstrap_models", [])}
+    color_arrays = []
+    if baked:
+        # Colors belong to instances, since door and loot may share one mesh
+        # while using different transforms, materials and shadowing.
+        model_rows = text.split("static const DlModelInstance dl_demo_models[] = {\n", 1)[1].split("\n};", 1)[0]
+        for index, entity in enumerate(bootstrap["models"]):
+            row = baked.get(entity["id"])
+            if not row:
+                continue
+            pointers = []
+            for side, key in enumerate(("closed_rgba", "open_rgba")):
+                name = f"dl_stream_baked_model_{index}_{side}"
+                values = ",".join(str(value) for value in bytes.fromhex(row[key]))
+                color_arrays.append(f"static const uint8_t {name}[] = {{{values}}};")
+                pointers.append(name)
+            lines = model_rows.splitlines()
+            lines[index] = lines[index].replace("{NULL,NULL}", "{" + ",".join(pointers) + "}")
+            model_rows = "\n".join(lines)
+        text = re.sub(r"static const DlModelInstance dl_demo_models\[\] = \{\n.*?\n\};",
+                      "\n".join(color_arrays) + "\nstatic const DlModelInstance dl_demo_models[] = {\n" + model_rows + "\n};",
+                      text, count=1, flags=re.S)
     # The existing helper emits legacy collision declarations even at count=0.
     # The stream bootstrap contains neither those arrays nor static geometry.
     text = re.sub(r"static const DlCollider dl_demo_colliders\[\] = \{\s*\};\n", "", text)
@@ -492,13 +614,14 @@ def bootstrap_header(document, state, package_report, package_path):
     meshes = list(bootstrap["meshes"].values())
     geometry_bytes = sum(len(mesh["vertices"]) * 12 + len(mesh["indices"]) * 2 + len(mesh.get("uvs", [])) * 8 + len(mesh.get("normals", [])) * 3 for mesh in meshes)
     return text, dict(compiled_geometry_bytes=geometry_bytes,
+                      baked_color_bytes=sum(len(bytes.fromhex(row[key])) for row in baked.values() for key in ("closed_rgba", "open_rgba")),
                       mesh_count=len(meshes), model_count=len(bootstrap["models"]),
                       models=[entity["id"] for entity in bootstrap["models"]],
                       model_entity_ids=[entity_ids[entity["id"]] for entity in bootstrap["models"]],
                       object_entity_ids=[entity_ids[entity["id"]] for entity in state["objects"]],
                       enemy_entity_ids=[entity_ids[entity["id"]] for entity in state["enemies"]],
                       collider_count=0, static_model_count=0,
-                      memory_note="Shared dynamic geometry arrays only. Descriptors, global gameplay state, stream scene banks, slots and renderer/audio/display costs are additional.")
+                      memory_note="compiled_geometry_bytes counts shared dynamic geometry; baked_color_bytes counts resident constant RGBA arrays separately. Descriptors, global gameplay state, stream scene banks, slots and renderer/audio/display costs are additional.")
 
 
 def validate_stream_bridge(package_report):
@@ -554,11 +677,14 @@ def prepare_stream_level(manifest_path, output, content_root=None):
         digest.update(path.name.encode("utf-8"))
         digest.update(path.read_bytes())
     report = dict(version=2, title=document["title"], source_sha256=digest.hexdigest(),
+                  mission_manifest_sha256=hashlib.sha256(manifest_raw).hexdigest(),
                   authoring_only=False, playable=True, experimental_stream=True,
-                  compiled_geometry_bytes=bootstrap["compiled_geometry_bytes"], bootstrap=bootstrap,
+                  compiled_geometry_bytes=bootstrap["compiled_geometry_bytes"],
+                  compiled_baked_color_bytes=bootstrap["baked_color_bytes"],
+                  compiled_known_array_bytes=bootstrap["compiled_geometry_bytes"] + bootstrap["baked_color_bytes"], bootstrap=bootstrap,
                   counts=dict(entities=len(state["by_id"]), models=bootstrap["model_count"], meshes=bootstrap["mesh_count"],
                               colliders=0, lights=len(state["kinds"]["light"]), enemies=len(state["enemies"]), test_starts=len(state["test_starts"])),
-                  characters={}, lighting=None, test_starts=state["test_starts"],
+                  characters={}, lighting=package_report.get("lighting"), test_starts=state["test_starts"],
                   mission=dict(path=relative, sha256=package_report["package_sha256"], bytes=len(package), report=package_report),
                   memory_note="Bootstrap shared visuals/global definitions are resident. Static architecture and all colliders live in mission chunks. No full mission or hardware performance acceptance is implied.")
     texture_report = dict(version=1, textures=state["textures"], **level.texture_memory_summary(state["textures"]))
@@ -608,7 +734,7 @@ def main(argv=None):
         atomic_write(args.output, package)
         print(json.dumps(dict(package=str(args.output), report=str(report_path), package_bytes=len(package), directory_bytes=report["directory_bytes"])))
         return 0
-    except (ValueError, OSError, KeyError, TypeError) as error:
+    except (ValueError, OSError, KeyError, TypeError, RuntimeError) as error:
         print("Mission cook failed: " + str(error), file=sys.stderr)
         return 1
 

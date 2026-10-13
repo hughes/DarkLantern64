@@ -291,13 +291,15 @@ def prepare_bundle(entries, title, output, sdk, *, start_level=None, start_prese
               "initial_start": initial_start, "start_in_menu": start_in_menu, **package,
               "resident_geometry_bytes": sum(level["content"]["compiled_geometry_bytes"] for level in levels),
               "resident_bootstrap_geometry_bytes": sum(level["content"]["compiled_geometry_bytes"] for level in levels if level["content"].get("experimental_stream")),
+              "resident_baked_color_bytes": sum(level["content"].get("compiled_baked_color_bytes", 0) for level in levels),
               "stream_rom_bytes": package["missions"]["bytes"],
-              "memory_note": "Normal level geometry and all bootstrap descriptors/shared visuals are resident. Stream mission architecture/colliders are ROM chunks. Only active-level sprites are loaded. Directory, stream banks/slots, renderer, global game state, audio and display buffers are additional; these geometry and ROM counts are not a total RDRAM measurement."}
+              "memory_note": "resident_known_array_bytes counts geometry plus resident constant baked-color arrays. Embedded triangle colors are already included in stream_rom_bytes; host lighting worker bytes are not ROM assets. Directory, descriptors, stream banks/slots, renderer, global game state, audio and display buffers are additional; these known array and ROM counts are not a total RDRAM measurement."}
     duplicated_character_geometry = sum(sum({c["source_sha256"]: c["geometry_bytes"]
                                              for c in level["content"].get("characters", {}).values()}.values())
                                         for level in levels)
     unique_character_geometry = sum(c["report"]["geometry_bytes"] for c in shared_characters.values())
     report["resident_geometry_bytes"] += unique_character_geometry-duplicated_character_geometry
+    report["resident_known_array_bytes"] = report["resident_geometry_bytes"] + report["resident_baked_color_bytes"]
     report["characters"] = {"unique_assets": len(shared_characters),
                             "shared_geometry_bytes": unique_character_geometry,
                             "geometry_duplication_avoided_bytes": duplicated_character_geometry-unique_character_geometry,

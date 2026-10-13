@@ -631,11 +631,11 @@ def header(data, state):
         character = state["characters"].get(ident)
         if character:
             s = character["symbol"]
-            mesh_rows.append(f"    {{{s}_vertices, {len(mesh['vertices'])}, {s}_indices, {len(mesh['indices'])}, {s}_uvs, {s}_normals, &{s}}}")
+            mesh_rows.append(f"    {{{s}_vertices, {len(mesh['vertices'])}, {s}_indices, {len(mesh['indices'])}, {s}_uvs, {s}_normals, &{s}, 0}}")
         else:
             mesh_rows.append(f"    {{dl_vertices_{i}, {len(mesh['vertices'])}, dl_indices_{i}, {len(mesh['indices'])}, "+
                              (f"dl_uvs_{i}" if "uvs" in mesh else "NULL")+", "+
-                             (f"dl_normals_{i}" if "normals" in mesh else "NULL")+", NULL}")
+                             (f"dl_normals_{i}" if "normals" in mesh else "NULL")+", NULL, 0}")
     lines.append("static const DlMesh dl_demo_meshes[] = {\n"+",\n".join(mesh_rows)+"\n};")
     if state["textures"]:
         lines.append("static const DlTexture dl_demo_textures[] = {\n"+",\n".join(
@@ -647,7 +647,7 @@ def header(data, state):
         emissive="{"+",".join(str(round(v*255)) for v in material.get("emissive", [0,0,0]))+"}"
         sides="true" if material.get("double_sided",True) else "false"
         highlight = str(e.get("loot_highlight", False)).lower()
-        lines.append("    {"+f"{json.dumps(e['id'])}, {mesh_ids.index(e['model'])}, {vec(t['position'])}, {vec([math.radians(v) for v in t['rotation']])}, {vec(t['scale'])}, "+"{"+",".join(str(round(v*255)) for v in color)+"}, "+ROLES.get(e["kind"],"DL_MODEL_STATIC")+f", {state['texture_indices'].get(e['material'], -1)}, {emissive}, {sides}, {enemy_indices.get(e['id'], -1)}, {highlight}"+"},")
+        lines.append("    {"+f"{json.dumps(e['id'])}, {mesh_ids.index(e['model'])}, {vec(t['position'])}, {vec([math.radians(v) for v in t['rotation']])}, {vec(t['scale'])}, "+"{"+",".join(str(round(v*255)) for v in color)+"}, "+ROLES.get(e["kind"],"DL_MODEL_STATIC")+f", {state['texture_indices'].get(e['material'], -1)}, {emissive}, {sides}, {enemy_indices.get(e['id'], -1)}, {highlight}"+", {NULL,NULL}},")
     lines.append("};\nstatic const DlCollider dl_demo_colliders[] = {")
     for box in state["colliders"]:
         lines.append("    {"+f"{vec(box['center'])}, {vec(box['half_size'])}, {f(box['yaw'])}, "+("true" if box["door"] else "false")+"},")

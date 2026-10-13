@@ -18,6 +18,7 @@ enum {
     DL_MISSION_MAX_SECTIONS = 4,
     DL_MISSION_TRIANGLE_BYTES = 44,
     DL_MISSION_TRIANGLE_V2_BYTES = 80,
+    DL_MISSION_TRIANGLE_V4_BYTES = 128,
     DL_MISSION_COLLIDER_BYTES = 32,
     DL_MISSION_FLOOR_BYTES = 36
 };
@@ -72,7 +73,7 @@ typedef struct {
     const uint8_t *data;
     size_t bytes;
     DlMissionVec3 origin;
-    uint16_t version; /* DLR1 chunk version: 1, 2 or 3 */
+    uint16_t version; /* DLR1 chunk version: 1, 2, 3 or 4 */
     uint32_t section_count;
     DlMissionSection sections[DL_MISSION_MAX_SECTIONS];
 } DlMissionChunk;
@@ -82,6 +83,7 @@ typedef struct {
     float uvs[6]; /* U,V for each corner, in the existing runtime UV basis */
     int8_t normals[9]; /* XYZ snorm8 for each corner; -128 is not valid */
     uint8_t attribute_flags;
+    uint8_t baked_colors[2][24]; /* v4: triangle front/back RGBA in both door states */
 } DlMissionTriangle;
 typedef struct {
     DlMissionVec3 center, half_size;

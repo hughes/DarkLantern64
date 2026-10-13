@@ -146,11 +146,11 @@ DlMissionStatus dl_mission_chunk_open(const void *data,size_t bytes,DlMissionChu
     if(bytes<DL_MISSION_CHUNK_HEADER_BYTES)return DL_MISSION_TRUNCATED;
     const uint8_t *p=data;
     uint16_t version=be16(p+4);
-    if(memcmp(p,"DLR1",4)||(version!=1&&version!=2&&version!=3)||
+    if(memcmp(p,"DLR1",4)||(version!=1&&version!=2&&version!=3&&version!=4)||
         be16(p+6)!=DL_MISSION_CHUNK_HEADER_BYTES)return DL_MISSION_HEADER;
     if(bytes>UINT32_MAX||be32(p+8)!=bytes||be32(p+28))return DL_MISSION_LAYOUT;
     uint32_t count=be32(p+12);
-    if(!count||count>(version==3?DL_MISSION_MAX_SECTIONS:3))return DL_MISSION_LAYOUT;
+    if(!count||count>(version>=3?DL_MISSION_MAX_SECTIONS:3))return DL_MISSION_LAYOUT;
     size_t payload_min=DL_MISSION_CHUNK_HEADER_BYTES+(size_t)count*DL_MISSION_SECTION_BYTES;
     if(bytes<payload_min)return DL_MISSION_TRUNCATED;
     DlMissionChunk result={.data=p,.bytes=bytes,.origin=vector(p+16),.version=version,.section_count=count};
@@ -159,13 +159,13 @@ DlMissionStatus dl_mission_chunk_open(const void *data,size_t bytes,DlMissionChu
     for(uint32_t i=0;i<count;++i){
         const uint8_t *row=p+DL_MISSION_CHUNK_HEADER_BYTES+(size_t)i*DL_MISSION_SECTION_BYTES;
         unsigned kind=be16(row);
-        if(kind<=previous_kind||kind>(version==3?DL_MISSION_SECTION_FLOORS:DL_MISSION_SECTION_ENTITIES)||be16(row+2)||be32(row+20))
+        if(kind<=previous_kind||kind>(version>=3?DL_MISSION_SECTION_FLOORS:DL_MISSION_SECTION_ENTITIES)||be16(row+2)||be32(row+20))
             return DL_MISSION_LAYOUT;
         previous_kind=kind;
         DlMissionSection *section=&result.sections[i];
         *section=(DlMissionSection){(DlMissionSectionKind)kind,be32(row+4),be32(row+8),be32(row+12),be32(row+16)};
         uint32_t stride=kind==DL_MISSION_SECTION_TRIANGLES?
-            (version>=2?DL_MISSION_TRIANGLE_V2_BYTES:DL_MISSION_TRIANGLE_BYTES):
+            (version==4?DL_MISSION_TRIANGLE_V4_BYTES:version>=2?DL_MISSION_TRIANGLE_V2_BYTES:DL_MISSION_TRIANGLE_BYTES):
             kind==DL_MISSION_SECTION_COLLIDERS?DL_MISSION_COLLIDER_BYTES:
             kind==DL_MISSION_SECTION_FLOORS?DL_MISSION_FLOOR_BYTES:4;
         if(section->record_bytes!=stride||section->bytes%stride||section->count!=section->bytes/stride||
@@ -195,7 +195,7 @@ static DlMissionStatus record(const DlMissionChunk *chunk,DlMissionSectionKind k
     if(status!=DL_MISSION_OK)return status;
     if(index>=section.count)return DL_MISSION_REFERENCE;
     uint32_t stride=kind==DL_MISSION_SECTION_TRIANGLES?
-        (chunk->version>=2?DL_MISSION_TRIANGLE_V2_BYTES:DL_MISSION_TRIANGLE_BYTES):
+        (chunk->version==4?DL_MISSION_TRIANGLE_V4_BYTES:chunk->version>=2?DL_MISSION_TRIANGLE_V2_BYTES:DL_MISSION_TRIANGLE_BYTES):
         kind==DL_MISSION_SECTION_COLLIDERS?DL_MISSION_COLLIDER_BYTES:
         kind==DL_MISSION_SECTION_FLOORS?DL_MISSION_FLOOR_BYTES:4;
     if(section.record_bytes!=stride||!range(chunk->bytes,section.offset,section.bytes)||
@@ -225,6 +225,11 @@ DlMissionStatus dl_mission_triangle(const DlMissionChunk *chunk,uint32_t index,D
             if(!result.normals[corner*3]&&!result.normals[corner*3+1]&&!result.normals[corner*3+2])
                 return DL_MISSION_VALUE;
     }
+    if(chunk->version==4){
+        memcpy(result.baked_colors,p+80,sizeof result.baked_colors);
+        for(unsigned state=0;state<2;++state)for(unsigned corner=0;corner<6;++corner)
+            if(result.baked_colors[state][corner*4+3]!=255)return DL_MISSION_VALUE;
+    }
     *triangle=result;return DL_MISSION_OK;
 }
 DlMissionStatus dl_mission_collider(const DlMissionChunk *chunk,const DlMission *mission,
@@ -253,7 +258,7 @@ DlMissionStatus dl_mission_entity_id(const DlMissionChunk *chunk,const DlMission
 
 DlMissionStatus dl_mission_floor(const DlMissionChunk *chunk,uint32_t index,DlMissionFloorTriangle *floor){
     if(!floor)return DL_MISSION_ARGUMENT;
-    if(!chunk||chunk->version!=3)return DL_MISSION_ARGUMENT;
+    if(!chunk||chunk->version<3)return DL_MISSION_ARGUMENT;
     const uint8_t *p;DlMissionStatus status=record(chunk,DL_MISSION_SECTION_FLOORS,index,&p);
     if(status!=DL_MISSION_OK)return status;
     DlMissionFloorTriangle result={.vertices={vector(p),vector(p+12),vector(p+24)}};

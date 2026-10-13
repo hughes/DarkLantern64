@@ -1,12 +1,13 @@
 #include "stream_rom.h"
 #include "stream_scene.h"
+#include "dl_music.h"
 #include <libdragon.h>
 #include <malloc.h>
 #include <math.h>
 #include <stdlib.h>
 #include <string.h>
 
-enum { SLOT_COUNT=5, READ_SLICE=256, DMA_BYTES=272, MAX_DIRECTORY=65536, MAX_CHUNK=65536 };
+enum { SLOT_COUNT=5, READ_SLICE=8192, DMA_BYTES=8208, MAX_DIRECTORY=65536, MAX_CHUNK=65536 };
 typedef struct {
     DlMission mission;
     DlWorldStream world;
@@ -19,8 +20,12 @@ typedef struct {
     DlStreamPolicyState policy_state;
     int queued_object;
     size_t platform_allocated;
+    bool preparing, assembling, gpu_started, gpu_ready;
+    DlGame prepared_game;
+    uint32_t prepared_regions, service_stage;
 } StreamRom;
 static StreamRom *active;
+static uint32_t resident_mask(const StreamRom *s);
 static bool pi_busy(void){return (*PI_STATUS&3u)!=0;}
 
 /* PI writes only an aligned staging buffer. It never retains a region-slot
@@ -66,6 +71,7 @@ void dl_stream_rom_close(void){
     if(!active)return;
     /* Caller releases the old renderer first, reaching its RDP ownership
      * boundary. PI may still own the independent read staging buffer. */
+    dl_stream_scene_prepare_cancel(&active->scene);
     completion(active);
     if(active->io_pending)dma_wait();
     for(size_t i=0;i<active->world.slot_count;++i)free(active->slots[i].buffer);
@@ -75,6 +81,12 @@ bool dl_stream_rom_active(void){return active!=NULL;}
 bool dl_stream_rom_music_ready(void){return !active||!active->io_pending||!pi_busy();}
 const DlWorldStream *dl_stream_rom_world(void){return active?&active->world:NULL;}
 uint32_t dl_stream_rom_retired(void){return active?active->retired:0;}
+uint32_t dl_stream_rom_service_stage(void){return active?active->service_stage:0;}
+uint32_t dl_stream_rom_view_mask(void){return active?active->view_regions:0;}
+bool dl_stream_rom_settled(void){
+    return !active||(!active->preparing&&active->view_regions==resident_mask(active)&&
+        (active->view_regions&active->wanted_regions)==active->wanted_regions);
+}
 uint32_t dl_stream_rom_current(const DlGame *g){
     return active?(active->scene.bootstrap->stream->policy==DL_STREAM_POLICY_AUTHORED?
         active->policy_state.current_region:dl_stream_scene_region_at(&active->scene,g->player)):0;
@@ -97,7 +109,7 @@ static float bounds_distance(DlVec3 point,const DlMissionRegion *region){
 }
 static uint32_t wanted_mask(StreamRom *s,const DlGame *game){
     if(s->scene.bootstrap->stream->policy==DL_STREAM_POLICY_AUTHORED){
-        uint32_t wanted=dl_stream_scene_policy_update(&s->scene,game->player,resident_mask(s),&s->policy_state);
+        uint32_t wanted=dl_stream_scene_policy_update(&s->scene,game->player,s->view_regions,&s->policy_state);
         assertf(wanted,"Stream start outside activation bounds");
         if(s->queued_use&&s->queued_transition){
             const DlStreamTransition *gate=&s->scene.bootstrap->stream->transitions[s->queued_transition-1];
@@ -159,16 +171,16 @@ static void request_wanted(StreamRom *s,uint32_t wanted){
     }
 }
 static void refresh(StreamRom *s,DlGame *game,bool renderer_ready){
-    if(renderer_ready)dl_render_release_scene();
     completion(s);
+    assertf(!renderer_ready,"Initial refresh only");
     assertf(dl_stream_scene_refresh(&s->scene,&s->world,game)==DL_STREAM_SCENE_OK,"Invalid streamed working set");
     game->level=dl_stream_scene_level(&s->scene);
+    assertf(dl_game_query_cache_ready(game->level),"Published collision index is incomplete");
     dl_game_set_active_enemies(game,dl_stream_scene_enemy_mask(&s->scene,game));
     s->view_regions=resident_mask(s);
     /* Region DMA owns only staging, but renderer DFS asset loads also use PI.
      * Preserve the completed staging result for the next bounded pump. */
     if(s->io_pending&&pi_busy())dma_wait();
-    if(renderer_ready)dl_render_prepare_scene(game);
     debugf("DL64 stream_view resident_mask=%lu triangles=%d colliders=%d active_enemies=%u loads=%llu retired=%lu reserved=%lu allocated_slots=%lu adapter_bytes=%lu\n",
         (unsigned long)s->view_regions,s->scene.banks[s->scene.active_bank].triangle_count,
         game->level->collider_count,(unsigned)game->active_enemy_mask,
@@ -209,6 +221,7 @@ void dl_stream_rom_start(DlGame *game,const DlLevel *bootstrap,int preset){
     for(uint32_t i=0;i<slot_count;++i){s->slots[i].buffer=memalign(16,capacity);s->slots[i].capacity=capacity;assertf(s->slots[i].buffer,"Cannot allocate region slot");}
     s->platform_allocated=sizeof *s+definition->directory_bytes+DMA_BYTES+slot_count*capacity;
     assertf(dl_world_stream_init(&s->world,&s->mission,s->slots,slot_count,read_region,s)==DL_STREAM_OK,"Cannot initialize streaming pool");
+    s->world.read_slice=READ_SLICE;
     assertf(dl_stream_scene_init(&s->scene,bootstrap,&s->mission)==DL_STREAM_SCENE_OK,"Invalid streaming bootstrap");
     assertf(dl_game_start(game,bootstrap,preset),"Invalid stream test start");
     uint32_t wanted=wanted_mask(s,game);s->wanted_regions=wanted;request_wanted(s,wanted);
@@ -228,14 +241,92 @@ void dl_stream_rom_start(DlGame *game,const DlLevel *bootstrap,int preset){
 void dl_stream_rom_service(DlGame *game,DlRenderStats *stats){
     stats->streaming=active!=NULL;
     if(!active)return;
-    StreamRom *s=active;completion(s);uint32_t wanted=wanted_mask(s,game);s->wanted_regions=wanted;
-    request_wanted(s,wanted);dl_world_stream_pump(&s->world,READ_SLICE);
-    uint32_t resident=resident_mask(s);
-    if(resident!=s->view_regions)refresh(s,game,true);
+    uint32_t service_start=TICKS_READ();
+    StreamRom *s=active;s->service_stage=0;completion(s);
+    uint32_t wanted=wanted_mask(s,game);s->wanted_regions=wanted;
+    /* A turn can choose a different approach while the previous candidate is
+     * still being prepared. Discard that unpublished work immediately instead
+     * of making the player wait for an obsolete doorway's full rebuild. */
+    if(s->preparing&&(s->prepared_regions&~wanted)){
+        if(s->gpu_started)dl_render_cancel_scene();
+        dl_stream_scene_prepare_cancel(&s->scene);
+        s->preparing=s->assembling=s->gpu_started=s->gpu_ready=false;
+    }
+    if(s->preparing){
+        if(s->assembling){
+            s->service_stage=1;uint32_t start=TICKS_READ();bool ready=false;
+            do{
+                assertf(dl_stream_scene_prepare_step(&s->scene,1,&ready)==DL_STREAM_SCENE_OK,"Invalid incremental streamed working set");
+            }while(!ready&&(uint32_t)(TICKS_READ()-start)<TICKS_PER_SECOND*11u/2000u);
+            if(ready){
+                s->assembling=false;s->prepared_game.level=dl_stream_scene_pending(&s->scene);
+            }
+        }else if(!s->gpu_started){
+            s->service_stage=2;
+            dl_render_stage_scene(&s->prepared_game);s->gpu_started=true;
+        }else if(!s->gpu_ready){
+            s->service_stage=2;
+            s->gpu_ready=dl_render_stage_step(&s->prepared_game,TICKS_PER_SECOND*11u/2000u);
+        }else{
+            s->service_stage=3;
+            /* Active guards keep moving while this candidate prepares. A
+             * changed visual membership must retry without publishing an
+             * invisible active guard or a visible guard in an absent region. */
+            if(!dl_stream_scene_pending_guards_match(&s->scene,game)){
+                dl_render_cancel_scene();dl_stream_scene_prepare_cancel(&s->scene);
+                s->preparing=s->assembling=s->gpu_started=s->gpu_ready=false;
+                s->prepared_regions=0;
+            }else{
+            dl_stream_scene_publish(&s->scene);
+            game->level=dl_stream_scene_level(&s->scene);
+            assertf(dl_game_query_cache_ready(game->level),"Published collision index is incomplete");
+            dl_render_commit_scene(game);
+            s->view_regions=s->prepared_regions;s->preparing=false;s->gpu_started=s->gpu_ready=false;
+            debugf("DL64 stream_query_cache ready=%d colliders=%d floors=%d\n",
+                dl_game_query_cache_ready(game->level),game->level->collider_count,game->level->floor_count);
+            debugf("DL64 stream_view resident_mask=%lu triangles=%d colliders=%d active_enemies=%u loads=%llu retired=%lu reserved=%lu allocated_slots=%lu adapter_bytes=%lu\n",
+                (unsigned long)s->view_regions,s->scene.banks[s->scene.active_bank].triangle_count,
+                game->level->collider_count,(unsigned)game->active_enemy_mask,
+                (unsigned long long)s->world.stats.completed_loads,(unsigned long)s->retired,
+                (unsigned long)s->world.stats.reserved_bytes,(unsigned long)s->world.stats.allocated_slot_bytes,
+                (unsigned long)s->platform_allocated);
+            }
+        }
+    }else{
+        request_wanted(s,wanted);
+        uint32_t resident=resident_mask(s);
+        /* Prepare a removal before exposing its replacements. The GPU pool
+         * contains at most the five-region union of current and candidate. */
+        /* Publish departures promptly to release the GPU union. Additions
+         * wait for the complete demand, avoiding an expensive rebuild for
+         * each independently completed chunk of the same approach. */
+        if(resident!=s->view_regions&&((s->view_regions&~resident)||(resident&wanted)==wanted)){
+            unsigned count=0;for(uint32_t bits=resident|s->view_regions;bits;bits&=bits-1)++count;
+            uint32_t candidate=count<=SLOT_COUNT?resident:resident&s->view_regions;
+            assertf(candidate!=s->view_regions,"Cannot retire a bounded render union");
+            s->service_stage=1;
+            assertf(dl_stream_scene_prepare_begin_mask(&s->scene,&s->world,game,candidate)==DL_STREAM_SCENE_OK,"Invalid pending streamed working set");
+            s->prepared_game=*game;
+            s->prepared_regions=candidate;s->preparing=true;s->assembling=true;
+        }
+    }
+    /* Borrowed resident chunks are immutable. Reads can progress in other
+     * slots while their snapshot is assembled or packed; request/cancel stays
+     * deferred until publication. Newly resident chunks join the next view. */
+    if(s->service_stage!=3&&(uint32_t)(TICKS_READ()-service_start)<TICKS_PER_SECOND/250u){
+        uint32_t start=TICKS_READ();size_t processed=0;
+        for(unsigned attempt=0;attempt<2;++attempt){
+            processed+=dl_world_stream_pump(&s->world,READ_SLICE*2u);
+            if(pi_busy()||processed>=READ_SLICE||
+                (uint32_t)(TICKS_READ()-start)>=TICKS_PER_SECOND/1000u)break;
+        }
+    }
+    /* main.c primes music before this bounded service call. Refill here
+     * would combine another mixer job with the stream CPU budget. */
     dl_game_set_active_enemies(game,dl_stream_scene_enemy_mask(&s->scene,game));
     stats->stream_current=dl_stream_rom_current(game);
     stats->stream_regions=0;for(size_t i=0;i<s->world.slot_count;++i)stats->stream_regions+=s->slots[i].state==DL_STREAM_RESIDENT;
-    stats->stream_loading=(resident&wanted)!=wanted;
+    stats->stream_loading=(s->view_regions&wanted)!=wanted;
     stats->stream_reserved_bytes=(uint32_t)s->world.stats.reserved_bytes;
     stats->stream_allocated_bytes=(uint32_t)s->world.stats.allocated_slot_bytes;
     stats->stream_loads=(uint32_t)s->world.stats.completed_loads;stats->stream_retired=s->retired;
@@ -243,7 +334,7 @@ void dl_stream_rom_service(DlGame *game,DlRenderStats *stats){
 void dl_stream_rom_filter_input(const DlGame *game,DlInput *input){
     if(!active)return;
     StreamRom *s=active;bool near_closed=false;int near_object=-1;float nearest=INFINITY;
-    uint32_t resident=resident_mask(s);
+    uint32_t resident=s->view_regions;
     if(s->scene.bootstrap->stream->policy==DL_STREAM_POLICY_AUTHORED&&dl_stream_scene_gate_waiting(&s->scene,game->player,resident)){
         input->forward=0;input->strafe=0;input->jump=false;
     }

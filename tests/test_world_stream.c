@@ -277,9 +277,23 @@ static int cooked_package(const char *path) {
         (unsigned long)capacity, (unsigned long)loader.stats.peak_reserved_bytes);
     free(data); free(directory); fclose(file); return 0;
 }
+static int platform_read_slice(void){
+    prepare();CHECK(initialize()==0);stream.read_slice=4096;
+    DlRegionHandle first;CHECK(dl_world_stream_request(&stream,1,&first)==DL_STREAM_OK);
+    CHECK(dl_world_stream_pump(&stream,100)==100&&reader.max_read==100);
+    CHECK(dl_world_stream_pump(&stream,4096)==336&&reader.max_read==336);
+    CHECK(slots[first.slot].state==DL_STREAM_VALIDATING&&stream.stats.completed_loads==0);
+    CHECK(dl_world_stream_cancel(&stream,first)==DL_STREAM_OK&&slots[first.slot].state==DL_STREAM_FREE);
+    CHECK(dl_world_stream_request(&stream,1,&first)==DL_STREAM_OK);
+    CHECK(dl_world_stream_pump(&stream,4096)==436&&reader.max_read==436);
+    CHECK(dl_world_stream_pump(&stream,1)==0&&slots[first.slot].state==DL_STREAM_RESIDENT);
+    CHECK(stream.stats.completed_loads==1&&stream.stats.bytes_read==872);
+    return 0;
+}
 int main(int argc, char **argv) {
     CHECK(budgets_and_publication() == 0); CHECK(retirement_and_handles() == 0);
     CHECK(pins_outlive_both_fences() == 0); CHECK(failures_and_cancellation() == 0); CHECK(storage_bounds() == 0);
+    CHECK(platform_read_slice()==0);
     if (argc > 1) CHECK(cooked_package(argv[1]) == 0);
     puts("world streaming: bounded/stalled reads, unpublished failures, cancellation, CPU pins, independent RSP/RDP retirement, stale generations and disjoint storage passed");
     return 0;

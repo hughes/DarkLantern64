@@ -208,6 +208,9 @@ class BundleTests(unittest.TestCase):
                  {"bafford_expanded_test_capture": True}, {"bafford_expanded_test": True},
                  {"bundle": ROOT / "content/level_bundle.json", "bafford_expanded_test": True, "bafford_stream_test": True},
                  {"bafford_district_test_capture": True}, {"bafford_district_test": True},
+                 {"bafford_district_performance_test": True},
+                 {"bundle": ROOT / "content/level_bundle.json", "bafford_district_performance_test": True, "bafford_district_test_capture": True},
+                 {"bundle": ROOT / "content/level_bundle.json", "bafford_district_performance_test": True, "menu_test": True},
                  {"bundle": ROOT / "content/level_bundle.json", "bafford_district_test": True, "bafford_expanded_test": True},
                  {"bundle": ROOT / "content/level_bundle.json", "bafford_district_test": True, "start_level": "bafford-district"},
                  {"lighting_bake_verify": True, "disable_lighting_bake": True}]
@@ -328,6 +331,10 @@ class BundleTests(unittest.TestCase):
         self.assertEqual(report["resident_bootstrap_geometry_bytes"], 1800)
         self.assertEqual(report["resident_geometry_bytes"], report["levels"][0]["content"]["compiled_geometry_bytes"] + 1800)
         self.assertEqual(report["stream_rom_bytes"], streamed["mission"]["bytes"])
+        self.assertEqual(report["resident_baked_color_bytes"], streamed["compiled_baked_color_bytes"])
+        self.assertEqual(report["resident_known_array_bytes"], report["resident_geometry_bytes"] + report["resident_baked_color_bytes"])
+        self.assertEqual(report["lighting"]["bytes"], 0)
+        self.assertEqual(streamed["lighting"]["storage"], "embedded")
         self.assertEqual(report["music"]["cues"], [None, None])
         self.assertEqual([asset["kind"] for asset in report["rom_assets"]], ["mission"])
         package = self.output / streamed["mission"]["path"]

@@ -1,0 +1,2336 @@
+{
+  "passed": true,
+  "platform": "Ares emulator",
+  "run": {
+    "name": "bafford-district",
+    "passed": true,
+    "log": ".dev\\ares\\runs\\e64b2c01fb9d43bfb184b111fcb09868\\bafford-district.log",
+    "tested_rom": ".dev\\ares\\runs\\e64b2c01fb9d43bfb184b111fcb09868\\DarkLantern64-bundle-level_bundle-menu-bafford-district-test-t3d.z64",
+    "rom_sha256": "a7279c266488ef6a4d0f6657f285f9f2cfad07dbbf0c61ed8203f6b3c9093190",
+    "rom_bytes": 1622016,
+    "settings": ".dev\\ares\\runs\\e64b2c01fb9d43bfb184b111fcb09868\\settings.bml",
+    "settings_source_sha256": "d3917400079a47105fa6bd7df53e4f530915aa3b4b70e79769f1b389bc2b196a",
+    "profile_report": null,
+    "elapsed_seconds": 72.265,
+    "peak_sampled_heap_bytes": 2059648,
+    "max_reported_cpu_ms": 20.1,
+    "boot": "DL64 boot_ok memory=8388608 scene=\"Bafford District\" meshes=32 models=32 colliders=166 version=2 world=3d renderer=rsp-tiny3d depth=hardware",
+    "terminal_event": "DL64 bafford_district_test_complete passed=1 input_only=1 coverage=1 collision_clear=1 stair_jumps=2 visited_regions=9 loot_persist=1 restart_reload=1 pre_restart_loads=33 audio_calls=1713"
+  },
+  "rom": "C:\\Users\\hughe\\dev\\DarkLantern64\\build\\DarkLantern64-bundle-level_bundle-menu-bafford-district-test-t3d.z64",
+  "rom_sha256": "a7279c266488ef6a4d0f6657f285f9f2cfad07dbbf0c61ed8203f6b3c9093190",
+  "log": "C:\\Users\\hughe\\dev\\DarkLantern64\\.dev\\ares\\runs\\e64b2c01fb9d43bfb184b111fcb09868\\bafford-district.log",
+  "log_sha256": "c34bd9311d7059419ff8464c72df29d044356709d76da17c552b6f93b7c59ef5",
+  "mission_sha256": "7e7243182bc47d4090d117596438fdd1c5c4dfae3faede6714407c90ac0f87c9",
+  "mission_bytes": 367272,
+  "district_cook_sha256": "13934ce1ccfb5e7632a5a6a694a76cc7828199ffe6cd4464d6c13f070400d143",
+  "build_signature": "94cb7577715f95cb0111d75fef8f1b2f6a501576a1c2200bee583a69289f6b57",
+  "functional_passed": true,
+  "checkpoints": [
+    {
+      "checkpoint": "start",
+      "epoch": 0,
+      "tick": 90,
+      "elapsed": 1.4833,
+      "player": [
+        -6.522,
+        -2.4384,
+        49.8253
+      ],
+      "grounded": 1,
+      "vertical_velocity": 0.0,
+      "jump_inputs": 0,
+      "collision_clear": 1,
+      "heap_used": 1908416,
+      "models": 32,
+      "triangles": 593,
+      "colliders": 166,
+      "floors": 8,
+      "textures": 48,
+      "door_index": 0,
+      "door_open": 0,
+      "loot_index": 1,
+      "loot_home": 3,
+      "loot_value": 0,
+      "collected_objects": 0,
+      "loot_retired": 0,
+      "loot_reloaded": 0,
+      "stream": {
+        "current": 9,
+        "resident": [
+          1,
+          9
+        ],
+        "slots": 5,
+        "settled": 1,
+        "reserved": 82524,
+        "allocated": 273680,
+        "completed_loads": 2,
+        "retired": 0,
+        "readbytes": 82524,
+        "stalls": 2729
+      }
+    },
+    {
+      "checkpoint": "street_center",
+      "epoch": 0,
+      "tick": 300,
+      "elapsed": 4.9833,
+      "player": [
+        -0.0738,
+        -2.4384,
+        48.515
+      ],
+      "grounded": 1,
+      "vertical_velocity": 0.0,
+      "jump_inputs": 0,
+      "collision_clear": 1,
+      "heap_used": 1993352,
+      "models": 51,
+      "triangles": 976,
+      "colliders": 286,
+      "floors": 24,
+      "textures": 48,
+      "door_index": 0,
+      "door_open": 0,
+      "loot_index": 1,
+      "loot_home": 3,
+      "loot_value": 0,
+      "collected_objects": 0,
+      "loot_retired": 0,
+      "loot_reloaded": 0,
+      "stream": {
+        "current": 1,
+        "resident": [
+          1,
+          9,
+          2
+        ],
+        "slots": 5,
+        "settled": 1,
+        "reserved": 136652,
+        "allocated": 273680,
+        "completed_loads": 4,
+        "retired": 1,
+        "readbytes": 171844,
+        "stalls": 2746
+      }
+    },
+    {
+      "checkpoint": "ramp_start",
+      "epoch": 0,
+      "tick": 392,
+      "elapsed": 6.5167,
+      "player": [
+        -0.0015,
+        -2.3637,
+        46.0308
+      ],
+      "grounded": 1,
+      "vertical_velocity": 0.0,
+      "jump_inputs": 0,
+      "collision_clear": 1,
+      "heap_used": 2011584,
+      "models": 49,
+      "triangles": 1077,
+      "colliders": 259,
+      "floors": 50,
+      "textures": 48,
+      "door_index": 0,
+      "door_open": 0,
+      "loot_index": 1,
+      "loot_home": 3,
+      "loot_value": 0,
+      "collected_objects": 0,
+      "loot_retired": 0,
+      "loot_reloaded": 0,
+      "stream": {
+        "current": 6,
+        "resident": [
+          1,
+          9,
+          6,
+          3,
+          7
+        ],
+        "slots": 5,
+        "settled": 1,
+        "reserved": 149924,
+        "allocated": 273680,
+        "completed_loads": 7,
+        "retired": 2,
+        "readbytes": 239244,
+        "stalls": 2758
+      }
+    },
+    {
+      "checkpoint": "ramp_top",
+      "epoch": 0,
+      "tick": 576,
+      "elapsed": 9.5833,
+      "player": [
+        -0.0,
+        -1.1123,
+        41.0253
+      ],
+      "grounded": 1,
+      "vertical_velocity": 0.0,
+      "jump_inputs": 0,
+      "collision_clear": 1,
+      "heap_used": 1974360,
+      "models": 34,
+      "triangles": 927,
+      "colliders": 214,
+      "floors": 58,
+      "textures": 48,
+      "door_index": 0,
+      "door_open": 0,
+      "loot_index": 1,
+      "loot_home": 3,
+      "loot_value": 0,
+      "collected_objects": 0,
+      "loot_retired": 0,
+      "loot_reloaded": 0,
+      "stream": {
+        "current": 7,
+        "resident": [
+          1,
+          8,
+          6,
+          3,
+          7
+        ],
+        "slots": 5,
+        "settled": 1,
+        "reserved": 129124,
+        "allocated": 273680,
+        "completed_loads": 8,
+        "retired": 3,
+        "readbytes": 273180,
+        "stalls": 2763
+      }
+    },
+    {
+      "checkpoint": "jump1_takeoff",
+      "epoch": 0,
+      "tick": 577,
+      "elapsed": 9.5999,
+      "player": [
+        -0.0,
+        -1.1123,
+        41.0253
+      ],
+      "grounded": 1,
+      "vertical_velocity": 0.0,
+      "jump_inputs": 1,
+      "collision_clear": 1,
+      "heap_used": 1974360,
+      "models": 34,
+      "triangles": 927,
+      "colliders": 214,
+      "floors": 58,
+      "textures": 48,
+      "door_index": 0,
+      "door_open": 0,
+      "loot_index": 1,
+      "loot_home": 3,
+      "loot_value": 0,
+      "collected_objects": 0,
+      "loot_retired": 0,
+      "loot_reloaded": 0,
+      "stream": {
+        "current": 7,
+        "resident": [
+          1,
+          8,
+          6,
+          3,
+          7
+        ],
+        "slots": 5,
+        "settled": 1,
+        "reserved": 129124,
+        "allocated": 273680,
+        "completed_loads": 8,
+        "retired": 3,
+        "readbytes": 273180,
+        "stalls": 2763
+      }
+    },
+    {
+      "checkpoint": "jump1_air",
+      "epoch": 0,
+      "tick": 578,
+      "elapsed": 9.6166,
+      "player": [
+        -0.0,
+        -1.0382,
+        41.0078
+      ],
+      "grounded": 0,
+      "vertical_velocity": 4.4,
+      "jump_inputs": 1,
+      "collision_clear": 1,
+      "heap_used": 1974360,
+      "models": 34,
+      "triangles": 927,
+      "colliders": 214,
+      "floors": 58,
+      "textures": 48,
+      "door_index": 0,
+      "door_open": 0,
+      "loot_index": 1,
+      "loot_home": 3,
+      "loot_value": 0,
+      "collected_objects": 0,
+      "loot_retired": 0,
+      "loot_reloaded": 0,
+      "stream": {
+        "current": 7,
+        "resident": [
+          1,
+          8,
+          6,
+          3,
+          7
+        ],
+        "slots": 5,
+        "settled": 1,
+        "reserved": 129124,
+        "allocated": 273680,
+        "completed_loads": 8,
+        "retired": 3,
+        "readbytes": 273180,
+        "stalls": 2763
+      }
+    },
+    {
+      "checkpoint": "first_stair",
+      "epoch": 0,
+      "tick": 626,
+      "elapsed": 10.4166,
+      "player": [
+        -0.0,
+        -0.6096,
+        40.4684
+      ],
+      "grounded": 1,
+      "vertical_velocity": 0.0,
+      "jump_inputs": 1,
+      "collision_clear": 1,
+      "heap_used": 1974360,
+      "models": 34,
+      "triangles": 927,
+      "colliders": 214,
+      "floors": 58,
+      "textures": 48,
+      "door_index": 0,
+      "door_open": 0,
+      "loot_index": 1,
+      "loot_home": 3,
+      "loot_value": 0,
+      "collected_objects": 0,
+      "loot_retired": 0,
+      "loot_reloaded": 0,
+      "stream": {
+        "current": 7,
+        "resident": [
+          1,
+          8,
+          6,
+          3,
+          7
+        ],
+        "slots": 5,
+        "settled": 1,
+        "reserved": 129124,
+        "allocated": 273680,
+        "completed_loads": 8,
+        "retired": 3,
+        "readbytes": 273180,
+        "stalls": 2763
+      }
+    },
+    {
+      "checkpoint": "door_open",
+      "epoch": 0,
+      "tick": 639,
+      "elapsed": 10.6333,
+      "player": [
+        -0.0,
+        -0.6096,
+        40.4684
+      ],
+      "grounded": 1,
+      "vertical_velocity": 0.0,
+      "jump_inputs": 1,
+      "collision_clear": 1,
+      "heap_used": 1974360,
+      "models": 34,
+      "triangles": 927,
+      "colliders": 214,
+      "floors": 58,
+      "textures": 48,
+      "door_index": 0,
+      "door_open": 1,
+      "loot_index": 1,
+      "loot_home": 3,
+      "loot_value": 0,
+      "collected_objects": 0,
+      "loot_retired": 0,
+      "loot_reloaded": 0,
+      "stream": {
+        "current": 7,
+        "resident": [
+          1,
+          8,
+          6,
+          3,
+          7
+        ],
+        "slots": 5,
+        "settled": 1,
+        "reserved": 129124,
+        "allocated": 273680,
+        "completed_loads": 8,
+        "retired": 3,
+        "readbytes": 273180,
+        "stalls": 2763
+      }
+    },
+    {
+      "checkpoint": "jump2_takeoff",
+      "epoch": 0,
+      "tick": 640,
+      "elapsed": 10.6499,
+      "player": [
+        -0.0,
+        -0.6096,
+        40.4684
+      ],
+      "grounded": 1,
+      "vertical_velocity": 0.0,
+      "jump_inputs": 2,
+      "collision_clear": 1,
+      "heap_used": 1974360,
+      "models": 34,
+      "triangles": 927,
+      "colliders": 214,
+      "floors": 58,
+      "textures": 48,
+      "door_index": 0,
+      "door_open": 1,
+      "loot_index": 1,
+      "loot_home": 3,
+      "loot_value": 0,
+      "collected_objects": 0,
+      "loot_retired": 0,
+      "loot_reloaded": 0,
+      "stream": {
+        "current": 7,
+        "resident": [
+          1,
+          8,
+          6,
+          3,
+          7
+        ],
+        "slots": 5,
+        "settled": 1,
+        "reserved": 129124,
+        "allocated": 273680,
+        "completed_loads": 8,
+        "retired": 3,
+        "readbytes": 273180,
+        "stalls": 2763
+      }
+    },
+    {
+      "checkpoint": "jump2_air",
+      "epoch": 0,
+      "tick": 641,
+      "elapsed": 10.6666,
+      "player": [
+        -0.0,
+        -0.5354,
+        40.4334
+      ],
+      "grounded": 0,
+      "vertical_velocity": 4.4,
+      "jump_inputs": 2,
+      "collision_clear": 1,
+      "heap_used": 1974360,
+      "models": 34,
+      "triangles": 927,
+      "colliders": 214,
+      "floors": 58,
+      "textures": 48,
+      "door_index": 0,
+      "door_open": 1,
+      "loot_index": 1,
+      "loot_home": 3,
+      "loot_value": 0,
+      "collected_objects": 0,
+      "loot_retired": 0,
+      "loot_reloaded": 0,
+      "stream": {
+        "current": 7,
+        "resident": [
+          1,
+          8,
+          6,
+          3,
+          7
+        ],
+        "slots": 5,
+        "settled": 1,
+        "reserved": 129124,
+        "allocated": 273680,
+        "completed_loads": 8,
+        "retired": 3,
+        "readbytes": 273180,
+        "stalls": 2763
+      }
+    },
+    {
+      "checkpoint": "entrance",
+      "epoch": 0,
+      "tick": 687,
+      "elapsed": 11.4332,
+      "player": [
+        -0.0,
+        0.0,
+        39.3461
+      ],
+      "grounded": 1,
+      "vertical_velocity": 0.0,
+      "jump_inputs": 2,
+      "collision_clear": 1,
+      "heap_used": 1974360,
+      "models": 34,
+      "triangles": 927,
+      "colliders": 214,
+      "floors": 58,
+      "textures": 48,
+      "door_index": 0,
+      "door_open": 1,
+      "loot_index": 1,
+      "loot_home": 3,
+      "loot_value": 0,
+      "collected_objects": 0,
+      "loot_retired": 0,
+      "loot_reloaded": 0,
+      "stream": {
+        "current": 7,
+        "resident": [
+          1,
+          8,
+          6,
+          3,
+          7
+        ],
+        "slots": 5,
+        "settled": 1,
+        "reserved": 129124,
+        "allocated": 273680,
+        "completed_loads": 8,
+        "retired": 3,
+        "readbytes": 273180,
+        "stalls": 2763
+      }
+    },
+    {
+      "checkpoint": "main_room",
+      "epoch": 0,
+      "tick": 832,
+      "elapsed": 13.8499,
+      "player": [
+        -0.0,
+        0.0,
+        34.6556
+      ],
+      "grounded": 1,
+      "vertical_velocity": 0.0,
+      "jump_inputs": 2,
+      "collision_clear": 1,
+      "heap_used": 1964456,
+      "models": 20,
+      "triangles": 907,
+      "colliders": 174,
+      "floors": 54,
+      "textures": 48,
+      "door_index": 0,
+      "door_open": 1,
+      "loot_index": 1,
+      "loot_home": 3,
+      "loot_value": 0,
+      "collected_objects": 0,
+      "loot_retired": 0,
+      "loot_reloaded": 0,
+      "stream": {
+        "current": 3,
+        "resident": [
+          4,
+          8,
+          3,
+          7
+        ],
+        "slots": 5,
+        "settled": 1,
+        "reserved": 124904,
+        "allocated": 273680,
+        "completed_loads": 9,
+        "retired": 5,
+        "readbytes": 307364,
+        "stalls": 2768
+      }
+    },
+    {
+      "checkpoint": "loot_collected",
+      "epoch": 0,
+      "tick": 845,
+      "elapsed": 14.0665,
+      "player": [
+        -0.0,
+        0.0,
+        34.6556
+      ],
+      "grounded": 1,
+      "vertical_velocity": 0.0,
+      "jump_inputs": 2,
+      "collision_clear": 1,
+      "heap_used": 1964456,
+      "models": 20,
+      "triangles": 907,
+      "colliders": 174,
+      "floors": 54,
+      "textures": 48,
+      "door_index": 0,
+      "door_open": 1,
+      "loot_index": 1,
+      "loot_home": 3,
+      "loot_value": 25,
+      "collected_objects": 2,
+      "loot_retired": 0,
+      "loot_reloaded": 0,
+      "stream": {
+        "current": 3,
+        "resident": [
+          4,
+          8,
+          3,
+          7
+        ],
+        "slots": 5,
+        "settled": 1,
+        "reserved": 124904,
+        "allocated": 273680,
+        "completed_loads": 9,
+        "retired": 5,
+        "readbytes": 307364,
+        "stalls": 2768
+      }
+    },
+    {
+      "checkpoint": "west_exit",
+      "epoch": 0,
+      "tick": 930,
+      "elapsed": 15.4832,
+      "player": [
+        -2.1885,
+        0.0,
+        33.3371
+      ],
+      "grounded": 1,
+      "vertical_velocity": 0.0,
+      "jump_inputs": 2,
+      "collision_clear": 1,
+      "heap_used": 1964456,
+      "models": 20,
+      "triangles": 907,
+      "colliders": 174,
+      "floors": 54,
+      "textures": 48,
+      "door_index": 0,
+      "door_open": 1,
+      "loot_index": 1,
+      "loot_home": 3,
+      "loot_value": 25,
+      "collected_objects": 2,
+      "loot_retired": 0,
+      "loot_reloaded": 0,
+      "stream": {
+        "current": 3,
+        "resident": [
+          4,
+          8,
+          3,
+          7
+        ],
+        "slots": 5,
+        "settled": 1,
+        "reserved": 124904,
+        "allocated": 273680,
+        "completed_loads": 9,
+        "retired": 5,
+        "readbytes": 307364,
+        "stalls": 2768
+      }
+    },
+    {
+      "checkpoint": "rear_entry",
+      "epoch": 0,
+      "tick": 972,
+      "elapsed": 16.1832,
+      "player": [
+        -2.2471,
+        0.0,
+        32.2536
+      ],
+      "grounded": 1,
+      "vertical_velocity": 0.0,
+      "jump_inputs": 2,
+      "collision_clear": 1,
+      "heap_used": 1964456,
+      "models": 20,
+      "triangles": 907,
+      "colliders": 174,
+      "floors": 54,
+      "textures": 48,
+      "door_index": 0,
+      "door_open": 1,
+      "loot_index": 1,
+      "loot_home": 3,
+      "loot_value": 25,
+      "collected_objects": 2,
+      "loot_retired": 0,
+      "loot_reloaded": 0,
+      "stream": {
+        "current": 8,
+        "resident": [
+          4,
+          8,
+          3,
+          7
+        ],
+        "slots": 5,
+        "settled": 1,
+        "reserved": 124904,
+        "allocated": 273680,
+        "completed_loads": 9,
+        "retired": 5,
+        "readbytes": 307364,
+        "stalls": 2768
+      }
+    },
+    {
+      "checkpoint": "courtyard",
+      "epoch": 0,
+      "tick": 1052,
+      "elapsed": 17.5165,
+      "player": [
+        -2.2499,
+        0.0,
+        29.8736
+      ],
+      "grounded": 1,
+      "vertical_velocity": 0.0,
+      "jump_inputs": 2,
+      "collision_clear": 1,
+      "heap_used": 1925480,
+      "models": 14,
+      "triangles": 718,
+      "colliders": 126,
+      "floors": 48,
+      "textures": 48,
+      "door_index": 0,
+      "door_open": 1,
+      "loot_index": 1,
+      "loot_home": 3,
+      "loot_value": 25,
+      "collected_objects": 2,
+      "loot_retired": 0,
+      "loot_reloaded": 0,
+      "stream": {
+        "current": 8,
+        "resident": [
+          4,
+          8,
+          3
+        ],
+        "slots": 5,
+        "settled": 1,
+        "reserved": 98592,
+        "allocated": 273680,
+        "completed_loads": 9,
+        "retired": 6,
+        "readbytes": 307364,
+        "stalls": 2768
+      }
+    },
+    {
+      "checkpoint": "courtyard_east_approach",
+      "epoch": 0,
+      "tick": 1269,
+      "elapsed": 21.1331,
+      "player": [
+        4.9247,
+        0.0,
+        29.8008
+      ],
+      "grounded": 1,
+      "vertical_velocity": 0.0,
+      "jump_inputs": 2,
+      "collision_clear": 1,
+      "heap_used": 2054336,
+      "models": 45,
+      "triangles": 1296,
+      "colliders": 319,
+      "floors": 64,
+      "textures": 48,
+      "door_index": 0,
+      "door_open": 1,
+      "loot_index": 1,
+      "loot_home": 3,
+      "loot_value": 25,
+      "collected_objects": 2,
+      "loot_retired": 0,
+      "loot_reloaded": 0,
+      "stream": {
+        "current": 8,
+        "resident": [
+          4,
+          8,
+          1,
+          3,
+          2
+        ],
+        "slots": 5,
+        "settled": 1,
+        "reserved": 180508,
+        "allocated": 273680,
+        "completed_loads": 13,
+        "retired": 8,
+        "readbytes": 472840,
+        "stalls": 2807
+      }
+    },
+    {
+      "checkpoint": "courtyard_east_crossed",
+      "epoch": 0,
+      "tick": 1373,
+      "elapsed": 22.8664,
+      "player": [
+        4.999,
+        0.0,
+        33.0549
+      ],
+      "grounded": 1,
+      "vertical_velocity": 0.0,
+      "jump_inputs": 2,
+      "collision_clear": 1,
+      "heap_used": 2054336,
+      "models": 45,
+      "triangles": 1296,
+      "colliders": 319,
+      "floors": 64,
+      "textures": 48,
+      "door_index": 0,
+      "door_open": 1,
+      "loot_index": 1,
+      "loot_home": 3,
+      "loot_value": 25,
+      "collected_objects": 2,
+      "loot_retired": 0,
+      "loot_reloaded": 0,
+      "stream": {
+        "current": 2,
+        "resident": [
+          4,
+          8,
+          1,
+          3,
+          2
+        ],
+        "slots": 5,
+        "settled": 1,
+        "reserved": 180508,
+        "allocated": 273680,
+        "completed_loads": 13,
+        "retired": 8,
+        "readbytes": 472840,
+        "stalls": 2807
+      }
+    },
+    {
+      "checkpoint": "courtyard_east_back",
+      "epoch": 0,
+      "tick": 1476,
+      "elapsed": 24.583,
+      "player": [
+        5.0,
+        0.0,
+        29.8698
+      ],
+      "grounded": 1,
+      "vertical_velocity": 0.0,
+      "jump_inputs": 2,
+      "collision_clear": 1,
+      "heap_used": 2054336,
+      "models": 45,
+      "triangles": 1296,
+      "colliders": 319,
+      "floors": 64,
+      "textures": 48,
+      "door_index": 0,
+      "door_open": 1,
+      "loot_index": 1,
+      "loot_home": 3,
+      "loot_value": 25,
+      "collected_objects": 2,
+      "loot_retired": 0,
+      "loot_reloaded": 0,
+      "stream": {
+        "current": 2,
+        "resident": [
+          4,
+          8,
+          1,
+          3,
+          2
+        ],
+        "slots": 5,
+        "settled": 1,
+        "reserved": 180508,
+        "allocated": 273680,
+        "completed_loads": 13,
+        "retired": 8,
+        "readbytes": 472840,
+        "stalls": 2807
+      }
+    },
+    {
+      "checkpoint": "courtyard_after_east",
+      "epoch": 0,
+      "tick": 1693,
+      "elapsed": 28.1997,
+      "player": [
+        -2.1747,
+        0.0,
+        29.8007
+      ],
+      "grounded": 1,
+      "vertical_velocity": 0.0,
+      "jump_inputs": 2,
+      "collision_clear": 1,
+      "heap_used": 2059648,
+      "models": 46,
+      "triangles": 1322,
+      "colliders": 277,
+      "floors": 58,
+      "textures": 48,
+      "door_index": 0,
+      "door_open": 1,
+      "loot_index": 1,
+      "loot_home": 3,
+      "loot_value": 25,
+      "collected_objects": 2,
+      "loot_retired": 0,
+      "loot_reloaded": 0,
+      "stream": {
+        "current": 8,
+        "resident": [
+          4,
+          8,
+          9,
+          3,
+          10
+        ],
+        "slots": 5,
+        "settled": 1,
+        "reserved": 182152,
+        "allocated": 273680,
+        "completed_loads": 15,
+        "retired": 10,
+        "readbytes": 556400,
+        "stalls": 2827
+      }
+    },
+    {
+      "checkpoint": "next_approach",
+      "epoch": 0,
+      "tick": 1806,
+      "elapsed": 30.083,
+      "player": [
+        -1.2171,
+        0.0,
+        26.3615
+      ],
+      "grounded": 1,
+      "vertical_velocity": 0.0,
+      "jump_inputs": 2,
+      "collision_clear": 1,
+      "heap_used": 1925480,
+      "models": 14,
+      "triangles": 718,
+      "colliders": 126,
+      "floors": 48,
+      "textures": 48,
+      "door_index": 0,
+      "door_open": 1,
+      "loot_index": 1,
+      "loot_home": 3,
+      "loot_value": 25,
+      "collected_objects": 2,
+      "loot_retired": 0,
+      "loot_reloaded": 0,
+      "stream": {
+        "current": 4,
+        "resident": [
+          4,
+          8,
+          3
+        ],
+        "slots": 5,
+        "settled": 1,
+        "reserved": 98592,
+        "allocated": 273680,
+        "completed_loads": 15,
+        "retired": 12,
+        "readbytes": 556400,
+        "stalls": 2827
+      }
+    },
+    {
+      "checkpoint": "next_deep",
+      "epoch": 0,
+      "tick": 1931,
+      "elapsed": 32.1663,
+      "player": [
+        -1.2003,
+        0.0,
+        23.9465
+      ],
+      "grounded": 1,
+      "vertical_velocity": 0.0,
+      "jump_inputs": 2,
+      "collision_clear": 1,
+      "heap_used": 2011744,
+      "models": 40,
+      "triangles": 1100,
+      "colliders": 254,
+      "floors": 32,
+      "textures": 48,
+      "door_index": 0,
+      "door_open": 1,
+      "loot_index": 1,
+      "loot_home": 3,
+      "loot_value": 25,
+      "collected_objects": 2,
+      "loot_retired": 1,
+      "loot_reloaded": 0,
+      "stream": {
+        "current": 4,
+        "resident": [
+          4,
+          8,
+          9,
+          10
+        ],
+        "slots": 5,
+        "settled": 1,
+        "reserved": 151680,
+        "allocated": 273680,
+        "completed_loads": 17,
+        "retired": 13,
+        "readbytes": 639960,
+        "stalls": 2847
+      }
+    },
+    {
+      "checkpoint": "next_west_approach",
+      "epoch": 0,
+      "tick": 2014,
+      "elapsed": 33.5499,
+      "player": [
+        -1.2,
+        0.0,
+        26.4315
+      ],
+      "grounded": 1,
+      "vertical_velocity": 0.0,
+      "jump_inputs": 2,
+      "collision_clear": 1,
+      "heap_used": 1925408,
+      "models": 14,
+      "triangles": 718,
+      "colliders": 126,
+      "floors": 48,
+      "textures": 48,
+      "door_index": 0,
+      "door_open": 1,
+      "loot_index": 1,
+      "loot_home": 3,
+      "loot_value": 25,
+      "collected_objects": 2,
+      "loot_retired": 1,
+      "loot_reloaded": 1,
+      "stream": {
+        "current": 4,
+        "resident": [
+          4,
+          8,
+          3
+        ],
+        "slots": 5,
+        "settled": 1,
+        "reserved": 98592,
+        "allocated": 273680,
+        "completed_loads": 18,
+        "retired": 15,
+        "readbytes": 670432,
+        "stalls": 2851
+      }
+    },
+    {
+      "checkpoint": "next_west_crossed",
+      "epoch": 0,
+      "tick": 2109,
+      "elapsed": 35.1336,
+      "player": [
+        -4.1392,
+        0.0,
+        26.4986
+      ],
+      "grounded": 1,
+      "vertical_velocity": 0.0,
+      "jump_inputs": 2,
+      "collision_clear": 1,
+      "heap_used": 2011776,
+      "models": 40,
+      "triangles": 1100,
+      "colliders": 254,
+      "floors": 32,
+      "textures": 48,
+      "door_index": 0,
+      "door_open": 1,
+      "loot_index": 1,
+      "loot_home": 3,
+      "loot_value": 25,
+      "collected_objects": 2,
+      "loot_retired": 1,
+      "loot_reloaded": 1,
+      "stream": {
+        "current": 10,
+        "resident": [
+          4,
+          8,
+          9,
+          10
+        ],
+        "slots": 5,
+        "settled": 1,
+        "reserved": 151680,
+        "allocated": 273680,
+        "completed_loads": 20,
+        "retired": 16,
+        "readbytes": 753992,
+        "stalls": 2876
+      }
+    },
+    {
+      "checkpoint": "next_west_return",
+      "epoch": 0,
+      "tick": 2203,
+      "elapsed": 36.7006,
+      "player": [
+        -1.2692,
+        0.0,
+        26.5
+      ],
+      "grounded": 1,
+      "vertical_velocity": 0.0,
+      "jump_inputs": 2,
+      "collision_clear": 1,
+      "heap_used": 1925408,
+      "models": 14,
+      "triangles": 718,
+      "colliders": 126,
+      "floors": 48,
+      "textures": 48,
+      "door_index": 0,
+      "door_open": 1,
+      "loot_index": 1,
+      "loot_home": 3,
+      "loot_value": 25,
+      "collected_objects": 2,
+      "loot_retired": 1,
+      "loot_reloaded": 1,
+      "stream": {
+        "current": 4,
+        "resident": [
+          4,
+          8,
+          3
+        ],
+        "slots": 5,
+        "settled": 1,
+        "reserved": 98592,
+        "allocated": 273680,
+        "completed_loads": 21,
+        "retired": 18,
+        "readbytes": 784464,
+        "stalls": 2880
+      }
+    },
+    {
+      "checkpoint": "courtyard_after_next",
+      "epoch": 0,
+      "tick": 2270,
+      "elapsed": 37.8175,
+      "player": [
+        -1.2026,
+        0.0,
+        28.4239
+      ],
+      "grounded": 1,
+      "vertical_velocity": 0.0,
+      "jump_inputs": 2,
+      "collision_clear": 1,
+      "heap_used": 1964288,
+      "models": 20,
+      "triangles": 907,
+      "colliders": 174,
+      "floors": 54,
+      "textures": 48,
+      "door_index": 0,
+      "door_open": 1,
+      "loot_index": 1,
+      "loot_home": 3,
+      "loot_value": 25,
+      "collected_objects": 2,
+      "loot_retired": 1,
+      "loot_reloaded": 1,
+      "stream": {
+        "current": 8,
+        "resident": [
+          4,
+          8,
+          3,
+          7
+        ],
+        "slots": 5,
+        "settled": 1,
+        "reserved": 124904,
+        "allocated": 273680,
+        "completed_loads": 22,
+        "retired": 18,
+        "readbytes": 810776,
+        "stalls": 2884
+      }
+    },
+    {
+      "checkpoint": "west_approach",
+      "epoch": 0,
+      "tick": 2388,
+      "elapsed": 39.7846,
+      "player": [
+        -4.9469,
+        0.0,
+        28.4989
+      ],
+      "grounded": 1,
+      "vertical_velocity": 0.0,
+      "jump_inputs": 2,
+      "collision_clear": 1,
+      "heap_used": 2059632,
+      "models": 46,
+      "triangles": 1322,
+      "colliders": 277,
+      "floors": 58,
+      "textures": 48,
+      "door_index": 0,
+      "door_open": 1,
+      "loot_index": 1,
+      "loot_home": 3,
+      "loot_value": 25,
+      "collected_objects": 2,
+      "loot_retired": 1,
+      "loot_reloaded": 1,
+      "stream": {
+        "current": 10,
+        "resident": [
+          4,
+          8,
+          3,
+          10,
+          9
+        ],
+        "slots": 5,
+        "settled": 1,
+        "reserved": 182152,
+        "allocated": 273680,
+        "completed_loads": 24,
+        "retired": 19,
+        "readbytes": 894336,
+        "stalls": 2903
+      }
+    },
+    {
+      "checkpoint": "west_deep",
+      "epoch": 0,
+      "tick": 2460,
+      "elapsed": 40.9848,
+      "player": [
+        -4.9984,
+        0.0,
+        26.3646
+      ],
+      "grounded": 1,
+      "vertical_velocity": 0.0,
+      "jump_inputs": 2,
+      "collision_clear": 1,
+      "heap_used": 2011816,
+      "models": 40,
+      "triangles": 1100,
+      "colliders": 254,
+      "floors": 32,
+      "textures": 48,
+      "door_index": 0,
+      "door_open": 1,
+      "loot_index": 1,
+      "loot_home": 3,
+      "loot_value": 25,
+      "collected_objects": 2,
+      "loot_retired": 1,
+      "loot_reloaded": 1,
+      "stream": {
+        "current": 10,
+        "resident": [
+          4,
+          8,
+          10,
+          9
+        ],
+        "slots": 5,
+        "settled": 1,
+        "reserved": 151680,
+        "allocated": 273680,
+        "completed_loads": 24,
+        "retired": 20,
+        "readbytes": 894336,
+        "stalls": 2903
+      }
+    },
+    {
+      "checkpoint": "west_return",
+      "epoch": 0,
+      "tick": 2557,
+      "elapsed": 42.6019,
+      "player": [
+        -4.9999,
+        0.0,
+        28.4296
+      ],
+      "grounded": 1,
+      "vertical_velocity": 0.0,
+      "jump_inputs": 2,
+      "collision_clear": 1,
+      "heap_used": 2059616,
+      "models": 46,
+      "triangles": 1322,
+      "colliders": 277,
+      "floors": 58,
+      "textures": 48,
+      "door_index": 0,
+      "door_open": 1,
+      "loot_index": 1,
+      "loot_home": 3,
+      "loot_value": 25,
+      "collected_objects": 2,
+      "loot_retired": 1,
+      "loot_reloaded": 1,
+      "stream": {
+        "current": 10,
+        "resident": [
+          4,
+          8,
+          3,
+          10,
+          9
+        ],
+        "slots": 5,
+        "settled": 1,
+        "reserved": 182152,
+        "allocated": 273680,
+        "completed_loads": 25,
+        "retired": 20,
+        "readbytes": 924808,
+        "stalls": 2907
+      }
+    },
+    {
+      "checkpoint": "courtyard_after_west",
+      "epoch": 0,
+      "tick": 2677,
+      "elapsed": 44.6023,
+      "player": [
+        -2.3059,
+        0.0,
+        29.7721
+      ],
+      "grounded": 1,
+      "vertical_velocity": 0.0,
+      "jump_inputs": 2,
+      "collision_clear": 1,
+      "heap_used": 1964280,
+      "models": 20,
+      "triangles": 907,
+      "colliders": 174,
+      "floors": 54,
+      "textures": 48,
+      "door_index": 0,
+      "door_open": 1,
+      "loot_index": 1,
+      "loot_home": 3,
+      "loot_value": 25,
+      "collected_objects": 2,
+      "loot_retired": 1,
+      "loot_reloaded": 1,
+      "stream": {
+        "current": 8,
+        "resident": [
+          4,
+          8,
+          3,
+          7
+        ],
+        "slots": 5,
+        "settled": 1,
+        "reserved": 124904,
+        "allocated": 273680,
+        "completed_loads": 26,
+        "retired": 22,
+        "readbytes": 951120,
+        "stalls": 2911
+      }
+    },
+    {
+      "checkpoint": "west_corner_return",
+      "epoch": 0,
+      "tick": 2756,
+      "elapsed": 45.9192,
+      "player": [
+        -2.2511,
+        0.0,
+        32.1516
+      ],
+      "grounded": 1,
+      "vertical_velocity": 0.0,
+      "jump_inputs": 2,
+      "collision_clear": 1,
+      "heap_used": 1964280,
+      "models": 20,
+      "triangles": 907,
+      "colliders": 174,
+      "floors": 54,
+      "textures": 48,
+      "door_index": 0,
+      "door_open": 1,
+      "loot_index": 1,
+      "loot_home": 3,
+      "loot_value": 25,
+      "collected_objects": 2,
+      "loot_retired": 1,
+      "loot_reloaded": 1,
+      "stream": {
+        "current": 8,
+        "resident": [
+          4,
+          8,
+          3,
+          7
+        ],
+        "slots": 5,
+        "settled": 1,
+        "reserved": 124904,
+        "allocated": 273680,
+        "completed_loads": 26,
+        "retired": 22,
+        "readbytes": 951120,
+        "stalls": 2911
+      }
+    },
+    {
+      "checkpoint": "west_exit_return",
+      "epoch": 0,
+      "tick": 2798,
+      "elapsed": 46.6194,
+      "player": [
+        -2.2501,
+        0.0,
+        33.2367
+      ],
+      "grounded": 1,
+      "vertical_velocity": 0.0,
+      "jump_inputs": 2,
+      "collision_clear": 1,
+      "heap_used": 1964280,
+      "models": 20,
+      "triangles": 907,
+      "colliders": 174,
+      "floors": 54,
+      "textures": 48,
+      "door_index": 0,
+      "door_open": 1,
+      "loot_index": 1,
+      "loot_home": 3,
+      "loot_value": 25,
+      "collected_objects": 2,
+      "loot_retired": 1,
+      "loot_reloaded": 1,
+      "stream": {
+        "current": 3,
+        "resident": [
+          4,
+          8,
+          3,
+          7
+        ],
+        "slots": 5,
+        "settled": 1,
+        "reserved": 124904,
+        "allocated": 273680,
+        "completed_loads": 26,
+        "retired": 22,
+        "readbytes": 951120,
+        "stalls": 2911
+      }
+    },
+    {
+      "checkpoint": "main_room_reloaded",
+      "epoch": 0,
+      "tick": 2883,
+      "elapsed": 48.0364,
+      "player": [
+        -0.0649,
+        0.0,
+        34.5607
+      ],
+      "grounded": 1,
+      "vertical_velocity": 0.0,
+      "jump_inputs": 2,
+      "collision_clear": 1,
+      "heap_used": 1964280,
+      "models": 20,
+      "triangles": 907,
+      "colliders": 174,
+      "floors": 54,
+      "textures": 48,
+      "door_index": 0,
+      "door_open": 1,
+      "loot_index": 1,
+      "loot_home": 3,
+      "loot_value": 25,
+      "collected_objects": 2,
+      "loot_retired": 1,
+      "loot_reloaded": 1,
+      "stream": {
+        "current": 3,
+        "resident": [
+          4,
+          8,
+          3,
+          7
+        ],
+        "slots": 5,
+        "settled": 1,
+        "reserved": 124904,
+        "allocated": 273680,
+        "completed_loads": 26,
+        "retired": 22,
+        "readbytes": 951120,
+        "stalls": 2911
+      }
+    },
+    {
+      "checkpoint": "door_return",
+      "epoch": 0,
+      "tick": 3028,
+      "elapsed": 50.4535,
+      "player": [
+        -0.0007,
+        0.0,
+        39.2501
+      ],
+      "grounded": 1,
+      "vertical_velocity": 0.0,
+      "jump_inputs": 2,
+      "collision_clear": 1,
+      "heap_used": 1974312,
+      "models": 34,
+      "triangles": 927,
+      "colliders": 214,
+      "floors": 58,
+      "textures": 48,
+      "door_index": 0,
+      "door_open": 1,
+      "loot_index": 1,
+      "loot_home": 3,
+      "loot_value": 25,
+      "collected_objects": 2,
+      "loot_retired": 1,
+      "loot_reloaded": 1,
+      "stream": {
+        "current": 3,
+        "resident": [
+          6,
+          8,
+          3,
+          7,
+          1
+        ],
+        "slots": 5,
+        "settled": 1,
+        "reserved": 129124,
+        "allocated": 273680,
+        "completed_loads": 28,
+        "retired": 23,
+        "readbytes": 989524,
+        "stalls": 2921
+      }
+    },
+    {
+      "checkpoint": "door_closed",
+      "epoch": 0,
+      "tick": 3100,
+      "elapsed": 51.6538,
+      "player": [
+        -0.0,
+        -0.3048,
+        40.3352
+      ],
+      "grounded": 1,
+      "vertical_velocity": 0.0,
+      "jump_inputs": 2,
+      "collision_clear": 1,
+      "heap_used": 2011808,
+      "models": 49,
+      "triangles": 1077,
+      "colliders": 259,
+      "floors": 50,
+      "textures": 48,
+      "door_index": 0,
+      "door_open": 0,
+      "loot_index": 1,
+      "loot_home": 3,
+      "loot_value": 25,
+      "collected_objects": 2,
+      "loot_retired": 1,
+      "loot_reloaded": 1,
+      "stream": {
+        "current": 7,
+        "resident": [
+          6,
+          9,
+          3,
+          7,
+          1
+        ],
+        "slots": 5,
+        "settled": 1,
+        "reserved": 149924,
+        "allocated": 273680,
+        "completed_loads": 29,
+        "retired": 24,
+        "readbytes": 1044260,
+        "stalls": 2928
+      }
+    },
+    {
+      "checkpoint": "ramp_return",
+      "epoch": 0,
+      "tick": 3271,
+      "elapsed": 54.5044,
+      "player": [
+        -0.0,
+        -2.3312,
+        45.9008
+      ],
+      "grounded": 1,
+      "vertical_velocity": 0.0,
+      "jump_inputs": 2,
+      "collision_clear": 1,
+      "heap_used": 1964008,
+      "models": 43,
+      "triangles": 855,
+      "colliders": 235,
+      "floors": 24,
+      "textures": 48,
+      "door_index": 0,
+      "door_open": 0,
+      "loot_index": 1,
+      "loot_home": 3,
+      "loot_value": 25,
+      "collected_objects": 2,
+      "loot_retired": 1,
+      "loot_reloaded": 1,
+      "stream": {
+        "current": 6,
+        "resident": [
+          6,
+          9,
+          7,
+          1
+        ],
+        "slots": 5,
+        "settled": 1,
+        "reserved": 119452,
+        "allocated": 273680,
+        "completed_loads": 29,
+        "retired": 25,
+        "readbytes": 1044260,
+        "stalls": 2928
+      }
+    },
+    {
+      "checkpoint": "street_return",
+      "epoch": 0,
+      "tick": 3355,
+      "elapsed": 55.9047,
+      "player": [
+        -0.0,
+        -2.4384,
+        48.4211
+      ],
+      "grounded": 1,
+      "vertical_velocity": 0.0,
+      "jump_inputs": 2,
+      "collision_clear": 1,
+      "heap_used": 1964008,
+      "models": 43,
+      "triangles": 855,
+      "colliders": 235,
+      "floors": 24,
+      "textures": 48,
+      "door_index": 0,
+      "door_open": 0,
+      "loot_index": 1,
+      "loot_home": 3,
+      "loot_value": 25,
+      "collected_objects": 2,
+      "loot_retired": 1,
+      "loot_reloaded": 1,
+      "stream": {
+        "current": 1,
+        "resident": [
+          6,
+          9,
+          7,
+          1
+        ],
+        "slots": 5,
+        "settled": 1,
+        "reserved": 119452,
+        "allocated": 273680,
+        "completed_loads": 29,
+        "retired": 25,
+        "readbytes": 1044260,
+        "stalls": 2928
+      }
+    },
+    {
+      "checkpoint": "east_street",
+      "epoch": 0,
+      "tick": 3508,
+      "elapsed": 58.4552,
+      "player": [
+        4.9344,
+        -2.4384,
+        48.499
+      ],
+      "grounded": 1,
+      "vertical_velocity": 0.0,
+      "jump_inputs": 2,
+      "collision_clear": 1,
+      "heap_used": 1993568,
+      "models": 51,
+      "triangles": 976,
+      "colliders": 286,
+      "floors": 24,
+      "textures": 48,
+      "door_index": 0,
+      "door_open": 0,
+      "loot_index": 1,
+      "loot_home": 3,
+      "loot_value": 25,
+      "collected_objects": 2,
+      "loot_retired": 1,
+      "loot_reloaded": 1,
+      "stream": {
+        "current": 1,
+        "resident": [
+          2,
+          9,
+          1
+        ],
+        "slots": 5,
+        "settled": 1,
+        "reserved": 136652,
+        "allocated": 273680,
+        "completed_loads": 30,
+        "retired": 27,
+        "readbytes": 1098388,
+        "stalls": 2935
+      }
+    },
+    {
+      "checkpoint": "east_ramp_top",
+      "epoch": 0,
+      "tick": 3887,
+      "elapsed": 64.7729,
+      "player": [
+        4.9997,
+        -0.0673,
+        36.8453
+      ],
+      "grounded": 1,
+      "vertical_velocity": 0.0,
+      "jump_inputs": 2,
+      "collision_clear": 1,
+      "heap_used": 2054320,
+      "models": 45,
+      "triangles": 1296,
+      "colliders": 319,
+      "floors": 64,
+      "textures": 48,
+      "door_index": 0,
+      "door_open": 0,
+      "loot_index": 1,
+      "loot_home": 3,
+      "loot_value": 25,
+      "collected_objects": 2,
+      "loot_retired": 1,
+      "loot_reloaded": 1,
+      "stream": {
+        "current": 2,
+        "resident": [
+          2,
+          3,
+          4,
+          8,
+          1
+        ],
+        "slots": 5,
+        "settled": 1,
+        "reserved": 180508,
+        "allocated": 273680,
+        "completed_loads": 33,
+        "retired": 28,
+        "readbytes": 1196980,
+        "stalls": 2968
+      }
+    },
+    {
+      "checkpoint": "east_interior",
+      "epoch": 0,
+      "tick": 3935,
+      "elapsed": 65.5727,
+      "player": [
+        5.0,
+        0.0,
+        35.5502
+      ],
+      "grounded": 1,
+      "vertical_velocity": 0.0,
+      "jump_inputs": 2,
+      "collision_clear": 1,
+      "heap_used": 2054320,
+      "models": 45,
+      "triangles": 1296,
+      "colliders": 319,
+      "floors": 64,
+      "textures": 48,
+      "door_index": 0,
+      "door_open": 0,
+      "loot_index": 1,
+      "loot_home": 3,
+      "loot_value": 25,
+      "collected_objects": 2,
+      "loot_retired": 1,
+      "loot_reloaded": 1,
+      "stream": {
+        "current": 2,
+        "resident": [
+          2,
+          3,
+          4,
+          8,
+          1
+        ],
+        "slots": 5,
+        "settled": 1,
+        "reserved": 180508,
+        "allocated": 273680,
+        "completed_loads": 33,
+        "retired": 28,
+        "readbytes": 1196980,
+        "stalls": 2968
+      }
+    },
+    {
+      "checkpoint": "restart_loaded",
+      "epoch": 1,
+      "tick": 4026,
+      "elapsed": 1.4833,
+      "player": [
+        -6.522,
+        -2.4384,
+        49.8253
+      ],
+      "grounded": 1,
+      "vertical_velocity": 0.0,
+      "jump_inputs": 2,
+      "collision_clear": 1,
+      "heap_used": 1908624,
+      "models": 32,
+      "triangles": 593,
+      "colliders": 166,
+      "floors": 8,
+      "textures": 48,
+      "door_index": 0,
+      "door_open": 0,
+      "loot_index": 1,
+      "loot_home": 3,
+      "loot_value": 0,
+      "collected_objects": 0,
+      "loot_retired": 1,
+      "loot_reloaded": 1,
+      "stream": {
+        "current": 9,
+        "resident": [
+          1,
+          9
+        ],
+        "slots": 5,
+        "settled": 1,
+        "reserved": 82524,
+        "allocated": 273680,
+        "completed_loads": 2,
+        "retired": 0,
+        "readbytes": 82524,
+        "stalls": 2645
+      }
+    }
+  ],
+  "terminal": {
+    "passed": "1",
+    "input_only": "1",
+    "coverage": "1",
+    "collision_clear": "1",
+    "stair_jumps": "2",
+    "visited_regions": "9",
+    "loot_persist": "1",
+    "restart_reload": "1",
+    "pre_restart_loads": "33",
+    "audio_calls": "1713"
+  },
+  "visited_regions": [
+    1,
+    2,
+    3,
+    4,
+    6,
+    7,
+    8,
+    9,
+    10
+  ],
+  "pre_restart_loads": 33,
+  "retirements": 28,
+  "allocated_slot_bytes": 273680,
+  "peak_heap_bytes": 2059648,
+  "working_views": [
+    {
+      "resident": [
+        1,
+        9
+      ],
+      "triangles": 593,
+      "colliders": 166
+    },
+    {
+      "resident": [
+        1,
+        2,
+        9
+      ],
+      "triangles": 976,
+      "colliders": 286
+    },
+    {
+      "resident": [
+        1,
+        9
+      ],
+      "triangles": 593,
+      "colliders": 166
+    },
+    {
+      "resident": [
+        1,
+        6,
+        7,
+        9
+      ],
+      "triangles": 855,
+      "colliders": 235
+    },
+    {
+      "resident": [
+        1,
+        3,
+        6,
+        7,
+        9
+      ],
+      "triangles": 1077,
+      "colliders": 259
+    },
+    {
+      "resident": [
+        1,
+        3,
+        6,
+        7
+      ],
+      "triangles": 679,
+      "colliders": 172
+    },
+    {
+      "resident": [
+        1,
+        3,
+        6,
+        7,
+        8
+      ],
+      "triangles": 927,
+      "colliders": 214
+    },
+    {
+      "resident": [
+        3,
+        7,
+        8
+      ],
+      "triangles": 659,
+      "colliders": 118
+    },
+    {
+      "resident": [
+        3,
+        4,
+        7,
+        8
+      ],
+      "triangles": 907,
+      "colliders": 174
+    },
+    {
+      "resident": [
+        3,
+        4,
+        8
+      ],
+      "triangles": 718,
+      "colliders": 126
+    },
+    {
+      "resident": [
+        1,
+        2,
+        3,
+        4,
+        8
+      ],
+      "triangles": 1296,
+      "colliders": 319
+    },
+    {
+      "resident": [
+        3,
+        4,
+        8
+      ],
+      "triangles": 718,
+      "colliders": 126
+    },
+    {
+      "resident": [
+        3,
+        4,
+        8,
+        9,
+        10
+      ],
+      "triangles": 1322,
+      "colliders": 277
+    },
+    {
+      "resident": [
+        3,
+        4,
+        8
+      ],
+      "triangles": 718,
+      "colliders": 126
+    },
+    {
+      "resident": [
+        4,
+        8
+      ],
+      "triangles": 496,
+      "colliders": 102
+    },
+    {
+      "resident": [
+        4,
+        8,
+        9,
+        10
+      ],
+      "triangles": 1100,
+      "colliders": 254
+    },
+    {
+      "resident": [
+        4,
+        8
+      ],
+      "triangles": 496,
+      "colliders": 102
+    },
+    {
+      "resident": [
+        3,
+        4,
+        8
+      ],
+      "triangles": 718,
+      "colliders": 126
+    },
+    {
+      "resident": [
+        4,
+        8
+      ],
+      "triangles": 496,
+      "colliders": 102
+    },
+    {
+      "resident": [
+        4,
+        8,
+        9,
+        10
+      ],
+      "triangles": 1100,
+      "colliders": 254
+    },
+    {
+      "resident": [
+        4,
+        8
+      ],
+      "triangles": 496,
+      "colliders": 102
+    },
+    {
+      "resident": [
+        3,
+        4,
+        8
+      ],
+      "triangles": 718,
+      "colliders": 126
+    },
+    {
+      "resident": [
+        3,
+        4,
+        7,
+        8
+      ],
+      "triangles": 907,
+      "colliders": 174
+    },
+    {
+      "resident": [
+        3,
+        4,
+        8
+      ],
+      "triangles": 718,
+      "colliders": 126
+    },
+    {
+      "resident": [
+        3,
+        4,
+        8,
+        9,
+        10
+      ],
+      "triangles": 1322,
+      "colliders": 277
+    },
+    {
+      "resident": [
+        4,
+        8,
+        9,
+        10
+      ],
+      "triangles": 1100,
+      "colliders": 254
+    },
+    {
+      "resident": [
+        3,
+        4,
+        8,
+        9,
+        10
+      ],
+      "triangles": 1322,
+      "colliders": 277
+    },
+    {
+      "resident": [
+        3,
+        4,
+        8
+      ],
+      "triangles": 718,
+      "colliders": 126
+    },
+    {
+      "resident": [
+        3,
+        4,
+        7,
+        8
+      ],
+      "triangles": 907,
+      "colliders": 174
+    },
+    {
+      "resident": [
+        3,
+        7,
+        8
+      ],
+      "triangles": 659,
+      "colliders": 118
+    },
+    {
+      "resident": [
+        1,
+        3,
+        6,
+        7,
+        8
+      ],
+      "triangles": 927,
+      "colliders": 214
+    },
+    {
+      "resident": [
+        1,
+        3,
+        6,
+        7
+      ],
+      "triangles": 679,
+      "colliders": 172
+    },
+    {
+      "resident": [
+        1,
+        3,
+        6,
+        7,
+        9
+      ],
+      "triangles": 1077,
+      "colliders": 259
+    },
+    {
+      "resident": [
+        1,
+        6,
+        7,
+        9
+      ],
+      "triangles": 855,
+      "colliders": 235
+    },
+    {
+      "resident": [
+        1,
+        9
+      ],
+      "triangles": 593,
+      "colliders": 166
+    },
+    {
+      "resident": [
+        1,
+        2,
+        9
+      ],
+      "triangles": 976,
+      "colliders": 286
+    },
+    {
+      "resident": [
+        1,
+        2
+      ],
+      "triangles": 578,
+      "colliders": 197
+    },
+    {
+      "resident": [
+        1,
+        2,
+        3,
+        4,
+        8
+      ],
+      "triangles": 1296,
+      "colliders": 319
+    },
+    {
+      "resident": [
+        1,
+        9
+      ],
+      "triangles": 593,
+      "colliders": 166
+    }
+  ],
+  "capture_diagnostic": false,
+  "music": {
+    "cue": "lanterns_below",
+    "consumed_frames": 2112792,
+    "generated_blocks": 1665,
+    "max_underruns": 0,
+    "sample_count": 69
+  },
+  "audio_continuity_passed": true,
+  "checkpoint_scope": "Pre-update observations; queued input is not executed until a later fixed tick",
+  "timing_scope": "Input-only tour on Ares; original N64 performance remains unverified"
+}

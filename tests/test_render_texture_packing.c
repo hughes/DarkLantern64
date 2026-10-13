@@ -58,6 +58,45 @@ static int periodic_interpolation(void){
     return 0;
 }
 
+static int sliced_batch_equivalence(void){
+    enum {COUNT=213};
+    DlVec3 vertices[COUNT]={0};DlNormal normals[COUNT]={0};DlVec2 uv[COUNT];
+    uint16_t indices[COUNT];for(int i=0;i<COUNT;++i)indices[i]=(uint16_t)i;
+    DlMesh mesh={.vertices=vertices,.vertex_count=COUNT,.indices=indices,.index_count=COUNT,.uvs=uv};
+    for(int smooth=0;smooth<2;++smooth){
+        mesh.normals=smooth?normals:NULL;DlRenderBatches batches={0};
+        CHECK(dl_render_batches_build(&mesh,&batches)&&batches.batch_count>2);
+        for(unsigned b=0;b<batches.batch_count;++b){
+            const DlRenderBatch *batch=&batches.batches[b];
+            for(unsigned v=0;v<batch->vertex_count;++v){
+                unsigned source=batches.vertices[batch->vertex_offset+v].source_vertex;
+                /* Separate batches require different whole-repeat rebases. */
+                float base=(b&1)?-4096.0f*(b+1):4096.0f*(b+1);
+                uv[source]=(DlVec2){base+(source%7)/64.0f,-base+(source%11)/128.0f};
+            }
+        }
+        size_t bytes=batches.vertex_count*2*sizeof(int16_t);
+        int16_t *whole=malloc(bytes),*sliced=malloc(bytes);CHECK(whole&&sliced);
+        CHECK(dl_render_texture_pack(&mesh,&batches,32,64,whole));
+        memset(sliced,0x55,bytes);
+        for(unsigned b=0;b<batches.batch_count;++b){
+            DlRenderBatch batch=batches.batches[b];unsigned offset=batch.vertex_offset;batch.vertex_offset=0;
+            DlRenderBatches one={.batches=&batch,.vertices=batches.vertices+offset,.batch_count=1,.vertex_count=batch.vertex_count};
+            CHECK(dl_render_texture_pack(&mesh,&one,32,64,sliced+offset*2));
+        }
+        CHECK(memcmp(whole,sliced,bytes)==0);
+        /* An invalid final slice cannot silently produce a usable candidate. */
+        DlRenderBatch last=batches.batches[batches.batch_count-1];unsigned offset=last.vertex_offset;last.vertex_offset=0;
+        DlRenderBatches one={.batches=&last,.vertices=batches.vertices+offset,.batch_count=1,.vertex_count=last.vertex_count};
+        uv[one.vertices[0].source_vertex].u=NAN;DlTexturePackError error;
+        CHECK(!dl_render_texture_pack_ex(&mesh,&one,32,64,sliced+offset*2,&error));
+        CHECK(error.status==DL_TEXTURE_PACK_NONFINITE_UV&&error.batch==0);
+        CHECK(memcmp(whole,sliced,bytes)==0);
+        free(whole);free(sliced);dl_render_batches_free(&batches);
+    }
+    return 0;
+}
+
 static int boundaries_and_failures(void){
     DlVec3 vertices[3]={0};DlVec2 uv[3]={{0,0},{1,0},{0,1}};uint16_t indices[]={0,1,2};
     DlMesh mesh={.vertices=vertices,.vertex_count=3,.indices=indices,.index_count=3,.uvs=uv};
@@ -104,7 +143,7 @@ static int boundaries_and_failures(void){
 }
 
 int main(void){
-    CHECK(periodic_interpolation()==0);CHECK(boundaries_and_failures()==0);
+    CHECK(periodic_interpolation()==0);CHECK(sliced_batch_equivalence()==0);CHECK(boundaries_and_failures()==0);
     puts("texture packing: large signed offsets, periodic interpolation across batches, unchanged atlas UVs, padding, s16 endpoints and transactional rejection passed");
     return 0;
 }

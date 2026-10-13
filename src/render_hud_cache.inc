@@ -31,6 +31,9 @@ static void hud_cache_release(void){
 
 static void hud_cache_prepare(const DlGame *g){
     if(hud_cache.level==g->level)return;
+    if(hud_cache.level&&g->level->stream&&hud_cache.level->stream==g->level->stream){
+        hud_cache.level=g->level;return;
+    }
     assertf(!hud_cache.level,"Release HUD cache before replacing a level");
     static const char *prompts[HUD_PROMPT_COUNT]={
         "Find the switch, open the gate, take the relic.",

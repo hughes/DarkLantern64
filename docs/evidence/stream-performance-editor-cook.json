@@ -1,0 +1,26 @@
+{
+  "ok": true,
+  "checks": [
+    "actual saved district source and raw paired manifest hashes match displayed v4 ROM cook",
+    "full-mission shadow scene and nonduplicated known array categories match compiler",
+    "Build & Diagnostics and Streaming panels render the cook report",
+    "read-only inspection preserves both canonical inputs"
+  ],
+  "source_sha256": "16160232d3051ba95ca0d78fa66bf02522399aa06659199a3c0285c2832fdcbe",
+  "manifest_sha256": "2f6aeeb0911aaf4806d8a848f0609c2552621a659df66fb5e78b1125fbd329d0",
+  "editor_sha256": "97fe93dff6750c677877c5c90ecdb78d223adebb349e252ccc51c2136fe6c637",
+  "cook_report_path": "C:\\Users\\hughe\\dev\\DarkLantern64\\build\\DarkLantern64-bundle-level_bundle-menu-bafford-district-test-performance-t3d\\catalog/generated/bundle_report.json",
+  "regions": 10,
+  "chunk_version": 4,
+  "lighting": {
+    "full_scene_colliders": 603,
+    "full_scene_floors": 118,
+    "global_lights": 16,
+    "states": 2,
+    "mission_embedded_rgba_bytes": 121776,
+    "bootstrap_embedded_rgba_bytes": 1152
+  },
+  "compiled_geometry_bytes": 624,
+  "compiled_baked_color_bytes": 1152,
+  "compiled_known_array_bytes": 1776
+}

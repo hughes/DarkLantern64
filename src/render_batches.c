@@ -93,6 +93,37 @@ static void pack(const DlMesh *mesh,DlRenderBatches *result,bool write){
     if(scratch.triangle_count)flush(mesh,&scratch,result,write);
 }
 
+static void pack_sequential(const DlMesh *mesh,DlRenderBatches *result,bool write){
+    /* Immutable streamed faces have three unique vertices and one bone group.
+     * The general cache's exact split is 23 triangles: 69 refs plus one pair
+     * padding ref. There are no vertex-key searches or remapping passes here. */
+    const uint32_t triangles_per_batch=DL_RENDER_BATCH_VERTICES/3;
+    const uint32_t indices_per_batch=triangles_per_batch*3;
+    uint32_t index_count=(uint32_t)mesh->index_count;
+    uint32_t whole=index_count/indices_per_batch,remainder=index_count%indices_per_batch;
+    result->batch_count=whole+(remainder!=0);
+    result->group_count=result->batch_count;result->index_count=index_count;
+    result->vertex_count=whole*(indices_per_batch+(indices_per_batch&1))+remainder+(remainder&1);
+    if(!write)return;
+    uint32_t first=0,vertex_offset=0;
+    for(uint32_t batch=0;batch<result->batch_count;++batch){
+        uint32_t count=index_count-first;
+        if(count>indices_per_batch)count=indices_per_batch;
+        uint8_t padded=(uint8_t)(count+(count&1));
+        result->batches[batch]=(DlRenderBatch){vertex_offset,batch,first,(uint16_t)count,padded,1};
+        result->groups[batch]=(DlRenderBatchGroup){0,0,padded};
+        for(uint32_t triangle=0;triangle<count/3;++triangle){
+            uint16_t face=(uint16_t)(first/3+triangle);
+            for(uint32_t corner=0;corner<3;++corner){uint32_t local=triangle*3+corner;
+                result->vertices[vertex_offset+local]=(DlRenderVertexRef){(uint16_t)(first+local),face};
+                result->indices[first+local]=(uint8_t)local;
+            }
+        }
+        if(count&1)result->vertices[vertex_offset+count]=result->vertices[vertex_offset+count-1];
+        first+=count;vertex_offset+=padded;
+    }
+}
+
 void dl_render_batches_free(DlRenderBatches *batches){
     if(!batches)return;
     free(batches->batches);free(batches->vertices);
@@ -110,9 +141,14 @@ bool dl_render_batches_build(const DlMesh *mesh,DlRenderBatches *out){
         if(!bones||!mesh->animation->bone_count||mesh->animation->bone_count>DL_ANIMATION_MAX_BONES)return false;
         for(int v=0;v<mesh->vertex_count;++v)if(bones[v]>=mesh->animation->bone_count)return false;
     }
-    for(int i=0;i<mesh->index_count;++i)if(mesh->indices[i]>=mesh->vertex_count)return false;
+    bool sequential=!mesh->animation&&mesh->index_count<=mesh->vertex_count;
+    for(int i=0;i<mesh->index_count;++i){
+        if(mesh->indices[i]>=mesh->vertex_count)return false;
+        if(mesh->indices[i]!=i)sequential=false;
+    }
     DlRenderBatches counts={0};
-    pack(mesh,&counts,false);
+    if(sequential)pack_sequential(mesh,&counts,false);
+    else pack(mesh,&counts,false);
     DlRenderBatches result={0};
     if(counts.batch_count){
         result.batches=malloc(sizeof *result.batches*counts.batch_count);
@@ -126,7 +162,8 @@ bool dl_render_batches_build(const DlMesh *mesh,DlRenderBatches *out){
             sizeof *result.vertices*counts.vertex_count+
             sizeof *result.groups*counts.group_count+
             sizeof *result.indices*counts.index_count;
-        pack(mesh,&result,true);
+        if(sequential)pack_sequential(mesh,&result,true);
+        else pack(mesh,&result,true);
     }
     *out=result;
     return true;

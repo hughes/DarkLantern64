@@ -1,0 +1,16 @@
+{
+  "ok": true,
+  "source": "isolated copy of thief_bafford_district.json",
+  "checks": [
+    "rendered actual ten-region district policy panel with 843 editable source entities",
+    "district activation and working-set paired Undo/Redo",
+    "district directed-gate edits and door deletion clean paired homes/references with Undo",
+    "Drop to surface finds transformed floor-only support under actual district loot and Undo restores placement",
+    "district floor vertex source-only Undo/Redo preserves partition and renders collision edges",
+    "actual district paired Save publishes both identities, remains ROM-valid and explicitly gates Native Play"
+  ],
+  "source_sha256": "16160232d3051ba95ca0d78fa66bf02522399aa06659199a3c0285c2832fdcbe",
+  "manifest_sha256": "2f6aeeb0911aaf4806d8a848f0609c2552621a659df66fb5e78b1125fbd329d0",
+  "editor_pid": 48048,
+  "editor_sha256": "97fe93dff6750c677877c5c90ecdb78d223adebb349e252ccc51c2136fe6c637"
+}

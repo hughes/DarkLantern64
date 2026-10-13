@@ -6,6 +6,11 @@ meaning, inspect validation, and play the same cooked result on host and ROM.
 A runtime demonstration that requires an engineer to repair every JSON edit
 does not complete this architecture.
 
+For the current practical workflow, including changing which rooms stay visible
+through an opening, see [Expanding Bafford content by hand](bafford-content-authoring.md).
+The sections below also describe future work; the hand-authoring guide labels
+the operations the editor supports today.
+
 ## Current integration and its limits
 
 `content/streaming_probe.json` is an ordinary editable scene. Its separate

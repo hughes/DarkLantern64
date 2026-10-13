@@ -31,20 +31,28 @@ The box counts below are static source proxies: 602 in total. The authored
 central door adds one box in ramp-upper, giving 603 cooked collider records;
 the working-set contact figures include that door whenever its home is resident.
 
-| Region | Static triangles | Boxes | Exact floors | Material groups | DLR chunk bytes |
+| Region | Static triangles | Boxes | Exact floors | Material groups | DLR1 v4 chunk bytes |
 |---|---:|---:|---:|---:|---:|
-| West street | 398 | 90 | 8 | 19 | 35,632 |
-| East street | 195 | 73 | 0 | 12 | 18,428 |
-| Ramp lower | 73 | 20 | 10 | 5 | 7,112 |
-| Ramp upper | 189 | 47 | 6 | 6 | 17,240 |
-| Main interior | 222 | 24 | 26 | 5 | 19,816 |
-| Rear courtyard | 248 | 39 | 16 | 4 | 22,032 |
-| Next passage | 248 | 57 | 6 | 3 | 22,280 |
-| West return | 206 | 61 | 2 | 13 | 18,936 |
-| Lower east alley | 383 | 118 | 16 | 19 | 35,744 |
-| Outer east walk | 375 | 73 | 28 | 18 | 33,952 |
+| West street | 398 | 90 | 8 | 19 | 54,736 |
+| East street | 195 | 73 | 0 | 12 | 27,788 |
+| Ramp lower | 73 | 20 | 10 | 5 | 10,616 |
+| Ramp upper | 189 | 47 | 6 | 6 | 26,312 |
+| Main interior | 222 | 24 | 26 | 5 | 30,472 |
+| Rear courtyard | 248 | 39 | 16 | 4 | 33,936 |
+| Next passage | 248 | 57 | 6 | 3 | 34,184 |
+| West return | 206 | 61 | 2 | 13 | 28,824 |
+| Lower east alley | 383 | 118 | 16 | 19 | 54,128 |
+| Outer east walk | 375 | 73 | 28 | 18 | 51,952 |
 
-The package is 245,496 bytes, with a 14,288-byte directory and entity table.
+The current DLR1 v4 package is 367,272 bytes, with a 14,288-byte directory and
+entity table. Its largest chunk is 54,736 bytes. Five allocated region slots
+therefore occupy 273,680 bytes; directory storage is separate, as are DMA
+scratch, scene banks, query indexes and renderer resources. These current
+storage figures come from the district entry in
+`build/DarkLantern64-bundle-level_bundle-menu-bafford-district-test-performance-t3d/catalog/generated/bundle_report.json`.
+V4 adds two states of front/back RGBA without changing source geometry or the
+working-set capacities. The earlier v3 package recorded in the historical
+evidence below was 245,496 bytes.
 The ROM bridge checked 49 stable, chosen-transition and partial publication
 states. Its current largest witnesses are:
 
@@ -160,6 +168,11 @@ rechecking these sets and gates, not merely recooking unchanged metadata.
 
 ## Reproduction and safe authoring
 
+For hand edits to rooms, openings and their visible region sets, use the
+[content authoring guide](bafford-content-authoring.md). It distinguishes the
+current editor controls from mesh cuts and new region rows that need external
+editing.
+
 With the ignored local sources and import evidence present:
 
 ```powershell
@@ -190,10 +203,13 @@ Current source SHA-256:
 `16160232d3051ba95ca0d78fa66bf02522399aa06659199a3c0285c2832fdcbe`.
 Partition SHA-256:
 `2f6aeeb0911aaf4806d8a848f0609c2552621a659df66fb5e78b1125fbd329d0`.
-Cooked package SHA-256:
+Historical DLR1 v3 package SHA-256 (the evidence below):
 `bb709d76895198bbccf36f9febf52990f2691e0ae67ed4c28e1aa9df7c14aaf5`.
+Current v4 package identities are recorded per build in its bundle report;
+compiler and lighting implementation changes can change that identity while
+the canonical source and partition remain unchanged.
 
-## Playable ROM and accepted route
+## Playable ROM and historical route verification
 
 Build `python tools/build.py --bundle content/level_bundle.json`, then select
 **Bafford District** from the main menu. The existing **Bafford Expanded Street**
@@ -218,7 +234,7 @@ flowchart LR
     EA <-. Authored gate .-> O[Outer east walk]
 ```
 
-Solid links were traversed in the input-only emulator tour. Dashed links describe
+Solid links were traversed in the historical input-only emulator tour. Dashed links describe
 authored adjacency; complete continuous traversal of those branches remains
 unproven. The central entrance follows the real sloping floor and requires two
 ordinary **L** jumps over the original tall steps. **A** opens the authored
@@ -227,7 +243,7 @@ continues into the courtyard, crosses into the rear eastern alley and back,
 walks through the northern passage directly into the western rooms, then backtracks
 through the central entrance and uses the separate eastern entrance.
 
-The final 8 MiB Ares tour visited nine regions, loaded 27 chunks and retired 25
+The historical DLR1 v3 8 MiB Ares tour visited nine regions, loaded 27 chunks and retired 25
 before a normal **R** restart from the eastern interior. It checked floor/body
 coverage throughout, two rising jumps, door opening and closing, actual loot-home
 retirement/reload, preserved collection state and clean source-spawn restart.
@@ -235,14 +251,14 @@ All 41 checkpoints' resident resources and every published view were compared
 with the actual cooked working-set witnesses. Ordinary assigned music had zero
 underruns. The tenth region's named start was checked through the menu lifecycle.
 
-The menu test checked all 31 bundled start variants through 186 launches/restarts
+The historical menu test checked all 31 bundled start variants through 186 launches/restarts
 and 93 resumes. Every variant reached stable per-start heaps after warmup and
 matched its authored position, view, stance and initial mission state. Ordinary
 menu boot, 4 MiB rejection and both direct-start modes passed. The earlier
 streaming probe and expanded street also passed their input-only regressions.
 
-The [integration ledger](evidence/bafford-district-integration.json) records the
-final normal ROM, source, partition and package identities, bounded resources,
+The historical [integration ledger](evidence/bafford-district-integration.json) records that
+normal ROM, source, partition and package identities, bounded resources,
 measured heap use and remaining unknown memory categories. Separate
 [ordinary-tour](evidence/bafford-district-ordinary.json),
 [capture](evidence/bafford-district-capture.json) and
@@ -250,13 +266,13 @@ measured heap use and remaining unknown memory categories. Separate
 and log identities. Framebuffer export is a diagnostic with extra audio cost;
 its underruns do not represent the ordinary tour.
 
-Actual framebuffer views from the capture ROM:
+Historical framebuffer views from that capture ROM:
 
 | Main interior | Rear courtyard | Eastern interior |
 |---|---|---|
 | ![Stone main interior](images/bafford-district-interior.png) | ![Tiled courtyard and northern passage](images/bafford-district-courtyard.png) | ![Eastern passage with windows](images/bafford-district-east-alley.png) |
 
-## Editor and exchange verification
+## Historical editor and exchange verification
 
 The actual 843-entity district was edited in an isolated live editor copy.
 Six checks covered activation/working-set paired Undo/Redo, directed gate edits,
@@ -284,15 +300,20 @@ float-rounding cases that would lose valid support at runtime.
 
 ## Practical limits and next work
 
-This accepts a larger playable streaming/content experiment. Synchronous
-renderer and lighting preparation still creates long room-loading pauses;
-the ordinary tour's worst reported CPU interval is recorded in the ledger.
-Cached or cooked regional lighting and incremental renderer preparation are
-needed before accepting frame-time behavior. The zero-underrun result establishes
-audio continuity during this tour, not smooth frame pacing or original-hardware
-performance.
+The earlier evidence accepted a larger playable streaming/content experiment.
+That v3 implementation synchronously prepared renderer resources and static
+lighting, producing long room-loading pauses recorded in its historical ledger.
+The current v4 implementation cooks static night lighting offline, stages and
+reuses renderer resources, and builds bounded collision query indexes. Its
+gameplay-frame, simulation and gate-wait acceptance is recorded separately in
+[the performance workflow](bafford-stream-performance.md). The final continuous
+Ares tour passes all of those checks, including zero gate waits and music
+underruns. The [current integration ledger](evidence/stream-performance-integration.json)
+also records the matching normal/menu ROM, ordinary and capture tours, older
+streaming regressions and editor checks. Original-hardware performance remains
+unverified.
 
-The broad Python suite ran 450 tests: 447 passed, two were skipped, and the
+At that historical checkpoint, the broad Python suite ran 450 tests: 447 passed, two were skipped, and the
 existing local Sponza geometry/collider mismatch
 (`sponza-collision-parapet-north`) still failed. Final focused compiler, derivation
 and verifier checks passed, including 14 final derivation checks with thick

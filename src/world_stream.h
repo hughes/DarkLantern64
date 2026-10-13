@@ -52,6 +52,7 @@ typedef struct {
     const DlMission *mission;
     DlRegionSlot *slots;
     size_t slot_count, cursor;
+    size_t read_slice; /* optional platform limit; zero retains the portable 256-byte default */
     DlStreamRead read;
     void *read_context;
     uint64_t completed_rsp, completed_rdp;
@@ -67,7 +68,7 @@ DlStreamStatus dl_world_stream_init(DlWorldStream *stream, const DlMission *miss
 DlStreamStatus dl_world_stream_request(DlWorldStream *stream, uint32_t region_id,
     DlRegionHandle *handle);
 /* Call at a tick/frame ownership boundary. Reads and CRC work together process
- * at most byte_budget bytes, using at most 256 bytes per slot per pump. One
+ * at most byte_budget bytes, using read_slice (default 256) bytes per slot. One
  * pump visits every slot at most once. Publication performs only bounded
  * structural validation (<=3 sections); lazy record getters validate values.
  * Return bytes actually read, not a wall-clock deadline guarantee. */

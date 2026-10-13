@@ -585,6 +585,19 @@ static DlInput bafford_expanded_input(const DlGame *game,const DlLauncher *launc
 #ifdef DL_BAFFORD_DISTRICT_TEST
 #include "stream_scene.h"
 static uint64_t bafford_district_tick;
+#ifdef DL_BAFFORD_DISTRICT_PERFORMANCE_TEST
+static uint64_t district_perf_tick_offset;
+static float district_perf_motion_seconds;
+static uint32_t district_perf_blocked_ticks;
+/* 1: initial/restart admission; 2: loading delays an authored interaction;
+ * 4: interaction state not yet applied. Ordinary walking never waits for IO. */
+static uint32_t district_perf_route_wait;
+static bool district_perf_use_loading;
+static bool district_perf_complete_logged;
+static bool district_perf_complete_pending;
+static unsigned district_perf_complete_visited;
+static uint64_t district_perf_complete_loads;
+#endif
 static uint32_t bafford_district_visited;
 static unsigned bafford_district_jumps;
 static int bafford_district_door=-1,bafford_district_loot=-1;
@@ -596,6 +609,7 @@ static bool bafford_district_resident(const DlWorldStream *world,uint32_t id){
     return false;
 }
 static bool bafford_district_settled(const DlWorldStream *world){
+    if(!dl_stream_rom_settled())return false;
     for(size_t i=0;i<world->slot_count;++i)
         if(world->slots[i].state!=DL_STREAM_FREE&&world->slots[i].state!=DL_STREAM_RESIDENT)return false;
     return true;
@@ -615,16 +629,33 @@ static void bafford_district_checkpoint(const char *name,const DlGame *game,unsi
         bafford_district_loot_retired,bafford_district_loot_reloaded,(unsigned long)dl_stream_rom_current(game));
     bool first=true;for(size_t i=0;i<world->slot_count;++i)if(world->slots[i].state==DL_STREAM_RESIDENT){
         debugf("%s%lu",first?"":",",(unsigned long)world->slots[i].region_id);first=false;}
-    debugf("],\"slots\":%lu,\"settled\":%d,\"reserved\":%lu,\"allocated\":%lu,\"completed_loads\":%llu,\"retired\":%lu,\"readbytes\":%llu,\"stalls\":%llu}}\n",
+    debugf("]");
+#ifdef DL_BAFFORD_DISTRICT_PERFORMANCE_TEST
+    uint32_t view_mask=dl_stream_rom_view_mask();first=true;debugf(",\"view\":[");
+    for(uint32_t id=1;id<=world->mission->region_count;++id)if(view_mask&(UINT32_C(1)<<(id-1))){
+        debugf("%s%lu",first?"":",",(unsigned long)id);first=false;}
+    debugf("]");
+#endif
+    debugf(",\"slots\":%lu,\"settled\":%d,\"reserved\":%lu,\"allocated\":%lu,\"completed_loads\":%llu,\"retired\":%lu,\"readbytes\":%llu,\"stalls\":%llu}}\n",
         (unsigned long)world->slot_count,bafford_district_settled(world),(unsigned long)world->stats.reserved_bytes,
         (unsigned long)world->stats.allocated_slot_bytes,(unsigned long long)world->stats.completed_loads,
         (unsigned long)dl_stream_rom_retired(),(unsigned long long)world->stats.bytes_read,(unsigned long long)world->stats.read_stalls);
 }
 static bool bafford_district_drive(const DlGame *game,DlVec3 target,DlInput *input){
     float dx=target.x-game->player.x,dz=target.z-game->player.z,distance=sqrtf(dx*dx+dz*dz);
-    if(distance>.08f){float s=sinf(game->yaw),c=cosf(game->yaw);
-        input->forward=(s*dx+c*dz)/distance;input->strafe=(-c*dx+s*dz)/distance;}
-    return distance<.1f&&game->grounded&&fabsf(game->player.y-target.y)<.04f;
+#ifdef DL_BAFFORD_DISTRICT_PERFORMANCE_TEST
+    /* A single input is reused across all ticks in this render frame. Limit
+     * only the final approach so catch-up ticks cannot pass the authored stair
+     * landing. Farther away, retain ordinary full-speed movement. */
+    float tolerance=.002f,arrival=.025f,magnitude=1;
+    float travel=2.1f*district_perf_motion_seconds;
+    if(travel>distance)magnitude=distance/travel;
+#else
+    float tolerance=.08f,arrival=.1f,magnitude=1;
+#endif
+    if(distance>tolerance){float s=sinf(game->yaw),c=cosf(game->yaw);
+        input->forward=magnitude*(s*dx+c*dz)/distance;input->strafe=magnitude*(-c*dx+s*dz)/distance;}
+    return distance<arrival&&game->grounded&&fabsf(game->player.y-target.y)<.04f;
 }
 #ifdef DL_BAFFORD_DISTRICT_TEST_CAPTURE
 static bool bafford_district_turn(const DlGame *game,float x,float z,DlInput *input){
@@ -674,17 +705,29 @@ static DlInput bafford_district_input(const DlGame *game,const DlLauncher *launc
         {"east_ramp_top",{5,-.056f,36.8f},false,0,0},
         {"east_interior",{5,0,35.5f},false,0,3}
     };
-    static unsigned stage,warmup,hold;static bool initiated,used,air_seen[2];static uint64_t prior_loads;
+    static unsigned stage,warmup;static bool initiated,used,air_seen[2];static uint64_t prior_loads;
+#ifndef DL_BAFFORD_DISTRICT_PERFORMANCE_TEST
+    static unsigned hold;
+#endif
     DlInput input={0};*menu=(DlLaunchInput){0};
+#ifdef DL_BAFFORD_DISTRICT_PERFORMANCE_TEST
+    district_perf_route_wait=0;
+#endif
     if(launcher->menu_open){int target=0;bool found=false;
         for(int i=0;i<launcher->bundle->level_count;++i)if(!strcmp(launcher->bundle->levels[i].id,"bafford-district")){target=i;found=true;}
         assertf(found,"District diagnostic bundle entry absent");
         if(launcher->selected_level!=target)menu->level_delta=1;else menu->accept=true;return input;
     }
+#ifndef DL_BAFFORD_DISTRICT_PERFORMANCE_TEST
     ++bafford_district_tick;
+#endif
     const DlWorldStream *world=dl_stream_rom_world();assertf(world,"District diagnostic mission absent");
     if(stage==0){
-        if(++warmup<90||!bafford_district_settled(world))return input;
+        if(++warmup<90||!bafford_district_settled(world)){
+#ifdef DL_BAFFORD_DISTRICT_PERFORMANCE_TEST
+            district_perf_route_wait=1;
+#endif
+            return input;}
         for(int i=0;i<game->level->object_count;++i){
             if(game->level->objects[i].kind==DL_OBJECT_DOOR&&bafford_district_door<0)bafford_district_door=i;
             if(game->level->objects[i].kind==DL_OBJECT_LOOT&&bafford_district_loot<0)bafford_district_loot=i;}
@@ -704,7 +747,9 @@ static DlInput bafford_district_input(const DlGame *game,const DlLauncher *launc
     if(stage<=sizeof(route)/sizeof(*route)){
         const Waypoint *waypoint=&route[stage-1];
         if(!initiated){
+#ifndef DL_BAFFORD_DISTRICT_PERFORMANCE_TEST
             if(!bafford_district_settled(world))return input;
+#endif
             initiated=true;
             if(waypoint->jump){assertf(game->grounded,"District stair jump lacks takeoff support");
                 ++bafford_district_jumps;input.jump=true;
@@ -712,9 +757,40 @@ static DlInput bafford_district_input(const DlGame *game,const DlLauncher *launc
         }
         if(waypoint->jump&&!game->grounded&&game->vertical_velocity>0&&!air_seen[bafford_district_jumps-1]){
             air_seen[bafford_district_jumps-1]=true;bafford_district_checkpoint(bafford_district_jumps==1?"jump1_air":"jump2_air",game,0);}
-        if(bafford_district_drive(game,waypoint->point,&input)&&bafford_district_settled(world)){
+        DlVec3 drive_target=waypoint->point;
+#ifdef DL_BAFFORD_DISTRICT_PERFORMANCE_TEST
+        /* The ordinary successful jump lands at z40.4684 on the first tread.
+         * The body's radius at nominal z40.4 can already touch the higher
+         * next tread; use the witnessed clear landing for both nearby actions. */
+        if(stage==4||stage==5)drive_target.z=40.4684f;
+        /* The return interaction must stay inside the door's use radius.
+         * This is the supported position witnessed in the ordinary tour. */
+        if(stage==30)drive_target.z=40.3352f;
+#endif
+        bool reached=bafford_district_drive(game,drive_target,&input);
+#ifdef DL_BAFFORD_DISTRICT_PERFORMANCE_TEST
+        if(waypoint->use){
+            /* Use is applied before movement within the next simulation tick.
+             * Finish the precise approach before issuing the one-shot action,
+             * so a still-occupied closing door cannot reject an early press. */
+            float x=drive_target.x-game->player.x,z=drive_target.z-game->player.z;
+            if(x*x+z*z>.000004f)reached=false;
+        }
+#endif
+        if(reached
+#ifndef DL_BAFFORD_DISTRICT_PERFORMANCE_TEST
+            &&bafford_district_settled(world)
+#endif
+        ){
             if(waypoint->use&&!used){used=true;input.use=true;return input;}
+#ifdef DL_BAFFORD_DISTRICT_PERFORMANCE_TEST
+            if((waypoint->use==1&&dl_game_object_open(game,bafford_district_door)!=(stage==5))||
+               (waypoint->use==2&&!collected)){
+                district_perf_route_wait=4|(district_perf_use_loading?2:0);return input;}
+            district_perf_use_loading=false;
+#else
             if(++hold<12)return input;
+#endif
             if(waypoint->jump)assertf(air_seen[bafford_district_jumps-1],"District stair crossing skipped real jump");
             if(waypoint->use==1)assertf(dl_game_object_open(game,bafford_district_door)==(stage==5),"District direct door state failed");
             if(waypoint->use==2)assertf(collected&&game->loot_value==game->level->objects[bafford_district_loot].value,"District pickup failed");
@@ -725,13 +801,22 @@ static DlInput bafford_district_input(const DlGame *game,const DlLauncher *launc
                 if(!bafford_district_turn(game,x,z,&input))return input;
                 dl_render_request_capture(waypoint->capture);}
 #endif
-            bafford_district_checkpoint(waypoint->name,game,0);++stage;hold=0;initiated=false;used=false;
+            bafford_district_checkpoint(waypoint->name,game,0);++stage;initiated=false;used=false;
+#ifndef DL_BAFFORD_DISTRICT_PERFORMANCE_TEST
+            hold=0;
         }else hold=0;
+#else
+        }
+#endif
     }else if(stage==sizeof(route)/sizeof(*route)+1){
         prior_loads=world->stats.completed_loads;assertf(dl_stream_rom_retired()&&bafford_district_jumps==2,"District residency/jump evidence incomplete");
         input.restart=true;++stage;warmup=0;
     }else{
-        if(++warmup<90||!bafford_district_settled(world))return input;
+        if(++warmup<90||!bafford_district_settled(world)){
+#ifdef DL_BAFFORD_DISTRICT_PERFORMANCE_TEST
+            district_perf_route_wait=1;
+#endif
+            return input;}
         assertf(!game->collected_objects&&!game->loot_value&&!dl_game_object_open(game,bafford_district_door)&&
             fabsf(game->player.x+6.522049f)<.03f&&fabsf(game->player.y+2.4384f)<.03f&&fabsf(game->player.z-49.8252936f)<.03f,"District remote restart did not rebuild source spawn");
         unsigned visited=0;for(unsigned i=0;i<32;++i)visited+=(bafford_district_visited>>i)&1u;
@@ -740,8 +825,13 @@ static DlInput bafford_district_input(const DlGame *game,const DlLauncher *launc
 #ifdef DL_BAFFORD_DISTRICT_TEST_CAPTURE
         debugf("DL64 bafford_district_capture_complete views=3\n");
 #endif
+#ifdef DL_BAFFORD_DISTRICT_PERFORMANCE_TEST
+        district_perf_complete_pending=true;district_perf_complete_visited=visited;district_perf_complete_loads=prior_loads;
+#else
         debugf("DL64 bafford_district_test_complete passed=1 input_only=1 coverage=1 collision_clear=1 stair_jumps=2 visited_regions=%u loot_persist=1 restart_reload=1 pre_restart_loads=%llu audio_calls=%lu\n",
-            visited,(unsigned long long)prior_loads,(unsigned long)audio_call_total);++stage;
+            visited,(unsigned long long)prior_loads,(unsigned long)audio_call_total);
+#endif
+        ++stage;
     }
     return input;
 }
@@ -752,7 +842,13 @@ static void gameplay_tick(void *context, const DlInput *input, uint64_t tick) {
 #ifndef DL_INPUT_REPLAY
     float elapsed_before_tick=game->elapsed;
 #endif
-    DlInput effective=*input;dl_stream_rom_filter_input(game,&effective);input=&effective;
+    DlInput effective=*input;dl_stream_rom_filter_input(game,&effective);
+#ifdef DL_BAFFORD_DISTRICT_PERFORMANCE_TEST
+    if((input->forward&&!effective.forward)||(input->strafe&&!effective.strafe)||(input->jump&&!effective.jump))
+        ++district_perf_blocked_ticks;
+    if(input->use&&!effective.use){district_perf_use_loading=true;district_perf_route_wait|=2;}
+#endif
+    input=&effective;
 #ifdef DL_INPUT_REPLAY
     float before=game->elapsed;
     if(input->restart)dl_game_start(game,game->level,replay_start_preset);
@@ -847,15 +943,27 @@ int main(void) {
         (unsigned long)game.level->version);
 #endif
     uint32_t previous = TICKS_READ(), next_report = previous;
+#ifdef DL_BAFFORD_DISTRICT_PERFORMANCE_TEST
+    uint32_t perf_sequence=0,perf_epoch=0,perf_total_dropped=0;
+    bool perf_started=false;
+    debugf("DL64 stream_perf_config version=2 ticks_per_second=%lu sim_rate=%u dt=wall route=continuous frame_budget_hz=30 service_budget_us=8000\n",
+        (unsigned long)TICKS_PER_SECOND,DL_TICK_RATE);
+#endif
     while (1) {
+#ifdef DL_BAFFORD_DISTRICT_PERFORMANCE_TEST
+        uint32_t perf_frame_start=TICKS_READ();
+#endif
         dl_profile_frame_begin(stats.debug);
         /* PI world reads use a separate aligned staging buffer. Service music
          * once that transfer finishes so foreground cartridge users serialize. */
         if(dl_stream_rom_music_ready())dl_music_service();
         uint32_t frame_start = TICKS_READ();
-        float elapsed = (float)(uint32_t)(frame_start - previous) / TICKS_PER_SECOND;
+        uint32_t interval_ticks=frame_start-previous;
+        float elapsed = (float)interval_ticks / TICKS_PER_SECOND;
         previous = frame_start;
+#ifndef DL_BAFFORD_DISTRICT_PERFORMANCE_TEST
         if (elapsed < 0.001f) elapsed = 1.0f / 60.0f;
+#endif
         stats.frame_ms += (elapsed * 1000.0f - stats.frame_ms) * 0.06f;
         /* The core subdivides collision movement; this cap prevents focus
          * loss or emulator debugger pauses from jumping the simulation. */
@@ -877,7 +985,15 @@ int main(void) {
         input=bafford_expanded_input(&game,&launcher,&menu);
 #endif
 #ifdef DL_BAFFORD_DISTRICT_TEST
+#ifndef DL_BAFFORD_DISTRICT_PERFORMANCE_TEST
         dt=DL_TICK_SECONDS;
+#else
+        bafford_district_tick=district_perf_tick_offset+clock.tick;
+        double perf_submitted=fmin((double)dt,(double)DL_MAX_FRAME_TICKS/DL_TICK_RATE);
+        unsigned perf_predicted=(unsigned)floor((clock.accumulator+perf_submitted+1e-9)*DL_TICK_RATE);
+        if(perf_predicted>DL_MAX_FRAME_TICKS)perf_predicted=DL_MAX_FRAME_TICKS;
+        district_perf_motion_seconds=(float)((double)perf_predicted/DL_TICK_RATE);
+#endif
         input=bafford_district_input(&game,&launcher,&menu);
 #endif
 #ifdef DL_INPUT_REPLAY
@@ -895,6 +1011,11 @@ int main(void) {
         if (action == DL_LAUNCH_LEVEL || (!launcher.menu_open && input.restart)) {
             bool restart = input.restart;
             dl_profile_frame_end();
+#ifdef DL_BAFFORD_DISTRICT_PERFORMANCE_TEST
+            if(perf_started){district_perf_tick_offset+=clock.tick;++perf_epoch;
+                perf_total_dropped+=(uint32_t)ceil(clock.dropped_seconds*TICKS_PER_SECOND);}
+            perf_started=true;
+#endif
             clock=(DlTickClock){0};
             start_level(&game,&launcher,&stats);
             if (restart) debugf("DL64 restart t=%.2f player=%.2f,%.2f,%.2f\n",
@@ -933,7 +1054,18 @@ int main(void) {
             dl_profile_frame_end();
             continue;
         }
+#ifdef DL_BAFFORD_DISTRICT_PERFORMANCE_TEST
+        DlProfileMark perf_service_start=dl_profile_mark();
+#endif
         dl_stream_rom_service(&game,&stats);
+#ifdef DL_BAFFORD_DISTRICT_PERFORMANCE_TEST
+        DlProfileMark perf_service_end=dl_profile_mark();
+        uint32_t perf_service_ticks=perf_service_end.ticks-perf_service_start.ticks;
+        uint32_t perf_service_audio=perf_service_end.audio_ticks-perf_service_start.audio_ticks;
+        assertf(perf_service_audio<=perf_service_ticks,"Overlapping performance service/audio timing");
+        uint32_t perf_stage=dl_stream_rom_service_stage();
+        uint32_t perf_sim_before=(uint32_t)clock.tick;
+#endif
 #ifdef DL_CAPTURE
         unsigned view=stats.frames/30;
         if(view>=DL_CAPTURE_VIEW_COUNT)view=DL_CAPTURE_VIEW_COUNT-1;
@@ -952,6 +1084,9 @@ int main(void) {
         uint32_t old_sound = game.sound_serial;
         float old_elapsed = game.elapsed;
         mark = dl_profile_mark();
+#ifdef DL_BAFFORD_DISTRICT_PERFORMANCE_TEST
+        district_perf_blocked_ticks=0;
+#endif
 #ifdef DL_INPUT_REPLAY
         if(clock.tick<DL_REPLAY_TICKS) {
             dl_tick_step(&clock,dl_replay_inputs[clock.tick],gameplay_tick,&game);
@@ -1015,10 +1150,44 @@ int main(void) {
             next_report = frame_start + TICKS_PER_SECOND;
         }
         float update_ms = (float)(uint32_t)(TICKS_READ() - frame_start) * (1000.0f / TICKS_PER_SECOND);
+#ifdef DL_BAFFORD_DISTRICT_PERFORMANCE_TEST
+        uint32_t perf_render_start=TICKS_READ();
+#endif
         stats.cpu_ms = dl_render_frame(&game, &stats) + update_ms;
+#ifdef DL_BAFFORD_DISTRICT_PERFORMANCE_TEST
+        uint32_t perf_render_ticks=TICKS_READ()-perf_render_start;
+#endif
         dl_stream_rom_submitted();
         ++stats.frames;
         dl_profile_frame_end();
+#ifdef DL_BAFFORD_DISTRICT_PERFORMANCE_TEST
+        if(!district_perf_complete_logged){
+        heap_stats_t perf_heap;sys_get_heap_stats(&perf_heap);
+        const DlWorldStream *perf_world=dl_stream_rom_world();uint32_t perf_resident=0;
+        for(size_t i=0;i<perf_world->slot_count;++i)if(perf_world->slots[i].state==DL_STREAM_RESIDENT)
+            perf_resident|=UINT32_C(1)<<(perf_world->slots[i].region_id-1);
+        uint32_t perf_frame_ticks=TICKS_READ()-perf_frame_start;
+        /* One compact hexadecimal row per completed gameplay frame. Its output
+         * overhead remains in the next raw wall interval; no samples are hidden. */
+        debugf("DL64 stream_perf_frame seq=%lu epoch=%lu samples=%lx,%lx,%lx,%lx,%lx,%lx,%lx,%lx,%lx,%lx,%lx,%lx,%lx,%lx,%lx\n",
+            (unsigned long)++perf_sequence,(unsigned long)perf_epoch,
+            (unsigned long)perf_frame_ticks,(unsigned long)interval_ticks,(unsigned long)perf_service_ticks,
+            (unsigned long)(perf_service_ticks-perf_service_audio),(unsigned long)perf_render_ticks,
+            (unsigned long)llround((double)dt*TICKS_PER_SECOND),(unsigned long)perf_sim_before,(unsigned long)clock.tick,
+            (unsigned long)llround(clock.accumulator*TICKS_PER_SECOND),
+            (unsigned long)ceil(clock.dropped_seconds*TICKS_PER_SECOND),(unsigned long)perf_stage,
+            (unsigned long)perf_resident,(unsigned long)perf_heap.used,(unsigned long)district_perf_blocked_ticks,
+            (unsigned long)district_perf_route_wait);
+        if(district_perf_complete_pending){
+            district_perf_complete_pending=false;district_perf_complete_logged=true;dl_profile_report();dl_music_report();
+            debugf("DL64 stream_perf_complete frames=%lu epochs=%lu dropped_ticks=%lu\n",
+                (unsigned long)perf_sequence,(unsigned long)(perf_epoch+1),
+                (unsigned long)(perf_total_dropped+(uint32_t)ceil(clock.dropped_seconds*TICKS_PER_SECOND)));
+            debugf("DL64 bafford_district_test_complete passed=1 input_only=1 coverage=1 collision_clear=1 stair_jumps=2 visited_regions=%u loot_persist=1 restart_reload=1 pre_restart_loads=%llu audio_calls=%lu\n",
+                district_perf_complete_visited,(unsigned long long)district_perf_complete_loads,(unsigned long)audio_call_total);
+        }
+        }
+#endif
         stats.debug = next_debug;
 #ifdef DL_CAPTURE
         if(stats.frames==DL_CAPTURE_VIEW_COUNT*30)debugf("DL64 capture_complete views=%d\n",DL_CAPTURE_VIEW_COUNT);

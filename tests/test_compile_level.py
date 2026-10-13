@@ -434,9 +434,9 @@ class CompileLevelTests(unittest.TestCase):
             self.assertIn(".patrol=dl_enemy_patrol_1", generated)
             self.assertIn(".enemy_count=2", generated)
             rows = [line for line in generated.splitlines() if line.startswith('    {"')]
-            self.assertTrue(next(line for line in rows if '"balcony-scout"' in line).endswith(", 0, false},"))
-            self.assertTrue(next(line for line in rows if '"store-guard"' in line).endswith(", 1, false},"))
-            self.assertTrue(next(line for line in rows if '"tilted-rafter"' in line).endswith(", -1, false},"))
+            self.assertTrue(next(line for line in rows if '"balcony-scout"' in line).endswith(", 0, false, {NULL,NULL}},"))
+            self.assertTrue(next(line for line in rows if '"store-guard"' in line).endswith(", 1, false, {NULL,NULL}},"))
+            self.assertTrue(next(line for line in rows if '"tilted-rafter"' in line).endswith(", -1, false, {NULL,NULL}},"))
 
     def test_empty_enemy_population_and_sentry_route_authoring(self):
         guard = self.entity("store-guard")

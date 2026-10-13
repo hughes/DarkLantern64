@@ -51,6 +51,8 @@ class DistrictLogTests(unittest.TestCase):
         self.assertTrue(decode_log(self.log(),self.content())['passed'])
         with self.assertRaisesRegex(ValueError,'music underruns'):
             decode_log(self.log(underruns=1),self.content())
+        performance=decode_log(self.log(underruns=1),self.content(),require_audio_continuity=False)
+        self.assertTrue(performance['functional_passed']);self.assertFalse(performance['audio_continuity_passed'])
         result=decode_log(self.log(capture=True,underruns=1),self.content(),capture=True)
         self.assertTrue(result['functional_passed']);self.assertFalse(result['audio_continuity_passed'])
 
@@ -86,6 +88,32 @@ class DistrictLogTests(unittest.TestCase):
         content=self.content();content['mission']['report']['policy_regions'][0]['working_mask']=3
         with self.assertRaisesRegex(ValueError,'visible set is not fully ready'):
             decode_log(self.log(),content)
+
+    def test_wall_route_validates_published_view_while_chunk_loading_continues(self):
+        rows=self.rows()
+        for row in rows:row['stream']['view']=row['stream']['resident'].copy()
+        returned=rows[NAMES.index('main_room_reloaded')]
+        returned['stream'].update(resident=[2,3],settled=0,reserved=2000)
+        result=decode_log(self.log(rows),self.content(),wall_time=True)
+        self.assertTrue(result['functional_passed'])
+        with self.assertRaises(ValueError):decode_log(self.log(rows),self.content())
+        returned['stream']['view']=[3]
+        with self.assertRaisesRegex(ValueError,'ready current region'):
+            decode_log(self.log(rows),self.content(),wall_time=True)
+        returned['stream']['view']=[2];returned['stream']['reserved']=9999
+        with self.assertRaisesRegex(ValueError,'slot reservation'):
+            decode_log(self.log(rows),self.content(),wall_time=True)
+
+    def test_unstepped_wall_checkpoint_is_observation_of_identical_pose(self):
+        rows=self.rows()
+        for row in rows:row['stream']['view']=row['stream']['resident'].copy()
+        door=rows[NAMES.index('door_open')];takeoff=rows[NAMES.index('jump2_takeoff')]
+        takeoff['tick']=door['tick'];takeoff['elapsed']=door['elapsed']
+        self.assertTrue(decode_log(self.log(rows),self.content(),wall_time=True)['functional_passed'])
+        with self.assertRaisesRegex(ValueError,'Input ticks regressed'):decode_log(self.log(rows),self.content())
+        takeoff['player'][0]+=.001
+        with self.assertRaisesRegex(ValueError,'Unstepped checkpoint changed physical pose'):
+            decode_log(self.log(rows),self.content(),wall_time=True)
 
 
 if __name__=='__main__':unittest.main()

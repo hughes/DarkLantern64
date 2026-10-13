@@ -1,0 +1,26 @@
+{
+  "model": "docs/models/region-lifetime.machine.ts",
+  "source_sha256": "9b7185c1baa3799bd10221e3d908ee020b132f00762d1a68c3fb84dac1d576b0",
+  "tool_version": "0.1.7",
+  "tier": "pr",
+  "slots": 2,
+  "estimated_states": "50_176",
+  "interpreter_states": 3136,
+  "interpreter_edges": 17024,
+  "invariant_checks": 9408,
+  "interpreter_passed": true,
+  "c_equivalence_proven": false,
+  "limitations": [
+    "Finite ownership abstraction: one CPU borrower, two generation values, boolean pending fences.",
+    "Completion reports are trusted; platform DMA, RSP and RDP adapters are outside the model.",
+    "C tests are conformance evidence, not automatically generated N64 semantics or a C equivalence proof.",
+    "No liveness, memory-size, content-validation or hardware frame-budget proof."
+  ],
+  "c_projection_states": 52,
+  "c_conformance_edges": 148,
+  "c_observed_steps": 1250,
+  "c_conformance_passed": true,
+  "tlc_proof_passed": true,
+  "interpreter_tla_graph_equivalent": true,
+  "machine_sha256": "1c82bd3811936459836afc308b1c11bdf9b61c051cec6e5e12b6bbce3355d2d2"
+}

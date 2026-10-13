@@ -1,0 +1,42 @@
+{
+  "version": 2,
+  "title": "Original two-region streaming probe",
+  "assets": [{"id": "probe-box", "type": "primitive", "shape": "box"}],
+  "materials": [
+    {"id": "probe-east", "color": [0.65, 0.72, 0.80, 1]},
+    {"id": "probe-west", "color": [0.70, 0.62, 0.48, 1]}
+  ],
+  "entities": [
+    {
+      "id": "west-floor", "kind": "static", "model": "probe-box", "material": "probe-west",
+      "transform": {"position": [-2, -0.25, 0], "rotation": [0, 0, 0], "scale": [4, 0.5, 4]},
+      "collider": {"shape": "box", "center": [0, 0, 0], "half_size": [0.5, 0.5, 0.5]}
+    },
+    {
+      "id": "east-floor", "kind": "static", "model": "probe-box", "material": "probe-east",
+      "transform": {"position": [2, -0.25, 0], "rotation": [0, 0, 0], "scale": [4, 0.5, 4]},
+      "collider": {"shape": "box", "center": [0, 0, 0], "half_size": [0.5, 0.5, 0.5]}
+    },
+    {
+      "id": "probe-door", "kind": "door", "model": "probe-box", "material": "probe-west",
+      "transform": {"position": [0, 1, 0], "rotation": [0, 0, 0], "scale": [0.1, 2, 1]},
+      "collider": {"shape": "box", "center": [0, 0, 0], "half_size": [0.5, 0.5, 0.5]}
+    },
+    {
+      "id": "probe-spawn", "kind": "spawn",
+      "transform": {"position": [-2, 0, 0], "rotation": [0, 90, 0], "scale": [1, 1, 1]}
+    },
+    {
+      "id": "probe-guard", "kind": "guard", "model": "probe-box", "material": "probe-east", "behavior": "sentry",
+      "transform": {"position": [3, 0, 0], "rotation": [0, -90, 0], "scale": [0.4, 1.65, 0.4]}
+    },
+    {
+      "id": "probe-loot", "kind": "loot", "model": "probe-box", "material": "probe-east", "value": 25,
+      "transform": {"position": [2, 0.3, 1], "rotation": [0, 0, 0], "scale": [0.2, 0.2, 0.2]}
+    },
+    {
+      "id": "probe-light", "kind": "light", "radius": 5, "intensity": 0.5,
+      "transform": {"position": [-1, 2, 0], "rotation": [0, 0, 0], "scale": [1, 1, 1]}
+    }
+  ]
+}

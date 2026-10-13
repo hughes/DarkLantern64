@@ -1,0 +1,9 @@
+{
+  "version": 1,
+  "source": "streaming_probe.json",
+  "entry_region": "west",
+  "regions": [
+    {"id": "west", "bounds": [[-4, -0.5, -2], [0.1, 3, 2]], "entities": ["west-floor", "probe-door", "probe-spawn", "probe-light"], "neighbors": ["east"]},
+    {"id": "east", "bounds": [[0, -0.5, -2], [4, 3, 2]], "entities": ["east-floor", "probe-guard", "probe-loot"], "neighbors": ["west"]}
+  ]
+}

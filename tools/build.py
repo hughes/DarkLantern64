@@ -202,7 +202,7 @@ def build_rom(sdk, autoplay=False, debug_overlay=False, level=None, capture=Fals
         extra_headers.append(capture_header)
     sources = [ROOT / "src" / f for f in ("game.c", "tick.c", "main.c", "dl_profile.c", "dl_music.c", "launch.c", "animation.c",
                                          "render_lighting.c", "render_batches.c", "render_transform.c", "render_texture_packing.c",
-                                         "static_lighting.c", "lighting_bake.c")]
+                                         "static_lighting.c", "lighting_bake.c", "mission.c", "world_stream.c")]
     sources += generated_sources
     if scale_bench:
         sources.append(ROOT / "src/scale_bench.c")
@@ -315,6 +315,13 @@ def run_tests():
     BUILD.mkdir(exist_ok=True)
     compile_level()
     run([sys.executable, "-m", "unittest", "discover", "-s", "tests", "-p", "test_*.py", "-v"])
+    run_portable_tests()
+
+
+def run_portable_tests():
+    """Run portable C checks independently of Python content regression tests."""
+    BUILD.mkdir(exist_ok=True)
+    compile_level()
     compiler = shutil.which("gcc") or "C:/msys64/ucrt64/bin/gcc.exe"
     if not Path(compiler).exists():
         raise RuntimeError("Host GCC required for portable simulation tests (MSYS2 UCRT64 supported).")
@@ -342,7 +349,10 @@ def run_tests():
          "-DDL_SCALE_BENCH", "-DDL_SCALE_BENCH_TEST", "src/game.c", "src/scale_bench.c",
          "tests/test_scale_bench.c", "-lm", "-o", output], env=env)
     result = run([output], env=env, capture=True)
-    from scale_study import parse_microbench
+    try:
+        from scale_study import parse_microbench
+    except ModuleNotFoundError:
+        from tools.scale_study import parse_microbench
     parsed = parse_microbench("DL64 scale_boot memory=8388608\n" + result.stdout)
     assert all(case["average_ms"] == 75 for case in parsed["cases"])
     print("Scale benchmark: guard equivalence, immutable inputs, timer wrap and audio subtraction passed.")
@@ -366,12 +376,26 @@ def run_tests():
         "test_render_texture_packing": ["src/render_texture_packing.c", "src/render_batches.c"],
         "test_lighting_bake": ["src/lighting_bake.c", "src/static_lighting.c", "src/game.c"],
         "test_static_lighting": ["src/static_lighting.c", "src/game.c"],
+        "test_mission": ["src/mission.c"],
+        "test_world_stream": ["src/mission.c", "src/world_stream.c"],
     }
     for name, sources in render_checks.items():
         render_output = BUILD / (name + ".exe")
         run([compiler, "-std=c17", "-O2", "-Wall", "-Wextra", "-Werror", "-Isrc",
              *sources, f"tests/{name}.c", "-lm", "-o", render_output], env=env)
         run([render_output], env=env)
+
+    # Cross-language package contract: cook the original two-region probe and
+    # traverse its chunks through the same bounded C loader as platform builds.
+    try:
+        from compile_mission import cook_mission
+    except ModuleNotFoundError:
+        from tools.compile_mission import cook_mission
+    probe_manifest = json.loads((ROOT / "content/streaming_probe.mission.json").read_text())
+    probe_bytes, _ = cook_mission(probe_manifest, ROOT / "content")
+    probe_path = BUILD / "streaming_probe.dlm"
+    probe_path.write_bytes(probe_bytes)
+    run([BUILD / "test_world_stream.exe", probe_path], env=env)
 
     run([compiler, "-std=c17", "-O2", "-Wall", "-Wextra", "-Werror", "-Isrc",
          "src/launch.c", "tests/test_launch.c", "-lm", "-o", output], env=env)

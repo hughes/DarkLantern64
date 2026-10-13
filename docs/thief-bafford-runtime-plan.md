@@ -2,6 +2,11 @@
 
 Prepared **2026-10-12** for DarkLantern's **8 MiB N64/M64 target**.
 
+The [implementation architecture](thief-bafford-runtime-architecture.md) defines
+the package, ownership and subsystem boundaries, with the initial branch scope
+and subsequent delivery gates. The experimental binary contract is documented
+in [mission package v1](mission-package-format.md).
+
 The conversion proves that the complete architecture, textures, placements and
 source topology can be brought into an editable `.blend` and our editor. It does
 not yet prove that the complete mission can run within N64 memory, maintain a

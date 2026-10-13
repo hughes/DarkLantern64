@@ -27,16 +27,20 @@ try:
     import editor_cache
     from character_assets import configure_editor_cache
     from content_profile import content_limits, is_study, STUDY_LIMITS, STUDY_PLAY_REASON
+    from compile_mission import mission_source, cook_mission, validate_stream_bridge
 except ModuleNotFoundError:
     from tools.compile_level import compile_level, validate
     from tools.compile_bundle import MAX_LEVELS, read_manifest
     from tools import editor_cache
     from tools.character_assets import configure_editor_cache
     from tools.content_profile import content_limits, is_study, STUDY_LIMITS, STUDY_PLAY_REASON
+    from tools.compile_mission import mission_source, cook_mission, validate_stream_bridge
 
 ROOT = Path(__file__).resolve().parents[1]
 FILENAME = re.compile(r"[A-Za-z][A-Za-z0-9_-]{0,63}\.json")
 RESERVED = re.compile(r"(?:con|prn|aux|nul|com[1-9]|lpt[1-9])", re.IGNORECASE)
+STREAM_NATIVE_REASON = ("Native Play for stream missions is not implemented yet. The editor shows the complete authoring scene; "
+                       "use Run level in Ares to exercise the ROM chunk loader. Native Play must use the same portable mission loader and working-scene adapter before it is enabled.")
 
 
 def require(condition, message):
@@ -183,21 +187,76 @@ class ProjectLevels:
     def bundle_snapshot(self):
         self.safe(self.manifest)
         raw = self.manifest.read_bytes()
-        data, _ = read_manifest(self.manifest, self.content)
-        for row in data["levels"]:
+        data, entries = read_manifest(self.manifest, self.content)
+        for row in entries:
             self.path(row["source"])
+            if "mission" in row:
+                self.safe(row["mission"])
         require(self.manifest.read_bytes() == raw, "The game bundle changed during this operation; refresh and retry")
         return data, raw
 
     def bundle(self):
         return self.bundle_snapshot()[0]
 
+    def mission_for(self, path):
+        """A partition remains associated with its scene when removed from menu."""
+        found = []
+        for candidate in sorted(self.content.glob("*.mission.json")):
+            self.safe(candidate)
+            raw = candidate.read_bytes()
+            try:
+                manifest, source = mission_source(candidate, self.content)
+            except (ValueError, OSError, KeyError, TypeError):
+                # Unrelated broken manifests should not hide valid scenes.
+                continue
+            if source == path:
+                require(candidate.read_bytes() == raw and json.loads(raw) == manifest,
+                        "Mission manifest changed during discovery; refresh and retry")
+                found.append(dict(path=candidate, raw=raw, document=manifest))
+        require(len(found) <= 1, "A canonical scene must have only one mission partition manifest")
+        return found[0] if found else None
+
+    def bundle_row(self, bundle, path):
+        for row in bundle["levels"]:
+            if row.get("source") == path.name:
+                return row
+            if "mission" in row:
+                _, source = mission_source(self.safe(self.content / row["mission"]), self.content)
+                if source == path:
+                    return row
+        return None
+
+    def stream_metadata(self, path, data, bundle, partition=None):
+        partition = partition or self.mission_for(path)
+        if partition is None:
+            return None
+        row = self.bundle_row(bundle, path)
+        status = {"valid": False, "portable_valid": False, "rom_valid": False, "error": ""}
+        try:
+            _, report = cook_mission(partition["document"], self.content, source_document=data)
+            status = dict(valid=False, portable_valid=True, rom_valid=False, error="", directory_bytes=report["directory_bytes"], package_bytes=report["package_bytes"],
+                          peak_neighbor_overlap_chunk_bytes=report["memory"]["peak_neighbor_overlap_chunk_bytes"],
+                          unknown_costs=report["memory"]["unknown_costs"])
+            validate_stream_bridge(report)
+            status.update(valid=True, rom_valid=True)
+        except (ValueError, OSError, KeyError, TypeError) as error:
+            status["error"] = str(error)
+        return dict(mission_manifest=partition["path"].as_posix(), mission_manifest_sha256=sha256(partition["raw"]),
+                    bundle_id=row["id"] if row and "mission" in row else None,
+                    native_play_supported=False, native_play_reason=STREAM_NATIVE_REASON,
+                    preview_mode="Complete authoring scene; streaming residency and visibility are not simulated",
+                    regions=copy.deepcopy(partition["document"].get("regions", [])), status=status)
+
     def entry(self, path, raw, data, bundle):
-        row = next((row for row in bundle["levels"] if row["source"] == path.name), None)
+        row = self.bundle_row(bundle, path)
+        streaming = self.stream_metadata(path, data, bundle)
         return {"file": path.name, "stem": path.stem, "title": data["title"],
                 "source": path.as_posix(), "source_sha256": sha256(raw),
                 "in_bundle": row is not None, "bundle_id": row["id"] if row else None,
                 "authoring_profile": data.get('authoring_profile'), "playable": not is_study(data),
+                "runtime_format": "stream-mission-v1" if streaming else "resident-level",
+                "native_play_supported": not is_study(data) and streaming is None,
+                "streaming": streaming,
                 "test_starts": copy.deepcopy(data.get("test_starts", []))}
 
     def catalog(self):
@@ -294,11 +353,13 @@ class ProjectLevels:
                 require(self.safe(temporary).parent == staging, "Unsafe transaction cleanup path")
                 shutil.rmtree(temporary)
 
-    def membership(self, bundle, path, included, data=None):
+    def membership(self, bundle, path, included, data=None, mission=None):
         require(type(included) is bool, "Bundle membership must be true or false")
         require(not included or not is_study(data), STUDY_PLAY_REASON)
         result = copy.deepcopy(bundle)
-        existing = next((row for row in result["levels"] if row["source"] == path.name), None)
+        existing = self.bundle_row(result, path)
+        partition = self.mission_for(path) if path.exists() and mission is None else None
+        mission = mission or (partition["path"].name if partition else None)
         if included and existing is None:
             require(len(result["levels"]) < MAX_LEVELS,
                     f"The game bundle is full ({MAX_LEVELS} levels). Create this level with In game menu unchecked, or remove another level from the menu first.")
@@ -308,7 +369,12 @@ class ProjectLevels:
                 tail = f"-{suffix}"
                 ident = path.stem[:64-len(tail)] + tail
                 suffix += 1
-            result["levels"].append({"id": ident, "source": path.name})
+            result["levels"].append({"id": ident, "mission": mission} if mission else {"id": ident, "source": path.name})
+        elif included and existing is not None and mission:
+            # An author can attach a new partition to an existing resident
+            # scene without changing its saved menu identity.
+            existing.pop("source", None)
+            existing["mission"] = mission
         elif not included and existing is not None:
             require(len(result["levels"]) > 1, "Keep at least one level in the game menu")
             result["levels"].remove(existing)
@@ -342,9 +408,21 @@ class ProjectLevels:
             bundle, bundle_raw = self.bundle_snapshot()
             data["title"] = title
             validate(data, self.content, authoring=True)
-            updated = self.membership(bundle, path, in_bundle, data)
-            self.publish({path: json_bytes(data), self.manifest: json_bytes(updated)},
-                         {source: raw, path: None, self.manifest: bundle_raw})
+            partition = self.mission_for(source)
+            changes, expected = {path: json_bytes(data)}, {source: raw, path: None, self.manifest: bundle_raw}
+            mission_name = None
+            if partition:
+                mission_name = path.stem + ".mission.json"
+                mission_path = self.safe(self.content / mission_name)
+                require(not any(item.name.casefold() == mission_name.casefold() for item in self.content.iterdir()),
+                        "A mission manifest with that duplicate name already exists")
+                copied = copy.deepcopy(partition["document"])
+                copied["source"] = path.name
+                changes[mission_path] = json_bytes(copied)
+                expected.update({partition["path"]: partition["raw"], mission_path: None})
+            updated = self.membership(bundle, path, in_bundle, data, mission=mission_name)
+            changes[self.manifest] = json_bytes(updated)
+            self.publish(changes, expected)
             return self.result(path)
 
     def update(self, level, expected_sha256, title=None, in_bundle=None):
@@ -357,8 +435,10 @@ class ProjectLevels:
                 data["title"] = title
             validate(data, self.content, authoring=True)
             updated = self.membership(bundle, path, in_bundle, data) if in_bundle is not None else bundle
+            partition = self.mission_for(path)
             self.publish({path: json_bytes(data) if title is not None else raw,
-                          self.manifest: json_bytes(updated)}, {path: raw, self.manifest: bundle_raw})
+                          self.manifest: json_bytes(updated)}, {path: raw, self.manifest: bundle_raw,
+                          **({partition["path"]: partition["raw"]} if partition else {})})
             return self.result(path)
 
     def delete(self, level, expected_sha256):
@@ -373,11 +453,20 @@ class ProjectLevels:
             stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ") + "-" + uuid.uuid4().hex[:12]
             backup = self.safe(self.editor / "deleted-levels" / stamp / path.name)
             recovery = {"source": f"content/{path.name}", "source_sha256": sha256(raw),
-                        "bundle_entry": next((row for row in bundle["levels"] if row["source"] == path.name), None),
+                        "bundle_entry": self.bundle_row(bundle, path),
                         "note": "Restore this JSON to content/ and, if desired, restore bundle_entry in content/level_bundle.json. Shared assets were retained."}
-            self.publish({backup: raw, backup.parent / "recovery.json": json_bytes(recovery),
-                          self.manifest: json_bytes(updated), path: None},
-                         {path: raw, self.manifest: bundle_raw, backup: None})
+            changes = {backup: raw, self.manifest: json_bytes(updated), path: None}
+            expected = {path: raw, self.manifest: bundle_raw, backup: None}
+            partition = self.mission_for(path)
+            if partition:
+                manifest_backup = backup.parent / partition["path"].name
+                changes.update({manifest_backup: partition["raw"], partition["path"]: None})
+                expected.update({manifest_backup: None, partition["path"]: partition["raw"]})
+                recovery.update(mission_source="content/" + partition["path"].name,
+                                mission_sha256=sha256(partition["raw"]), mission_backup=manifest_backup.name)
+                recovery["note"] = "Restore both scene and mission manifest to content/, then restore bundle_entry if desired. Shared assets were retained."
+            changes[backup.parent / "recovery.json"] = json_bytes(recovery)
+            self.publish(changes, expected)
             return {"ok": True, "level": entry, "backup": backup.as_posix(), "catalog": self.catalog()}
 
     def cook(self, level, expected_sha256=None, staged=None):
@@ -389,11 +478,15 @@ class ProjectLevels:
             if staged is not None:
                 require(candidate != path and not candidate.is_relative_to(self.content),
                         "Staged level JSON must be a separate file outside content and inside this project")
-            candidate_raw, _ = self.read_level(candidate)
+            candidate_raw, candidate_data = self.read_level(candidate)
+            bundle, bundle_raw = self.bundle_snapshot()
+            partition = self.mission_for(path)
+            streaming = self.stream_metadata(path, candidate_data, bundle, partition)
             output = self.safe(self.root / "build" if path.stem == "first_room" else self.root / "build/scenes" / path.stem)
             asset_root = self.safe(self.root / "build/project/editor-assets")
             cache = self.safe(self.cache / "cooked" / path.name)
-            key = [self.code_key, sha256(raw), sha256(candidate_raw), staged is not None]
+            key = [self.code_key, sha256(raw), sha256(candidate_raw), staged is not None,
+                   sha256(bundle_raw), sha256(partition["raw"]) if partition else None]
             cached = editor_cache.read(cache, key)
             if cached is not None:
                 cached.update(catalog=self.catalog(), changed_preview_assets=[], cache_hit=True)
@@ -407,8 +500,18 @@ class ProjectLevels:
                 snapshot.write_bytes(candidate_raw)
                 cooked = temporary / "output"
                 report = compile_level(snapshot, cooked, self.content, authoring=True)
+                if streaming:
+                    report.update(playable=False, native_play_supported=False, streaming=streaming,
+                                  preview_mode="Complete authoring scene; stream simulation requires the ROM pipeline")
                 changes = {output / item.relative_to(cooked): item.read_bytes()
-                           for item in cooked.rglob("*") if item.is_file()}
+                           for item in cooked.rglob("*") if item.is_file() and
+                           (not streaming or item.relative_to(cooked).as_posix() not in ("generated/demo_level.h", "generated/play.json"))}
+                if streaming:
+                    changes[output / "generated/level_report.json"] = json_bytes(report)
+                    for blocked in ("generated/demo_level.h", "generated/play.json"):
+                        target = output / blocked
+                        if target.exists():
+                            changes[target] = None
                 preview = json.loads((cooked / "editor-assets/levels/first_room.json").read_bytes())
                 texture_folder = cooked / "editor-assets/textures"
                 texture_names = {item.name: f"{item.stem}-{sha256(item.read_bytes())[:16]}.png"
@@ -451,22 +554,25 @@ class ProjectLevels:
                 # Scene descriptor appears only after its referenced files exist.
                 changes[asset_root / scene_path] = json_bytes(namespace(preview))
                 changes = {self.safe(target): payload for target, payload in changes.items()}
-                outputs = list(changes)
+                outputs = [target for target, payload in changes.items() if payload is not None]
                 preview_fingerprint = sha256(json_bytes({str(target.relative_to(asset_root)): sha256(payload)
                     for target, payload in changes.items() if target.is_relative_to(asset_root)}))
                 changed_preview_assets = [target.as_posix() for target, payload in changes.items()
                                           if target.is_relative_to(asset_root) and target.suffix in (".gltf", ".png")
                                           and (not target.exists() or target.read_bytes() != payload)]
                 changes = {target: payload for target, payload in changes.items()
-                           if not target.exists() or target.read_bytes() != payload}
-                self.publish(changes, {path: raw, candidate: candidate_raw})
+                           if payload is None or not target.exists() or target.read_bytes() != payload}
+                self.publish(changes, {path: raw, candidate: candidate_raw, self.manifest: bundle_raw,
+                                     **({partition["path"]: partition["raw"]} if partition else {})})
             result = {"ok": True, "source": path.as_posix(), "source_sha256": sha256(raw), "source_text": raw.decode("utf-8"),
                     "output": output.as_posix(), "asset_root": asset_root.as_posix(),
                     "scene_path": scene_path, "staged": staged is not None,
                     "changed_preview_assets": changed_preview_assets,
-                    "report": report, "preview_fingerprint": preview_fingerprint}
+                     "report": report, "preview_fingerprint": preview_fingerprint,
+                     "runtime_format": "stream-mission-v1" if streaming else "resident-level",
+                     "native_play_supported": streaming is None and not is_study(candidate_data), "streaming": streaming}
             dependencies = self.validate_cached(candidate, candidate_raw, json.loads(candidate_raw))
-            editor_cache.write(cache, key, result, [*dependencies, *outputs])
+            editor_cache.write(cache, key, result, [*dependencies, *outputs, *([partition["path"]] if partition else [])])
             result.update(catalog=self.catalog(), cache_hit=False, prepare_ms=round((time.perf_counter()-started)*1000, 2))
             return result
 

@@ -11,6 +11,7 @@
 #include "animation.h"
 #include "tick.h"
 #include "dl_music.h"
+#include "stream_rom.h"
 #ifdef DL_INPUT_REPLAY
 #include "input_replay.h"
 static int replay_start_preset=-1;
@@ -32,10 +33,12 @@ typedef struct {
 static Voice voices[VOICE_COUNT];
 static uint32_t random_state = 0x64d4a7u;
 static int sample_rate;
+static volatile uint32_t audio_call_total;
 
 /* The callback runs under an AI interrupt: bounded integer synthesis only,
  * with no allocation, logging, game access or floating-point instructions. */
 static void audio_callback(short *buffer, size_t samples) {
+    ++audio_call_total;
     uint32_t start = TICKS_READ();
     const int16_t *music = dl_music_consume(samples);
     for (size_t i = 0; i < samples; ++i) {
@@ -227,12 +230,17 @@ static void require_expansion_pak(int memory) {
 
 static void start_level(DlGame *game, const DlLauncher *launcher, DlRenderStats *stats) {
     uint32_t load_start = TICKS_READ();
+    if(!dl_stream_rom_music_ready())dma_wait();
     dl_music_stop();
     clear_sounds();
     dl_render_release_scene();
+    dl_stream_rom_close();
     const DlLevel *level = dl_launcher_active_level(launcher);
-    assertf(dl_game_start(game, level, launcher->active_start), "Invalid level start preset");
+    if(level->stream)dl_stream_rom_start(game,level,launcher->active_start);
+    else assertf(dl_game_start(game, level, launcher->active_start), "Invalid level start preset");
+    level=game->level;
     dl_render_prepare_scene(game);
+    stats->streaming=level->stream!=NULL;
     dl_music_start(&dl_level_music[launcher->active_level]);
     stats->frames = 0; stats->frame_ms = 16.67f; stats->cpu_ms = 0;
     heap_stats_t heap;
@@ -301,8 +309,104 @@ static DlLaunchInput menu_test_input(const DlLauncher *launcher, DlInput *input)
 }
 #endif
 
+#ifdef DL_STREAM_TEST
+static uint64_t stream_test_tick;
+static void stream_checkpoint(const char *name,const DlGame *game){
+    const DlWorldStream *world=dl_stream_rom_world();
+    assertf(world,"Stream diagnostic has no active mission");
+    debugf("DL64 stream_probe {\"checkpoint\":\"%s\",\"tick\":%llu,\"player\":[%.4f,%.4f,%.4f],\"door_open\":%d,\"loot_value\":%lu,\"collected_objects\":%llu,\"guards\":[",
+        name,(unsigned long long)stream_test_tick,game->player.x,game->player.y,game->player.z,game->door_open,
+        (unsigned long)game->loot_value,(unsigned long long)game->collected_objects);
+    for(int i=0;i<game->enemy_count;++i){const DlEnemy *enemy=&game->enemies[i];
+        debugf("%s{\"position\":[%.4f,%.4f,%.4f],\"awareness\":%.4f,\"state\":\"%s\",\"patrol_index\":%d}",
+            i?",":"",enemy->position.x,enemy->position.y,enemy->position.z,enemy->awareness,
+            dl_guard_state_name(enemy->state),enemy->patrol_index);}
+    debugf("],\"stream\":{\"current\":%lu,\"resident\":[",(unsigned long)dl_stream_rom_current(game));
+    bool first=true;for(size_t i=0;i<world->slot_count;++i)if(world->slots[i].state==DL_STREAM_RESIDENT){
+        debugf("%s%lu",first?"":",",(unsigned long)world->slots[i].region_id);first=false;}
+    debugf("],\"reserved\":%lu,\"allocated\":%lu,\"completed_loads\":%llu,\"retired\":%lu,\"readbytes\":%llu,\"stalls\":%llu}}\n",
+        (unsigned long)world->stats.reserved_bytes,(unsigned long)world->stats.allocated_slot_bytes,
+        (unsigned long long)world->stats.completed_loads,(unsigned long)dl_stream_rom_retired(),
+        (unsigned long long)world->stats.bytes_read,(unsigned long long)world->stats.read_stalls);
+}
+static bool stream_test_move(const DlGame *game,DlVec3 target,DlInput *input){
+    float x=target.x-game->player.x,z=target.z-game->player.z;
+    if(x*x+z*z<.015f)return true;
+    float error=atan2f(x,z)-game->yaw;
+    while(error>3.14159265f)error-=6.28318531f;
+    while(error< -3.14159265f)error+=6.28318531f;
+    float turn=-error/(2.3f*DL_TICK_SECONDS);
+    input->turn=fmaxf(-1,fminf(1,turn));input->forward=fabsf(error)<.1f?1:0;return false;
+}
+static DlInput stream_test_input(const DlGame *game,const DlLauncher *launcher,DlLaunchInput *menu){
+    static unsigned stage;static uint64_t collected;static DlEnemy remembered;
+    DlInput input={0};*menu=(DlLaunchInput){0};++stream_test_tick;
+    if(launcher->menu_open){
+        int probe=-1;for(int i=0;i<launcher->bundle->level_count;++i)
+            if(strcmp(launcher->bundle->levels[i].id,"streaming-probe")==0)probe=i;
+        assertf(probe>=0,"Streaming Rooms is missing from the diagnostic menu");
+        menu->level_delta=probe-launcher->selected_level;menu->accept=true;return input;
+    }
+    assertf(dl_stream_rom_active(),"Diagnostic did not select the streamed menu entry");
+    assertf(!game->caught&&!game->complete,"Streaming diagnostic reached an unexpected terminal state");
+    assertf(stream_test_tick<7200,"Streaming diagnostic route timed out stage=%u",stage);
+    const DlWorldStream *world=dl_stream_rom_world();unsigned resident=0;
+    for(size_t i=0;i<world->slot_count;++i)resident+=world->slots[i].state==DL_STREAM_RESIDENT;
+    switch(stage){
+    case 0:
+        stream_checkpoint("start",game);
+#ifdef DL_STREAM_TEST_CAPTURE
+        dl_render_request_capture(1);
+#endif
+        ++stage;break;
+    case 1:if(stream_test_move(game,(DlVec3){-1.1f,0,0},&input)){input.use=true;++stage;}break;
+    case 2:if(game->door_open){stream_checkpoint("east_gate_open",game);++stage;}break;
+    case 3:if(stream_test_move(game,(DlVec3){1.1f,0,0},&input)){input.use=true;++stage;}break;
+    case 4:if(!game->door_open){stream_checkpoint("east_closed",game);++stage;}break;
+    case 5:if(stream_test_move(game,(DlVec3){5,0,2},&input)){input.use=true;++stage;}break;
+    case 6:if(game->loot_value==25){collected=game->collected_objects;stream_checkpoint("east_closed_loot",game);
+        ++stage;}break;
+    case 7:if(resident==1){
+#ifdef DL_STREAM_TEST_CAPTURE
+        /* Turn through ordinary controls to show the room/gate instead of
+         * exporting a close view of the empty loot location. */
+        float error=atan2f(-game->player.x,-game->player.z)-game->yaw;
+        while(error>3.14159265f)error-=6.28318531f;
+        while(error< -3.14159265f)error+=6.28318531f;
+        if(fabsf(error)>.05f){input.turn=fmaxf(-1,fminf(1,-error/(2.3f*DL_TICK_SECONDS)));break;}
+        dl_render_request_capture(2);
+#endif
+        stream_checkpoint("west_retired",game);++stage;}break;
+    case 8:if(stream_test_move(game,(DlVec3){1.1f,0,0},&input)){input.use=true;++stage;}break;
+    case 9:if(game->door_open){stream_checkpoint("west_gate_open",game);++stage;}break;
+    case 10:if(stream_test_move(game,(DlVec3){-1.1f,0,0},&input)){input.use=true;++stage;}break;
+    case 11:if(!game->door_open){stream_checkpoint("west_closed",game);++stage;}break;
+    case 12:if(stream_test_move(game,(DlVec3){-5,0,0},&input)&&resident==1){
+        remembered=game->enemies[0];stream_checkpoint("east_retired",game);++stage;}break;
+    case 13:if(stream_test_move(game,(DlVec3){-1.1f,0,0},&input)){input.use=true;++stage;}break;
+    case 14:if(game->door_open){stream_checkpoint("east_reload_gate_open",game);++stage;}break;
+    case 15:if(stream_test_move(game,(DlVec3){5,0,2},&input)){input.use=true;++stage;}break;
+    case 16:{
+        const DlEnemy *enemy=&game->enemies[0];
+        bool guard=enemy->position.x==remembered.position.x&&enemy->position.y==remembered.position.y&&
+            enemy->position.z==remembered.position.z&&enemy->yaw==remembered.yaw&&enemy->awareness==remembered.awareness&&
+            enemy->state==remembered.state&&enemy->patrol_index==remembered.patrol_index&&enemy->search_timer==remembered.search_timer;
+        assertf(game->loot_value==25&&game->collected_objects==collected&&guard,"Stream mission state lost on reload");
+        stream_checkpoint("east_reload",game);
+#ifdef DL_STREAM_TEST_CAPTURE
+        debugf("DL64 capture_complete views=2\n");
+#endif
+        debugf("DL64 stream_test_complete passed=1 input_only=1 guard_persisted=1 audio_calls=%lu\n",(unsigned long)audio_call_total);
+        ++stage;break;
+    }
+    default:break;
+    }
+    return input;
+}
+#endif
 static void gameplay_tick(void *context, const DlInput *input, uint64_t tick) {
     (void)tick; DlGame *game=context;
+    DlInput effective=*input;dl_stream_rom_filter_input(game,&effective);input=&effective;
 #ifdef DL_INPUT_REPLAY
     float before=game->elapsed;
     if(input->restart)dl_game_start(game,game->level,replay_start_preset);
@@ -393,7 +497,9 @@ int main(void) {
     uint32_t previous = TICKS_READ(), next_report = previous;
     while (1) {
         dl_profile_frame_begin(stats.debug);
-        dl_music_service();
+        /* PI world reads use a separate aligned staging buffer. Service music
+         * once that transfer finishes so foreground cartridge users serialize. */
+        if(dl_stream_rom_music_ready())dl_music_service();
         uint32_t frame_start = TICKS_READ();
         float elapsed = (float)(uint32_t)(frame_start - previous) / TICKS_PER_SECOND;
         previous = frame_start;
@@ -406,6 +512,10 @@ int main(void) {
         bool next_debug = stats.debug;
         DlLaunchInput menu;
         DlInput input = read_input(&next_debug,&launcher,&menu);
+#ifdef DL_STREAM_TEST
+        dt=DL_TICK_SECONDS;
+        input=stream_test_input(&game,&launcher,&menu);
+#endif
 #ifdef DL_INPUT_REPLAY
         input=(DlInput){0};menu=(DlLaunchInput){0};
 #endif
@@ -459,6 +569,7 @@ int main(void) {
             dl_profile_frame_end();
             continue;
         }
+        dl_stream_rom_service(&game,&stats);
 #ifdef DL_CAPTURE
         unsigned view=stats.frames/30;
         if(view>=DL_CAPTURE_VIEW_COUNT)view=DL_CAPTURE_VIEW_COUNT-1;
@@ -540,6 +651,7 @@ int main(void) {
         }
         float update_ms = (float)(uint32_t)(TICKS_READ() - frame_start) * (1000.0f / TICKS_PER_SECOND);
         stats.cpu_ms = dl_render_frame(&game, &stats) + update_ms;
+        dl_stream_rom_submitted();
         ++stats.frames;
         dl_profile_frame_end();
         stats.debug = next_debug;

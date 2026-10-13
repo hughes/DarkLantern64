@@ -1,42 +1,898 @@
 {
   "version": 2,
-  "title": "Original two-region streaming probe",
-  "assets": [{"id": "probe-box", "type": "primitive", "shape": "box"}],
+  "title": "Streaming Rooms",
+  "assets": [
+    {
+      "id": "probe-box",
+      "type": "primitive",
+      "shape": "box"
+    },
+    {
+      "id": "probe-guard-mesh",
+      "uri": "models/guard.obj"
+    }
+  ],
   "materials": [
-    {"id": "probe-east", "color": [0.65, 0.72, 0.80, 1]},
-    {"id": "probe-west", "color": [0.70, 0.62, 0.48, 1]}
+    {
+      "id": "probe-east",
+      "color": [
+        0.24,
+        0.42,
+        0.68,
+        1
+      ],
+      "double_sided": false
+    },
+    {
+      "id": "probe-west",
+      "color": [
+        0.65,
+        0.42,
+        0.19,
+        1
+      ],
+      "double_sided": false
+    },
+    {
+      "id": "probe-door-material",
+      "color": [
+        0.35,
+        0.2,
+        0.1,
+        1
+      ],
+      "double_sided": false
+    },
+    {
+      "id": "probe-guard-material",
+      "color": [
+        0.58,
+        0.16,
+        0.12,
+        1
+      ],
+      "double_sided": false
+    },
+    {
+      "id": "probe-loot-material",
+      "color": [
+        1,
+        0.75,
+        0.18,
+        1
+      ],
+      "double_sided": false
+    }
   ],
   "entities": [
     {
-      "id": "west-floor", "kind": "static", "model": "probe-box", "material": "probe-west",
-      "transform": {"position": [-2, -0.25, 0], "rotation": [0, 0, 0], "scale": [4, 0.5, 4]},
-      "collider": {"shape": "box", "center": [0, 0, 0], "half_size": [0.5, 0.5, 0.5]}
+      "id": "west-floor",
+      "kind": "static",
+      "model": "probe-box",
+      "material": "probe-west",
+      "transform": {
+        "position": [
+          -4,
+          -0.25,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          8,
+          0.5,
+          8
+        ]
+      },
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          0.5,
+          0.5,
+          0.5
+        ]
+      }
     },
     {
-      "id": "east-floor", "kind": "static", "model": "probe-box", "material": "probe-east",
-      "transform": {"position": [2, -0.25, 0], "rotation": [0, 0, 0], "scale": [4, 0.5, 4]},
-      "collider": {"shape": "box", "center": [0, 0, 0], "half_size": [0.5, 0.5, 0.5]}
+      "id": "west-ceiling",
+      "kind": "static",
+      "model": "probe-box",
+      "material": "probe-west",
+      "transform": {
+        "position": [
+          -4,
+          3.9,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          8,
+          0.2,
+          8
+        ]
+      },
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          0.5,
+          0.5,
+          0.5
+        ]
+      }
     },
     {
-      "id": "probe-door", "kind": "door", "model": "probe-box", "material": "probe-west",
-      "transform": {"position": [0, 1, 0], "rotation": [0, 0, 0], "scale": [0.1, 2, 1]},
-      "collider": {"shape": "box", "center": [0, 0, 0], "half_size": [0.5, 0.5, 0.5]}
+      "id": "west-outer-wall",
+      "kind": "static",
+      "model": "probe-box",
+      "material": "probe-west",
+      "transform": {
+        "position": [
+          -7.9,
+          1.9,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          0.2,
+          3.8,
+          8
+        ]
+      },
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          0.5,
+          0.5,
+          0.5
+        ]
+      }
     },
     {
-      "id": "probe-spawn", "kind": "spawn",
-      "transform": {"position": [-2, 0, 0], "rotation": [0, 90, 0], "scale": [1, 1, 1]}
+      "id": "west-north-wall",
+      "kind": "static",
+      "model": "probe-box",
+      "material": "probe-west",
+      "transform": {
+        "position": [
+          -4,
+          1.9,
+          -3.9
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          8,
+          3.8,
+          0.2
+        ]
+      },
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          0.5,
+          0.5,
+          0.5
+        ]
+      }
     },
     {
-      "id": "probe-guard", "kind": "guard", "model": "probe-box", "material": "probe-east", "behavior": "sentry",
-      "transform": {"position": [3, 0, 0], "rotation": [0, -90, 0], "scale": [0.4, 1.65, 0.4]}
+      "id": "west-south-wall",
+      "kind": "static",
+      "model": "probe-box",
+      "material": "probe-west",
+      "transform": {
+        "position": [
+          -4,
+          1.9,
+          3.9
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          8,
+          3.8,
+          0.2
+        ]
+      },
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          0.5,
+          0.5,
+          0.5
+        ]
+      }
     },
     {
-      "id": "probe-loot", "kind": "loot", "model": "probe-box", "material": "probe-east", "value": 25,
-      "transform": {"position": [2, 0.3, 1], "rotation": [0, 0, 0], "scale": [0.2, 0.2, 0.2]}
+      "id": "east-floor",
+      "kind": "static",
+      "model": "probe-box",
+      "material": "probe-east",
+      "transform": {
+        "position": [
+          4,
+          -0.25,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          8,
+          0.5,
+          8
+        ]
+      },
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          0.5,
+          0.5,
+          0.5
+        ]
+      }
     },
     {
-      "id": "probe-light", "kind": "light", "radius": 5, "intensity": 0.5,
-      "transform": {"position": [-1, 2, 0], "rotation": [0, 0, 0], "scale": [1, 1, 1]}
+      "id": "east-ceiling",
+      "kind": "static",
+      "model": "probe-box",
+      "material": "probe-east",
+      "transform": {
+        "position": [
+          4,
+          3.9,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          8,
+          0.2,
+          8
+        ]
+      },
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          0.5,
+          0.5,
+          0.5
+        ]
+      }
+    },
+    {
+      "id": "east-outer-wall",
+      "kind": "static",
+      "model": "probe-box",
+      "material": "probe-east",
+      "transform": {
+        "position": [
+          7.9,
+          1.9,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          0.2,
+          3.8,
+          8
+        ]
+      },
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          0.5,
+          0.5,
+          0.5
+        ]
+      }
+    },
+    {
+      "id": "east-north-wall",
+      "kind": "static",
+      "model": "probe-box",
+      "material": "probe-east",
+      "transform": {
+        "position": [
+          4,
+          1.9,
+          -3.9
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          8,
+          3.8,
+          0.2
+        ]
+      },
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          0.5,
+          0.5,
+          0.5
+        ]
+      }
+    },
+    {
+      "id": "east-south-wall",
+      "kind": "static",
+      "model": "probe-box",
+      "material": "probe-east",
+      "transform": {
+        "position": [
+          4,
+          1.9,
+          3.9
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          8,
+          3.8,
+          0.2
+        ]
+      },
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          0.5,
+          0.5,
+          0.5
+        ]
+      }
+    },
+    {
+      "id": "shared-wall-north",
+      "kind": "static",
+      "model": "probe-box",
+      "material": "probe-west",
+      "transform": {
+        "position": [
+          0,
+          1.9,
+          -2.65
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          0.2,
+          3.8,
+          2.7
+        ]
+      },
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          0.5,
+          0.5,
+          0.5
+        ]
+      }
+    },
+    {
+      "id": "shared-wall-south",
+      "kind": "static",
+      "model": "probe-box",
+      "material": "probe-west",
+      "transform": {
+        "position": [
+          0,
+          1.9,
+          2.65
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          0.2,
+          3.8,
+          2.7
+        ]
+      },
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          0.5,
+          0.5,
+          0.5
+        ]
+      }
+    },
+    {
+      "id": "shared-wall-lintel",
+      "kind": "static",
+      "model": "probe-box",
+      "material": "probe-west",
+      "transform": {
+        "position": [
+          0,
+          3,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          0.2,
+          1.6,
+          2.6
+        ]
+      },
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          0.5,
+          0.5,
+          0.5
+        ]
+      }
+    },
+    {
+      "id": "probe-door",
+      "kind": "door",
+      "model": "probe-box",
+      "material": "probe-door-material",
+      "transform": {
+        "position": [
+          0,
+          1.1,
+          0
+        ],
+        "rotation": [
+          0,
+          90,
+          0
+        ],
+        "scale": [
+          2.6,
+          2.2,
+          0.2
+        ]
+      },
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          0.5,
+          0.5,
+          0.5
+        ]
+      }
+    },
+    {
+      "id": "probe-spawn",
+      "kind": "spawn",
+      "transform": {
+        "position": [
+          -5,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          90,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "id": "probe-guard",
+      "kind": "guard",
+      "model": "probe-guard-mesh",
+      "material": "probe-guard-material",
+      "behavior": "sentry",
+      "speed": 0.9,
+      "sight_range": 3,
+      "hearing_range": 1,
+      "transform": {
+        "position": [
+          6,
+          0,
+          -2
+        ],
+        "rotation": [
+          0,
+          90,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "id": "probe-loot",
+      "kind": "loot",
+      "model": "probe-box",
+      "material": "probe-loot-material",
+      "value": 25,
+      "loot_highlight": true,
+      "transform": {
+        "position": [
+          5,
+          0.3,
+          2
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          0.3,
+          0.3,
+          0.3
+        ]
+      }
+    },
+    {
+      "id": "probe-exit",
+      "kind": "objective",
+      "zone": true,
+      "required_loot": 25,
+      "interaction_radius": 0.8,
+      "transform": {
+        "position": [
+          -6,
+          0,
+          2
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "id": "probe-light-west",
+      "kind": "light",
+      "radius": 10,
+      "intensity": 0.8,
+      "color": [
+        1,
+        0.65,
+        0.25
+      ],
+      "transform": {
+        "position": [
+          -5,
+          3,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "id": "probe-light-east",
+      "kind": "light",
+      "radius": 10,
+      "intensity": 0.8,
+      "color": [
+        0.25,
+        0.6,
+        1
+      ],
+      "transform": {
+        "position": [
+          5,
+          3,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "id": "east-boundary-north",
+      "kind": "static",
+      "model": "probe-box",
+      "material": "probe-east",
+      "transform": {
+        "position": [
+          0.11,
+          1.9,
+          -2.65
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          0.02,
+          3.8,
+          2.7
+        ]
+      },
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          0.5,
+          0.5,
+          0.5
+        ]
+      }
+    },
+    {
+      "id": "east-boundary-south",
+      "kind": "static",
+      "model": "probe-box",
+      "material": "probe-east",
+      "transform": {
+        "position": [
+          0.11,
+          1.9,
+          2.65
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          0.02,
+          3.8,
+          2.7
+        ]
+      },
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          0.5,
+          0.5,
+          0.5
+        ]
+      }
+    },
+    {
+      "id": "east-boundary-lintel",
+      "kind": "static",
+      "model": "probe-box",
+      "material": "probe-east",
+      "transform": {
+        "position": [
+          0.11,
+          3,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          0.02,
+          1.6,
+          2.6
+        ]
+      },
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          0.5,
+          0.5,
+          0.5
+        ]
+      }
     }
-  ]
+  ],
+  "test_starts": [
+    {
+      "id": "west",
+      "label": "Amber room",
+      "position": [
+        -5,
+        0,
+        0
+      ],
+      "yaw": 90,
+      "pitch": 0,
+      "door_open": false,
+      "crouched": false
+    },
+    {
+      "id": "east",
+      "label": "Blue room",
+      "position": [
+        5,
+        0,
+        2
+      ],
+      "yaw": -90,
+      "pitch": 0,
+      "door_open": false,
+      "crouched": false
+    }
+  ],
+  "environment": {
+    "ambient": [
+      0.15,
+      0.15,
+      0.15
+    ],
+    "moon_direction": [
+      0,
+      1,
+      0
+    ],
+    "moon_color": [
+      0,
+      0,
+      0
+    ],
+    "moon_intensity": 0,
+    "fog_color": [
+      0.03,
+      0.03,
+      0.05
+    ],
+    "fog_near": 24,
+    "fog_far": 64,
+    "sky_top": [
+      0.02,
+      0.02,
+      0.04
+    ],
+    "sky_bottom": [
+      0.04,
+      0.04,
+      0.06
+    ],
+    "exposure": 1
+  }
 }

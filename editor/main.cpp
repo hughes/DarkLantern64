@@ -616,7 +616,15 @@ class DemoEditor
                 {
                     std::vector<std::wstring> arguments{L"python",(root/"tools/build.py").wstring()};
                     if (play=="menu") arguments.insert(arguments.end(),{L"--bundle",(root/"content/level_bundle.json").wstring()});
-                    else arguments.insert(arguments.end(),{L"--level",source.wstring()});
+                    else if(cooked.contains("streaming")&&cooked.at("streaming").is_object()) {
+                        const auto& streaming=cooked.at("streaming");
+                        if(!streaming.at("status").value("valid",false))
+                            throw std::runtime_error("Authoring saved; stream ROM cook needs repair: "+streaming.at("status").value("error",std::string()));
+                        if(!streaming.contains("bundle_id")||!streaming.at("bundle_id").is_string())
+                            throw std::runtime_error("Authoring saved. Include this stream mission in the game menu before building or running its ROM.");
+                        arguments.insert(arguments.end(),{L"--bundle",(root/"content/level_bundle.json").wstring(),
+                            L"--start-level",fs::path(streaming.at("bundle_id").get<std::string>()).wstring()});
+                    } else arguments.insert(arguments.end(),{L"--level",source.wstring()});
                     if (play=="level" && preset!="default") arguments.insert(arguments.end(),{L"--start-preset",fs::path(preset).wstring()});
                     if (!play.empty()) arguments.push_back(L"--run");
                     const int code=Run(root,arguments,queue/"rom-build.log");

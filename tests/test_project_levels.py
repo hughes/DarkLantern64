@@ -20,7 +20,8 @@ ROOT = Path(__file__).resolve().parents[1]
 
 class ProjectLevelTests(unittest.TestCase):
     def setUp(self):
-        self.temporary = tempfile.TemporaryDirectory()
+        (ROOT / "build").mkdir(exist_ok=True)
+        self.temporary = tempfile.TemporaryDirectory(prefix="project-level-test-", dir=ROOT / "build")
         self.addCleanup(self.temporary.cleanup)
         self.root = Path(self.temporary.name).resolve()
         self.content = self.root / "content"
@@ -424,6 +425,138 @@ class ProjectLevelTests(unittest.TestCase):
         self.assertEqual(failure.returncode, 1)
         self.assertFalse(json.loads(failure.stdout)["ok"])
         self.assertEqual(failure.stderr, "")
+
+    def stream_fixture(self):
+        self.stream_source = json.loads((ROOT / "content/streaming_probe.json").read_text())
+        self.stream_manifest = json.loads((ROOT / "content/streaming_probe.mission.json").read_text())
+        self.write("streaming_probe.json", self.stream_source)
+        self.write("streaming_probe.mission.json", self.stream_manifest)
+        self.bundle["levels"].append({"id": "streaming-probe", "mission": "streaming_probe.mission.json"})
+        self.write("level_bundle.json", self.bundle)
+
+    def test_stream_scene_discovery_and_preview_do_not_bypass_native_pipeline(self):
+        self.stream_fixture()
+        catalog = self.project.list()
+        entry = next(row for row in catalog["levels"] if row["file"] == "streaming_probe.json")
+        self.assertTrue(entry["in_bundle"])
+        self.assertEqual(entry["bundle_id"], "streaming-probe")
+        self.assertEqual(entry["runtime_format"], "stream-mission-v1")
+        self.assertFalse(entry["native_play_supported"])
+        self.assertTrue(entry["streaming"]["status"]["valid"])
+        cooked = self.project.cook("streaming_probe.json")
+        self.assertEqual(cooked["streaming"]["bundle_id"], "streaming-probe")
+        self.assertIn("same portable mission loader", cooked["streaming"]["native_play_reason"])
+        self.assertFalse(cooked["report"]["playable"])
+        self.assertFalse((Path(cooked["output"]) / "generated/play.json").exists())
+        self.assertFalse((Path(cooked["output"]) / "generated/demo_level.h").exists())
+        self.assertTrue((Path(cooked["asset_root"]) / cooked["scene_path"]).exists())
+
+    def test_stream_include_update_exclude_and_reinclude_preserve_mission_kind(self):
+        self.stream_fixture()
+        original_manifest = (self.content / "streaming_probe.mission.json").read_bytes()
+        renamed = self.project.update("streaming_probe.json", self.hash("streaming_probe.json"), title="Changed rooms")
+        self.assertEqual(renamed["level"]["bundle_id"], "streaming-probe")
+        self.assertEqual(self.project.bundle()["levels"][-1], self.bundle["levels"][-1])
+        self.project.update("streaming_probe.json", self.hash("streaming_probe.json"), in_bundle=False)
+        entry = next(row for row in self.project.list()["levels"] if row["file"] == "streaming_probe.json")
+        self.assertFalse(entry["in_bundle"])
+        self.assertEqual(entry["runtime_format"], "stream-mission-v1")
+        self.assertFalse(entry["native_play_supported"])
+        self.project.update("streaming_probe.json", self.hash("streaming_probe.json"), in_bundle=True)
+        self.assertEqual(self.project.bundle()["levels"][-1]["mission"], "streaming_probe.mission.json")
+        self.assertNotIn("source", self.project.bundle()["levels"][-1])
+        self.assertEqual((self.content / "streaming_probe.mission.json").read_bytes(), original_manifest)
+
+    def test_stream_duplicate_copies_partition_with_canonical_ids_transactionally(self):
+        self.stream_fixture()
+        original = self.content_bytes()
+        result = self.project.duplicate("streaming_probe.json", "rooms_copy", "Copied rooms", self.hash("streaming_probe.json"), True)
+        duplicate = json.loads((self.content / "rooms_copy.mission.json").read_bytes())
+        self.assertEqual(duplicate["source"], "rooms_copy.json")
+        self.assertEqual(duplicate["regions"], self.stream_manifest["regions"])
+        self.assertEqual(result["level"]["runtime_format"], "stream-mission-v1")
+        self.assertTrue(result["level"]["streaming"]["status"]["valid"])
+        self.assertEqual(self.project.bundle()["levels"][-1], {"id": "rooms_copy", "mission": "rooms_copy.mission.json"})
+        self.assertEqual((self.content / "streaming_probe.json").read_bytes(), original["streaming_probe.json"])
+        self.assertEqual((self.content / "streaming_probe.mission.json").read_bytes(), original["streaming_probe.mission.json"])
+        unbundled = self.project.duplicate("streaming_probe.json", "rooms_draft", "Draft rooms", self.hash("streaming_probe.json"), False)
+        self.assertFalse(unbundled["level"]["in_bundle"])
+        self.assertTrue((self.content / "rooms_draft.mission.json").exists())
+
+    def test_stream_delete_archives_source_partition_and_preserves_other_entries(self):
+        self.stream_fixture()
+        source = (self.content / "streaming_probe.json").read_bytes()
+        partition = (self.content / "streaming_probe.mission.json").read_bytes()
+        result = self.project.delete("streaming_probe.json", self.hash("streaming_probe.json"))
+        backup = Path(result["backup"])
+        self.assertEqual(backup.read_bytes(), source)
+        self.assertEqual((backup.parent / "streaming_probe.mission.json").read_bytes(), partition)
+        self.assertFalse((self.content / "streaming_probe.mission.json").exists())
+        self.assertFalse((self.content / "streaming_probe.json").exists())
+        recovery = json.loads((backup.parent / "recovery.json").read_bytes())
+        self.assertEqual(recovery["bundle_entry"], self.bundle["levels"][-1])
+        self.assertEqual(recovery["mission_sha256"], project.sha256(partition))
+        self.assertEqual(self.project.bundle()["levels"], self.bundle["levels"][:-1])
+
+    def test_stream_new_entity_and_out_of_bounds_edits_remain_authorable_with_diagnostics(self):
+        self.stream_fixture()
+        saved = self.content_bytes()
+        staged = self.root / "draft.json"
+        draft = copy.deepcopy(self.stream_source)
+        light = copy.deepcopy(next(row for row in draft["entities"] if row["kind"] == "light"))
+        light["id"] = "new-author-light"
+        draft["entities"].append(light)
+        staged.write_bytes(project.json_bytes(draft))
+        result = self.project.cook("streaming_probe.json", staged=staged)
+        self.assertFalse(result["streaming"]["status"]["valid"])
+        self.assertIn("exactly one home region", result["streaming"]["status"]["error"])
+        self.assertEqual(self.content_bytes(), saved)
+        # Saved structural edits must stay discoverable to allow repair.
+        self.write("streaming_probe.json", draft)
+        entry = next(row for row in self.project.list()["levels"] if row["file"] == "streaming_probe.json")
+        self.assertFalse(entry["streaming"]["status"]["valid"])
+        self.assertFalse(entry["native_play_supported"])
+
+    def test_stream_partition_change_invalidates_preview_cache_and_reports_bounds(self):
+        self.stream_fixture()
+        self.project.cook("streaming_probe.json")
+        self.assertTrue(self.project.cook("streaming_probe.json")["cache_hit"])
+        self.stream_manifest["regions"][0]["bounds"][1][1] = 4.1
+        self.write("streaming_probe.mission.json", self.stream_manifest)
+        changed = self.project.cook("streaming_probe.json")
+        self.assertFalse(changed["cache_hit"])
+        self.assertEqual(changed["streaming"]["regions"][0]["bounds"][1][1], 4.1)
+        self.stream_manifest["regions"][0]["bounds"][0][0] = -7.99
+        self.write("streaming_probe.mission.json", self.stream_manifest)
+        invalid = self.project.cook("streaming_probe.json")
+        self.assertFalse(invalid["streaming"]["status"]["valid"])
+        self.assertIn("bounds do not cover", invalid["streaming"]["status"]["error"])
+
+    def test_stream_duplicate_publication_failure_restores_source_and_manifest(self):
+        self.stream_fixture()
+        before = self.content_bytes()
+        original_replace = project.os.replace
+        def fail_bundle(source, target):
+            if Path(target) == self.content / "level_bundle.json":
+                raise OSError("simulated stream bundle failure")
+            return original_replace(source, target)
+        with patch.object(project.os, "replace", side_effect=fail_bundle), self.assertRaises(OSError):
+            self.project.duplicate("streaming_probe.json", "failed_copy", "Failed", self.hash("streaming_probe.json"), True)
+        self.assertEqual(self.content_bytes(), before)
+
+    def test_stream_preview_exposes_rom_bridge_gate_for_portable_one_region(self):
+        self.stream_fixture()
+        self.stream_manifest["regions"] = [dict(id="west", bounds=[[-8, -.5, -4], [8, 4, 4]],
+                                               entities=[row["id"] for row in self.stream_source["entities"]], neighbors=[])]
+        self.write("streaming_probe.mission.json", self.stream_manifest)
+        entry = next(row for row in self.project.list()["levels"] if row["file"] == "streaming_probe.json")
+        self.assertTrue(entry["streaming"]["status"]["portable_valid"])
+        self.assertFalse(entry["streaming"]["status"]["rom_valid"])
+        self.assertIn("exactly 2 regions", entry["streaming"]["status"]["error"])
+        result = self.project.cook("streaming_probe.json")
+        self.assertFalse(result["streaming"]["status"]["valid"])
+        self.assertTrue((Path(result["asset_root"]) / result["scene_path"]).exists())
+        self.assertFalse(result["native_play_supported"])
 
 
 if __name__ == "__main__":

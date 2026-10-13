@@ -930,6 +930,18 @@ static void hud(const DlGame *g,const DlRenderStats *stats){
     if(dot(sub(eye,g->level->objective),sub(eye,g->level->objective))<2.25f&&dl_line_of_sight(g,eye,g->level->objective))prompt=HUD_PROMPT_RELIC;
     if(enemy_chasing(g))prompt=HUD_PROMPT_CHASE;
     hud_cache_draw(g,prompt);
+    if(stats->streaming){
+        /* This probe exposes residency because loading is the demonstrated
+         * behavior. Detailed memory/fence instrumentation remains in logs. */
+        box(7,30,314,47,rgb(9,12,17));
+        rdpq_text_printf(NULL,1,12,42,"Room %lu  Loaded %lu/2  Loot %lu%s",
+            (unsigned long)stats->stream_current,(unsigned long)stats->stream_regions,
+            (unsigned long)g->loot_value,
+            stats->stream_loading?"  Loading...":"");
+        if(stats->debug)rdpq_text_printf(NULL,1,12,188,"Loads %lu  Retired %lu  Slots %luK",
+            (unsigned long)stats->stream_loads,(unsigned long)stats->stream_retired,
+            (unsigned long)(stats->stream_allocated_bytes/1024));
+    }
     dl_profile_record(DL_PROFILE_HUD,mark);
     if(stats->debug){
         mark=dl_profile_mark();
@@ -989,7 +1001,7 @@ static void background(const DlGame *game){
         }
     }
 }
-#if defined(DL_CAPTURE) || defined(DL_MENU_TEST)
+#if defined(DL_CAPTURE) || defined(DL_MENU_TEST) || defined(DL_STREAM_TEST)
 /* Diagnostic builds only: export the actual completed RGBA5551 framebuffer.
  * The explicit GPU wait and dump are outside normal performance captures. */
 static int capture_id;
@@ -1008,6 +1020,25 @@ static void capture_frame(surface_t *display){
     debugf("DL64 capture_end id=%d\n",capture_id);capture_id=0;
 }
 #endif
+typedef struct {surface_t *display;rspq_syncpoint_t rsp;uint32_t serial;} StreamRenderFrame;
+static StreamRenderFrame stream_render_frames[3];
+static uint32_t stream_render_serial,stream_rsp_completed;
+static volatile uint32_t stream_rdp_completed;
+static void stream_frame_done(void *argument){
+    StreamRenderFrame *frame=argument;
+    stream_rdp_completed=frame->serial;
+    display_show(frame->display);
+}
+void dl_render_stream_completed(uint64_t *rsp,uint64_t *rdp){
+    for(int i=0;i<3;++i){
+        const StreamRenderFrame *frame=&stream_render_frames[i];
+        if(frame->serial>stream_rsp_completed&&frame->rsp&&rspq_syncpoint_check(frame->rsp))
+            stream_rsp_completed=frame->serial;
+    }
+    if(rsp)*rsp=stream_rsp_completed;
+    if(rdp)*rdp=stream_rdp_completed;
+}
+uint64_t dl_render_stream_submitted(void){return stream_render_serial;}
 float dl_render_frame(const DlGame *game,const DlRenderStats *stats){
     DlProfileMark mark=dl_profile_mark();
     /* Keep the queued completion callback runnable before waiting for its
@@ -1024,12 +1055,30 @@ float dl_render_frame(const DlGame *game,const DlRenderStats *stats){
     dl_profile_record(DL_PROFILE_RENDER_SETUP,mark);
     geometry(game);hud(game,stats);
     mark=dl_profile_mark();
-#ifdef DL_CAPTURE
-    if(capture_id){rdpq_detach();capture_frame(display);display_show(display);}
-    else rdpq_detach_show();
-#else
-    rdpq_detach_show();
+#if defined(DL_CAPTURE) || defined(DL_STREAM_TEST)
+    if(capture_id){
+        rdpq_detach();capture_frame(display);display_show(display);
+        if(stats->streaming){
+            assertf(stream_render_serial<UINT32_MAX,"Stream submission serial exhausted");
+            ++stream_render_serial;
+            /* capture_frame's wait has completed both graphics processors. */
+            stream_rsp_completed=stream_rdp_completed=stream_render_serial;
+        }
+    }else
 #endif
+    {
+    if(stats->streaming){
+        assertf(stream_render_serial<UINT32_MAX,"Stream submission serial exhausted");
+        uint32_t serial=++stream_render_serial;
+        StreamRenderFrame *frame=&stream_render_frames[serial%3];
+        /* Display buffering bounds outstanding detach callbacks. If a future
+         * display policy changes that bound, wait before reusing callback data. */
+        if(frame->serial>stream_rdp_completed)rspq_wait();
+        *frame=(StreamRenderFrame){.display=display,.serial=serial};
+        rdpq_detach_cb(stream_frame_done,frame);
+        frame->rsp=rspq_syncpoint_new();
+    }else rdpq_detach_show();
+    }
     dl_profile_record(DL_PROFILE_RENDER_SETUP,mark);
     return (float)(uint32_t)(TICKS_READ()-start)*(1000.0f/TICKS_PER_SECOND);
 }

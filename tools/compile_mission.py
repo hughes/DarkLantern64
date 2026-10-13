@@ -12,6 +12,7 @@ import json
 import math
 import os
 from pathlib import Path
+import re
 import struct
 import sys
 import tempfile
@@ -56,11 +57,13 @@ def fields(value, required, label):
     level.require(set(value) == set(required), label + ": missing or unknown fields")
 
 
-def read_source(manifest, content_root):
+def read_source(manifest, content_root, source_document=None):
     path = content_path(manifest["source"], content_root, {".json"})
     level.require(path.stat().st_size <= 8 * 1024 * 1024, "Mission source exceeds 8 MiB")
     raw = path.read_bytes()
-    document = json.loads(raw)
+    document = json.loads(raw) if source_document is None else source_document
+    if source_document is not None:
+        raw = canonical_json(source_document)
     # Run the profile gate before unsupported-feature checks or asset reads.
     level.content_limits(document, level.LIMITS, authoring=False)
     level.require(not document.get("asset_packs"), "DLM1 v1 does not support linked asset packs; use local bounded definitions")
@@ -149,12 +152,12 @@ def make_chunk(origin, sections):
     return bytes(result)
 
 
-def cook_mission(manifest, content_root=ROOT / "content"):
+def cook_mission(manifest, content_root=ROOT / "content", *, source_document=None):
     """Validate all inputs before returning reproducible package bytes/report."""
     fields(manifest, {"version", "source", "entry_region", "regions"}, "Mission manifest")
     level.require(type(manifest["version"]) is int and manifest["version"] == 1, "Mission manifest version must be 1")
     content_root = Path(content_root).resolve()
-    document, state, source_raw, dependencies = read_source(manifest, content_root)
+    document, state, source_raw, dependencies = read_source(manifest, content_root, source_document)
     regions, homes = validated_regions(manifest, state)
     region_ids = {row["id"]: index + 1 for index, row in enumerate(regions)}
     entity_ids = {ident: index + 1 for index, ident in enumerate(sorted(state["by_id"]))}
@@ -173,6 +176,7 @@ def cook_mission(manifest, content_root=ROOT / "content"):
     for region in regions:
         origin = [(a + b) / 2 for a, b in zip(*region["bounds"])]
         triangle_payload, collider_payload = bytearray(), bytearray()
+        region_materials = set()
         for ident in region["entities"]:
             entity = state["by_id"][ident]
             if entity["kind"] == "static" and "model" in entity:
@@ -183,6 +187,7 @@ def cook_mission(manifest, content_root=ROOT / "content"):
                     positions = [points[index] for index in mesh["indices"][triangle * 3:triangle * 3 + 3]]
                     local = [value - origin[axis] for point in positions for axis, value in enumerate(point)]
                     triangle_payload.extend(struct.pack(">9fII", *local, material_ids[entity["material"]], surface_ids[(ident, triangle)]))
+                    region_materials.add(material_ids[entity["material"]])
             if ident in boxes:
                 box = boxes[ident]
                 assert_bounds(region, collider_corners(box), ident + " collider")
@@ -195,6 +200,7 @@ def cook_mission(manifest, content_root=ROOT / "content"):
         chunks.append(chunk)
         region_reports.append(dict(id=region_ids[region["id"]], source_id=region["id"], bounds=region["bounds"], origin=origin,
                                    triangle_count=len(triangle_payload) // 44, collider_count=len(collider_payload) // 32,
+                                   material_ids=sorted(region_materials),
                                    entity_count=len(region["entities"]), chunk_bytes=len(chunk), crc32=f"{zlib.crc32(chunk):08x}"))
     canonical_manifest = dict(manifest, regions=regions)
     source_sha = hashlib.sha256(canonical_json(canonical_source(document))).hexdigest()
@@ -251,6 +257,116 @@ def cook_mission(manifest, content_root=ROOT / "content"):
                   unsupported_inputs=["external-scale-study", "animated character assets", "textures", "linked asset packs"]),
                   acceptance="Portable package foundation only; neighbor overlap is authored adjacency, not a proven PVS or an 8 MiB runtime budget.")
     return bytes(result), report
+
+
+def mission_source(manifest_path, content_root=None):
+    """Resolve the canonical scene without allowing a manifest to escape content."""
+    manifest_path = Path(manifest_path).resolve()
+    content_root = Path(content_root or manifest_path.parent).resolve()
+    level.require(manifest_path.is_relative_to(content_root) and manifest_path.is_file(),
+                  "Mission manifest must stay inside content")
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    # Discovery must keep an editable source accessible while its region data
+    # is invalid. The actual cook applies the complete manifest schema gate.
+    level.require(isinstance(manifest, dict), "Mission manifest must be an object")
+    source = content_path(manifest.get("source"), content_root, {".json"})
+    return manifest, source
+
+
+def bootstrap_header(document, state, package_report, package_path):
+    """Emit persistent gameplay/shared visuals, with architecture only in ROM."""
+    bootstrap = dict(state)
+    bootstrap["models"] = [entity for entity in state["models"] if entity["kind"] != "static"]
+    level.require(all(entity["kind"] in level.ROLES for entity in bootstrap["models"]),
+                  "Stream bootstrap supports only guard, door, control, loot and objective visuals")
+    model_ids = {entity["model"] for entity in bootstrap["models"]}
+    bootstrap["meshes"] = {ident: state["meshes"][ident] for ident in sorted(model_ids)}
+    bootstrap["colliders"] = []
+    bootstrap.pop("baked_lighting", None)
+    text = level.header(document, bootstrap)
+    # The existing helper emits legacy collision declarations even at count=0.
+    # The stream bootstrap contains neither those arrays nor static geometry.
+    text = re.sub(r"static const DlCollider dl_demo_colliders\[\] = \{\s*\};\n", "", text)
+    text = re.sub(r"static const int16_t dl_collider_objects\[\] = \{\s*\};\n", "", text)
+    text = text.replace(".colliders=dl_demo_colliders", ".colliders=NULL")
+    text = text.replace(".collider_objects=dl_collider_objects", ".collider_objects=NULL")
+    text = text.replace('#include "game.h"', '#include "game.h"\n#include "stream_scene.h"')
+    entity_ids = {row["source_id"]: row["id"] for row in package_report["entity_ids"]}
+    links = []
+    for name, rows in (("model", bootstrap["models"]), ("object", state["objects"]), ("enemy", state["enemies"])):
+        values = ",".join(str(entity_ids[row["id"]]) for row in rows)
+        links.append(f"static const uint32_t dl_stream_{name}_ids[] = {{" + (values or "0") + "};")
+    materials = []
+    for row in package_report["material_ids"]:
+        material = state["materials"][row["source_id"]]
+        color = ",".join(str(round(component * 255)) for component in material["color"])
+        materials.append("    {" + str(row["id"]) + ",{ " + color + " }," + str(material.get("double_sided", True)).lower() + "}")
+    links.append("static const DlStreamMaterial dl_stream_materials[] = {\n" + ",\n".join(materials) + "\n};")
+    links.append("static const DlStreamDefinition dl_stream_definition = {\n" +
+                 "    .package_path=" + json.dumps(package_path) + ",\n" +
+                 f"    .directory_bytes={package_report['directory_bytes']}, .file_bytes={package_report['package_bytes']}, " +
+                 f".max_region_bytes={max(row['chunk_bytes'] for row in package_report['regions'])}, .region_count={len(package_report['regions'])},\n" +
+                 "    .model_entity_ids=dl_stream_model_ids, .object_entity_ids=dl_stream_object_ids, .enemy_entity_ids=dl_stream_enemy_ids,\n" +
+                 f"    .materials=dl_stream_materials, .material_count={len(materials)}\n" + "};")
+    text = text.replace("static const DlLevel dl_demo_level = {", "\n".join(links) + "\nstatic const DlLevel dl_demo_level = {\n    .stream=&dl_stream_definition,")
+    meshes = list(bootstrap["meshes"].values())
+    geometry_bytes = sum(len(mesh["vertices"]) * 12 + len(mesh["indices"]) * 2 + len(mesh.get("uvs", [])) * 8 + len(mesh.get("normals", [])) * 3 for mesh in meshes)
+    return text, dict(compiled_geometry_bytes=geometry_bytes,
+                      mesh_count=len(meshes), model_count=len(bootstrap["models"]),
+                      models=[entity["id"] for entity in bootstrap["models"]],
+                      model_entity_ids=[entity_ids[entity["id"]] for entity in bootstrap["models"]],
+                      object_entity_ids=[entity_ids[entity["id"]] for entity in state["objects"]],
+                      enemy_entity_ids=[entity_ids[entity["id"]] for entity in state["enemies"]],
+                      collider_count=0, static_model_count=0,
+                      memory_note="Shared dynamic geometry arrays only. Descriptors, global gameplay state, stream scene banks, slots and renderer/audio/display costs are additional.")
+
+
+def validate_stream_bridge(package_report):
+    """The first ROM adapter is deliberately smaller than the portable format."""
+    regions = package_report["regions"]
+    level.require(len(regions) == 2, "Stream ROM bridge requires exactly 2 regions")
+    level.require(sum(row["triangle_count"] for row in regions) <= 512,
+                  "Stream ROM bridge supports at most 512 resident static triangles")
+    level.require(sum(len(row["material_ids"]) for row in regions) <= 16,
+                  "Stream ROM bridge supports at most 16 nonempty region/material groups")
+    level.require(max(row["collider_count"] for row in regions) + 1 <= 256,
+                  "Stream ROM bridge needs one unavailable-region barrier: each region permits at most 255 colliders")
+
+
+def prepare_stream_level(manifest_path, output, content_root=None):
+    """Build the menu bootstrap and a checked, hash-addressed ROM package."""
+    manifest_path, output = Path(manifest_path).resolve(), Path(output).resolve()
+    content_root = Path(content_root or manifest_path.parent).resolve()
+    manifest, source = mission_source(manifest_path, content_root)
+    package, package_report = cook_mission(manifest, content_root)
+    document = canonical_source(json.loads(source.read_text(encoding="utf-8")))
+    state = level.validate(document, content_root, authoring=False)
+    validate_stream_bridge(package_report)
+    relative = "romfs/missions/mission-" + package_report["package_sha256"] + ".dlm"
+    rom_path = "rom:/missions/" + Path(relative).name
+    text, bootstrap = bootstrap_header(document, state, package_report, rom_path)
+    # Package identity and compiler inputs enter the build fingerprint. This
+    # includes primitive recipes and enemy defaults absent from source JSON.
+    recipe_inputs = [Path(__file__), Path(level.__file__)]
+    recipe_inputs.extend(path for uri, path in state["dependencies"] if uri.startswith("code:"))
+    digest = hashlib.sha256(package)
+    digest.update(text.encode("utf-8"))
+    for path in sorted(set(recipe_inputs)):
+        digest.update(path.name.encode("utf-8"))
+        digest.update(path.read_bytes())
+    report = dict(version=2, title=document["title"], source_sha256=digest.hexdigest(),
+                  authoring_only=False, playable=True, experimental_stream=True,
+                  compiled_geometry_bytes=bootstrap["compiled_geometry_bytes"], bootstrap=bootstrap,
+                  counts=dict(entities=len(state["by_id"]), models=bootstrap["model_count"], meshes=bootstrap["mesh_count"],
+                              colliders=0, lights=len(state["kinds"]["light"]), enemies=len(state["enemies"]), test_starts=len(state["test_starts"])),
+                  characters={}, lighting=None, test_starts=state["test_starts"],
+                  mission=dict(path=relative, sha256=package_report["package_sha256"], bytes=len(package), report=package_report),
+                  memory_note="Bootstrap shared visuals/global definitions are resident. Static architecture and all colliders live in mission chunks. No full mission or hardware performance acceptance is implied.")
+    atomic_write(output / relative, package)
+    atomic_write(output / "generated/demo_level.h", text.encode("utf-8"))
+    atomic_write(output / "generated/mission_report.json", (json.dumps(package_report, indent=2, sort_keys=True) + "\n").encode("utf-8"))
+    atomic_write(output / "generated/level_report.json", (json.dumps(report, indent=2, sort_keys=True) + "\n").encode("utf-8"))
+    return report
 
 
 def atomic_write(path, payload):

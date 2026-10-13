@@ -19,7 +19,8 @@ ROOT = Path(__file__).resolve().parents[1]
 
 class BundleTests(unittest.TestCase):
     def setUp(self):
-        self.temporary = tempfile.TemporaryDirectory()
+        (ROOT / "build").mkdir(exist_ok=True)
+        self.temporary = tempfile.TemporaryDirectory(prefix="bundle-test-", dir=ROOT / "build")
         self.addCleanup(self.temporary.cleanup)
         self.root = Path(self.temporary.name)
         self.content = self.root / "content"
@@ -198,6 +199,9 @@ class BundleTests(unittest.TestCase):
                  {"bundle": ROOT / "content/level_bundle.json", "capture": True},
                  {"start_preset": "default", "autoplay": True},
                  {"start_level": "first_room"}, {"menu_test": True},
+                 {"stream_test_capture": True}, {"stream_test": True},
+                 {"bundle": ROOT / "content/level_bundle.json", "stream_test": True, "menu_test": True},
+                 {"bundle": ROOT / "content/level_bundle.json", "stream_test": True, "start_level": "streaming-probe"},
                  {"lighting_bake_verify": True, "disable_lighting_bake": True}]
         with patch.object(build, "prepare_bundle", side_effect=AssertionError("Must reject before cook")):
             for kwargs in cases:
@@ -259,6 +263,153 @@ class BundleTests(unittest.TestCase):
         self.assertEqual(report["textures"]["textures"], [])
         self.assertEqual(len(report["rom_assets"]), 1)
         self.assertIn(".has_rom_assets=true", (self.output / "generated/bundle.c").read_text())
+
+    def stream_fixture(self, *, mixed=False):
+        source = json.loads((ROOT / "content/streaming_probe.json").read_text())
+        manifest = json.loads((ROOT / "content/streaming_probe.mission.json").read_text())
+        self.write_level("streaming_probe.json", source)
+        self.write_level("streaming_probe.mission.json", manifest)
+        # The existing baseline fixture already supplies the legacy guard OBJ.
+        self.data["levels"] = ([{"id": "one", "source": "one.json"}] if mixed else []) + [
+            {"id": "streaming-probe", "mission": "streaming_probe.mission.json"}]
+        return source, manifest
+
+    def test_stream_manifest_selection_and_exclusive_source_contract(self):
+        self.stream_fixture(mixed=True)
+        _, entries = self.read()
+        self.assertEqual(entries[1]["source"], self.content / "streaming_probe.json")
+        self.assertEqual(entries[1]["mission"], self.content / "streaming_probe.mission.json")
+        self.assertEqual(bundle.selection(entries, "streaming-probe", "east", menu=True), (1, 1, False))
+        original = copy.deepcopy(self.data)
+        for entry in ({"id": "bad", "source": "one.json", "mission": "streaming_probe.mission.json"},
+                      {"id": "bad", "mission": "../streaming_probe.mission.json"},
+                      {"id": "bad", "mission": "one.json"},
+                      {"id": "bad", "mission": "missing.mission.json"}):
+            self.data = dict(original, levels=[entry])
+            with self.subTest(entry=entry), self.assertRaises(ValueError):
+                self.read()
+
+    def test_stream_manifest_source_confinement_and_study_gate(self):
+        source, manifest = self.stream_fixture()
+        self.write_level("streaming_probe.mission.json", dict(manifest, source="../outside.json"))
+        with self.assertRaisesRegex(ValueError, "inside content"):
+            self.read()
+        self.write_level("streaming_probe.mission.json", manifest)
+        source["authoring_profile"] = "external-scale-study"
+        self.write_level("streaming_probe.json", source)
+        with self.assertRaisesRegex(ValueError, "authoring-only source study"):
+            self.read()
+
+    def test_stream_bundle_packages_binary_and_reports_bootstrap_residency(self):
+        self.stream_fixture(mixed=True)
+        report, sources = self.prepare(menu=True, start_level="streaming-probe", start_preset="east")
+        streamed = report["levels"][1]["content"]
+        self.assertEqual(streamed["title"], "Streaming Rooms")
+        self.assertEqual(report["initial_level"], 1)
+        self.assertEqual(report["initial_start"], 1)
+        self.assertEqual(report["resident_bootstrap_geometry_bytes"], 1800)
+        self.assertEqual(report["resident_geometry_bytes"], report["levels"][0]["content"]["compiled_geometry_bytes"] + 1800)
+        self.assertEqual(report["stream_rom_bytes"], streamed["mission"]["bytes"])
+        self.assertEqual(report["music"]["cues"], [None, None])
+        self.assertEqual([asset["kind"] for asset in report["rom_assets"]], ["mission"])
+        package = self.output / streamed["mission"]["path"]
+        self.assertEqual(package.read_bytes()[:4], b"DLM1")
+        self.assertEqual(hashlib.sha256(package.read_bytes()).hexdigest(), streamed["mission"]["sha256"])
+        header = (Path(report["levels"][1]["cooked_dir"]) / "generated/demo_level.h").read_text()
+        self.assertNotIn('"west-floor"', header)
+        self.assertNotIn("static const DlCollider", header)
+        self.assertIn(".stream=&dl_stream_definition", header)
+        self.assertIn(".has_rom_assets=true", (self.output / "generated/bundle.c").read_text())
+        self.assertEqual(len(sources), 3)
+
+    def test_stream_partition_fingerprint_and_exact_asset_union(self):
+        _, manifest = self.stream_fixture()
+        first, sources = self.prepare(menu=True)
+        first_content = first["levels"][0]["content"]
+        old_path = first_content["mission"]["path"]
+        signature = build.fingerprint(sources, {}, content_hashes=[first_content["source_sha256"]])
+        manifest["regions"][0]["bounds"][1][1] = 4.1
+        self.write_level("streaming_probe.mission.json", manifest)
+        second, sources = self.prepare(menu=True)
+        second_content = second["levels"][0]["content"]
+        self.assertNotEqual(first_content["source_sha256"], second_content["source_sha256"])
+        self.assertNotEqual(signature, build.fingerprint(sources, {}, content_hashes=[second_content["source_sha256"]]))
+        self.assertFalse((self.output / old_path).exists())
+        self.assertTrue((Path(first["levels"][0]["cooked_dir"]) / old_path).exists())
+        self.assertEqual(len(list((self.output / "romfs/missions").iterdir())), 1)
+
+    def test_stream_binary_corruption_and_escape_preserve_published_union(self):
+        self.stream_fixture()
+        report, _ = self.prepare(menu=True)
+        streamed = report["levels"][0]
+        mission = streamed["content"]["mission"]
+        published = self.output / mission["path"]
+        payload = published.read_bytes()
+        cooked_path = Path(streamed["cooked_dir"]) / mission["path"]
+        cooked_path.write_bytes(payload[:-1] + bytes([payload[-1] ^ 1]))
+        with self.assertRaisesRegex(ValueError, "mission hash or size mismatch"):
+            bundle.union_assets([streamed], self.output)
+        self.assertEqual(published.read_bytes(), payload)
+        cooked_path.write_bytes(payload)
+        mission["path"] = "../outside.dlm"
+        with self.assertRaisesRegex(ValueError, "Invalid bundle mission path"):
+            bundle.union_assets([streamed], self.output)
+        self.assertEqual(published.read_bytes(), payload)
+
+    def test_failed_directory_publish_restores_previous_asset_union(self):
+        original = self.texture_level("accepted-assets", b"accepted")
+        replacement = self.texture_level("replacement-assets", b"replacement")
+        bundle.union_assets([original], self.output)
+        published = self.output / "romfs"
+        previous = {path.relative_to(published): path.read_bytes() for path in published.rglob("*") if path.is_file()}
+        actual_replace = bundle.os.replace
+        def fail_new_publication(source, destination):
+            if Path(source).name == "romfs" and Path(source).parent.name.startswith("package-"):
+                raise OSError("injected directory publication failure")
+            return actual_replace(source, destination)
+        with patch.object(bundle.os, "replace", side_effect=fail_new_publication), self.assertRaisesRegex(OSError, "injected directory publication"):
+            bundle.union_assets([replacement], self.output)
+        self.assertEqual(previous, {path.relative_to(published): path.read_bytes() for path in published.rglob("*") if path.is_file()})
+        self.assertFalse(list(self.output.glob("package-*-previous")))
+
+    @unittest.skipUnless(os.name == "nt", "Windows directory sharing retries")
+    def test_windows_sharing_retry_is_bounded_filtered_and_retains_previous_package(self):
+        original = self.texture_level("original-sharing", b"original")
+        replacement = self.texture_level("replacement-sharing", b"replacement")
+        bundle.union_assets([original], self.output)
+        published = self.output / "romfs"
+        actual_replace = bundle.os.replace
+        calls = []
+        def sharing_error(code):
+            error = PermissionError("injected Windows directory lock")
+            error.winerror = code
+            return error
+        def transient(source, destination):
+            if Path(source).name == "romfs" and Path(source).parent.name.startswith("package-"):
+                calls.append(source)
+                if len(calls) <= 2:
+                    raise sharing_error(5)
+            return actual_replace(source, destination)
+        with patch.object(bundle.os, "replace", side_effect=transient), patch.object(bundle.time, "sleep") as sleep:
+            bundle.union_assets([replacement], self.output)
+        self.assertEqual(len(calls), 3)
+        self.assertEqual(sleep.call_count, 2)
+        self.assertEqual((published / "textures/texture-0123456789abcdef.sprite").read_bytes(), b"replacement")
+        calls.clear()
+        def permanent(source, destination):
+            if Path(source).name == "romfs" and Path(source).parent.name.startswith("package-"):
+                calls.append(source)
+                raise sharing_error(5)
+            return actual_replace(source, destination)
+        with patch.object(bundle.os, "replace", side_effect=permanent), patch.object(bundle.time, "sleep") as sleep, self.assertRaises(PermissionError):
+            bundle.union_assets([original], self.output)
+        self.assertEqual(len(calls), 8)
+        self.assertEqual(sleep.call_count, 7)
+        self.assertEqual((published / "textures/texture-0123456789abcdef.sprite").read_bytes(), b"replacement")
+        with patch.object(bundle.os, "replace", side_effect=sharing_error(87)) as replace, patch.object(bundle.time, "sleep") as sleep, self.assertRaises(PermissionError):
+            bundle.replace_directory("source", "destination")
+        self.assertEqual(replace.call_count, 1)
+        sleep.assert_not_called()
 
 
 if __name__ == "__main__":

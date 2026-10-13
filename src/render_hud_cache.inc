@@ -37,6 +37,11 @@ static void hud_cache_prepare(const DlGame *g){
         "Gate open. Find the gold relic and press A.",
         "A: operate the gate switch","A: take the relic",
         "Spotted! Break sight and retreat into shadow."};
+    static const char *stream_prompts[HUD_PROMPT_COUNT]={
+        "A: open gate. Collect loot in the blue room.",
+        "Close the gate; explore, then return to amber.",
+        "A: open or close the gate","A: collect loot; return to the amber exit",
+        "Spotted! Break sight and retreat into shadow."};
     char title[97];int end=0;
     for(int i=0;i<48&&g->level->title[i];++i){
         char ch=g->level->title[i];if(ch=='^'||ch=='$')title[end++]=ch;
@@ -62,7 +67,7 @@ static void hud_cache_prepare(const DlGame *g){
         hud_cache.result[i]=rspq_block_end();
     }
     for(int i=0;i<HUD_PROMPT_COUNT;++i){
-        rspq_block_begin();rdpq_text_print(NULL,1,9,215,prompts[i]);
+        rspq_block_begin();rdpq_text_print(NULL,1,9,215,g->level->stream?stream_prompts[i]:prompts[i]);
         hud_cache.prompt[i]=rspq_block_end();
     }
     for(int stance=0;stance<2;++stance)for(int prompt=0;prompt<HUD_PROMPT_COUNT;++prompt){

@@ -1,0 +1,205 @@
+{
+  "version": 1,
+  "platform": "Ares emulator",
+  "tested_at_utc": "2026-10-13T02:23:36Z",
+  "functional_passed": true,
+  "audio_continuity_passed": true,
+  "rom_sha256": "0acab9e0936ee8b8042d81ae0798f4c355114167272c5986e79e5af9b642b1f9",
+  "build_signature": "ada68efde6501157080bc37659eb919f93011b1ea95ab213539b97f515cfb0a6",
+  "source_sha256": "61402afbea1c7496dde9037e8eab1e49acc198861836c985a421bfb51327b337",
+  "probe_cook_sha256": "457136b29ef3aabea7b748bbd5afea0b0420c09829f66d1e259a8d3fe9627c0b",
+  "build_metadata": ".dev/ares/runs/de7cc1c44b504e12bfc219ad20abf7c9/verification-build.json",
+  "build_metadata_sha256": "e3c73d7957c438666c3528f5a9baa601315d801325c1d4a5e5b123e54509172e",
+  "tested_rom": ".dev/ares/runs/de7cc1c44b504e12bfc219ad20abf7c9/DarkLantern64-bundle-level_bundle-menu-stream-test-t3d.z64",
+  "log_sha256": "14102efefb84b81d2e8de840c89e12e8b7593ff1e85bd28b228b3a2341bd4bba",
+  "log": ".dev/ares/runs/de7cc1c44b504e12bfc219ad20abf7c9/streaming-probe.log",
+  "package": {
+    "sha256": "baa3609544279dde240aff7896972ea5291ab3578c6fb5c9aa39b3477e5ea27d",
+    "bytes": 9888,
+    "directory_bytes": 568,
+    "entity_count": 23,
+    "static_triangles": 192,
+    "collider_count": 17,
+    "regions": [
+      {
+        "id": 1,
+        "source_id": "east",
+        "chunk_bytes": 4636,
+        "triangle_count": 96,
+        "collider_count": 8
+      },
+      {
+        "id": 2,
+        "source_id": "west",
+        "chunk_bytes": 4672,
+        "triangle_count": 96,
+        "collider_count": 9
+      }
+    ]
+  },
+  "route": [
+    2,
+    1,
+    2,
+    1
+  ],
+  "checkpoint_count": 10,
+  "final_tick": 1082,
+  "final_door_open": 1,
+  "loot_value": 25,
+  "collected_objects": 4,
+  "guard_persisted": true,
+  "final_stream": {
+    "current": 1,
+    "resident": [
+      2,
+      1
+    ],
+    "reserved": 9308,
+    "allocated": 9344,
+    "completed_loads": 4,
+    "retired": 2,
+    "readbytes": 18616,
+    "stalls": 329,
+    "resident_count": 2
+  },
+  "peak_reserved_chunk_bytes": 9308,
+  "allocated_slot_bytes": 9344,
+  "music": {
+    "cue": "lanterns_below",
+    "consumed_frames": 580032,
+    "generated_blocks": 460,
+    "max_underruns": 0,
+    "sample_count": 19
+  },
+  "audio_callbacks": 465,
+  "sampled_heap_peak_bytes": 1007928,
+  "timing_scope": "Ordinary input route without framebuffer export; emulator continuity only",
+  "capture_diagnostic": {
+    "tested_at_utc": "2026-10-13T02:24:58Z",
+    "rom_sha256": "b8446ae4c23a524ce1afdd690ab4df4cb6010a527e37a0aa5eb4db4da1f0b2c3",
+    "build_signature": "273a1647a86c80aac6d153e9d5ada5c7402699314105fb88626979dcf17631d6",
+    "source_sha256": "61402afbea1c7496dde9037e8eab1e49acc198861836c985a421bfb51327b337",
+    "build_metadata": ".dev/ares/runs/27048691ee9149049331c82ec6650bdc/verification-build.json",
+    "build_metadata_sha256": "46cc38e513961f9aef81840d0f67e0f94b3b33dc80ee65b29f367777104f4e05",
+    "tested_rom": ".dev/ares/runs/27048691ee9149049331c82ec6650bdc/DarkLantern64-bundle-level_bundle-menu-stream-test-capture-t3d.z64",
+    "log": ".dev/ares/runs/27048691ee9149049331c82ec6650bdc/streaming-probe.log",
+    "log_sha256": "7b3ef4e51932c98deb4caee03a0239c1f88607dc931cb9a0a0612fd037f787ad",
+    "functional_passed": true,
+    "audio_continuity_passed": false,
+    "music": {
+      "cue": "lanterns_below",
+      "consumed_frames": 580032,
+      "generated_blocks": 460,
+      "max_underruns": 2,
+      "sample_count": 19
+    },
+    "audio_callbacks": 475,
+    "timing_scope": "Framebuffer-export diagnostic; excludes normal frame/audio acceptance",
+    "captures": [
+      {
+        "id": 1,
+        "image": "docs/images/streaming-probe-west.png",
+        "sha256": "7ce6bf2461a18aafbefa1c12862c184f4a786a2d2e5f48e2ba98e7803b88d2f4"
+      },
+      {
+        "id": 2,
+        "image": "docs/images/streaming-probe-east.png",
+        "sha256": "f488ec5309f24bb1dd63f00b494f14c24206c6b2a2e7f51bba795bea9369656b"
+      }
+    ]
+  },
+  "bundle_lifecycle": {
+    "passed": true,
+    "report_sha256": "37e2b31237759525448876b562db5f798408974ae65e568ace09279bf087ca8d",
+    "checks": [
+      "Ordinary menu renders without starting a level; 4 MiB boot gate works",
+      "Every bundled default/test start launches and restarts three times",
+      "Position, view, stance, door and clean mission state match authored starts",
+      "Repeated textured/untextured launches and restarts each reach an exactly stable per-start heap",
+      "Menu resume preserves paused simulation time",
+      "Both bundle and standalone ROMs bypass the menu into a named start"
+    ],
+    "stream_heap_samples_bytes": {
+      "streaming-probe/default": [
+        955008,
+        955008,
+        955008,
+        955008,
+        955008,
+        955008
+      ],
+      "streaming-probe/west": [
+        955008,
+        955008,
+        955008,
+        955008,
+        955008,
+        955008
+      ],
+      "streaming-probe/east": [
+        977096,
+        977096,
+        977096,
+        977096,
+        977096,
+        977096
+      ]
+    },
+    "runs": [
+      {
+        "name": "bundle-idle",
+        "passed": true,
+        "rom_sha256": "1f12c7fd2de4ed1f6a5b8f9a4f7b130ec5eb800aa07bb2ae4be676926e3a8e9d",
+        "tested_rom": ".dev/ares/runs/c3f7e197618e4049acb2b58be5cce3d8/DarkLantern64-bundle-level_bundle-menu-t3d.z64",
+        "log": ".dev/ares/runs/c3f7e197618e4049acb2b58be5cce3d8/bundle-idle.log",
+        "log_sha256": "81cb7342b439cfd629540476c9123fda005473a4676e4b966cde046ef3626f17",
+        "terminal_event": "DL64 profile_end window=1"
+      },
+      {
+        "name": "bundle-4mb",
+        "passed": true,
+        "rom_sha256": "1f12c7fd2de4ed1f6a5b8f9a4f7b130ec5eb800aa07bb2ae4be676926e3a8e9d",
+        "tested_rom": ".dev/ares/runs/2330cc85884848068d16872b7b13e463/DarkLantern64-bundle-level_bundle-menu-t3d.z64",
+        "log": ".dev/ares/runs/2330cc85884848068d16872b7b13e463/bundle-4mb.log",
+        "log_sha256": "6a003df14d099a8523ace15ca3db477a9b6ee35b159495a739d750e6557c0eab",
+        "terminal_event": "DL64 boot_failed reason=expansion_pak memory=4194304 required=8388608"
+      },
+      {
+        "name": "bundle-switching",
+        "passed": true,
+        "rom_sha256": "7081c334a8d470d9eba54e7614feca74e96b33114076c01dcda997b07d45bdc6",
+        "tested_rom": ".dev/ares/runs/d9d5cbc9c5784f86987a0657725d0380/DarkLantern64-bundle-level_bundle-menu-menu-test-t3d.z64",
+        "log": ".dev/ares/runs/d9d5cbc9c5784f86987a0657725d0380/bundle-switching.log",
+        "log_sha256": "8d972bdea8e8ca28ae5a97088ec011467b0eaf4a52cf649727a613aeeb482abb",
+        "terminal_event": "DL64 menu_test_complete transitions=126 variants=21 cycles=3"
+      },
+      {
+        "name": "bundle-direct",
+        "passed": true,
+        "rom_sha256": "ce868212f4d61f9b6cb11fd194a8a4a5e0e8703dba7372506a3870a62db189df",
+        "tested_rom": ".dev/ares/runs/e152509849ed49419ee657b33efbda24/DarkLantern64-bundle-level_bundle-start-enemy-workshop-preset-store-door-open-t3d.z64",
+        "log": ".dev/ares/runs/e152509849ed49419ee657b33efbda24/bundle-direct.log",
+        "log_sha256": "43c8d390a1dc59fff6d04171a5161e5fb00af184f7361587ae20d696dee2fbfe",
+        "terminal_event": "DL64 frame n=0 t=0.02 ms=16.67 cpu_ms=0.00 heap=1290920/7283104 triangles=0 player=2.50,0.00,0.00 yaw=1.571 pitch=0.000 grounded=1 guard=3.01,0.00,-4.00 light=0.184 alert=0.000 state=PATROL door=1 complete=0 caught=0"
+      },
+      {
+        "name": "single-direct-preset",
+        "passed": true,
+        "rom_sha256": "1ce3d38b14d58227ffd922543333286cc495149666a360e3cafcc8b4bd7a2cf1",
+        "tested_rom": ".dev/ares/runs/4cb1955bfa664b6c85d087d0492b3914/DarkLantern64-enemy_patrols-preset-scout-observation-t3d.z64",
+        "log": ".dev/ares/runs/4cb1955bfa664b6c85d087d0492b3914/single-direct-preset.log",
+        "log_sha256": "23e45ca340df65b62aa7b472035f5a9805afe372e21e305c42ec69f622f45349",
+        "terminal_event": "DL64 frame n=0 t=0.02 ms=16.67 cpu_ms=0.00 heap=1290368/7509664 triangles=0 player=-6.00,0.00,2.70 yaw=3.142 pitch=-0.070 grounded=1 guard=3.01,0.00,-4.00 light=0.080 alert=0.000 state=PATROL door=0 complete=0 caught=0"
+      }
+    ],
+    "menu_rom_sha256": "1f12c7fd2de4ed1f6a5b8f9a4f7b130ec5eb800aa07bb2ae4be676926e3a8e9d",
+    "source_sha256": "61402afbea1c7496dde9037e8eab1e49acc198861836c985a421bfb51327b337"
+  },
+  "limitations": [
+    "Original N64 and M64 validation remains pending.",
+    "Sampled heap is not a whole-game high-water ledger.",
+    "Ordinary audio continuity excludes framebuffer export; the separate capture diagnostic recorded two music underruns.",
+    "This original two-room scene does not establish full Bafford playability, spatial visibility, navigation, texture streaming or local lighting/acoustics."
+  ]
+}

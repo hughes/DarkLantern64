@@ -7,6 +7,12 @@ the package, ownership and subsystem boundaries, with the initial branch scope
 and subsequent delivery gates. The experimental binary contract is documented
 in [mission package v1](mission-package-format.md).
 
+The [streaming editor contract](streaming-editor.md) makes region authoring,
+validation, transactional saves and matching Native Play behavior delivery
+requirements. The [playable two-room probe](streaming-probe.md) is selectable
+from the ROM menu; its editor integration is experimental until those gates
+are complete.
+
 The conversion proves that the complete architecture, textures, placements and
 source topology can be brought into an editable `.blend` and our editor. It does
 not yet prove that the complete mission can run within N64 memory, maintain a
@@ -299,7 +305,8 @@ Add transparent water only with an explicit sorting/fill-rate policy.
 | --- | --- | --- |
 | 1. Measure and partition | Audit complete routes; cook region membership, dependencies and worst sightlines; establish whole-game RAM and ROM ledgers. | Every retained surface/entity has stable identity and region coverage. Reports show peak overlap, byte categories, omitted behavior and ROM size. Keep the full study protected from direct Play. |
 | 2. Stream two connected regions | Implement versioned chunk loading, bounded pools, prefetch and fenced retirement; retain global object/actor state. | Repeatedly cross both ways with audio running. No geometry/collision holes, stale pointers, duplicated loot or growing heap. Peak memory stays within an agreed 8 MiB budget including reserve and transition scratch. |
-| 3. Establish movement and visibility | Add richer world collision, spatial queries, navigation and conservative portal visibility; rebuild derived metadata after Blender edits. | Walk/crouch through representative slopes, stairs, arches, vertical links and seams. Hidden-room tests reduce submitted work without missing visible surfaces; edited openings rebuild correctly. |
+| Editor gate before content development | Make regions, stable home assignments, bounds and doorway annotations editable with undo and atomic scene/manifest saves. Inspect dependencies, invalidation and complete memory categories. Use the same package/loader in Native Play and ROM. | Create and assign objects, move boundaries, edit openings, duplicate/recover missions and diagnose invalid seams entirely through the editor. Matching input traces preserve gameplay state during delayed loads in Native Play and ROM. Full-scene authoring preview alone does not pass this gate. |
+| 3. Establish movement and visibility | Add richer world collision, spatial queries, navigation and conservative portal visibility; rebuild derived metadata after editor or Blender edits. | Walk/crouch through representative slopes, stairs, arches, vertical links and seams. Hidden-room tests reduce submitted work without missing visible surfaces; edited openings rebuild correctly. |
 | 4. Establish stealth behavior | Stream baked lighting; add local probes/light lists, door invalidation, surface sound and persistent guard scheduling. | Deterministic route tests preserve guard awareness, sound responses and loot/objective state across unload/reload. Door changes update local sight/light/nav data within the agreed budget. |
 | 5. Make all intended routes playable | Implement or replace water, ladders and trapdoors; author patrols and the adapted mission objective flow. | Start-to-scepter-to-completion traversal works without debug teleports. Audit alternate retained routes and record intentional differences from Thief. |
 | 6. Accept the whole mission | Test the complete packaged ROM, repeated traversals, busy views and transitions on emulator and original N64/M64. | Record ROM/source hashes, device/firmware, RAM high-water marks, load stalls, frame-time distributions and audio underruns. No unbounded residency, invalid accesses or persistent-state loss. |

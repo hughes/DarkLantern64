@@ -1,7 +1,7 @@
     std::map<std::string,bool> panels_={{"Objects",true},{"Inspector",true},{"Levels",false},
         {"Blockout & Groups",false},{"Assets",false},{"Environment",false},{"Animation",false},
         {"Play Inspector",false},{"Build & Diagnostics",false},{"Audio Memory",false},{"Controls",false},
-        {"Renderer resources",false}};
+        {"Renderer resources",false},{"Streaming",false}};
     std::vector<std::function<void()>> uiActions_;
     std::string savedPanels_,focusPanel_;
     char objectFilter_[96]{};
@@ -27,6 +27,45 @@
         engine_.SetEditorResourcePanelsVisible(false);engine_.ResetEditorLayout();
     }
     void Defer(std::function<void()> action){uiActions_.push_back(std::move(action));}
+    const Json* StreamingInfo() const {
+        if(report_.is_object()&&report_.contains("streaming")&&report_.at("streaming").is_object())return &report_.at("streaming");
+        const auto* entry=LevelEntry(source_.filename().string());
+        if(entry&&entry->contains("streaming")&&entry->at("streaming").is_object())return &entry->at("streaming");
+        return nullptr;
+    }
+    void DrawStreaming() {
+        if(BeginPanel("Streaming")) {
+            if(const auto* info=StreamingInfo()) {
+                ImGui::TextWrapped("Experimental stream mission");
+                ImGui::TextWrapped("%s",info->value("preview_mode",std::string()).c_str());
+                ImGui::TextWrapped("%s",info->value("native_play_reason",std::string()).c_str());
+                ImGui::Separator();
+                ImGui::TextWrapped("Partition: %s",info->value("mission_manifest",std::string()).c_str());
+                const auto& validation=info->at("status");
+                if(validation.value("valid",false)) {
+                    ImGui::Text("Directory %u bytes | ROM %u bytes",validation.value("directory_bytes",0u),validation.value("package_bytes",0u));
+                    ImGui::Text("Neighbor chunk overlap: %u bytes",validation.value("peak_neighbor_overlap_chunk_bytes",0u));
+                    ImGui::TextWrapped("Renderer, stream banks/slots, gameplay, audio and display costs are additional.");
+                } else ImGui::TextWrapped("Region cook needs repair: %s",validation.value("error",std::string()).c_str());
+                if(info->at("regions").is_array())for(const auto& region:info->at("regions")) {
+                    if(!region.is_object())continue;
+                    const auto id=region.value("id",std::string("Invalid region"));
+                    if(ImGui::TreeNode(id.c_str())) {
+                        ImGui::TextWrapped("Bounds and authored home IDs: %s",region.dump(2).c_str());
+                        ImGui::TreePop();
+                    }
+                }
+                if(!selected_.empty()) {
+                    std::string home;
+                    if(info->at("regions").is_array())for(const auto& region:info->at("regions"))
+                        if(region.is_object()&&region.contains("entities")&&region.at("entities").is_array())
+                            for(const auto& entity:region.at("entities"))if(entity==selected_)home=region.value("id",std::string());
+                    ImGui::TextWrapped("Selected %s | home: %s",selected_.c_str(),home.empty()?"UNASSIGNED - assign before ROM cook":home.c_str());
+                }
+            } else ImGui::TextWrapped("This scene uses the resident level format. Streaming partition controls are experimental.");
+        }
+        ImGui::End();
+    }
     void DrawWorkspaceMenu() {
         const bool playing=engine_.IsPlaying(),locked=playing||Busy()||!pendingAction_.empty();
         if(ImGui::BeginMenu("File")) {
@@ -65,7 +104,7 @@
             for(const char* name:{"Objects","Inspector","Levels","Blockout & Groups","Assets","Environment","Animation"})
                 if(ImGui::MenuItem(name,nullptr,panels_.at(name),!playing))ShowPanel(name,!panels_.at(name));
             if(ImGui::BeginMenu("Diagnostics")) {
-                for(const char* name:{"Play Inspector","Build & Diagnostics","Audio Memory","Renderer resources"})
+                for(const char* name:{"Play Inspector","Build & Diagnostics","Audio Memory","Renderer resources","Streaming"})
                     if(ImGui::MenuItem(name,nullptr,panels_.at(name),!playing||std::string(name)!="Renderer resources"))ShowPanel(name,!panels_.at(name));
                 ImGui::EndMenu();
             }
@@ -98,9 +137,13 @@
         }
         ImGui::Separator();
         if(!playing) {
-            ImGui::BeginDisabled(locked);
+            ImGui::BeginDisabled(locked||StreamingInfo()!=nullptr);
             if(ImGui::SmallButton("Play")){nativeStart_=testStart_;nativeRequested_=true;}
             ImGui::EndDisabled();
+            if(StreamingInfo()) {
+                if(ImGui::SmallButton("Stream regions"))ShowPanel("Streaming");
+                if(ImGui::IsItemHovered())ImGui::SetTooltip("Native Play is unavailable for stream missions. Run level in Ares uses the ROM streaming pipeline.");
+            }
         } else {
             if(ImGui::SmallButton(engine_.IsPlayPaused()?"Resume":"Pause"))Defer([this]{engine_.SetPlayPaused(!engine_.IsPlayPaused());});
             ImGui::BeginDisabled(!engine_.IsPlayPaused());
@@ -117,6 +160,7 @@
         }
     }
     void FinishWorkspace() {
+        if(panels_.at("Streaming"))DrawStreaming();
         if(!engine_.IsPlaying()) {
             if(selected_.empty())selection_.clear();
             else if(!selection_.contains(selected_)){selection_.clear();selection_.insert(selected_);}

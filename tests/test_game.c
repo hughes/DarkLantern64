@@ -620,6 +620,113 @@ static bool ray_query_reference_parity(void) {
     CHECK(!dl_line_of_sight(&g,(DlVec3){NAN,0,0},(DlVec3){2,0,0}));
     return true;
 }
+static bool inactive_guards_retain_state_and_resume(void) {
+    Fixture f; fixture_init(&f); f.level.enemy_count=2;
+    f.enemies[1]=f.enemies[0];f.enemies[1].id="second";f.enemies[1].spawn.x=10;
+    DlGame g;dl_game_init(&g,&f.level);
+    CHECK(g.active_enemy_mask==3);
+    g.enemies[0].state=DL_SEARCH;g.enemies[0].awareness=.6f;g.enemies[0].search_timer=9;
+    g.enemies[0].patrol_index=2;g.enemies[0].investigate_target=(DlVec3){8,0,5};
+    g.enemies[0].animation_distance=5.3f;g.enemies[0].animation_speed=.4f;
+    g.enemies[0].heard_sound=true;g.enemies[0].sees_player=true;
+    g.enemies[1].state=DL_SEARCH;g.enemies[1].search_timer=9;
+    DlEnemy sleeping=g.enemies[0];
+    dl_game_set_active_enemies(&g,UINT16_C(2));
+    advance(&g,(DlInput){0},1);
+    CHECK(memcmp(&sleeping,&g.enemies[0],sizeof sleeping)==0);
+    CHECK(g.enemies[1].search_timer<8.01f&&g.enemies[1].yaw!=f.enemies[1].yaw);
+    for(unsigned i=0;i<g.event_count;++i)CHECK(g.events[i].kind!=DL_EVENT_GUARD_CONTACT);
+    DlEnemy other=g.enemies[1];dl_game_set_active_enemies(&g,UINT16_C(1));
+    dl_game_update(&g,&(DlInput){0},DT);
+    CHECK(g.enemies[0].state==DL_SEARCH&&g.enemies[0].search_timer<sleeping.search_timer);
+    CHECK(g.enemies[0].awareness<sleeping.awareness&&g.enemies[0].patrol_index==2);
+    CHECK(memcmp(&other,&g.enemies[1],sizeof other)==0);
+    dl_game_set_active_enemies(&g,UINT16_MAX);CHECK(g.active_enemy_mask==3);
+    dl_game_set_active_enemies(NULL,UINT16_MAX);
+    dl_game_init(&g,NULL);dl_game_set_active_enemies(&g,UINT16_MAX);CHECK(g.active_enemy_mask==0);
+    return true;
+}
+static bool sound_wakes_inactive_guard_without_local_queries(void) {
+    Fixture f;fixture_init(&f);f.enemies[0].spawn=(DlVec3){0,0,3};
+    f.enemies[0].hearing_range=8;f.enemies[0].speed=1;
+    box(&f,(DlVec3){0,1.5f,1.5f},(DlVec3){1,1.5f,.1f},0,false);
+    DlGame g;dl_game_init(&g,&f.level);dl_game_set_active_enemies(&g,0);
+    g.enemies[0].awareness=.45f;g.enemies[0].patrol_index=7;
+    DlVec3 position=g.enemies[0].position,source=dl_player_eye(&g);
+    CHECK(!dl_line_of_sight(&g,source,(DlVec3){0,1.5f,3}));
+    dl_game_update(&g,&(DlInput){.noise=true},DT);
+    CHECK(g.enemies[0].heard_sound&&g.enemies[0].state==DL_INVESTIGATE);
+    CHECK(NEAR(g.enemies[0].investigate_target.y,source.y)); /* no support-floor rewrite */
+    CHECK(NEAR(g.enemies[0].investigate_target.x,source.x)&&NEAR(g.enemies[0].investigate_target.z,source.z));
+    CHECK(NEAR(g.enemies[0].position.z,position.z)&&g.enemies[0].awareness==.45f);
+    CHECK(g.enemies[0].patrol_index==7&&g.enemies[0].search_timer==6);
+    DlEnemy woke=g.enemies[0];advance(&g,(DlInput){0},1);
+    CHECK(memcmp(&woke,&g.enemies[0],sizeof woke)==0);
+    dl_game_set_active_enemies(&g,1);dl_game_update(&g,&(DlInput){0},DT);
+    CHECK(g.enemies[0].search_timer<6&&g.enemies[0].position.z<position.z);
+    return true;
+}
+static bool inactive_guard_does_not_block_loaded_door(void) {
+    Fixture f;fixture_init(&f);f.enemies[0].spawn=(DlVec3){0,0,1};
+    f.level.control=(DlVec3){0,1,.3f};
+    box(&f,(DlVec3){0,1.5f,1},(DlVec3){1,1.5f,.1f},0,true);
+    DlGame g;dl_game_init(&g,&f.level);dl_game_set_active_enemies(&g,0);
+    dl_game_update(&g,&(DlInput){.use=true},DT);CHECK(g.door_open);
+    dl_game_update(&g,&(DlInput){.use=true},DT);CHECK(!g.door_open);
+    dl_game_update(&g,&(DlInput){.use=true},DT);CHECK(g.door_open);
+    dl_game_set_active_enemies(&g,1);
+    dl_game_update(&g,&(DlInput){.use=true},DT);CHECK(g.door_open);
+    return true;
+}
+static bool direct_door_interaction_and_occupancy(void) {
+    Fixture f;fixture_init(&f);f.level.spawn=(DlVec3){-1.1f,0,0};
+    box(&f,(DlVec3){0,1.1f,0},(DlVec3){.08f,1.1f,.5f},0,true);
+    int16_t links[]={-1,0};f.level.collider_objects=links;
+    DlObjectDef door={.id="direct",.kind=DL_OBJECT_DOOR,.position={0,1.1f,0},.radius=1.5f};
+    f.level.objects=&door;f.level.object_count=1;
+    DlGame g;dl_game_init(&g,&f.level);
+    CHECK(!dl_line_of_sight(&g,dl_player_eye(&g),door.position));
+    dl_game_update(&g,&(DlInput){.use=true},DT);
+    CHECK(g.door_open&&g.open_objects==1&&g.object_revision==1&&g.event==DL_EVENT_DOOR);
+    CHECK(dl_position_clear(&g,(DlVec3){0,0,0},.18f,1.65f));
+    dl_game_update(&g,&(DlInput){.use=true},DT);
+    CHECK(!g.door_open&&!g.open_objects&&g.object_revision==2&&g.sound_serial==2);
+    dl_game_update(&g,&(DlInput){.use=true},DT);CHECK(g.door_open);
+    g.player=(DlVec3){0,0,0};
+    uint32_t revision=g.object_revision,serial=g.sound_serial;
+    dl_game_update(&g,&(DlInput){.use=true,.crouch=true},DT);
+    CHECK(g.door_open&&g.object_revision==revision&&g.sound_serial==serial);
+    g.player=(DlVec3){-1.1f,0,0};g.enemies[0].position=(DlVec3){0,0,0};
+    dl_game_update(&g,&(DlInput){.use=true},DT);
+    CHECK(g.door_open&&g.object_revision==revision);
+    g.enemies[0].position=(DlVec3){0,2.3f,0}; /* above the closing volume */
+    dl_game_update(&g,&(DlInput){.use=true},DT);
+    CHECK(!g.door_open&&g.object_revision==revision+1);
+    return true;
+}
+static bool direct_door_keeps_other_obstructions_and_independent_state(void) {
+    Fixture f;fixture_init(&f);f.level.enemy_count=0;f.level.spawn=(DlVec3){-1.1f,0,0};
+    box(&f,(DlVec3){0,1.1f,0},(DlVec3){.08f,1.1f,.5f},0,true);
+    box(&f,(DlVec3){-.6f,1.1f,0},(DlVec3){.05f,1.1f,.5f},0,true);
+    int16_t links[]={-1,0,1};f.level.collider_objects=links;
+    DlObjectDef doors[]={
+        {.id="direct",.kind=DL_OBJECT_DOOR,.position={0,1.1f,0},.radius=1.5f},
+        {.id="blocking",.kind=DL_OBJECT_DOOR,.position={-.6f,1.1f,0},.radius=0}
+    };
+    f.level.objects=doors;f.level.object_count=2;
+    DlGame g;dl_game_init(&g,&f.level);
+    dl_game_update(&g,&(DlInput){.use=true},DT);
+    CHECK(!dl_game_object_open(&g,0)&&!dl_game_object_open(&g,1)&&!g.object_revision);
+    g.open_objects=2; /* the other independently opened door no longer obstructs */
+    dl_game_update(&g,&(DlInput){.use=true},DT);
+    CHECK(dl_game_object_open(&g,0)&&dl_game_object_open(&g,1)&&g.open_objects==3);
+    dl_game_update(&g,&(DlInput){.use=true},DT);
+    CHECK(!dl_game_object_open(&g,0)&&dl_game_object_open(&g,1)&&g.open_objects==2);
+    f.boxes[2].door=false; /* a solid wall must still obstruct the direct action */
+    dl_game_update(&g,&(DlInput){.use=true},DT);
+    CHECK(!dl_game_object_open(&g,0)&&g.object_revision==2);
+    return true;
+}
 int main(void) {
     struct { const char *name; bool (*run)(void); } cases[]={
         {"rotated wall collision and sliding",rotated_wall_sliding},{"stairs and falling",stairs_and_falling},
@@ -645,7 +752,12 @@ int main(void) {
         {"camera matches right-handed editor and asymmetric loot placement",camera_matches_right_handed_editor},
         {"player strafe and turning follow screen right",player_controls_follow_screen_right},
         {"animation follows actual travel and stops at blocked routes",animation_tracks_real_horizontal_travel},
-        {"ray queries preserve reference crossings, grazing endpoints and rotated boxes",ray_query_reference_parity}
+        {"ray queries preserve reference crossings, grazing endpoints and rotated boxes",ray_query_reference_parity},
+        {"inactive guards retain state and resume detailed work",inactive_guards_retain_state_and_resume},
+        {"sound wakes an inactive guard without local collision queries",sound_wakes_inactive_guard_without_local_queries},
+        {"inactive guard does not block a loaded door",inactive_guard_does_not_block_loaded_door},
+        {"direct door use preserves state, events and body occupancy",direct_door_interaction_and_occupancy},
+        {"direct door use retains other obstructions and independent doors",direct_door_keeps_other_obstructions_and_independent_state}
     };
     int failures=0;
     for(unsigned i=0;i<sizeof(cases)/sizeof(cases[0]);++i) {

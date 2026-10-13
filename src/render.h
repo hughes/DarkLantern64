@@ -17,6 +17,9 @@ typedef struct {
     int heap_used;
     int heap_total;
     uint32_t frames;
+    bool streaming, stream_loading;
+    uint32_t stream_current, stream_regions, stream_loads, stream_retired;
+    uint32_t stream_reserved_bytes, stream_allocated_bytes;
 } DlRenderStats;
 
 void dl_render_init(void);
@@ -24,6 +27,10 @@ void dl_render_prepare_scene(const DlGame *game);
 /* Call between frames before replacing a level. Frame/depth buffers persist;
  * level textures and lighting caches are released after queued graphics finish. */
 void dl_render_release_scene(void);
+/* Stream submissions use independent RSP syncpoints and the actual RDP detach
+ * completion callback. Monotonic serials survive scene switches. */
+void dl_render_stream_completed(uint64_t *rsp, uint64_t *rdp);
+uint64_t dl_render_stream_submitted(void);
 float dl_render_menu(const DlBundle *bundle, const DlLauncher *launcher, const DlRenderStats *stats);
 int dl_render_triangle_count(void);
 int dl_render_texture_upload_count(void);
@@ -36,7 +43,7 @@ int dl_render_transformed_vertex_count(void);
  * CPU pose/skinning costs; these are emulator CPU ticks, not RSP/RDP timings.
  * Window totals cover all visible models; maxima are per individual pose. */
 void dl_render_report_animation(void);
-#if defined(DL_CAPTURE) || defined(DL_MENU_TEST)
+#if defined(DL_CAPTURE) || defined(DL_MENU_TEST) || defined(DL_STREAM_TEST)
 void dl_render_request_capture(int id);
 #endif
 #ifdef DL_CAPTURE

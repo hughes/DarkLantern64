@@ -3,7 +3,68 @@
   "source": "streaming_probe.json",
   "entry_region": "west",
   "regions": [
-    {"id": "west", "bounds": [[-4, -0.5, -2], [0.1, 3, 2]], "entities": ["west-floor", "probe-door", "probe-spawn", "probe-light"], "neighbors": ["east"]},
-    {"id": "east", "bounds": [[0, -0.5, -2], [4, 3, 2]], "entities": ["east-floor", "probe-guard", "probe-loot"], "neighbors": ["west"]}
+    {
+      "id": "west",
+      "bounds": [
+        [
+          -8,
+          -0.5,
+          -4
+        ],
+        [
+          0.11,
+          4,
+          4
+        ]
+      ],
+      "entities": [
+        "west-floor",
+        "west-ceiling",
+        "west-outer-wall",
+        "west-north-wall",
+        "west-south-wall",
+        "shared-wall-north",
+        "shared-wall-south",
+        "shared-wall-lintel",
+        "probe-door",
+        "probe-spawn",
+        "probe-exit",
+        "probe-light-west"
+      ],
+      "neighbors": [
+        "east"
+      ]
+    },
+    {
+      "id": "east",
+      "bounds": [
+        [
+          0,
+          -0.5,
+          -4
+        ],
+        [
+          8,
+          4,
+          4
+        ]
+      ],
+      "entities": [
+        "east-floor",
+        "east-ceiling",
+        "east-outer-wall",
+        "east-north-wall",
+        "east-south-wall",
+        "probe-guard",
+        "probe-loot",
+        "probe-light-east",
+        "east-boundary-north",
+        "east-boundary-south",
+        "east-boundary-lintel"
+      ],
+      "neighbors": [
+        "west"
+      ]
+    }
   ]
 }

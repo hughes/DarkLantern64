@@ -56,9 +56,15 @@ def scene_paths(level=None):
 def build_rom(sdk, autoplay=False, debug_overlay=False, level=None, capture=False,
               scale_bench=False, disable_model_cull=False, *, bundle=None,
               start_level=None, start_preset=None, menu_test=False, renderer="t3d",
-              lighting_bake_verify=False, disable_lighting_bake=False, input_replay=None):
+              lighting_bake_verify=False, disable_lighting_bake=False, input_replay=None, stream_test=False,
+              stream_test_capture=False):
     start = time.perf_counter()
     replay = None
+    if stream_test_capture and not stream_test:
+        raise ValueError("--stream-test-capture requires --stream-test")
+    if stream_test and (bundle is None or level is not None or start_level is not None or start_preset is not None or
+                        autoplay or capture or scale_bench or menu_test or input_replay is not None):
+        raise ValueError("--stream-test requires a bundle starting in its menu and runs separately from other diagnostics")
     if input_replay is not None:
         if bundle is not None or autoplay or capture or scale_bench or menu_test:
             raise ValueError("Recorded input replay requires an isolated single-level build")
@@ -110,6 +116,10 @@ def build_rom(sdk, autoplay=False, debug_overlay=False, level=None, capture=Fals
         name += "-unculled"
     if menu_test:
         name += "-menu-test"
+    if stream_test:
+        name += "-stream-test"
+    if stream_test_capture:
+        name += "-capture"
     if lighting_bake_verify:
         name += "-verify-lighting"
     if disable_lighting_bake:
@@ -168,6 +178,10 @@ def build_rom(sdk, autoplay=False, debug_overlay=False, level=None, capture=Fals
         common += ["-DDL_DISABLE_MODEL_CULL=1"]
     if menu_test:
         common += ["-DDL_MENU_TEST=1"]
+    if stream_test:
+        common += ["-DDL_STREAM_TEST=1"]
+    if stream_test_capture:
+        common += ["-DDL_STREAM_TEST_CAPTURE=1"]
     if lighting_bake_verify:
         common += ["-DDL_VERIFY_LIGHTING_BAKE=1"]
     if disable_lighting_bake:
@@ -202,7 +216,8 @@ def build_rom(sdk, autoplay=False, debug_overlay=False, level=None, capture=Fals
         extra_headers.append(capture_header)
     sources = [ROOT / "src" / f for f in ("game.c", "tick.c", "main.c", "dl_profile.c", "dl_music.c", "launch.c", "animation.c",
                                          "render_lighting.c", "render_batches.c", "render_transform.c", "render_texture_packing.c",
-                                         "static_lighting.c", "lighting_bake.c", "mission.c", "world_stream.c")]
+                                         "static_lighting.c", "lighting_bake.c", "mission.c", "world_stream.c",
+                                         "stream_scene.c", "stream_rom.c")]
     sources += generated_sources
     if scale_bench:
         sources.append(ROOT / "src/scale_bench.c")
@@ -213,8 +228,12 @@ def build_rom(sdk, autoplay=False, debug_overlay=False, level=None, capture=Fals
     headers += [bundle_output / "generated/bundle.h"]
     for entry in catalog["levels"]:
         entry_output = Path(entry["cooked_dir"])
-        headers += [Path(entry["source"]), entry_output / "generated/demo_level.h",
-                    entry_output / "generated/texture_runtime_report.json"]
+        headers += [Path(entry["source"]), entry_output / "generated/demo_level.h"]
+        if entry["content"].get("experimental_stream"):
+            headers += [Path(entry["mission_manifest"]), entry_output / "generated/mission_report.json",
+                        ROOT / "tools/compile_mission.py"]
+        else:
+            headers += [entry_output / "generated/texture_runtime_report.json"]
     headers += [bundle_output / asset["path"] for asset in catalog["rom_assets"]]
     headers += [Path(path) for path in catalog["music"]["inputs"]]
     if bundle is not None:
@@ -289,7 +308,8 @@ def build_rom(sdk, autoplay=False, debug_overlay=False, level=None, capture=Fals
               "lighting_bake_verify": lighting_bake_verify, "disable_lighting_bake": disable_lighting_bake,
               "level": str(level.relative_to(ROOT)) if level is not None else None,
               "bundle": str(bundle.relative_to(ROOT)) if bundle is not None else None,
-              "start_level": start_level, "start_preset": start_preset, "menu_test": menu_test,
+              "start_level": start_level, "start_preset": start_preset, "menu_test": menu_test, "stream_test": stream_test,
+              "stream_test_capture": stream_test_capture,
               "level_catalog": catalog, "textures": texture_report, "lighting": catalog["lighting"], "size_output": size}
     manifest.write_text(json.dumps(report, indent=2) + "\n")
     print(json.dumps({"manifest": str(manifest.relative_to(ROOT)), "rom": report["rom"],
@@ -378,6 +398,7 @@ def run_portable_tests():
         "test_static_lighting": ["src/static_lighting.c", "src/game.c"],
         "test_mission": ["src/mission.c"],
         "test_world_stream": ["src/mission.c", "src/world_stream.c"],
+        "test_stream_scene": ["src/mission.c", "src/world_stream.c", "src/stream_scene.c", "src/game.c"],
     }
     for name, sources in render_checks.items():
         render_output = BUILD / (name + ".exe")
@@ -435,6 +456,8 @@ def main():
     parser.add_argument("--start-level", help="Bundle level ID to launch directly")
     parser.add_argument("--start-preset", help="Authored test start ID (or default for the normal spawn)")
     parser.add_argument("--menu-test", action="store_true", help="Diagnostic scripted menu and level-switch exercise")
+    parser.add_argument("--stream-test", action="store_true", help="Diagnostic input-driven traversal of Streaming Rooms from the menu")
+    parser.add_argument("--stream-test-capture", action="store_true", help="Export two diagnostic framebuffers during --stream-test; excludes audio/timing acceptance")
     parser.add_argument("--capture", action="store_true", help="Diagnostic framebuffer export at authored views")
     parser.add_argument("--scale-bench", action="store_true", help="Diagnostic CPU workload sweeps, without rendering")
     parser.add_argument("--disable-model-cull", action="store_true", help="Disable early bounds rejection for controlled A/B measurements")
@@ -455,7 +478,8 @@ def main():
                             args.scale_bench, args.disable_model_cull, bundle=args.bundle,
                             start_level=args.start_level, start_preset=args.start_preset, menu_test=args.menu_test,
                             renderer=args.renderer, lighting_bake_verify=args.verify_lighting_bake,
-                            disable_lighting_bake=args.disable_lighting_bake,input_replay=args.input_replay)
+                            disable_lighting_bake=args.disable_lighting_bake,input_replay=args.input_replay,stream_test=args.stream_test,
+                            stream_test_capture=args.stream_test_capture)
             if args.run:
                 ares = os.environ.get("ARES_EXE", str(Path(os.environ.get("LOCALAPPDATA", "")) / "ares/ares.exe"))
                 if not Path(ares).is_file():

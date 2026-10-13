@@ -35,10 +35,16 @@
         Json result=native_?native_->State():Json::object();
         result["mode"]=engine_.IsPlaying()?(engine_.IsPlayPaused()?"paused":"playing"):"edit";
         result["systems"]=engine_.PlaySystemNames();result["error"]=nativeError_;
-        result["authoring_dirty"]=dirty_;return result;
+        result["authoring_dirty"]=dirty_;
+        result["native_play_supported"]=StreamingInfo()==nullptr&&
+            (!document_.contains("authoring_profile")||document_.at("authoring_profile")!="external-scale-study");
+        if(const auto* streaming=StreamingInfo())result["streaming"]=*streaming;
+        return result;
     }
     void StartNative(const std::string& preset="default",bool paused=false) {
         if(engine_.IsPlaying()||Busy()||!pendingAction_.empty())throw std::runtime_error("Stop play and finish pending editor work first");
+        if(const auto* streaming=StreamingInfo())
+            throw std::runtime_error(streaming->value("native_play_reason",std::string("Native Play for stream missions is unavailable; use Run level in Ares.")));
         if(document_.contains("authoring_profile")&&document_.at("authoring_profile")=="external-scale-study")
             throw std::runtime_error("This source study is available for editor and Blender inspection. Open its bounded runtime level for Native Play; the full mission needs streaming and runtime capacity work.");
         SyncPreviewTransforms();

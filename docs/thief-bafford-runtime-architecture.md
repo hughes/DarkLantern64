@@ -136,6 +136,17 @@ visual portals, and delayed events remain mission-owned.
 
 ## Authoring integration
 
+The level editor owns the production workflow. A Blender scene can prove the
+geometry import, but content authors must be able to create regions, assign
+stable entity homes, edit boundaries and doors, inspect derived spatial data,
+and play the same package from the editor. Source scene and region manifest
+form one document for save, undo and publication. Preparation must invalidate
+affected regions and seams and explain unresolved assignments at the object.
+Native Play must use the portable loader and persistent mission state, with
+delayed reads and unavailable collision handled as on ROM. See
+[streaming editor integration](streaming-editor.md) for the current bridge and
+the required authoring, diagnostics, transaction and preview acceptance gates.
+
 Export evaluated geometry plus an explicit provenance/topology sidecar. Source
 IDs seed the compiler; edited geometry is authoritative. Hash geometry,
 transforms, collision flags, materials, portals, lights and compiler settings.
@@ -167,9 +178,9 @@ legacy bundled C arrays remain part of the startup ledger until migrated.
 Region sizes and concurrency limits follow measurements, not total mission
 counts or an assumed free remainder of RDRAM.
 
-## Initial branch scope
+## Initial foundation (commit 5942349)
 
-The first implementation adds a manual-partition mission cooker, bounded
+The first implementation added a manual-partition mission cooker, bounded
 pointer-free directory/chunk readers, and a portable region lifetime manager.
 Host tests exercise malformed packages, IO stalls, bounded read work, failed
 publication, independent graphics fences, cancellation and slot reuse. A finite
@@ -177,7 +188,7 @@ lifecycle model checks the abstract ownership protocol; its evidence must state
 the boundary between host interpreter semantics and the separately tested C
 implementation.
 
-This foundation does not yet replace `DlLevel`, render streamed chunks on the
+That foundation did not replace `DlLevel`, render streamed chunks on the
 console, supply triangle sweeps/nav/PVS, or make Bafford playable. Those remain
 the next delivery gates above, rather than hidden omissions in an accepted
 mission format.
@@ -192,11 +203,11 @@ python tools/build.py --bundle content/level_bundle.json
 ```
 
 The portable checks compile the decoder/manager with the host C17 compiler and
-load the independently cooked probe with bounded file reads. The two-region
-fixture has seven entity IDs, 24 static triangles and three upright colliders.
-Its package is 1,728 bytes, directory 312 bytes, and total region payloads 1,404
-bytes. The single-slot repeated-load test allocates 720 payload bytes and
-crosses the region sequence both ways for four cycles. These figures exclude
+load the independently cooked probe with bounded file reads. The initial
+two-region fixture had seven entity IDs, 24 static triangles and three upright
+colliders. Its package was 1,728 bytes, directory 312 bytes, and region payloads 1,404
+bytes. The initial single-slot repeated-load test allocated 720 payload bytes
+and crossed the region sequence both ways for four cycles. These figures exclude
 slot metadata and every rendering, gameplay, audio and display allocation.
 They demonstrate the storage/ownership contract, not player traversal.
 
@@ -215,3 +226,59 @@ reference geometry. Comparing the unchanged files/functions at base commit
 does not change those scene/reference inputs. Sandbox temporary-file rename
 restrictions required placing test scratch in the workspace; MSYS's Windows
 shared-object requirements required an unsandboxed N64 build invocation.
+
+## Playable ROM bridge and editor integration
+
+The next increment adds **Streaming Rooms** to the ordinary game menu. The
+expanded original probe has twenty-three entity IDs, 192 static triangles and
+seventeen colliders. Its 9,888-byte mission package contains a 568-byte directory
+and 9,308 bytes of region payloads. Only three dynamic visuals and compact
+gameplay definitions are emitted into the bootstrap header; architecture and
+static collision come from region chunks. Each room owns its boundary wall
+faces so retiring its peer preserves enclosure; the small shared door visual
+stays resident. General cross-boundary dependency compilation remains later work.
+
+The ROM adapter uses two fixed payload slots and asynchronous PI reads into
+aligned scratch. It validates directory and chunk records before publication.
+Closed-door distance controls prefetch/retirement, while opening the connecting
+door demands both rooms; this is a probe policy pending general portal/PVS
+scheduling. Collision barriers cover unavailable regions, and a door use can
+wait for the adjoining region. Alerted guards retain their current region.
+ROM cooking and the editor diagnose this adapter's two-region and bounded
+rendering contract before launch; the portable package cooker remains broader.
+Foreground music service yields while PI reads are outstanding; audio callbacks
+continue consuming buffered PCM. RSP syncpoints and RDP completion callbacks
+are distinct retirement fences.
+
+The portable scene bridge copies validated resident geometry and colliders
+into one of two bounded banks. A working-set change releases the existing
+renderer before publishing the new bank and rebuilding its caches. This
+transitional implementation introduces a graphics wait and rebuild cost; the
+target per-region immutable Tiny3D packets remain future work. It does not
+retain pointers into chunk payloads. Global loot, doors, objectives and guard
+state survive bank changes without reinitializing the game. Inactive guards
+retain state and receive a coarse distance-only sound wake signal; distant
+patrol simulation and acoustic propagation remain unimplemented.
+
+The editor now preserves the manifest through catalog, duplicate, delete and
+menu operations, shows partition and byte diagnostics, and launches the
+streamed bundle. Its authoring viewport shows the full scene. Region controls
+and stream Native Play are still required before this can support routine
+content development; Native Play is explicitly disabled for these missions.
+
+See [playable probe and verification](streaming-probe.md) for the current
+input-driven Ares evidence, reproduction commands and screenshots. Region
+payload allocation stays at 9,344 bytes; the complete memory ledger must also
+account for both scene banks, renderer copies, shared assets, persistent state,
+audio, display and legacy bundled arrays. This increment does not establish
+full Bafford playability, arbitrary mission scale, target frame times or
+original N64/M64 acceptance.
+
+On 2026-10-12 the targeted mission and bundle tests passed, as did
+all portable C checks. Editor project tests passed with one Windows symlink
+privilege skip. The full Python suite ran 357 tests with two skips and the same
+pre-existing Sponza parapet collision mismatch described above; it had no
+streaming or editor failures. The ordinary input-driven Ares traversal had
+zero reported music underruns. The complete bundle lifecycle smoke also passed,
+including three launch/restart/resume cycles for each streamed preset with
+exactly stable per-phase heap samples.

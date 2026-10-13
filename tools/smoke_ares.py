@@ -80,6 +80,8 @@ def exercise(exe, settings, rom, name, success, seconds, expected_sha256=None, m
                 text = log.read_text(errors="replace")
                 if "RSP CRASH |" in text:
                     raise RuntimeError(f"{name}: ROM reported an RSP graphics failure; inspect {log}")
+                if "ASSERTION FAILED:" in text:
+                    raise RuntimeError(f"{name}: ROM assertion failed; inspect {log}")
                 if success in text:
                     boot = next((s for s in text.splitlines() if "DL64 boot_ok " in s), None)
                     if name == "smoke-8mb" and (boot is None or "world=3d" not in boot):

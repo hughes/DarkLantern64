@@ -13,6 +13,7 @@ typedef struct { float x, y, z; } DlVec3;
 typedef struct { float u, v; } DlVec2;
 typedef struct { int8_t x, y, z; } DlNormal; /* normalized XYZ quantized to -127..127 */
 struct DlAnimationAsset;
+struct DlStreamDefinition;
 typedef struct {
     DlVec3 position;
     float radius, intensity;
@@ -124,6 +125,7 @@ typedef struct {
     int object_count;
     const int16_t *collider_objects; /* collider -> door object index, -1 static */
     const DlFootContacts *foot_contacts; /* optional, one track per enemy */
+    const struct DlStreamDefinition *stream; /* optional bounded mission package bootstrap */
 } DlLevel;
 
 typedef enum { DL_PATROL, DL_INVESTIGATE, DL_SEARCH, DL_CHASE } DlGuardState;
@@ -162,6 +164,7 @@ typedef struct {
     bool grounded, crouched, door_open, complete, caught;
     DlEnemy enemies[DL_MAX_ENEMIES];
     int enemy_count;
+    uint16_t active_enemy_mask; /* detailed work only; inactive state remains authoritative */
     float visibility;
     DlVec3 last_sound;
     float footstep_timer, sound_age, elapsed;
@@ -179,6 +182,9 @@ void dl_game_init(DlGame *game, const DlLevel *level);
  * An invalid selection leaves the existing game untouched. */
 bool dl_game_start(DlGame *game, const DlLevel *level, int preset_index);
 void dl_game_update(DlGame *game, const DlInput *input, float dt);
+/* Select detailed simulation slots without resetting mission-owned guard state.
+ * Inactive guards can still hear a conservative distance-only wake signal. */
+void dl_game_set_active_enemies(DlGame *game, uint16_t mask);
 DlVec3 dl_player_eye(const DlGame *game);
 bool dl_position_clear(const DlGame *game, DlVec3 feet, float radius, float height);
 bool dl_line_of_sight(const DlGame *game, DlVec3 a, DlVec3 b);

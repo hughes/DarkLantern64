@@ -25,6 +25,10 @@
     {
       "id": "bafford-entry",
       "source": "thief_bafford_entry.json"
+    },
+    {
+      "id": "streaming-probe",
+      "mission": "streaming_probe.mission.json"
     }
   ]
 }

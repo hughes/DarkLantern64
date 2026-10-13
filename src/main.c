@@ -404,6 +404,89 @@ static DlInput stream_test_input(const DlGame *game,const DlLauncher *launcher,D
     return input;
 }
 #endif
+#ifdef DL_BAFFORD_STREAM_TEST
+/* Source street traversal uses ordinary turning/walking inputs. Both regions
+ * remain visible in this open corridor until a real visibility policy exists. */
+static uint64_t bafford_stream_test_tick;
+static void bafford_stream_checkpoint(const char *name,const DlGame *game){
+    const DlWorldStream *world=dl_stream_rom_world();heap_stats_t heap;
+    assertf(world,"Bafford diagnostic has no active stream mission");
+    sys_get_heap_stats(&heap);
+    debugf("DL64 bafford_stream {\"checkpoint\":\"%s\",\"tick\":%llu,\"elapsed\":%.4f,\"player\":[%.4f,%.4f,%.4f],\"grounded\":%d,\"collision_clear\":%d,\"heap_used\":%d,\"models\":%d,\"colliders\":%d,\"textures\":%d,\"stream\":{\"current\":%lu,\"resident\":[",
+        name,(unsigned long long)bafford_stream_test_tick,game->elapsed,
+        game->player.x,game->player.y,game->player.z,game->grounded,
+        dl_position_clear(game,game->player,.18f,1.65f),heap.used,
+        game->level->model_count,game->level->collider_count,game->level->texture_count,
+        (unsigned long)dl_stream_rom_current(game));
+    bool first=true;for(size_t i=0;i<world->slot_count;++i)if(world->slots[i].state==DL_STREAM_RESIDENT){
+        debugf("%s%lu",first?"":",",(unsigned long)world->slots[i].region_id);first=false;}
+    debugf("],\"reserved\":%lu,\"allocated\":%lu,\"completed_loads\":%llu,\"retired\":%lu,\"readbytes\":%llu,\"stalls\":%llu}}\n",
+        (unsigned long)world->stats.reserved_bytes,(unsigned long)world->stats.allocated_slot_bytes,
+        (unsigned long long)world->stats.completed_loads,(unsigned long)dl_stream_rom_retired(),
+        (unsigned long long)world->stats.bytes_read,(unsigned long long)world->stats.read_stalls);
+}
+static bool bafford_stream_move(const DlGame *game,float x,DlInput *input){
+    float dx=x-game->player.x,dz=49.4f-game->player.z;
+    if(dx*dx+dz*dz<.015f)return true;
+    float error=atan2f(dx,dz)-game->yaw;
+    while(error>3.14159265f)error-=6.28318531f;
+    while(error< -3.14159265f)error+=6.28318531f;
+    input->turn=fmaxf(-1,fminf(1,-error/(2.3f*DL_TICK_SECONDS)));
+    input->forward=fabsf(error)<.1f?1:0;return false;
+}
+static DlInput bafford_stream_test_input(const DlGame *game,const DlLauncher *launcher,DlLaunchInput *menu){
+    static unsigned stage,warmup;DlInput input={0};*menu=(DlLaunchInput){0};++bafford_stream_test_tick;
+    if(launcher->menu_open){
+        int probe=-1;for(int i=0;i<launcher->bundle->level_count;++i)
+            if(strcmp(launcher->bundle->levels[i].id,"bafford-stream")==0)probe=i;
+        assertf(probe>=0,"Bafford stream entry is missing from diagnostic menu");
+        menu->level_delta=probe-launcher->selected_level;menu->accept=true;return input;
+    }
+    assertf(dl_stream_rom_active(),"Bafford diagnostic did not select a stream mission");
+    assertf(!game->caught&&!game->complete,"Bafford diagnostic reached an unexpected terminal state");
+    assertf(bafford_stream_test_tick<7200,"Bafford diagnostic timed out stage=%u",stage);
+    if(stage==0){
+        if(++warmup<90)return input;
+        bafford_stream_checkpoint("start",game);
+#ifdef DL_BAFFORD_STREAM_TEST_CAPTURE
+        dl_render_request_capture(1);
+#endif
+        ++stage;
+    }
+    assertf(game->grounded&&fabsf(game->player.y+2.4384f)<.03f&&
+        dl_position_clear(game,game->player,.18f,1.65f),"Bafford street lost floor/body clearance");
+    assertf(dl_stream_rom_current(game),"Bafford traversal left covered regions");
+    const DlWorldStream *world=dl_stream_rom_world();unsigned resident=0;
+    for(size_t i=0;i<world->slot_count;++i)resident+=world->slots[i].state==DL_STREAM_RESIDENT;
+    assertf(resident==2&&world->stats.completed_loads==2&&!dl_stream_rom_retired(),
+        "Open Bafford street must retain both visible regions");
+    switch(stage){
+    case 1:if(bafford_stream_move(game,-6.522049f,&input)){bafford_stream_checkpoint("west_ready",game);++stage;}break;
+    case 2:if(bafford_stream_move(game,-2.5f,&input)){bafford_stream_checkpoint("east_crossed",game);++stage;}break;
+    case 3:if(bafford_stream_move(game,2.2f,&input)){bafford_stream_checkpoint("east_turnaround",game);++stage;}break;
+    case 4:
+#ifdef DL_BAFFORD_STREAM_TEST_CAPTURE
+        {float error=atan2f(-6.522049f-game->player.x,49.4f-game->player.z)-game->yaw;
+        while(error>3.14159265f)error-=6.28318531f;
+        while(error< -3.14159265f)error+=6.28318531f;
+        if(fabsf(error)>.05f){input.turn=fmaxf(-1,fminf(1,-error/(2.3f*DL_TICK_SECONDS)));break;}
+        dl_render_request_capture(2);}
+#endif
+        ++stage;break;
+    case 5:if(bafford_stream_move(game,-3.6f,&input)){bafford_stream_checkpoint("west_crossed",game);++stage;}break;
+    case 6:if(bafford_stream_move(game,-6.522049f,&input)){bafford_stream_checkpoint("west_return",game);++stage;}break;
+    case 7:if(bafford_stream_move(game,2.2f,&input)){bafford_stream_checkpoint("east_return",game);++stage;}break;
+    case 8:
+#ifdef DL_BAFFORD_STREAM_TEST_CAPTURE
+        debugf("DL64 bafford_capture_complete views=2\n");
+#endif
+        debugf("DL64 bafford_stream_test_complete passed=1 input_only=1 coverage=1 feet_stable=1 collision_clear=1 audio_calls=%lu\n",(unsigned long)audio_call_total);
+        ++stage;break;
+    default:break;
+    }
+    return input;
+}
+#endif
 static void gameplay_tick(void *context, const DlInput *input, uint64_t tick) {
     (void)tick; DlGame *game=context;
     DlInput effective=*input;dl_stream_rom_filter_input(game,&effective);input=&effective;
@@ -515,6 +598,10 @@ int main(void) {
 #ifdef DL_STREAM_TEST
         dt=DL_TICK_SECONDS;
         input=stream_test_input(&game,&launcher,&menu);
+#endif
+#ifdef DL_BAFFORD_STREAM_TEST
+        dt=DL_TICK_SECONDS;
+        input=bafford_stream_test_input(&game,&launcher,&menu);
 #endif
 #ifdef DL_INPUT_REPLAY
         input=(DlInput){0};menu=(DlLaunchInput){0};

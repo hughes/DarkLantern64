@@ -13,6 +13,7 @@ typedef struct {
     uint32_t id;
     uint8_t color[4];
     bool double_sided;
+    uint16_t texture_id; /* zero: untextured; otherwise bootstrap texture index + 1 */
 } DlStreamMaterial;
 typedef struct DlStreamDefinition {
     const char *package_path;
@@ -20,14 +21,15 @@ typedef struct DlStreamDefinition {
     const uint32_t *model_entity_ids, *object_entity_ids, *enemy_entity_ids;
     const DlStreamMaterial *materials;
     uint32_t material_count;
+    bool keep_neighbors_resident; /* conservative open sightlines; default probe policy is false */
 } DlStreamDefinition;
 
 enum {
     DL_STREAM_SCENE_MAX_REGIONS = 32,
     DL_STREAM_SCENE_MAX_RESIDENT_REGIONS = 2,
     DL_STREAM_SCENE_MAX_ENTITIES = 256,
-    DL_STREAM_SCENE_MAX_TRIANGLES = 512,
-    DL_STREAM_SCENE_MAX_GROUPS = 16,
+    DL_STREAM_SCENE_MAX_TRIANGLES = 1024,
+    DL_STREAM_SCENE_MAX_GROUPS = 64,
     DL_STREAM_SCENE_MAX_MATERIALS = 64,
     DL_STREAM_SCENE_MAX_COLLIDERS = 256,
     DL_STREAM_SCENE_MAX_MESHES = DL_MAX_MODELS + DL_STREAM_SCENE_MAX_GROUPS
@@ -40,10 +42,13 @@ typedef struct {
     uint32_t region_id, material_id;
     int first_vertex, triangle_count, written_triangles;
     DlVec3 origin;
+    uint8_t attribute_flags;
 } DlStreamSceneGroup;
 typedef struct {
     DlLevel level;
     DlVec3 vertices[DL_STREAM_SCENE_MAX_TRIANGLES*3];
+    DlVec2 uvs[DL_STREAM_SCENE_MAX_TRIANGLES*3];
+    DlNormal normals[DL_STREAM_SCENE_MAX_TRIANGLES*3];
     uint16_t indices[DL_STREAM_SCENE_MAX_TRIANGLES*3];
     DlMesh meshes[DL_STREAM_SCENE_MAX_MESHES];
     DlModelInstance models[DL_MAX_MODELS];

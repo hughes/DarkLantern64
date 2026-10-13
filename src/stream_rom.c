@@ -92,10 +92,15 @@ static float bounds_distance(DlVec3 point,const DlMissionRegion *region){
     return sqrtf(x*x+z*z);
 }
 static uint32_t wanted_mask(StreamRom *s,const DlGame *game){
+    /* Open exterior coverage has no proven occlusion cut. Keep all authored
+     * regions rather than retiring visible architecture. Outside the partial
+     * import's bounds, retain coverage and allow the existing fall recovery. */
+    if(s->scene.bootstrap->stream->keep_neighbors_resident)
+        return (UINT32_C(1)<<s->mission.region_count)-1u;
     uint32_t current=dl_stream_scene_region_at(&s->scene,game->player);
     assertf(current,"Player outside streaming probe bounds");
     uint32_t wanted=UINT32_C(1)<<(current-1);
-    bool open=doors_open(game);
+    bool open=doors_open(game)||s->scene.bootstrap->stream->keep_neighbors_resident;
     for(uint32_t id=1;id<=s->mission.region_count;++id){
         DlMissionRegion region;assertf(dl_mission_region(&s->mission,id,&region)==DL_MISSION_OK,"Bad region demand");
         /* This two-room proof has one opaque shared wall/gate. Opening the

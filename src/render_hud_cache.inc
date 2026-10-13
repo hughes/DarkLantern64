@@ -67,7 +67,10 @@ static void hud_cache_prepare(const DlGame *g){
         hud_cache.result[i]=rspq_block_end();
     }
     for(int i=0;i<HUD_PROMPT_COUNT;++i){
-        rspq_block_begin();rdpq_text_print(NULL,1,9,215,g->level->stream?stream_prompts[i]:prompts[i]);
+        const char *prompt=g->level->stream?stream_prompts[i]:prompts[i];
+        if(g->level->stream&&g->level->object_count==0)
+            prompt="Explore the street. Z+Start: level menu.";
+        rspq_block_begin();rdpq_text_print(NULL,1,9,215,prompt);
         hud_cache.prompt[i]=rspq_block_end();
     }
     for(int stance=0;stance<2;++stance)for(int prompt=0;prompt<HUD_PROMPT_COUNT;++prompt){

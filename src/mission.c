@@ -145,14 +145,15 @@ DlMissionStatus dl_mission_chunk_open(const void *data,size_t bytes,DlMissionChu
     if(!data)return DL_MISSION_ARGUMENT;
     if(bytes<DL_MISSION_CHUNK_HEADER_BYTES)return DL_MISSION_TRUNCATED;
     const uint8_t *p=data;
-    if(memcmp(p,"DLR1",4)||be16(p+4)!=DL_MISSION_VERSION||
+    uint16_t version=be16(p+4);
+    if(memcmp(p,"DLR1",4)||(version!=1&&version!=2)||
         be16(p+6)!=DL_MISSION_CHUNK_HEADER_BYTES)return DL_MISSION_HEADER;
     if(bytes>UINT32_MAX||be32(p+8)!=bytes||be32(p+28))return DL_MISSION_LAYOUT;
     uint32_t count=be32(p+12);
     if(!count||count>DL_MISSION_MAX_SECTIONS)return DL_MISSION_LAYOUT;
     size_t payload_min=DL_MISSION_CHUNK_HEADER_BYTES+(size_t)count*DL_MISSION_SECTION_BYTES;
     if(bytes<payload_min)return DL_MISSION_TRUNCATED;
-    DlMissionChunk result={.data=p,.bytes=bytes,.origin=vector(p+16),.section_count=count};
+    DlMissionChunk result={.data=p,.bytes=bytes,.origin=vector(p+16),.version=version,.section_count=count};
     if(!finite_vector(result.origin))return DL_MISSION_VALUE;
     unsigned previous_kind=0;
     for(uint32_t i=0;i<count;++i){
@@ -163,7 +164,8 @@ DlMissionStatus dl_mission_chunk_open(const void *data,size_t bytes,DlMissionChu
         previous_kind=kind;
         DlMissionSection *section=&result.sections[i];
         *section=(DlMissionSection){(DlMissionSectionKind)kind,be32(row+4),be32(row+8),be32(row+12),be32(row+16)};
-        uint32_t stride=kind==DL_MISSION_SECTION_TRIANGLES?DL_MISSION_TRIANGLE_BYTES:
+        uint32_t stride=kind==DL_MISSION_SECTION_TRIANGLES?
+            (version==2?DL_MISSION_TRIANGLE_V2_BYTES:DL_MISSION_TRIANGLE_BYTES):
             kind==DL_MISSION_SECTION_COLLIDERS?DL_MISSION_COLLIDER_BYTES:4;
         if(section->record_bytes!=stride||section->bytes%stride||section->count!=section->bytes/stride||
             section->offset%16||section->offset<payload_min||!range(bytes,section->offset,section->bytes))
@@ -191,7 +193,8 @@ static DlMissionStatus record(const DlMissionChunk *chunk,DlMissionSectionKind k
     DlMissionSection section;DlMissionStatus status=dl_mission_section(chunk,kind,&section);
     if(status!=DL_MISSION_OK)return status;
     if(index>=section.count)return DL_MISSION_REFERENCE;
-    uint32_t stride=kind==DL_MISSION_SECTION_TRIANGLES?DL_MISSION_TRIANGLE_BYTES:
+    uint32_t stride=kind==DL_MISSION_SECTION_TRIANGLES?
+        (chunk->version==2?DL_MISSION_TRIANGLE_V2_BYTES:DL_MISSION_TRIANGLE_BYTES):
         kind==DL_MISSION_SECTION_COLLIDERS?DL_MISSION_COLLIDER_BYTES:4;
     if(section.record_bytes!=stride||!range(chunk->bytes,section.offset,section.bytes)||
         (size_t)index>=section.bytes/section.record_bytes)return DL_MISSION_LAYOUT;
@@ -207,6 +210,19 @@ DlMissionStatus dl_mission_triangle(const DlMissionChunk *chunk,uint32_t index,D
     if(!finite_vector(result.positions[0])||!finite_vector(result.positions[1])||
         !finite_vector(result.positions[2]))return DL_MISSION_VALUE;
     if(!result.material_id||!result.surface_id)return DL_MISSION_REFERENCE;
+    if(chunk->version==2){
+        result.attribute_flags=p[77];
+        if(result.attribute_flags&~(DL_MISSION_TRIANGLE_UV|DL_MISSION_TRIANGLE_NORMAL)||p[78]||p[79])
+            return DL_MISSION_LAYOUT;
+        for(unsigned i=0;i<6;++i){result.uvs[i]=f32(p+44+i*4);if(!isfinite(result.uvs[i]))return DL_MISSION_VALUE;}
+        for(unsigned i=0;i<9;++i){
+            if(p[68+i]==128)return DL_MISSION_VALUE;
+            result.normals[i]=(int8_t)(p[68+i]>127?(int)p[68+i]-256:p[68+i]);
+        }
+        if(result.attribute_flags&DL_MISSION_TRIANGLE_NORMAL)for(unsigned corner=0;corner<3;++corner)
+            if(!result.normals[corner*3]&&!result.normals[corner*3+1]&&!result.normals[corner*3+2])
+                return DL_MISSION_VALUE;
+    }
     *triangle=result;return DL_MISSION_OK;
 }
 DlMissionStatus dl_mission_collider(const DlMissionChunk *chunk,const DlMission *mission,

@@ -282,3 +282,31 @@ streaming or editor failures. The ordinary input-driven Ares traversal had
 zero reported music underruns. The complete bundle lifecycle smoke also passed,
 including three launch/restart/resume cycles for each streamed preset with
 exactly stable per-phase heap samples.
+
+## Textured Bafford entry conversion
+
+The conversion branch derives two regions from the edited, playable Bafford
+entry source while leaving that source and the full manor study unchanged.
+Evaluated triangles and box proxies are clipped at an authored street seam.
+Canonical region-local OBJ assets retain interpolated UVs, normals and source
+entity/triangle provenance. Original dependencies are captured for preparation
+and checked again before transactional publication. Existing derived edits
+require an explicit replacement, with recovery copies retained.
+
+DLR1 chunk version 2 extends each triangle to 80 bytes with UVs and signed
+normal attributes; the DLM1 directory remains version 1, and original 44-byte
+triangles remain supported. Shared texture sprites use the existing texture
+cooker and active-level renderer lifetime. They are not yet evicted by region.
+The bounded scene bridge now permits 1,024 static triangles and 64 draw groups,
+with the existing 256-collider working bank and a 64 KiB per-chunk limit.
+Cooking and editor diagnostics enforce these limits before ROM publication.
+
+The source entry's 475 triangles and 155 proxies become 487 triangles and 158
+proxies after seam clipping, grouped into 28 region/material groups. Its
+48,512-byte package includes a 3,448-byte directory. No architecture or
+collider arrays remain in the streamed bootstrap; the menu replaces the legacy
+resident entry. Both chunks remain loaded because the street has open
+sightlines. Distance-based retirement would hide visible buildings. This
+demonstrates textured chunk loading and traversal, not a reduced working set
+for the full manor. See [Bafford streaming conversion](thief-bafford-streaming.md)
+for reproducible generation, editor handling and measured verification.

@@ -47,13 +47,20 @@ these sources; Native Play reports why it is blocked. The ROM demo is the
 current stream simulation path. This is a deliberate integration gate, not
 editor support being complete.
 
-The first ROM bridge requires exactly two regions, at most 512 static triangles
-and 16 nonempty region/material groups across those regions, and at most 255
+The current ROM bridge requires exactly two regions, at most 1,024 static triangles
+and 64 nonempty region/material groups across those regions, and at most 255
 colliders in either region to reserve an unavailable-region barrier. These are
 demo runtime capacities, not portable package limits. The panel distinguishes
 a valid portable partition from one that fits the current ROM bridge; a
 bridge-capacity failure keeps the authoring preview available and prevents ROM
 publication.
+
+Textured region chunks retain evaluated UVs and normals. Shared texture sprites
+use the ordinary texture cooker and active-level renderer lifetime; they are
+not yet evicted by region. The manifest's optional `visibility` chooses the
+original `door-distance` probe policy or conservative `all-regions` residency.
+The panel displays this policy. Open Bafford street regions stay loaded together
+until a spatial compiler can prove safe visibility and retirement.
 
 Region authoring controls are still required. Today the panel displays the
 external manual manifest; it does not assign homes or edit bounds. Artists can

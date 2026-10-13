@@ -245,7 +245,7 @@ class MissionCookTests(unittest.TestCase):
 
     def test_unsupported_inputs_fail_explicitly(self):
         original = copy.deepcopy(self.document)
-        for feature in ("character", "texture", "packs"):
+        for feature in ("character", "packs"):
             self.document = copy.deepcopy(original)
             if feature == "character":
                 self.document["assets"][0]["type"] = "character"
@@ -352,30 +352,87 @@ class MissionCookTests(unittest.TestCase):
             self.prepare_bootstrap()
         self.assertFalse((self.root / "bootstrap").exists())
 
-    def test_seventeen_region_material_groups_are_rejected_before_publication(self):
-        statics = [row for row in self.document["entities"] if row["kind"] == "static" and "model" in row]
-        self.assertEqual(len(statics), 16)
-        extra = dict(id="extra-group", kind="static", model="probe-box", material="group-17",
-                     transform=dict(position=[-6, .25, -2], rotation=[0, 0, 0], scale=[.1, .1, .1]))
-        self.document["entities"].append(extra)
-        next(row for row in self.manifest["regions"] if row["id"] == "west")["entities"].append(extra["id"])
-        for index, entity in enumerate(statics + [extra], 1):
-            ident = f"group-{index:02d}"
-            self.document["materials"].append(dict(id=ident, color=[.5, .5, .5, 1]))
-            entity["material"] = ident
+    def test_more_than_sixty_four_groups_are_rejected_before_publication(self):
+        for index in range(33):
+            self.document["materials"].append(dict(id=f"group-{index}", color=[.5, .5, .5, 1]))
+        for region in self.manifest["regions"]:
+            statics = [e for e in self.document["entities"] if e["id"] in region["entities"] and e["kind"] == "static" and "model" in e]
+            while len(statics) < 33:
+                ident = f"extra-{region['id']}-{len(statics)}"
+                entity = dict(id=ident, kind="static", model="probe-box", material="group-0",
+                              transform=dict(position=[-6 if region["id"] == "west" else 6, .25, -2], rotation=[0,0,0], scale=[.01,.01,.01]))
+                self.document["entities"].append(entity)
+                region["entities"].append(ident)
+                statics.append(entity)
+            for index, entity in enumerate(statics):
+                entity["material"] = f"group-{index}"
         self.write_source()
         _, report = self.cook()
-        self.assertEqual(sum(len(row["material_ids"]) for row in report["regions"]), 17)
-        self.assertLess(sum(row["triangle_count"] for row in report["regions"]), 512)
-        with self.assertRaisesRegex(ValueError, "16 nonempty region/material groups"):
+        self.assertEqual(sum(len(row["material_ids"]) for row in report["regions"]), 66)
+        with self.assertRaisesRegex(ValueError, "64 nonempty region/material groups"):
             self.prepare_bootstrap()
         self.assertFalse((self.root / "bootstrap").exists())
+
+    def test_textured_v2_preserves_uv_normal_and_pixel_dependencies(self):
+        from PIL import Image
+        Image.new("RGB", (8,8), (180,100,40)).save(self.content / "brick.png")
+        (self.content / "models/uv.obj").write_text("v -.1 0 -.1\nv .1 0 -.1\nv 0 .1 .1\nvt 0 0\nvt 2 0\nvt 1 3\nvn 0 0 1\nf 1/1/1 2/2/1 3/3/1\n")
+        self.document["assets"].append(dict(id="uv-mesh", uri="models/uv.obj"))
+        self.document["materials"].append(dict(id="brick", color=[1,1,1,1], texture=dict(uri="brick.png",width=8,height=8,format="RGBA16")))
+        self.document["entities"].append(dict(id="uv-wall",kind="static",model="uv-mesh",material="brick",transform=dict(position=[-6,.3,2],rotation=[0,90,0],scale=[1,2,1])))
+        next(r for r in self.manifest["regions"] if r["id"]=="west")["entities"].append("uv-wall")
+        self.manifest["visibility"]="all-regions"
+        self.write_source()
+        package, report=self.cook()
+        self.assertEqual(report["chunk_version"],2)
+        surface=next(r["id"] for r in report["surface_ids"] if r["entity"]=="uv-wall")
+        found=[]
+        for region in self.region_rows(package):
+            chunk=package[region[1]:region[1]+region[2]]
+            self.assertEqual(struct.unpack_from(">H",chunk,4)[0],2)
+            for kind,_,start,_,count,stride,_ in self.sections(chunk):
+                if kind!=1: continue
+                self.assertEqual(stride,80)
+                for i in range(count):
+                    offset=start+i*stride
+                    if struct.unpack_from(">I",chunk,offset+40)[0]==surface:
+                        found.append(struct.unpack_from(">6f9bB2s",chunk,offset+44))
+        self.assertEqual(len(found),1)
+        self.assertEqual(found[0][:6],(0,1,2,1,1,-2))
+        self.assertEqual(found[0][6:15],(127,0,0)*3)
+        self.assertEqual(found[0][-2:],(3,bytes(2)))
+        first_hash=report["package_sha256"]
+        bootstrap, header=self.prepare_bootstrap()
+        self.assertIn(".keep_neighbors_resident=true",header.read_text())
+        self.assertEqual(len(bootstrap["textures"]["textures"]),1)
+        self.assertTrue((self.root/"bootstrap/generated/texture_report.json").is_file())
+        Image.new("RGB",(8,8),(10,20,30)).save(self.content/"brick.png")
+        self.assertNotEqual(self.cook()[1]["package_sha256"],first_hash)
 
     def test_rom_bridge_reserves_an_unavailable_region_collider(self):
         _, report = self.cook()
         report["regions"][0]["collider_count"] = 256
         with self.assertRaisesRegex(ValueError, "unavailable-region barrier"):
             mission.validate_stream_bridge(report)
+
+    def test_rom_bridge_rejects_oversized_chunk(self):
+        _, report = self.cook()
+        report["regions"][0]["chunk_bytes"] = 65537
+        with self.assertRaisesRegex(ValueError, "65536 bytes"):
+            mission.validate_stream_bridge(report)
+
+    def test_changed_source_during_bootstrap_keeps_previous_outputs(self):
+        _, header = self.prepare_bootstrap()
+        previous = header.read_bytes()
+        real_header = mission.bootstrap_header
+        def changed(*args):
+            result = real_header(*args)
+            self.document["title"] = "Changed during preparation"
+            self.write_source()
+            return result
+        with patch.object(mission, "bootstrap_header", side_effect=changed), self.assertRaisesRegex(ValueError, "changed during preparation"):
+            self.prepare_bootstrap()
+        self.assertEqual(header.read_bytes(), previous)
 
 
 if __name__ == "__main__":

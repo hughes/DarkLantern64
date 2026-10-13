@@ -23,8 +23,8 @@
       "source": "sponza_courtyard.json"
     },
     {
-      "id": "bafford-entry",
-      "source": "thief_bafford_entry.json"
+      "id": "bafford-stream",
+      "mission": "thief_bafford_stream.mission.json"
     },
     {
       "id": "streaming-probe",

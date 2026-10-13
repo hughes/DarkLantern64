@@ -1001,7 +1001,7 @@ static void background(const DlGame *game){
         }
     }
 }
-#if defined(DL_CAPTURE) || defined(DL_MENU_TEST) || defined(DL_STREAM_TEST)
+#if defined(DL_CAPTURE) || defined(DL_MENU_TEST) || defined(DL_STREAM_TEST) || defined(DL_BAFFORD_STREAM_TEST)
 /* Diagnostic builds only: export the actual completed RGBA5551 framebuffer.
  * The explicit GPU wait and dump are outside normal performance captures. */
 static int capture_id;
@@ -1055,7 +1055,7 @@ float dl_render_frame(const DlGame *game,const DlRenderStats *stats){
     dl_profile_record(DL_PROFILE_RENDER_SETUP,mark);
     geometry(game);hud(game,stats);
     mark=dl_profile_mark();
-#if defined(DL_CAPTURE) || defined(DL_STREAM_TEST)
+#if defined(DL_CAPTURE) || defined(DL_STREAM_TEST) || defined(DL_BAFFORD_STREAM_TEST)
     if(capture_id){
         rdpq_detach();capture_frame(display);display_show(display);
         if(stats->streaming){

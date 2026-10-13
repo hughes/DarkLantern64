@@ -75,7 +75,8 @@ DlStreamSceneStatus dl_stream_scene_init(DlStreamScene *scene,const DlLevel *boo
         if(!finite_vec(half))return DL_STREAM_SCENE_CORRUPT;
     }
     for(uint32_t i=0;i<definition->material_count;++i){
-        if(!definition->materials[i].id)return DL_STREAM_SCENE_ARGUMENT;
+        if(!definition->materials[i].id||definition->materials[i].texture_id>bootstrap->texture_count)
+            return DL_STREAM_SCENE_ARGUMENT;
         for(uint32_t j=0;j<i;++j)if(definition->materials[j].id==definition->materials[i].id)
             return DL_STREAM_SCENE_ARGUMENT;
     }
@@ -141,6 +142,8 @@ static DlStreamSceneStatus scan_chunk(DlStreamScene *scene,DlStreamSceneBank *ba
             DlMissionTriangle triangle;
             if(dl_mission_triangle(chunk,i,&triangle)!=DL_MISSION_OK||!material(scene,triangle.material_id))
                 return DL_STREAM_SCENE_CORRUPT;
+            const DlStreamMaterial *source=material(scene,triangle.material_id);
+            if(source->texture_id&&!(triangle.attribute_flags&DL_MISSION_TRIANGLE_UV))return DL_STREAM_SCENE_CORRUPT;
             for(int v=0;v<3;++v){
                 DlVec3 world={triangle.positions[v].x+chunk->origin.x,triangle.positions[v].y+chunk->origin.y,
                     triangle.positions[v].z+chunk->origin.z};
@@ -148,11 +151,12 @@ static DlStreamSceneStatus scan_chunk(DlStreamScene *scene,DlStreamSceneBank *ba
             }
             int group=0;
             while(group<bank->group_count&&(bank->groups[group].region_id!=region_id||
-                bank->groups[group].material_id!=triangle.material_id))++group;
+                bank->groups[group].material_id!=triangle.material_id||
+                bank->groups[group].attribute_flags!=triangle.attribute_flags))++group;
             if(group==bank->group_count){
                 if(group>=DL_STREAM_SCENE_MAX_GROUPS)return DL_STREAM_SCENE_CAPACITY;
                 bank->groups[group]=(DlStreamSceneGroup){.region_id=region_id,.material_id=triangle.material_id,
-                    .origin=vec(chunk->origin)};++bank->group_count;
+                    .origin=vec(chunk->origin),.attribute_flags=triangle.attribute_flags};++bank->group_count;
             }
             ++bank->groups[group].triangle_count;++bank->triangle_count;
         }
@@ -188,13 +192,16 @@ static DlStreamSceneStatus fill_chunk(DlStreamSceneBank *bank,const DlMissionChu
         if(dl_mission_triangle(chunk,i,&triangle)!=DL_MISSION_OK)return DL_STREAM_SCENE_CORRUPT;
         int group=0;
         while(group<bank->group_count&&(bank->groups[group].region_id!=region_id||
-            bank->groups[group].material_id!=triangle.material_id))++group;
+            bank->groups[group].material_id!=triangle.material_id||
+            bank->groups[group].attribute_flags!=triangle.attribute_flags))++group;
         if(group==bank->group_count)return DL_STREAM_SCENE_CORRUPT;
         DlStreamSceneGroup *target=&bank->groups[group];
         int local=target->written_triangles++*3;
         for(int v=0;v<3;++v){
             bank->vertices[target->first_vertex+local+v]=vec(triangle.positions[v]);
             bank->indices[target->first_vertex+local+v]=(uint16_t)(local+v);
+            bank->uvs[target->first_vertex+local+v]=(DlVec2){triangle.uvs[v*2],triangle.uvs[v*2+1]};
+            bank->normals[target->first_vertex+local+v]=(DlNormal){triangle.normals[v*3],triangle.normals[v*3+1],triangle.normals[v*3+2]};
         }
     }
     return DL_STREAM_SCENE_OK;
@@ -262,10 +269,12 @@ DlStreamSceneStatus dl_stream_scene_refresh(DlStreamScene *scene,DlWorldStream *
         const DlStreamMaterial *source=material(scene,group->material_id);
         int mesh=bank->level.mesh_count++;
         bank->meshes[mesh]=(DlMesh){.vertices=bank->vertices+group->first_vertex,.vertex_count=group->triangle_count*3,
-            .indices=bank->indices+group->first_vertex,.index_count=group->triangle_count*3};
+            .indices=bank->indices+group->first_vertex,.index_count=group->triangle_count*3,
+            .uvs=group->attribute_flags&DL_MISSION_TRIANGLE_UV?bank->uvs+group->first_vertex:NULL,
+            .normals=group->attribute_flags&DL_MISSION_TRIANGLE_NORMAL?bank->normals+group->first_vertex:NULL};
         DlModelInstance *model=&bank->models[bank->level.model_count++];
         *model=(DlModelInstance){.mesh=(uint16_t)mesh,.position=group->origin,.scale={1,1,1},.role=DL_MODEL_STATIC,
-            .texture=-1,.double_sided=source->double_sided,.enemy_index=-1};
+            .texture=source->texture_id?(int16_t)(source->texture_id-1):-1,.double_sided=source->double_sided,.enemy_index=-1};
         memcpy(model->color,source->color,4);
     }
     for(uint32_t id=1;id<=scene->mission->region_count;++id){

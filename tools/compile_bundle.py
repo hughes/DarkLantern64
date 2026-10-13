@@ -250,7 +250,7 @@ def prepare_bundle(entries, title, output, sdk, *, start_level=None, start_prese
         cooked = Path(cooked_dirs[index] if cooked_dirs else output / "levels" / f"{index}-{entry['id']}").resolve()
         if "mission" in entry:
             report = prepare_stream_level(entry["mission"], cooked)
-            textures = {"version": 1, "textures": [], **texture_memory_summary([]), "sprite_bytes": 0}
+            textures = cook_sprites(cooked, sdk)
         else:
             report = compile_level(source, cooked, shared_characters=shared_characters)
             textures = cook_sprites(cooked, sdk)

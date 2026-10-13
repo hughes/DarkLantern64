@@ -52,9 +52,9 @@ def align16(value):
     return (value + 15) & ~15
 
 
-def fields(value, required, label):
+def fields(value, required, label, optional=()):
     level.require(isinstance(value, dict), label + ": expected an object")
-    level.require(set(value) == set(required), label + ": missing or unknown fields")
+    level.require(set(required) <= set(value) <= set(required) | set(optional), label + ": missing or unknown fields")
 
 
 def read_source(manifest, content_root, source_document=None):
@@ -77,8 +77,15 @@ def read_source(manifest, content_root, source_document=None):
         dependencies[dependency.relative_to(content_root).as_posix()] = hashlib.sha256(dependency.read_bytes()).hexdigest()
     for material in document.get("materials", []):
         level.require(isinstance(material, dict), "material: expected an object")
-        level.require("texture" not in material, "DLM1 v1 does not support textures or texture dependencies")
+        if "texture" in material:
+            level.require(isinstance(material["texture"], dict), "material.texture: expected an object")
+            dependency = content_path(material["texture"].get("uri"), content_root, {".png", ".jpg", ".jpeg"})
+            dependencies[dependency.relative_to(content_root).as_posix()] = hashlib.sha256(dependency.read_bytes()).hexdigest()
     state = level.validate(document, content_root, authoring=False)
+    for entity in state["models"]:
+        if entity["kind"] == "static" and "texture" in state["materials"][entity["material"]]:
+            level.require("uvs" in state["meshes"][entity["model"]],
+                          entity["id"] + ": textured stream geometry requires evaluated UVs")
     return document, state, raw, dependencies
 
 
@@ -129,21 +136,22 @@ def collider_corners(box):
             for dx in (-hx, hx) for dy in (-hy, hy) for dz in (-hz, hz)]
 
 
-def make_chunk(origin, sections):
+def make_chunk(origin, sections, version=1):
     """Section tuples are (kind, payload, count); empty sections are omitted."""
     sections = sorted((row for row in sections if row[2]), key=lambda row: row[0])
     level.require(1 <= len(sections) <= 3, "Region requires at least one section")
     cursor = align16(CHUNK_HEADER_BYTES + SECTION_RECORD_BYTES * len(sections))
     descriptors, payloads = [], []
     for kind, payload, count in sections:
-        level.require(len(payload) == count * RECORD_BYTES[kind], "Internal section length mismatch")
-        descriptors.append(struct.pack(">HHIIIII", kind, 0, cursor, len(payload), count, RECORD_BYTES[kind], 0))
+        record_bytes = 80 if kind == 1 and version == 2 else RECORD_BYTES[kind]
+        level.require(len(payload) == count * record_bytes, "Internal section length mismatch")
+        descriptors.append(struct.pack(">HHIIIII", kind, 0, cursor, len(payload), count, record_bytes, 0))
         payloads.append((cursor, payload))
         cursor = align16(cursor + len(payload))
     # Trailing padding is unnecessary; inter-section padding is deterministic.
     size = payloads[-1][0] + len(payloads[-1][1])
     result = bytearray(size)
-    struct.pack_into(">4sHHII3fI", result, 0, b"DLR1", 1, CHUNK_HEADER_BYTES, size, len(sections), *origin, 0)
+    struct.pack_into(">4sHHII3fI", result, 0, b"DLR1", version, CHUNK_HEADER_BYTES, size, len(sections), *origin, 0)
     for index, descriptor in enumerate(descriptors):
         start = CHUNK_HEADER_BYTES + index * SECTION_RECORD_BYTES
         result[start:start + SECTION_RECORD_BYTES] = descriptor
@@ -152,12 +160,32 @@ def make_chunk(origin, sections):
     return bytes(result)
 
 
+def triangle_attributes(mesh, corners, transform, positions):
+    """World-oriented normals and the runtime UV convention used by read_obj."""
+    uvs = [value for index in corners for value in mesh.get("uvs", [[0, 0]] * len(mesh["vertices"]))[index]]
+    normals = []
+    if "normals" not in mesh:
+        a = [positions[1][axis] - positions[0][axis] for axis in range(3)]
+        b = [positions[2][axis] - positions[0][axis] for axis in range(3)]
+        face = [a[1]*b[2]-a[2]*b[1], a[2]*b[0]-a[0]*b[2], a[0]*b[1]-a[1]*b[0]]
+    for index in corners:
+        normal = level.rotate([mesh["normals"][index][axis] / transform["scale"][axis] for axis in range(3)],
+                              transform["rotation"]) if "normals" in mesh else face
+        length = math.hypot(*normal)
+        level.require(length > 0 and math.isfinite(length), "Stream triangle has a degenerate normal")
+        normals.extend(level.quantize_normal([value / length for value in normal]))
+    return struct.pack(">6f9bB2x", *uvs, *normals, 3)
+
+
 def cook_mission(manifest, content_root=ROOT / "content", *, source_document=None):
     """Validate all inputs before returning reproducible package bytes/report."""
-    fields(manifest, {"version", "source", "entry_region", "regions"}, "Mission manifest")
+    fields(manifest, {"version", "source", "entry_region", "regions"}, "Mission manifest", {"visibility"})
     level.require(type(manifest["version"]) is int and manifest["version"] == 1, "Mission manifest version must be 1")
+    level.require(manifest.get("visibility", "door-distance") in ("door-distance", "all-regions"), "Unsupported mission visibility policy")
     content_root = Path(content_root).resolve()
     document, state, source_raw, dependencies = read_source(manifest, content_root, source_document)
+    chunk_version = 2 if state["textures"] else 1
+    triangle_bytes = 80 if chunk_version == 2 else 44
     regions, homes = validated_regions(manifest, state)
     region_ids = {row["id"]: index + 1 for index, row in enumerate(regions)}
     entity_ids = {ident: index + 1 for index, ident in enumerate(sorted(state["by_id"]))}
@@ -184,9 +212,12 @@ def cook_mission(manifest, content_root=ROOT / "content", *, source_document=Non
                 points = [level.transform_point(point, entity["transform"]) for point in mesh["vertices"]]
                 assert_bounds(region, points, ident + " static geometry")
                 for triangle in range(len(mesh["indices"]) // 3):
-                    positions = [points[index] for index in mesh["indices"][triangle * 3:triangle * 3 + 3]]
+                    corners = mesh["indices"][triangle * 3:triangle * 3 + 3]
+                    positions = [points[index] for index in corners]
                     local = [value - origin[axis] for point in positions for axis, value in enumerate(point)]
                     triangle_payload.extend(struct.pack(">9fII", *local, material_ids[entity["material"]], surface_ids[(ident, triangle)]))
+                    if chunk_version == 2:
+                        triangle_payload.extend(triangle_attributes(mesh, corners, entity["transform"], positions))
                     region_materials.add(material_ids[entity["material"]])
             if ident in boxes:
                 box = boxes[ident]
@@ -194,17 +225,17 @@ def cook_mission(manifest, content_root=ROOT / "content", *, source_document=Non
                 local = [box["center"][axis] - origin[axis] for axis in range(3)]
                 collider_payload.extend(struct.pack(">7fI", *local, *box["half_size"], box["yaw"], entity_ids[ident]))
         entity_payload = b"".join(struct.pack(">I", entity_ids[ident]) for ident in region["entities"])
-        chunk = make_chunk(origin, [(1, triangle_payload, len(triangle_payload) // 44),
+        chunk = make_chunk(origin, [(1, triangle_payload, len(triangle_payload) // triangle_bytes),
                                     (2, collider_payload, len(collider_payload) // 32),
-                                    (3, entity_payload, len(region["entities"]))])
+                                    (3, entity_payload, len(region["entities"]))], version=chunk_version)
         chunks.append(chunk)
         region_reports.append(dict(id=region_ids[region["id"]], source_id=region["id"], bounds=region["bounds"], origin=origin,
-                                   triangle_count=len(triangle_payload) // 44, collider_count=len(collider_payload) // 32,
+                                   chunk_version=chunk_version, triangle_count=len(triangle_payload) // triangle_bytes, collider_count=len(collider_payload) // 32,
                                    material_ids=sorted(region_materials),
                                    entity_count=len(region["entities"]), chunk_bytes=len(chunk), crc32=f"{zlib.crc32(chunk):08x}"))
     canonical_manifest = dict(manifest, regions=regions)
     source_sha = hashlib.sha256(canonical_json(canonical_source(document))).hexdigest()
-    identity = hashlib.sha256(canonical_json(dict(format="DLM1/DLR1-v1", source_sha256=source_sha,
+    identity = hashlib.sha256(canonical_json(dict(format=f"DLM1/DLR1-v{chunk_version}", source_sha256=source_sha,
                                                  manifest=canonical_manifest, content_dependencies=dependencies))).digest()
     dependency_ids = [region_ids[neighbor] for region in regions for neighbor in region["neighbors"]]
     directory_bytes = DIRECTORY_HEADER_BYTES + len(regions) * REGION_RECORD_BYTES + len(entity_ids) * ENTITY_RECORD_BYTES + len(dependency_ids) * 4
@@ -238,7 +269,7 @@ def cook_mission(manifest, content_root=ROOT / "content", *, source_document=Non
                      decoded_chunk_bytes=sum(len(chunks[region_ids[name] - 1]) for name in [region["id"]] + region["neighbors"])) for region in regions]
     peak = max(overlaps, key=lambda row: (row["decoded_chunk_bytes"], row["region"]))
     omitted_models = [ident for ident in sorted(state["by_id"]) if "model" in state["by_id"][ident] and state["by_id"][ident]["kind"] != "static"]
-    report = dict(format="DLM1/DLR1", version=1, experimental=True, source=manifest["source"],
+    report = dict(format="DLM1/DLR1", version=1, chunk_version=chunk_version, visibility=manifest.get("visibility", "door-distance"), experimental=True, source=manifest["source"],
                   source_sha256=source_sha, source_file_sha256=hashlib.sha256(source_raw).hexdigest(), content_identity_sha256=identity.hex(),
                   package_sha256=hashlib.sha256(result).hexdigest(), package_bytes=package_bytes, directory_bytes=directory_bytes,
                   directory_crc32=f"{struct.unpack_from('>I', result, 28)[0]:08x}",
@@ -253,8 +284,8 @@ def cook_mission(manifest, content_root=ROOT / "content", *, source_document=Non
                   renderer_bytes=None, audio_bytes=None, code_display_buffers_bytes=None, loader_slots_and_scratch_bytes=None,
                   unknown_costs=["renderer caches, packing and textures", "audio", "code and display/depth buffers", "loader slot padding and scratch", "visibility, navigation and richer collision"]),
                   omissions=dict(nonstatic_visual_entities=omitted_models,
-                  features=["dynamic model geometry and animation", "material colors, UVs and normals", "lighting and probes", "gameplay definitions, transforms and scripts", "visibility/PVS, navigation, BVHs and triangle sweeps"],
-                  unsupported_inputs=["external-scale-study", "animated character assets", "textures", "linked asset packs"]),
+                  features=["dynamic model geometry and animation", "material colors in chunk payloads", "lighting and probes", "gameplay definitions, transforms and scripts", "visibility/PVS, navigation, BVHs and triangle sweeps"] + (["UVs and normals"] if chunk_version == 1 else []),
+                  unsupported_inputs=["external-scale-study", "animated character assets", "linked asset packs"]),
                   acceptance="Portable package foundation only; neighbor overlap is authored adjacency, not a proven PVS or an 8 MiB runtime budget.")
     return bytes(result), report
 
@@ -300,13 +331,14 @@ def bootstrap_header(document, state, package_report, package_path):
     for row in package_report["material_ids"]:
         material = state["materials"][row["source_id"]]
         color = ",".join(str(round(component * 255)) for component in material["color"])
-        materials.append("    {" + str(row["id"]) + ",{ " + color + " }," + str(material.get("double_sided", True)).lower() + "}")
+        materials.append("    {" + str(row["id"]) + ",{ " + color + " }," + str(material.get("double_sided", True)).lower() + "," + str(state["texture_indices"].get(row["source_id"], -1) + 1) + "}")
     links.append("static const DlStreamMaterial dl_stream_materials[] = {\n" + ",\n".join(materials) + "\n};")
     links.append("static const DlStreamDefinition dl_stream_definition = {\n" +
                  "    .package_path=" + json.dumps(package_path) + ",\n" +
                  f"    .directory_bytes={package_report['directory_bytes']}, .file_bytes={package_report['package_bytes']}, " +
                  f".max_region_bytes={max(row['chunk_bytes'] for row in package_report['regions'])}, .region_count={len(package_report['regions'])},\n" +
                  "    .model_entity_ids=dl_stream_model_ids, .object_entity_ids=dl_stream_object_ids, .enemy_entity_ids=dl_stream_enemy_ids,\n" +
+                 "    .keep_neighbors_resident=" + str(package_report.get("visibility") == "all-regions").lower() + ",\n" +
                  f"    .materials=dl_stream_materials, .material_count={len(materials)}\n" + "};")
     text = text.replace("static const DlLevel dl_demo_level = {", "\n".join(links) + "\nstatic const DlLevel dl_demo_level = {\n    .stream=&dl_stream_definition,")
     meshes = list(bootstrap["meshes"].values())
@@ -325,12 +357,14 @@ def validate_stream_bridge(package_report):
     """The first ROM adapter is deliberately smaller than the portable format."""
     regions = package_report["regions"]
     level.require(len(regions) == 2, "Stream ROM bridge requires exactly 2 regions")
-    level.require(sum(row["triangle_count"] for row in regions) <= 512,
-                  "Stream ROM bridge supports at most 512 resident static triangles")
-    level.require(sum(len(row["material_ids"]) for row in regions) <= 16,
-                  "Stream ROM bridge supports at most 16 nonempty region/material groups")
+    level.require(sum(row["triangle_count"] for row in regions) <= 1024,
+                  "Stream ROM bridge supports at most 1024 resident static triangles")
+    level.require(sum(len(row["material_ids"]) for row in regions) <= 64,
+                  "Stream ROM bridge supports at most 64 nonempty region/material groups")
     level.require(max(row["collider_count"] for row in regions) + 1 <= 256,
                   "Stream ROM bridge needs one unavailable-region barrier: each region permits at most 255 colliders")
+    level.require(max(row["chunk_bytes"] for row in regions) <= 65536,
+                  "Stream ROM bridge permits at most 65536 bytes per region chunk")
 
 
 def prepare_stream_level(manifest_path, output, content_root=None):
@@ -338,8 +372,9 @@ def prepare_stream_level(manifest_path, output, content_root=None):
     manifest_path, output = Path(manifest_path).resolve(), Path(output).resolve()
     content_root = Path(content_root or manifest_path.parent).resolve()
     manifest, source = mission_source(manifest_path, content_root)
+    manifest_raw, source_raw = manifest_path.read_bytes(), source.read_bytes()
     package, package_report = cook_mission(manifest, content_root)
-    document = canonical_source(json.loads(source.read_text(encoding="utf-8")))
+    document = canonical_source(json.loads(source_raw))
     state = level.validate(document, content_root, authoring=False)
     validate_stream_bridge(package_report)
     relative = "romfs/missions/mission-" + package_report["package_sha256"] + ".dlm"
@@ -362,6 +397,17 @@ def prepare_stream_level(manifest_path, output, content_root=None):
                   characters={}, lighting=None, test_starts=state["test_starts"],
                   mission=dict(path=relative, sha256=package_report["package_sha256"], bytes=len(package), report=package_report),
                   memory_note="Bootstrap shared visuals/global definitions are resident. Static architecture and all colliders live in mission chunks. No full mission or hardware performance acceptance is implied.")
+    texture_report = dict(version=1, textures=state["textures"], **level.texture_memory_summary(state["textures"]))
+    report["textures"] = texture_report
+    level.require(source.read_bytes() == source_raw and manifest_path.read_bytes() == manifest_raw,
+                  "Mission source or manifest changed during preparation; retry")
+    for dependency in package_report["content_dependencies"]:
+        path = content_path(dependency["path"], content_root, {".obj", ".png", ".jpg", ".jpeg"})
+        level.require(hashlib.sha256(path.read_bytes()).hexdigest() == dependency["sha256"],
+                      "Mission asset changed during preparation; retry: " + dependency["path"])
+    for path, png in state["texture_artifacts"].items():
+        atomic_write(output / path, png)
+    atomic_write(output / "generated/texture_report.json", (json.dumps(texture_report, indent=2) + "\n").encode())
     atomic_write(output / relative, package)
     atomic_write(output / "generated/demo_level.h", text.encode("utf-8"))
     atomic_write(output / "generated/mission_report.json", (json.dumps(package_report, indent=2, sort_keys=True) + "\n").encode("utf-8"))

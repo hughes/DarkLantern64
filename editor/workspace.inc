@@ -41,6 +41,9 @@
                 ImGui::TextWrapped("%s",info->value("native_play_reason",std::string()).c_str());
                 ImGui::Separator();
                 ImGui::TextWrapped("Partition: %s",info->value("mission_manifest",std::string()).c_str());
+                ImGui::TextWrapped("Visibility: %s",info->value("visibility",std::string("door-distance")).c_str());
+                if(info->value("visibility",std::string())=="all-regions")
+                    ImGui::TextWrapped("Open exterior: all region chunks stay resident until visibility is proven.");
                 const auto& validation=info->at("status");
                 if(validation.value("valid",false)) {
                     ImGui::Text("Directory %u bytes | ROM %u bytes",validation.value("directory_bytes",0u),validation.value("package_bytes",0u));

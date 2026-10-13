@@ -17,8 +17,10 @@ enum {
     DL_MISSION_SECTION_BYTES = 24,
     DL_MISSION_MAX_SECTIONS = 3,
     DL_MISSION_TRIANGLE_BYTES = 44,
+    DL_MISSION_TRIANGLE_V2_BYTES = 80,
     DL_MISSION_COLLIDER_BYTES = 32
 };
+enum { DL_MISSION_TRIANGLE_UV = 1, DL_MISSION_TRIANGLE_NORMAL = 2 };
 
 typedef enum {
     DL_MISSION_OK = 0, DL_MISSION_ARGUMENT, DL_MISSION_TRUNCATED,
@@ -68,12 +70,16 @@ typedef struct {
     const uint8_t *data;
     size_t bytes;
     DlMissionVec3 origin;
+    uint16_t version; /* DLR1 chunk version: 1 or 2 */
     uint32_t section_count;
     DlMissionSection sections[DL_MISSION_MAX_SECTIONS];
 } DlMissionChunk;
 typedef struct {
     DlMissionVec3 positions[3];
     uint32_t material_id, surface_id;
+    float uvs[6]; /* U,V for each corner, in the existing runtime UV basis */
+    int8_t normals[9]; /* XYZ snorm8 for each corner; -128 is not valid */
+    uint8_t attribute_flags;
 } DlMissionTriangle;
 typedef struct {
     DlMissionVec3 center, half_size;

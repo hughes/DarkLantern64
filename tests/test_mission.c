@@ -73,6 +73,7 @@ static int valid_package(void){
     CHECK(descriptor.offset==112&&descriptor.bytes==44&&descriptor.count==1);
     DlMissionTriangle triangle;CHECK(dl_mission_triangle(&chunk,0,&triangle)==DL_MISSION_OK);
     CHECK(triangle.positions[2].z==2&&triangle.material_id==7&&triangle.surface_id==12);
+    CHECK(triangle.attribute_flags==0&&triangle.uvs[0]==0&&triangle.normals[0]==0&&chunk.version==1);
     DlMissionCollider collider;CHECK(dl_mission_collider(&chunk,&mission,0,&collider)==DL_MISSION_OK);
     CHECK(collider.center.x==2&&collider.half_size.y==1.5f&&collider.yaw==0.25f&&collider.entity_id==1);
     CHECK(dl_mission_entity_id(&chunk,&mission,1,1,&id)==DL_MISSION_OK&&id==2);
@@ -176,7 +177,7 @@ static int chunk_errors(void){
     }
     CHECK(dl_mission_chunk_open(package+CHUNK_OFFSET,CHUNK_BYTES,NULL)==DL_MISSION_ARGUMENT);
     uint8_t *p=package+CHUNK_OFFSET;p[0]='X';CHECK(dl_mission_chunk_open(p,CHUNK_BYTES,&chunk)==DL_MISSION_HEADER);
-    prepare();put16(p+4,2);CHECK(dl_mission_chunk_open(p,CHUNK_BYTES,&chunk)==DL_MISSION_HEADER);
+    prepare();put16(p+4,3);CHECK(dl_mission_chunk_open(p,CHUNK_BYTES,&chunk)==DL_MISSION_HEADER);
     prepare();put16(p+6,24);CHECK(dl_mission_chunk_open(p,CHUNK_BYTES,&chunk)==DL_MISSION_HEADER);
     prepare();put32(p+8,80);CHECK(dl_mission_chunk_open(p,80,&chunk)==DL_MISSION_TRUNCATED);
     /* A legal descriptor order need not imply payload order. */
@@ -218,7 +219,37 @@ static int lazy_records(void){
     CHECK(strcmp(dl_mission_status_name((DlMissionStatus)99),"unknown")==0);
     return 0;
 }
+static void prepare_v2(uint8_t *bytes){
+    memset(bytes,0,144);memcpy(bytes,"DLR1",4);put16(bytes+4,2);put16(bytes+6,32);
+    put32(bytes+8,144);put32(bytes+12,1);section(bytes+32,1,64,80,1,80);
+    putfloat(bytes+64+12,1);putfloat(bytes+64+28,1);put32(bytes+64+36,3);put32(bytes+64+40,7);
+    for(unsigned i=0;i<6;++i)putfloat(bytes+64+44+i*4,(float)i-2.5f);
+    bytes[64+69]=127;bytes[64+71]=(uint8_t)-127;bytes[64+76]=127;bytes[64+77]=3;
+}
+static int triangle_v2(void){
+    uint8_t bytes[144];prepare_v2(bytes);DlMissionChunk chunk;DlMissionTriangle triangle;
+    CHECK(dl_mission_chunk_open(bytes,sizeof bytes,&chunk)==DL_MISSION_OK&&chunk.version==2);
+    CHECK(dl_mission_triangle(&chunk,0,&triangle)==DL_MISSION_OK);
+    CHECK(triangle.attribute_flags==3&&triangle.uvs[0]==-2.5f&&triangle.uvs[5]==2.5f);
+    CHECK(triangle.normals[1]==127&&triangle.normals[3]==-127&&triangle.normals[8]==127);
+    static const struct {unsigned offset;uint32_t value;DlMissionStatus status;} cases[]={
+        {108,0x7f800000u,DL_MISSION_VALUE},{132,0x80000000u,DL_MISSION_VALUE},
+        {140,0x00040000u,DL_MISSION_LAYOUT},{140,0x00030100u,DL_MISSION_LAYOUT}
+    };
+    for(unsigned i=0;i<sizeof cases/sizeof cases[0];++i){
+        prepare_v2(bytes);put32(bytes+cases[i].offset,cases[i].value);
+        CHECK(dl_mission_chunk_open(bytes,sizeof bytes,&chunk)==DL_MISSION_OK);
+        CHECK(dl_mission_triangle(&chunk,0,&triangle)==cases[i].status);
+    }
+    prepare_v2(bytes);memset(bytes+64+68,0,3);
+    CHECK(dl_mission_chunk_open(bytes,sizeof bytes,&chunk)==DL_MISSION_OK);
+    CHECK(dl_mission_triangle(&chunk,0,&triangle)==DL_MISSION_VALUE);
+    bytes[64+77]=DL_MISSION_TRIANGLE_UV;CHECK(dl_mission_triangle(&chunk,0,&triangle)==DL_MISSION_OK);
+    prepare_v2(bytes);put32(bytes+48,44);CHECK(dl_mission_chunk_open(bytes,sizeof bytes,&chunk)==DL_MISSION_LAYOUT);
+    prepare_v2(bytes);put16(bytes+4,1);CHECK(dl_mission_chunk_open(bytes,sizeof bytes,&chunk)==DL_MISSION_LAYOUT);
+    return 0;
+}
 int main(void){
-    if(valid_package()||crc_cases()||empty_entity_directory()||directory_errors()||chunk_errors()||lazy_records())return 1;
+    if(valid_package()||crc_cases()||empty_entity_directory()||directory_errors()||chunk_errors()||lazy_records()||triangle_v2())return 1;
     puts("mission directory, chunk layout and lazy record validation passed");return 0;
 }

@@ -242,6 +242,7 @@ class ProjectLevels:
         except (ValueError, OSError, KeyError, TypeError) as error:
             status["error"] = str(error)
         return dict(mission_manifest=partition["path"].as_posix(), mission_manifest_sha256=sha256(partition["raw"]),
+                    visibility=partition["document"].get("visibility", "door-distance"),
                     bundle_id=row["id"] if row and "mission" in row else None,
                     native_play_supported=False, native_play_reason=STREAM_NATIVE_REASON,
                     preview_mode="Complete authoring scene; streaming residency and visibility are not simulated",

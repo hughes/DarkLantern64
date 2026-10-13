@@ -202,6 +202,9 @@ class BundleTests(unittest.TestCase):
                  {"stream_test_capture": True}, {"stream_test": True},
                  {"bundle": ROOT / "content/level_bundle.json", "stream_test": True, "menu_test": True},
                  {"bundle": ROOT / "content/level_bundle.json", "stream_test": True, "start_level": "streaming-probe"},
+                 {"bafford_stream_test_capture": True}, {"bafford_stream_test": True},
+                 {"bundle": ROOT / "content/level_bundle.json", "bafford_stream_test": True, "stream_test": True},
+                 {"bundle": ROOT / "content/level_bundle.json", "bafford_stream_test": True, "start_level": "bafford-stream"},
                  {"lighting_bake_verify": True, "disable_lighting_bake": True}]
         with patch.object(build, "prepare_bundle", side_effect=AssertionError("Must reject before cook")):
             for kwargs in cases:

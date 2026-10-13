@@ -1,4 +1,4 @@
-# Mission package v1
+# Mission directory v1 and region chunks v1/v2
 
 Status: first implementation contract, 2026-10-12. This is an experimental
 portable streaming foundation, not acceptance of the complete Bafford mission.
@@ -46,6 +46,10 @@ coverage. No compression in v1: stored and decoded chunk sizes are equal.
 | 44 | f32[3] | World bounds maximum, metres |
 | 56 | byte[8] | Reserved, zero |
 
+Bounds contain finite values and minimum must be strictly below maximum on
+every axis. They describe conservative ownership coverage; they are not a
+validated visibility partition or a complete movement boundary.
+
 Dependency slices are contiguous in region order and cover the dependency
 table exactly. Each dependency is a valid, distinct, non-self region ID. These
 are authored prefetch neighbors in v1, not a proven PVS or complete sensory
@@ -64,7 +68,7 @@ dependency set.
 | Header offset | Type | Meaning |
 | --- | --- | --- |
 | 0 | char[4] | `DLR1` |
-| 4 | u16 | Version, 1 |
+| 4 | u16 | Chunk version, 1 or 2 |
 | 6 | u16 | Header bytes, 32 |
 | 8 | u32 | Exact chunk bytes |
 | 12 | u32 | Section count, 1..3 |
@@ -82,18 +86,42 @@ descriptors or each other, and their length is count times record bytes.
 | 4 | u32 | Chunk-relative payload offset |
 | 8 | u32 | Payload bytes |
 | 12 | u32 | Record count |
-| 16 | u32 | Record bytes: 44, 32 or 4 respectively |
+| 16 | u32 | Record bytes: triangles 44 (v1) or 80 (v2), colliders 32, entity IDs 4 |
 | 20 | u32 | Reserved, zero |
 
-Triangle records contain three region-local XYZ positions (9 floats), a
+Version-1 triangle records contain three region-local XYZ positions (9 floats), a
 one-based material ID (u32) and one-based source surface ID (u32), totalling
-44 bytes. These are a portable geometry foundation; Tiny3D packing, UVs,
-normals, baked colors, batching and material/texture payloads remain subsequent
-format work. The debug report maps material and surface IDs to source IDs.
+44 bytes. Version 2 retains these first 44 bytes and appends corner attributes:
+
+| Triangle offset | Type | Meaning |
+| --- | --- | --- |
+| 44 | f32[6] | U,V for each of the three corners |
+| 68 | i8[9] | XYZ snorm8 normal for each corner; each component -127..127 |
+| 77 | u8 | Attribute flags: UV present 1, normal present 2 |
+| 78 | byte[2] | Reserved, zero |
+
+UVs use the existing runtime basis, including the OBJ reader's V conversion;
+the chunk decoder does not flip V or clamp coordinates to one texture repeat.
+Normals use the cooked geometry's orientation after inverse-scale/rotation,
+before quantization. Flagged normals must contain a nonzero vector at each
+corner. All UV floats must be finite, unknown flags and nonzero reserved bytes
+are rejected, and -128 is invalid in every normal component. Attribute values
+are validated lazily before use. Version-1 getters return zero attributes and
+flags, preserving the original untextured flat-normal probe contract.
+
+The bounded working-view bridge groups by region, material and attribute flags;
+its meshes retain optional UV and normal arrays. Material bootstraps use
+`texture_id=0` for untextured material and otherwise a one-based index into the
+bootstrap's ordinary `DlTexture` table. Texture pixels remain hash-addressed
+sprites packaged by the existing texture cooker. The directory layout remains
+v1 for both chunk versions. Tiny3D packing, baked colors, batch commands and
+texture pixels are not serialized into these triangle records. The debug
+report maps material and surface IDs to canonical source IDs.
 
 Collider records contain region-local center (3 floats), positive half size
 (3 floats), yaw in radians (float), and associated entity ID (u32), totalling
-32 bytes. Door association is resolved through the mission entity kind. This
+32 bytes. Entity ID zero means no association; other IDs must resolve through
+the mission directory. Door association is resolved through the entity kind. This
 initial representation retains the existing upright boxes; triangle sweeps and
 BVHs are a later compiler/runtime increment.
 

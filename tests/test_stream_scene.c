@@ -199,18 +199,21 @@ static int refresh_capacity(void){
     enum { MAX_TRIANGLES=DL_STREAM_SCENE_MAX_TRIANGLES+1,MAX_BYTES=64+MAX_TRIANGLES*44 };
     static uint8_t large_package[128+MAX_BYTES],large_buffer[MAX_BYTES];
     static DlStreamScene scratch;
-    DlStreamMaterial many_materials[DL_STREAM_SCENE_MAX_GROUPS+1];
+    enum { MATERIALS=DL_STREAM_SCENE_MAX_GROUPS/2+1 };
+    DlStreamMaterial many_materials[MATERIALS];
     for(unsigned i=0;i<sizeof many_materials/sizeof many_materials[0];++i)
         many_materials[i]=(DlStreamMaterial){.id=i+1,.color={128,128,128,255}};
     for(unsigned attempt=0;attempt<2;++attempt){
         unsigned triangles=attempt?DL_STREAM_SCENE_MAX_GROUPS+1:MAX_TRIANGLES;
-        size_t chunk_bytes=64+(size_t)triangles*44,file_bytes=128+chunk_bytes;
+        unsigned stride=attempt?80:44;
+        size_t chunk_bytes=64+(size_t)triangles*stride,file_bytes=128+chunk_bytes;
         memset(large_package,0,sizeof large_package);
-        uint8_t *p=large_package+128;memcpy(p,"DLR1",4);put16(p+4,1);put16(p+6,32);
-        put32(p+8,(uint32_t)chunk_bytes);put32(p+12,1);section(p+32,1,64,triangles,44);
+        uint8_t *p=large_package+128;memcpy(p,"DLR1",4);put16(p+4,attempt?2:1);put16(p+6,32);
+        put32(p+8,(uint32_t)chunk_bytes);put32(p+12,1);section(p+32,1,64,triangles,stride);
         for(unsigned i=0;i<triangles;++i){
-            uint8_t *triangle=p+64+i*44;putfloat(triangle+12,1);putfloat(triangle+28,1);
-            put32(triangle+36,attempt?i+1:1);put32(triangle+40,i+1);
+            uint8_t *triangle=p+64+i*stride;putfloat(triangle+12,1);putfloat(triangle+28,1);
+            put32(triangle+36,attempt?i%MATERIALS+1:1);put32(triangle+40,i+1);
+            if(attempt)triangle[77]=(uint8_t)(i<MATERIALS?DL_MISSION_TRIANGLE_UV:0);
         }
         memcpy(large_package,"DLM1",4);put16(large_package+4,1);put16(large_package+6,64);
         put32(large_package+8,(uint32_t)file_bytes);put32(large_package+12,1);
@@ -222,7 +225,7 @@ static int refresh_capacity(void){
         DlMission parsed;CHECK(dl_mission_open(large_package,128,file_bytes,&parsed)==DL_MISSION_OK);
         DlStreamDefinition def={.package_path="probe",.directory_bytes=128,.file_bytes=(uint32_t)file_bytes,
             .max_region_bytes=(uint32_t)chunk_bytes,.region_count=1,.materials=many_materials,
-            .material_count=attempt?DL_STREAM_SCENE_MAX_GROUPS+1:1};
+            .material_count=attempt?MATERIALS:1};
         DlLevel base={.stream=&def};CHECK(dl_stream_scene_init(&scratch,&base,&parsed)==DL_STREAM_SCENE_OK);
         DlRegionSlot slot={.buffer=large_buffer,.capacity=sizeof large_buffer};DlWorldStream manager;
         LargeReader reader={large_package,file_bytes};
@@ -233,6 +236,55 @@ static int refresh_capacity(void){
         CHECK(dl_stream_scene_refresh(&scratch,&manager,NULL)==DL_STREAM_SCENE_CAPACITY);
         CHECK(!dl_stream_scene_level(&scratch)&&scratch.revision==0&&slot.cpu_pins==0);
     }
+    return 0;
+}
+static int textured_v2_scene(void){
+    enum { V2_SECOND=512,V2_CHUNK=232,V2_FILE=744 };
+    static uint8_t bytes[V2_FILE],data[2][V2_CHUNK];static DlStreamScene adapter;
+    prepare();memset(bytes,0,sizeof bytes);memcpy(bytes,package,DIRECTORY);put32(bytes+8,V2_FILE);
+    for(unsigned i=0;i<2;++i){
+        uint8_t *chunk=bytes+(i?V2_SECOND:FIRST);
+        memcpy(chunk,package+(i?SECOND:FIRST),CHUNK_BYTES);
+        memmove(chunk+224,chunk+192,8);memmove(chunk+192,chunk+160,32);
+        memset(chunk+156,0,36);put16(chunk+4,2);put32(chunk+8,V2_CHUNK);
+        section(chunk+32,1,112,1,80);section(chunk+56,2,192,1,32);section(chunk+80,3,224,2,4);
+        putfloat(chunk+156,-2.5f);putfloat(chunk+160,6.25f);putfloat(chunk+164,2);putfloat(chunk+168,6.25f);
+        putfloat(chunk+172,2);putfloat(chunk+176,7.5f);
+        chunk[181]=127;chunk[184]=127;chunk[187]=127;chunk[189]=3;
+        uint8_t *region=bytes+64+i*64;put32(region+4,i?V2_SECOND:FIRST);
+        put32(region+8,V2_CHUNK);put32(region+12,V2_CHUNK);put32(region+16,crc32(chunk,V2_CHUNK));
+    }
+    put32(bytes+28,0);put32(bytes+28,crc32(bytes,DIRECTORY));
+    DlMission parsed;CHECK(dl_mission_open(bytes,DIRECTORY,sizeof bytes,&parsed)==DL_MISSION_OK);
+    const DlTexture textures[]={ {.path="rom:/textures/test.sprite",.width=32,.height=32} };
+    DlStreamMaterial textured=materials[0];textured.texture_id=1;
+    DlStreamDefinition def=definition;def.file_bytes=V2_FILE;def.max_region_bytes=V2_CHUNK;def.materials=&textured;
+    DlLevel base=bootstrap;base.stream=&def;base.textures=textures;base.texture_count=1;
+    CHECK(dl_stream_scene_init(&adapter,&base,&parsed)==DL_STREAM_SCENE_OK);
+    DlRegionSlot loaded[2]={{.buffer=data[0],.capacity=sizeof data[0]},{.buffer=data[1],.capacity=sizeof data[1]}};
+    DlWorldStream manager;LargeReader reader={bytes,sizeof bytes};
+    CHECK(dl_world_stream_init(&manager,&parsed,loaded,2,read_large,&reader)==DL_STREAM_OK);
+    DlRegionHandle first={0},second;
+    CHECK(dl_world_stream_request(&manager,1,&first)==DL_STREAM_OK);
+    CHECK(dl_world_stream_request(&manager,2,&second)==DL_STREAM_OK);
+    for(unsigned i=0;i<32&&(loaded[0].state!=DL_STREAM_RESIDENT||loaded[1].state!=DL_STREAM_RESIDENT);++i)
+        dl_world_stream_pump(&manager,256);
+    CHECK(loaded[0].state==DL_STREAM_RESIDENT&&loaded[1].state==DL_STREAM_RESIDENT);
+    CHECK(dl_stream_scene_refresh(&adapter,&manager,NULL)==DL_STREAM_SCENE_OK);
+    const DlLevel *old=dl_stream_scene_level(&adapter);
+    CHECK(old->textures==textures&&old->texture_count==1);
+    CHECK(old->models[3].texture==0&&old->meshes[1].uvs&&old->meshes[1].normals);
+    CHECK(old->meshes[1].uvs[0].u==-2.5f&&old->meshes[1].uvs[0].v==6.25f&&old->meshes[1].uvs[2].v==7.5f);
+    CHECK(old->meshes[1].normals[0].y==127&&old->meshes[1].normals[0].x==0);
+    CHECK(old->meshes[1].vertices[0].x==-3&&old->meshes[1].indices[2]==2);
+    /* Texture links cannot silently fall back to the untextured v1 behavior. */
+    data[first.slot][189]=DL_MISSION_TRIANGLE_NORMAL;
+    CHECK(dl_stream_scene_refresh(&adapter,&manager,NULL)==DL_STREAM_SCENE_CORRUPT&&dl_stream_scene_level(&adapter)==old);
+    data[first.slot][189]=3;memset(data[first.slot]+180,0,3);
+    CHECK(dl_stream_scene_refresh(&adapter,&manager,NULL)==DL_STREAM_SCENE_CORRUPT&&dl_stream_scene_level(&adapter)==old);
+    textured.texture_id=2;
+    CHECK(dl_stream_scene_init(&adapter,&base,&parsed)==DL_STREAM_SCENE_ARGUMENT);
+    CHECK(loaded[0].cpu_pins==0&&loaded[1].cpu_pins==0);
     return 0;
 }
 #ifdef DL_STREAM_SCENE_INTEGRATION
@@ -277,7 +329,7 @@ static int cooked_fixture(const char *path){
 }
 #endif
 int main(int argc,char **argv){
-    if(working_views()||atomic_failures()||initialization_limits()||refresh_capacity())return 1;
+    if(working_views()||atomic_failures()||initialization_limits()||refresh_capacity()||textured_v2_scene())return 1;
 #ifdef DL_STREAM_SCENE_INTEGRATION
     if(argc>1&&cooked_fixture(argv[1]))return 1;
 #else

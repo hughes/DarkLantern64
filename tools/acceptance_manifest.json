@@ -9,6 +9,12 @@
   },
   "checks": [
     {
+      "id": "capability-docs", "kind": "command", "required": true,
+      "profiles": ["portable", "host", "all"], "dependencies": [], "classification": "portable",
+      "argv": ["{python}", "{snapshot_root}/tools/check_project_capabilities.py"],
+      "parser": {"kind": "exit_code"}
+    },
+    {
       "id": "portable-python", "kind": "python_unittest", "required": true,
       "profiles": ["portable", "host", "all"], "dependencies": [],
       "start_directory": "tests", "pattern": "test_*.py", "classification": "portable",
@@ -47,6 +53,12 @@
       "profiles": ["host", "all"], "dependencies": ["editor-tests"], "classification": "functional",
       "argv": ["{python}", "{snapshot_root}/tools/verify_native_lighting_metadata.py", "--runner", "{runner}", "--evidence", "{artifacts_dir}/native-metadata.json"],
       "parser": {"kind": "json_file", "path": "{artifacts_dir}/native-metadata.json"}
+    },
+    {
+      "id": "editor-project-status", "kind": "command", "required": true,
+      "profiles": ["host", "all"], "dependencies": ["editor-tests"], "classification": "editor", "gpu": true,
+      "argv": ["{python}", "{snapshot_root}/tools/verify_project_status_editor.py", "--editor", "{editor}"],
+      "parser": {"kind": "stdout_json"}, "timeout_seconds": 1200
     },
     {
       "id": "editor-authoring-preview", "kind": "command", "required": true,

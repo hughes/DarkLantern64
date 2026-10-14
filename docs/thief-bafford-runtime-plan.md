@@ -10,8 +10,9 @@ in [mission package v1](mission-package-format.md).
 The [streaming editor contract](streaming-editor.md) makes region authoring,
 validation, transactional saves and matching Native Play behavior delivery
 requirements. The [playable two-room probe](streaming-probe.md) is selectable
-from the ROM menu; its editor integration is experimental until those gates
-are complete.
+from the ROM menu; the editor now authors paired regions/gates and previews the
+same cooked package and coordinator policy. The experimental package still has
+explicit bounds and unsupported inputs; see [maintained capabilities](project-status.md).
 
 The [Bafford streaming conversion](thief-bafford-streaming.md) now derives a
 textured, two-region version of the playable entry. The subsequent
@@ -61,7 +62,10 @@ is smaller because the adaptation removes water, sky boundaries and tiny slivers
 
 The full JSON deliberately uses `external-scale-study`. It is accepted for host
 authoring, while Native Play, ROM cooking and bundle membership reject it.
-Keep that protection until a separate streamed runtime format is implemented.
+Keep that protection until the complete imported study has a valid bounded
+mission partition, supported asset conversion and its own runtime acceptance.
+The DLM1/DLR1 streamed format now exists; its implementation alone does not
+establish that this full study fits or traverses correctly.
 The current contracts are defined by
 [content limits](../src/content_limits.h),
 [authoring profiles](../tools/content_profile.py) and
@@ -70,11 +74,15 @@ limits of N64 hardware.
 
 ## 1. Memory residency and ROM streaming
 
-The current [bundle compiler](../tools/compile_bundle.py) emits C geometry and
-descriptors for every bundled level. **All of those arrays are resident** even
-when another level is selected. Only the active level's sprites are loaded;
-its lighting bake is decoded into the renderer's existing caches. Adding the
-entry area to level select therefore does not introduce mission streaming.
+The [bundle compiler](../tools/compile_bundle.py) emits resident C geometry and
+descriptors for ordinary levels. Their arrays remain resident when another
+level is selected; only the active level's textures and decoded lighting cache
+are loaded. Streamed bundle entries instead retain a small shared bootstrap
+and load bounded DLM1/DLR1 static-region working sets. Merely adding an ordinary
+entry to the menu does not convert it to streaming. The full-study calculations
+and proposed subsystem work below preserve the original resident baseline;
+current delivery evidence is in the [streaming coordinator](streaming-coordinator.md)
+and [district performance report](bafford-stream-performance.md).
 
 The 2.61 MiB geometry figure counts emitted vertex, index, UV and normal arrays.
 It excludes descriptors, collision, strings, animation, textures, rendering

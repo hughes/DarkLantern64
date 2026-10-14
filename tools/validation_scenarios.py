@@ -221,17 +221,10 @@ class StructuredTestResult(unittest.TextTestResult):
 
 
 def run_unittest(spec, output):
-    # Direct script execution adds tools/ to sys.path. Keeping it would load
-    # both compile_level and tools.compile_level, giving identical exception
-    # definitions distinct identities and bypassing package-qualified mocks.
-    # Match the canonical namespace of python -m unittest discover.
-    scripts = (ROOT / "tools").resolve()
-    sys.path[:] = [entry for entry in sys.path if Path(entry or ".").resolve() != scripts]
-    suite = unittest.defaultTestLoader.discover(str(ROOT / spec.get("start_directory", "tests")),
-                                              pattern=spec.get("pattern", "test_*.py"))
-    result = unittest.TextTestRunner(verbosity=2, resultclass=StructuredTestResult).run(suite)
-    report = classify_unittest(result.testsRun, result.failure_rows, result.error_rows, result.skip_rows, spec)
-    write_json(output, report)
+    # The standard runner owns UTF-8, TEMP and its process tree. It calls our
+    # classifier directly, so command-line and pipeline allowances stay exact.
+    from tools.run_tests import run_tests
+    report = run_tests(ROOT, spec=spec, manifest=ROOT / "tools/acceptance_manifest.json", output=output)
     return 0 if report["accepted"] else 1
 
 

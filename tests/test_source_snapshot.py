@@ -5,7 +5,7 @@ import tempfile
 import subprocess
 import unittest
 
-from tools.source_snapshot import FrozenInputs, ReadGuard, SourceChanged, inventory, project_run_lock
+from tools.source_snapshot import FrozenInputs, ReadGuard, SourceChanged, inventory, project_run_lock, SOURCE_FILES
 
 
 class SourceSnapshotTests(unittest.TestCase):
@@ -34,6 +34,31 @@ class SourceSnapshotTests(unittest.TestCase):
             (self.root / "src/new_header.h").write_text("#define NEW_INPUT 1\n")
             with self.assertRaises(SourceChanged):
                 frozen.assert_current()
+
+    def test_maintained_document_change_invalidates_snapshot_but_evidence_can_publish(self):
+        document = self.root / "docs/project-status.md"
+        document.parent.mkdir()
+        document.write_text("Original maintained capabilities", encoding="utf-8")
+        readme = self.root / "README.md"
+        readme.write_text("Original project guide", encoding="utf-8")
+        with FrozenInputs(self.root, self.archive, external=False) as frozen:
+            self.assertIn("docs/project-status.md", frozen.files)
+            self.assertIn("README.md", frozen.files)
+            self.assertEqual((self.archive / "docs/project-status.md").read_bytes(), document.read_bytes())
+            evidence = self.root / "docs/evidence/result.json"
+            evidence.parent.mkdir()
+            evidence.write_text('{"passed":true}', encoding="utf-8")
+            frozen.assert_current()
+            frozen.guard.close()
+            document.write_text("Changed maintained capabilities", encoding="utf-8")
+            with self.assertRaises(SourceChanged):
+                frozen.assert_current()
+
+    def test_all_capability_marker_targets_are_captured_inputs(self):
+        root = Path(__file__).resolve().parents[1]
+        data = json.loads((root / "tools/project_capabilities.json").read_text(encoding="utf-8"))
+        targets = {row["path"] for row in data["documentation"]}
+        self.assertTrue(targets <= set(SOURCE_FILES), targets - set(SOURCE_FILES))
 
     def test_modified_archive_is_stale(self):
         with FrozenInputs(self.root, self.archive, external=False) as frozen:

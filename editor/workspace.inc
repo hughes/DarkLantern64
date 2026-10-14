@@ -1,7 +1,7 @@
     std::map<std::string,bool> panels_={{"Objects",true},{"Inspector",true},{"Levels",false},
         {"Blockout & Groups",false},{"Assets",false},{"Environment",false},{"Animation",false},
         {"Play Inspector",false},{"Build & Diagnostics",false},{"Audio Memory",false},{"Controls",false},
-        {"Renderer resources",false},{"Streaming",false}};
+        {"Renderer resources",false},{"Streaming",false},{"Project Status",false}};
     std::vector<std::function<void()>> uiActions_;
     std::string savedPanels_,focusPanel_;
     char objectFilter_[96]{};
@@ -263,7 +263,7 @@
             for(const char* name:{"Objects","Inspector","Levels","Blockout & Groups","Assets","Environment","Animation"})
                 if(ImGui::MenuItem(name,nullptr,panels_.at(name),!playing))ShowPanel(name,!panels_.at(name));
             if(ImGui::BeginMenu("Diagnostics")) {
-                for(const char* name:{"Play Inspector","Build & Diagnostics","Audio Memory","Renderer resources","Streaming"})
+                for(const char* name:{"Play Inspector","Build & Diagnostics","Project Status","Audio Memory","Renderer resources","Streaming"})
                     if(ImGui::MenuItem(name,nullptr,panels_.at(name),!playing||std::string(name)!="Renderer resources"))ShowPanel(name,!panels_.at(name));
                 ImGui::EndMenu();
             }
@@ -291,6 +291,7 @@
             ImGui::EndMenu();
         }
         if(ImGui::BeginMenu("Help")) {
+            if(ImGui::MenuItem("Project status"))ShowPanel("Project Status");
             if(ImGui::MenuItem("Controls"))ShowPanel("Controls");
             ImGui::EndMenu();
         }
@@ -321,6 +322,7 @@
     void FinishWorkspace() {
         UpdateStreamObjectSelection();
         if(panels_.at("Streaming"))DrawStreaming();
+        if(panels_.at("Project Status"))DrawProjectStatus();else projectStatusVisible_=false;
         if(!engine_.IsPlaying()) {
             if(selected_.empty())selection_.clear();
             else if(!selection_.contains(selected_)){selection_.clear();selection_.insert(selected_);}

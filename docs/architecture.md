@@ -1,8 +1,14 @@
 # Architecture
 
-Status: architecture and prototype direction, 2026-09-05. The [8 MiB memory requirement](decisions/0001-memory-baseline.md) and [full 3D world](decisions/0002-full-3d-world.md) are accepted. Current implementations are distinguished from longer-term authoring goals below.
+The [8 MiB memory requirement](decisions/0001-memory-baseline.md) and [full 3D world](decisions/0002-full-3d-world.md) are accepted. Current implementations are distinguished from longer-term authoring goals below; the original inspection snapshots remain dated evidence.
 
-The [hardware guide](n64-hardware-guide.md) documents the platform facts and proposed rendering budgets. The [audio design](audio-design.md) treats playback, acoustics, and AI hearing as one information system. The full 3D compiler, editor, and ROM now build; the editor transform round trip and an Ares input-only mission replay have passed. The [audio memory planner](audio-memory-planning.md) supplies scenario estimates, while runtime allocation instrumentation remains future work.
+<!-- project-capabilities:begin -->
+This section is maintained in [project_capabilities.json](../tools/project_capabilities.json); run `python tools/check_project_capabilities.py` to check it.
+
+Full authoring preview: implemented; Ordinary Native Play: limited; Streamed Native Play: limited; ROM play: limited; Streamed animated assets: unavailable; Original N64 and M64 validation: pending validation. Streamed missions use DLM1 directory version 1 and DLR1 chunks through version 4. Authoring, host simulation and ROM residency have different limits. See the [capability table and project status](../docs/project-status.md).
+<!-- project-capabilities:end -->
+
+The [hardware guide](n64-hardware-guide.md) documents platform facts and proposed rendering budgets. The [audio design](audio-design.md) treats playback, acoustics and AI hearing as one information system. Editor authoring, shared streamed simulation and source-bound Ares input replays are exercised by the [validation pipeline](validation-pipeline.md). The [audio memory planner](audio-memory-planning.md) supplies scenario estimates; target telemetry measures heap high-water marks and scoped frame/service costs. Estimates, measurements and unknown categories remain separately labeled.
 
 ## Responsibilities
 
@@ -55,7 +61,7 @@ The default renderer uses Tiny3D on the RSP for model transforms, rigid skeletal
 
 `src/game.c` is portable C17. It handles player movement, gravity, steps/jumping, arbitrary-yaw box collision, XYZ sight/light queries, guard state, hearing, a linked door/control, and objective completion. Player and guard positions represent their feet; perception uses eye positions. Upright box collision is a first implementation limit, not a restriction on visual model transforms or the future world representation. Patrols use explicit world-space waypoints; general navigation is future work.
 
-The compiler currently generates a C header that the N64 compiler/linker packs into the ROM. It is not a host-native binary dump or a stable streaming package. New runtime package formats must follow the requirements below.
+Ordinary levels use generated C assets packed by the N64 compiler/linker. Streamed missions use a versioned big-endian DLM1 directory with CRC-checked DLR1 chunks through version 4 for static geometry, collision, floor support, UVs/normals and baked state colors. Global gameplay definitions and dynamic model geometry remain in the shared resident bootstrap. The portable decoder and coordinator are consumed by both Native Play and the N64 adapter, with explicit IO, clock, renderer-preparation and graphics-completion interfaces. The coordinator owns demand, queued transitions, candidate assembly/publication, CPU pins, cancellation generations and retirement. See [package format](mission-package-format.md) and [streaming editor](streaming-editor.md). This experimental format is explicitly serialized, rather than a native desktop structure dump.
 
 The editor/content round trip is verified with an actual XYZ/rotation edit, generated-header change, save, and restoration. Both ROM variants compile and package. Ares has exercised the 4 MiB startup error and an 8 MiB input-only route through the gate, up the stairs, and to objective completion. This is functional emulator evidence; original-hardware performance and visual acceptance remain separate checks.
 
@@ -69,7 +75,7 @@ Use the [Dark Object System research](research/thief-object-system.md) to guide 
 - **Relationships:** typed source/destination IDs with optional data, suitable for a control-to-door connection or patrol route. Detect missing endpoints and invalid relationship types. Legitimate graph cycles, such as looping patrols, remain possible.
 - **Surface semantics:** explicit gameplay materials for footstep sounds and interactions. Visual texture changes should not silently change gameplay material assignments.
 
-The initial schema implements only the first encounter's entity kinds and links. Prototype inheritance, traits, provenance inspectors, general relationship editing, and Blender reimport ownership remain planned work. Changes to the source format require explicit schema versions and validation.
+The schema implements multiple guards, typed interactive objects, objective dependencies and explicit control/door links. The editor supports relationship authoring, encounter copies, reusable linked asset packs and stable Blender reimport ownership. General prototype inheritance, traits and effective-property provenance remain planned work. Changes to the source format require explicit schema versions and validation.
 
 ## Compiled data and runtime state
 
@@ -96,12 +102,12 @@ Keep Vulkan/editor dependencies outside the N64 target. The runtime should use b
 | Larger-scene rendering and libdragon revision | Tiny3D is the default, with a tracked project precision patch applied in a disposable build stage. Measure larger content and original hardware before committing to final scene budgets. |
 | Display mode and frame target | The two-guard workshop sustains every native refresh at 320x240 in Ares; [640x480 with AA](video-quality-study.md) sustains 30 fps there. Neither is a guarantee for larger missions. PAL timing and original hardware remain unverified. |
 | Runtime language subset | Portable C17 is implemented for gameplay and shared with host tests. Broader runtime dependencies remain constrained by target compilation and budgets. |
-| Detailed collision, navigation, and acoustics | Extend upright box proxies and authored patrols when sloped walkable geometry, detours, or richer sound propagation require it. |
+| Detailed collision, navigation, and acoustics | Walkable triangle floors already support slopes/stairs beside upright box solids. General triangle-solid sweeps, navigation detours and richer sound propagation need separate implementation and acceptance. |
 | Build distribution | Extend the existing Bazel prototype while making SDK identity and asset dependencies reproducible. |
-| ROM capacity, streaming, and saving | Measured content size, cartridge constraints, and game design needs. |
+| Larger missions and saving | Bounded static-region streaming is implemented. Full imported-mission conversion, cartridge-wide limits, animated asset streaming and persistent save storage remain separate work. |
 
 Implementation order and acceptance checks are in [First playable](first-playable.md).
 
-The [mission scale guide](scaling-guide.md) records the first guard/light workload measurements and hidden-room rendering comparison. Model bounds culling is implemented; spatial query candidates, separate guard perception scheduling, general actor/item arrays and 3D cell/portal visibility are the next scaling foundations.
+The [mission scale guide](scaling-guide.md) records the first guard/light workload measurements and hidden-room rendering comparison. Model-bounds culling, query candidates, actor/item arrays, perception scheduling and manual region working sets are implemented. Automatic portal/PVS compilation and general navigation remain future scaling work. Stable visibility sets and transition unions are authored explicitly and checked against runtime caps.
 
-The [character animation prototype](guard-animation-prototype.md) implements a shared Blender-authored skeleton and five compressed clips, independent instance playback, connected rigid joints and bounded procedural head attention. LightEngine previews the same N64 pose sampler. General animation graphs, richer transitions and semantic foot-contact events remain future work.
+The [character animation prototype](guard-animation-prototype.md) implements a shared Blender-authored skeleton and five compressed clips, independent instance playback, connected rigid joints and bounded procedural head attention. LightEngine previews the same N64 pose sampler; the default target renderer uses the RSP for deformation. Authored foot contacts advance from actual traveled distance even for culled actors. General animation graphs, richer transitions, IK and streamed character/clip assets remain future work.

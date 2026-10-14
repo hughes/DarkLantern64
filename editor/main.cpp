@@ -2,6 +2,7 @@
 #include <windows.h>
 #include <algorithm>
 #include <chrono>
+#include <cctype>
 #include <cmath>
 #include <filesystem>
 #include <fstream>
@@ -213,7 +214,7 @@ void ProjectLayout(ImGuiID root)
     ImGui::DockBuilderDockWindow("Viewport",main);
     ImGui::DockBuilderDockWindow("Objects",objects);
     for(const char* name:{"Inspector","Levels","Blockout & Groups","Assets","Environment","Animation",
-        "Play Inspector","Build & Diagnostics","Audio Memory","Controls","Image Viewer","Texture Browser"})
+        "Play Inspector","Build & Diagnostics","Project Status","Audio Memory","Controls","Image Viewer","Texture Browser"})
         ImGui::DockBuilderDockWindow(name,inspector);
 }
 
@@ -303,6 +304,7 @@ class DemoEditor
             PollPreparation();
             if(!ImGui::GetCurrentContext()||!ImGui::IsAnyItemActive())ObserveDocument();
             PollJob();
+            PollProjectStatus();
             PollCommands();
             auto actions=std::move(uiActions_);uiActions_.clear();
             for(auto& action:actions)try{action();}catch(const std::exception& e){status_=e.what();ShowPanel("Build & Diagnostics");}
@@ -336,8 +338,7 @@ class DemoEditor
             engine_.Render();
             ++frame_;
             if (frame_ % 120 == 0)
-                AtomicWrite(queue_ / "state.json", Json{{"pid",GetCurrentProcessId()},{"frame",frame_},{"dirty",dirty_},
-                            {"busy",Busy()},{"selected",selected_},{"status",status_},{"layout",Layout()}}.dump(2));
+                WriteEditorStatusState();
             if (!captureId_.empty() && frame_ >= captureFrame_)
             {
                 const auto id = captureId_;
@@ -350,6 +351,7 @@ class DemoEditor
         }
         engine_.ExitPlayMode();
         if (job_.valid()) { job_.wait(); PollJob(); }
+        if(projectStatusJob_.valid()){projectStatusJob_.wait();PollProjectStatus();}
     }
 
   private:
@@ -408,6 +410,7 @@ class DemoEditor
 #include "stream_preview.inc"
 #include "stream_workspace.inc"
 #include "render_diagnostics.inc"
+#include "project_status.inc"
 
     bool Busy() const { return job_.valid()||preparation_.valid(); }
     static std::string LevelLabel(std::string title)
@@ -447,11 +450,12 @@ class DemoEditor
     void WriteSession()
     {
         AtomicWrite(queue_/"project-state.json",Json{{"last_level",source_.filename().string()}}.dump(2));
-        AtomicWrite(queue_/"session.json",Json{{"pid",GetCurrentProcessId()},{"root",root_.string()},
+        Json session={{"pid",GetCurrentProcessId()},{"root",root_.string()},
             {"source",source_.string()},{"output",output_.string()},{"scene_path",scenePath_},{"project_editor",true},
             {"operations",{"pick_editor","inspect","list_levels","open_level","create_level","duplicate_level","delete_level","update_level","play_level","play_menu",
                 "drop_selection","save_prefab","place_prefab","add_game_object","set_game_object","undo","redo","add_blockout","select_entities","transform_selection","group_entities","duplicate_entities","delete_entities","refresh_preview","add_floor","add_transition","set_transition","delete_transition","import_blender_scene","import_asset_pack","add_prop","set_entity","add_enemy","duplicate_enemy","add_waypoint","delete_entity","set_environment","set_material",
-                "set_preview_transform","get_animation","set_animation","focus_character","save","build","capture","get_layout","set_panel","reset_layout","get_streaming","get_render_diagnostics","refresh_render_diagnostics","select_resource_witness","assign_region","set_region","set_streaming","fit_region_bounds","create_region","rename_region","duplicate_region","delete_region","add_transition_pair","select_stream_bounds","move_stream_bounds","clear_stream_bounds","start_stream_preview","stop_stream_preview","inspect_stream_preview","step_stream_preview","set_stream_preview_camera","set_stream_preview_transport","select_stream_preview","start_play","stop_play","inspect_scene","query_play","set_play_debug","inspect_play","pause_play","step_play","restart_play","set_play_input","get_play_trace","export_replay","replay_play","reload","get_audio_memory","set_audio_config","recalculate_audio","quit"}}}.dump(2));
+                "set_preview_transform","get_animation","set_animation","focus_character","save","build","capture","get_layout","set_panel","reset_layout","get_project_status","get_streaming","get_render_diagnostics","refresh_render_diagnostics","select_resource_witness","assign_region","set_region","set_streaming","fit_region_bounds","create_region","rename_region","duplicate_region","delete_region","add_transition_pair","select_stream_bounds","move_stream_bounds","clear_stream_bounds","start_stream_preview","stop_stream_preview","inspect_stream_preview","step_stream_preview","set_stream_preview_camera","set_stream_preview_transport","select_stream_preview","start_play","stop_stream_preview","inspect_scene","query_play","set_play_debug","inspect_play","pause_play","step_play","restart_play","set_play_input","get_play_trace","export_replay","replay_play","reload","get_audio_memory","set_audio_config","recalculate_audio","quit"}}};
+        session.update(ProjectSessionIdentity());AtomicWrite(queue_/"session.json",session.dump(2));
     }
     void InvalidatePreviewAssets(const Json& cooked)
     {
@@ -605,7 +609,7 @@ class DemoEditor
     {
         Json windows = Json::array();
         for (const char* name : {"Objects","Inspector","Levels","Blockout & Groups","Assets","Environment","Animation",
-                                "Play Inspector","Build & Diagnostics","Audio Memory","Controls","Viewport","Entity List","Selected Entity","Image Viewer","Texture Browser"})
+                                "Play Inspector","Build & Diagnostics","Project Status","Audio Memory","Controls","Viewport","Entity List","Selected Entity","Image Viewer","Texture Browser"})
             if (auto* w = ImGui::FindWindowByName(name))
                 windows.push_back({{"name",name},{"dock_id",w->DockId},{"position",{w->Pos.x,w->Pos.y}},
                                    {"size",{w->Size.x,w->Size.y}},{"active",bool(w->Active)},{"tab_id",w->TabId},{"tab_visible",bool(w->DockTabIsVisible)}});
@@ -1641,7 +1645,7 @@ class DemoEditor
             const std::string id = path.stem().string();
             if (id.size() != 32 || id.find_first_not_of("0123456789abcdef") != std::string::npos) continue;
             if (fs::exists(queue_/"responses"/(id+".json"))) { fs::remove(path); continue; }
-            if (id==captureId_ || id==jobId_ || id==actionRequestId_) continue;
+            if (id==captureId_ || id==jobId_ || id==actionRequestId_ || id==projectStatusRequest_) continue;
             try
             {
                 if (fs::file_size(path) > 65536) throw std::runtime_error("Request exceeds 64 KiB");
@@ -1650,15 +1654,20 @@ class DemoEditor
                 const double now = std::chrono::duration<double>(std::chrono::system_clock::now().time_since_epoch()).count();
                 if (request.at("expires_at").get<double>() < now) throw std::runtime_error("Request expired without execution");
                 const std::string op = request.at("op");
-                if(preparation_.valid()&&op!="inspect"&&op!="get_layout"&&op!="get_animation"&&op!="get_audio_memory"&&op!="get_render_diagnostics"&&op!="select_resource_witness")continue;
+                if(preparation_.valid()&&op!="inspect"&&op!="get_layout"&&op!="get_animation"&&op!="get_audio_memory"&&op!="get_project_status"&&op!="get_render_diagnostics"&&op!="select_resource_witness")continue;
+                if(op=="get_project_status"&&projectStatusJob_.valid())continue;
                 fs::remove(path);
                 const Json args = request.value("args",Json::object());
                 SyncStreamBoundsHandle();
                 ObserveDocument();
-                if (op == "inspect") { Respond(id,true,{{"document",document_},{"source",source_.string()},{"output",output_.string()},{"scene_path",scenePath_},{"catalog",catalog_},{"pending_action",pendingAction_},{"dirty",dirty_},{"busy",Busy()},{"status",status_},{"report",report_},{"stream_cook_report",streamCookReport_},{"stream_cook_report_path",streamCookReportPath_.string()},{"enemy_types",EnemyTypes()},{"prefabs",PrefabCatalog()},{"frame",frame_},{"preparing",preparationKind_},{"last_preparation",lastPreparation_},{"preview_refresh_pending",structureDirty_},{"audio",AudioState()},{"animation",AnimationState()},{"play",NativeState()},{"stream_preview",StreamPreviewState()},{"stream_bounds_handle",StreamBoundsState()},{"selection",selection_},{"history",{{"can_undo",history_.CanUndo()},{"can_redo",history_.CanRedo()}}}}); continue; }
+                if (op == "inspect") { Respond(id,true,{{"document",document_},{"source",source_.string()},{"output",output_.string()},{"scene_path",scenePath_},{"catalog",catalog_},{"pending_action",pendingAction_},{"dirty",dirty_},{"busy",Busy()},{"status",status_},{"report",report_},{"stream_cook_report",streamCookReport_},{"stream_cook_report_path",streamCookReportPath_.string()},{"enemy_types",EnemyTypes()},{"prefabs",PrefabCatalog()},{"frame",frame_},{"preparing",preparationKind_},{"last_preparation",lastPreparation_},{"preview_refresh_pending",structureDirty_},{"audio",AudioState()},{"animation",AnimationState()},{"play",NativeState()},{"stream_preview",StreamPreviewState()},{"stream_bounds_handle",StreamBoundsState()},{"project_status",ProjectStatusState()},{"selection",selection_},{"history",{{"can_undo",history_.CanUndo()},{"can_redo",history_.CanRedo()}}}}); continue; }
                 if (op == "get_audio_memory") { Respond(id,true,AudioState()); continue; }
                 if (op == "get_animation") { Respond(id,true,AnimationState()); continue; }
                 if (op == "get_layout") { Respond(id,true,Layout()); continue; }
+                if(op=="get_project_status") {
+                    if(args.contains("include_doctor")&&!args.at("include_doctor").is_boolean())throw std::runtime_error("include_doctor must be a boolean");
+                    RefreshProjectStatus(id,args.value("include_doctor",true));continue;
+                }
                 if(op=="get_render_diagnostics"){Respond(id,true,RenderDiagnostics(true));continue;}
                 if (op == "get_streaming") { Respond(id,true,StreamCommand(op,args)); continue; }
                 if(op=="start_stream_preview"||op=="stop_stream_preview"||op=="inspect_stream_preview"||op=="step_stream_preview"||op=="set_stream_preview_camera"||op=="set_stream_preview_transport"||op=="select_stream_preview") {Respond(id,true,StreamPreviewCommand(op,args));continue;}

@@ -1,5 +1,11 @@
 # Content and development workflow
 
+<!-- project-capabilities:begin -->
+This section is maintained in [project_capabilities.json](../tools/project_capabilities.json); run `python tools/check_project_capabilities.py` to check it.
+
+Full authoring preview: implemented; Ordinary Native Play: limited; Streamed Native Play: limited; ROM play: limited; Streamed animated assets: unavailable; Original N64 and M64 validation: pending validation. Streamed missions use DLM1 directory version 1 and DLR1 chunks through version 4. Authoring, host simulation and ROM residency have different limits. See the [capability table and project status](../docs/project-status.md).
+<!-- project-capabilities:end -->
+
 Creators can start with the [quickstart](creator-guide.md). See the [project overview](../README.md) for prerequisites, the [editor reference](../editor/README.md) for controls, the [developer tools guide](developer-tools.md) for specialist commands, and the [architecture](architecture.md) for current limits.
 
 ## Author in LightEngine
@@ -8,7 +14,7 @@ LightEngine is the desktop authoring environment. The DarkLantern64 editor appli
 
 Use **DarkLantern64: Launch editor** once, then manage levels in its **Levels** panel. It registers source levels whether or not they are in the runtime bundle, and supports opening, creating, duplicating, retitling and deleting them. Switching prompts for unsaved level and audio-plan drafts. Deletion confirms and archives the saved level under `.dev/editor/deleted-levels/`, preserving shared assets. **Include in game menu** updates the explicit bundle manifest `content/level_bundle.json`; the game menu currently supports up to eight levels.
 
-Use the 3D viewport and object properties to place models, then **Save + Cook** to validate and update generated assets. **Play level** saves, cooks, builds and launches the active level at the selected **Test start**; **Play game menu** saves the active level before building and launching the bundle. **Build ROM only** builds the active level without launching. Assets use OBJ geometry with per-instance colors or UV-mapped RGBA16 textures; animation conversion remains future work. The [texture pipeline](texture-pipeline.md) and [courtyard study](night-contrast.md) describe the working textured scene. Export compatible placeholder geometry from Blender, reference it by asset ID, and preserve gameplay IDs when revising it. The [Blender scene bridge](blender-scenes.md) supports safe re-import of existing static meshes, placements and box proxies, with Sponza as the verified example. Rich inheritance remains planned work.
+Use the 3D viewport and object properties to place models, then **Save + Cook** to validate and update generated assets. **Play level** saves, cooks, builds and launches the active level at the selected **Test start**; **Play game menu** saves the active level before building and launching the bundle. **Build ROM only** builds the active level without launching. Assets use OBJ geometry with per-instance colors or UV-mapped RGBA16 textures; resident character export, compressed shared clips and editor/N64 playback are implemented; the DLM streamed format excludes animated assets. The [texture pipeline](texture-pipeline.md) and [courtyard study](night-contrast.md) describe the working textured scene. Export compatible placeholder geometry from Blender, reference it by asset ID, and preserve gameplay IDs when revising it. The [Blender scene bridge](blender-scenes.md) supports safe re-import of existing static meshes, placements and box proxies, with Sponza as the verified example. Rich inheritance remains planned work.
 
 Stable authoring IDs must survive save, reload, and import changes. Duplication creates new identities. The compiler may remap IDs into compact runtime indices while retaining a debug mapping to the editor.
 
@@ -24,9 +30,9 @@ The implemented build loop is:
 4. Rebuild affected artifacts and the ROM incrementally. Record inputs, tool versions, output sizes, and warnings. A failed build must leave the previous valid ROM available and clearly identify it as stale.
 5. Launch the new ROM in Ares, then validate representative changes on hardware.
 
-`tools/compile_level.py` handles content validation/cooking. `tools/build.py` invokes the installed SDK without shell interpolation and preserves the last valid ROM if compilation or packaging fails. `build/<ROM-name>/build.json` records source and ROM hashes, tool identity, size, and elapsed build time. Unchanged builds reuse the existing ROM only when input fingerprints and its output hash still match. Generated C data is compiled for the target; a separately versioned streaming asset format is future work.
+`tools/compile_level.py` handles ordinary content validation/cooking; `tools/compile_mission.py` handles paired streamed missions. `tools/build.py` invokes the installed SDK without shell interpolation and preserves the last valid ROM if compilation or packaging fails. `build/<ROM-name>/build.json` records source and ROM hashes, tool identity, size, and elapsed build time. Unchanged builds reuse the existing ROM only when input fingerprints and its output hash still match. Ordinary levels use generated C data; streamed missions add the versioned DLM1 directory and DLR1 chunks through version 4, with checked identities and bounded runtime publication. See the [streaming editor](streaming-editor.md) for region authoring, cooked preview and diagnostics.
 
-Per-system memory allowances and frame-time budgets remain to be established from measurements. The [8 MiB baseline](decisions/0001-memory-baseline.md) includes runtime allocations, buffers, stacks, code, and resident content; desktop authoring richness must compile into that bounded space.
+Memory, frame and service work are measured for declared workloads, including the [strict district route](bafford-stream-performance.md); these results do not establish a universal mission budget. The [8 MiB baseline](decisions/0001-memory-baseline.md) includes runtime allocations, buffers, stacks, code, and resident content; desktop authoring richness must compile into that bounded space. Use [project status](project-status.md) to distinguish matching, stale, missing and incomplete artifacts, and the [standard runner/bootstrap](bootstrap.md) for environment checks and tests.
 
 ## Editor commands and layout
 

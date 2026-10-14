@@ -151,6 +151,11 @@ def exercise(exe, settings, rom, name, success, seconds, expected_sha256=None, m
             # kill-on-close job. It cannot contend before the lease grants it.
             lease.register(process)
             result.update(status="running", process_pid=process.pid)
+            try:
+                from .process_identity import creation_filetime
+            except ImportError:
+                from process_identity import creation_filetime
+            result["process_creation_filetime"] = creation_filetime(process.pid)
             _write_run_status(status_path, result)
             deadline = time.monotonic() + seconds
             while time.monotonic() < deadline:

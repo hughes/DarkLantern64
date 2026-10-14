@@ -50,7 +50,8 @@ class ManifestTests(unittest.TestCase):
 
     def test_failure_allowance_requires_id_and_message(self):
         data = manifest()
-        del data["checks"][0]["known_failures"][0]["message_pattern"]
+        python_check = next(row for row in data["checks"] if row["id"] == "portable-python")
+        del python_check["known_failures"][0]["message_pattern"]
         with self.assertRaisesRegex(ValueError, "exact ID and message"):
             validation.validate_manifest(data)
 
@@ -70,7 +71,7 @@ class ManifestTests(unittest.TestCase):
 
 class StructuredTests(unittest.TestCase):
     def setUp(self):
-        self.spec = manifest()["checks"][0]
+        self.spec = next(row for row in manifest()["checks"] if row["id"] == "portable-python")
         self.known = self.spec["known_failures"][0]
 
     def test_exact_known_fixture_is_retained_without_pure_pass(self):
@@ -139,7 +140,16 @@ class StructuredTests(unittest.TestCase):
             self.assertEqual(Path(start), ROOT / "tests")
             return unittest.TestSuite([unittest.FunctionTestCase(lambda: None)])
         with tempfile.TemporaryDirectory() as temp, patch.object(unittest.defaultTestLoader, "discover", side_effect=discover):
-            self.assertEqual(validation.run_unittest(dict(start_directory="tests", pattern="test_*.py"), Path(temp)/"tests.json"), 0)
+            from tools.run_tests import execute_suite
+            self.assertTrue(execute_suite(ROOT, dict(start_directory="tests", pattern="test_*.py"), stream=io.StringIO())["accepted"])
+
+    def test_pipeline_unittest_delegates_standard_runner_without_changing_spec(self):
+        from tools import run_tests
+        with patch.object(run_tests, "run_tests", return_value={"accepted": True}) as run:
+            self.assertEqual(validation.run_unittest(self.spec, Path("unittest.json")), 0)
+        self.assertEqual(run.call_args.args, (ROOT,))
+        self.assertEqual(run.call_args.kwargs["spec"], self.spec)
+        self.assertEqual(run.call_args.kwargs["output"], Path("unittest.json"))
 
 
 class ReplayExpectationsTests(unittest.TestCase):

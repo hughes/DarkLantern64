@@ -1,0 +1,794 @@
+{
+  "schema_version": 1,
+  "capabilities": [
+    {
+      "id": "full-authoring-preview",
+      "label": "Full authoring preview",
+      "state": "implemented",
+      "description": "Canonical scene editing, import, history and desktop preview include host-only large studies. A source preview is not cooked ROM simulation or target lighting/performance validation. Unassigned streaming homes and invalid capacity drafts stay editable.",
+      "limits": [
+        "study_models",
+        "study_scene_vertices",
+        "study_scene_triangles"
+      ],
+      "source_references": [
+        {
+          "path": "tools/compile_level.py",
+          "symbol": "preview_scene"
+        },
+        {
+          "path": "tools/content_profile.py",
+          "symbol": "STUDY_LIMITS"
+        },
+        {
+          "path": "editor/region_authoring.h",
+          "symbol": "DlRegionAuthoring"
+        }
+      ]
+    },
+    {
+      "id": "ordinary-native-play",
+      "label": "Ordinary Native Play",
+      "state": "limited",
+      "description": "Bounded ordinary levels use shared portable gameplay, tick and animation with independent runtime state. Large external-scale-study sources are rejected; desktop rendering/lighting approximate the target.",
+      "limits": [
+        "scene_models",
+        "scene_vertices",
+        "scene_triangles",
+        "ordinary_enemies"
+      ],
+      "source_references": [
+        {
+          "path": "editor/play_session.h",
+          "symbol": "DlPlaySession"
+        },
+        {
+          "path": "tools/compile_level.py",
+          "symbol": "play_package"
+        }
+      ]
+    },
+    {
+      "id": "streamed-native-play",
+      "label": "Streamed Native Play",
+      "state": "limited",
+      "description": "Cooked DLM1 package chunks and shared coordinator drive demand, queued doors, floor support, preparation/publication/retirement and persistent mission state. CRC/SHA identity checks, delay injection and inspector snapshots are available. Rendering policy classification is shared; host shader work and timing do not certify the ROM.",
+      "limits": [
+        "runtime_regions",
+        "resident_regions",
+        "stream_static_triangles",
+        "stream_colliders",
+        "stream_floors"
+      ],
+      "source_references": [
+        {
+          "path": "editor/play_session.h",
+          "symbol": "DlPlaySession"
+        },
+        {
+          "path": "src/stream_coordinator.h",
+          "symbol": "DlStreamCoordinator"
+        }
+      ]
+    },
+    {
+      "id": "rom-play",
+      "label": "ROM play",
+      "state": "limited",
+      "description": "Ordinary resident C assets and bounded streamed DLM1 missions run through libdragon/Tiny3D. The default RSP backend transforms, rigidly deforms and clips; the CPU reference remains available. Source-bound Ares functional/lifecycle/strict workload checks exist. Larger missions and original hardware need separate acceptance.",
+      "limits": [
+        "required_memory",
+        "scene_models",
+        "scene_vertices",
+        "scene_triangles",
+        "stream_chunk_bytes"
+      ],
+      "source_references": [
+        {
+          "path": "src/main.c",
+          "symbol": "require_expansion_pak"
+        },
+        {
+          "path": "src/render_t3d.inc",
+          "symbol": "GPU_FRAMES"
+        },
+        {
+          "path": "src/stream_rom.c",
+          "symbol": "MAX_CHUNK"
+        }
+      ]
+    },
+    {
+      "id": "static-lighting",
+      "label": "Static lighting and diagnostics",
+      "state": "limited",
+      "description": "Baked inline closed/open states support at most one global independent door. Standalone baked assets and live night fallbacks have explicit policy reasons; multiple doors disable the inline shortcut and lighting changes can require live work. Publication/revision reports identify source/package/build and cost scope. Estimates and unknown costs remain distinct from measured timing/heap.",
+      "limits": [
+        "inline_independent_doors"
+      ],
+      "source_references": [
+        {
+          "path": "src/lighting_policy.h",
+          "symbol": "dl_lighting_inline_payload"
+        },
+        {
+          "path": "src/lighting_policy.c",
+          "symbol": "dl_lighting_decision"
+        }
+      ]
+    },
+    {
+      "id": "character-animation",
+      "label": "Resident character animation",
+      "state": "limited",
+      "description": "Shared immutable meshes/skeletons/quantized keys, independent actor playback, two-clip blending, connected one-influence geometry, bounded head attention and traveled-distance foot contacts are implemented. Host cooked-character caches use source/recipe identity; runtime pose/render caches stay bounded by scene storage. Animated scale, multiple vertex influences, general graphs/IK and cold-clip streaming are unavailable.",
+      "limits": [
+        "animation_bones",
+        "animation_clips",
+        "animation_samples",
+        "animation_events",
+        "animation_sockets"
+      ],
+      "source_references": [
+        {
+          "path": "src/animation.c",
+          "symbol": "dl_animation_pose"
+        },
+        {
+          "path": "tools/character_assets.py",
+          "symbol": "load_character"
+        },
+        {
+          "path": "src/render_t3d.inc",
+          "symbol": "GPU_FRAMES"
+        }
+      ]
+    },
+    {
+      "id": "streamed-animation",
+      "label": "Streamed animated assets",
+      "state": "unavailable",
+      "description": "The DLM cooker rejects animated character assets and linked asset packs. Resident character support does not imply character/clip streaming in a streamed mission.",
+      "limits": [],
+      "source_references": [
+        {
+          "path": "tools/compile_mission.py",
+          "symbol": "read_source"
+        }
+      ]
+    },
+    {
+      "id": "runtime-regions",
+      "label": "Runtime regions and visibility",
+      "state": "limited",
+      "description": "Manual ownership, activation bounds, directed paired gates and independent authored visible sets feed the shared transactional coordinator. Stable sets and transition unions must satisfy bridge capacity. Visibility authoring has no automatic BSP/PVS compiler. Portable packages can exceed the runtime region cap and then remain inspectable with target failures.",
+      "limits": [
+        "portable_package_regions",
+        "runtime_regions",
+        "resident_regions",
+        "directed_gates",
+        "outgoing_gates",
+        "stream_groups"
+      ],
+      "source_references": [
+        {
+          "path": "tools/compile_mission.py",
+          "symbol": "authored_policy"
+        },
+        {
+          "path": "src/stream_scene.h",
+          "symbol": "DL_STREAM_SCENE_MAX_REGIONS"
+        },
+        {
+          "path": "src/stream_coordinator.h",
+          "symbol": "DlStreamCoordinator"
+        }
+      ]
+    },
+    {
+      "id": "hardware-validation",
+      "label": "Original N64 and M64 validation",
+      "state": "pending_validation",
+      "description": "Expansion Pak startup and measured Ares workloads are verified separately from original N64/M64 visual, audio and performance acceptance. Those physical target checks remain pending.",
+      "limits": [],
+      "source_references": [
+        {
+          "path": "src/main.c",
+          "symbol": "require_expansion_pak"
+        }
+      ]
+    }
+  ],
+  "limits": {
+    "mesh_vertices": {
+      "value": 4096,
+      "unit": "vertices",
+      "scope": "Resident renderer; placed instances count separately, including bootstrap/dynamic models.",
+      "source_references": [
+        {
+          "path": "src/content_limits.h",
+          "symbol": "DL_MAX_MESH_VERTICES",
+          "kind": "c_constant"
+        }
+      ]
+    },
+    "scene_vertices": {
+      "value": 6144,
+      "unit": "vertices",
+      "scope": "Resident renderer; placed instances count separately, including bootstrap/dynamic models.",
+      "source_references": [
+        {
+          "path": "src/content_limits.h",
+          "symbol": "DL_MAX_SCENE_VERTICES",
+          "kind": "c_constant"
+        },
+        {
+          "path": "tools/cook_diagnostics.py",
+          "symbol": "CAPS",
+          "kind": "python_constant",
+          "key": "scene_vertices"
+        }
+      ]
+    },
+    "scene_triangles": {
+      "value": 4096,
+      "unit": "triangles",
+      "scope": "Resident renderer; placed instances count separately, including bootstrap/dynamic models.",
+      "source_references": [
+        {
+          "path": "src/content_limits.h",
+          "symbol": "DL_MAX_SCENE_TRIANGLES",
+          "kind": "c_constant"
+        },
+        {
+          "path": "tools/cook_diagnostics.py",
+          "symbol": "CAPS",
+          "kind": "python_constant",
+          "key": "scene_triangles"
+        }
+      ]
+    },
+    "scene_models": {
+      "value": 128,
+      "unit": "models",
+      "scope": "Resident renderer; placed instances count separately, including bootstrap/dynamic models.",
+      "source_references": [
+        {
+          "path": "src/content_limits.h",
+          "symbol": "DL_MAX_MODELS",
+          "kind": "c_constant"
+        },
+        {
+          "path": "tools/cook_diagnostics.py",
+          "symbol": "CAPS",
+          "kind": "python_constant",
+          "key": "model_count"
+        }
+      ]
+    },
+    "ordinary_entities": {
+      "value": 256,
+      "unit": "entities",
+      "scope": "Ordinary saved level validation; host study and streamed authoring use separate budgets.",
+      "source_references": [
+        {
+          "path": "tools/content_profile.py",
+          "symbol": "content_limits",
+          "kind": "python_dict",
+          "variable": "result",
+          "key": "entities"
+        }
+      ]
+    },
+    "ordinary_materials": {
+      "value": 64,
+      "unit": "materials",
+      "scope": "Ordinary saved level validation; host study and streamed authoring use separate budgets.",
+      "source_references": [
+        {
+          "path": "tools/content_profile.py",
+          "symbol": "content_limits",
+          "kind": "python_dict",
+          "variable": "result",
+          "key": "materials"
+        }
+      ]
+    },
+    "ordinary_lights": {
+      "value": 16,
+      "unit": "lights",
+      "scope": "Ordinary saved level validation; host study and streamed authoring use separate budgets.",
+      "source_references": [
+        {
+          "path": "tools/content_profile.py",
+          "symbol": "content_limits",
+          "kind": "python_dict",
+          "variable": "result",
+          "key": "lights"
+        }
+      ]
+    },
+    "ordinary_colliders": {
+      "value": 256,
+      "unit": "colliders",
+      "scope": "Ordinary saved level validation; host study and streamed authoring use separate budgets.",
+      "source_references": [
+        {
+          "path": "tools/content_profile.py",
+          "symbol": "content_limits",
+          "kind": "python_dict",
+          "variable": "result",
+          "key": "colliders"
+        }
+      ]
+    },
+    "ordinary_floors": {
+      "value": 128,
+      "unit": "floor triangles",
+      "scope": "Ordinary saved level validation; host study and streamed authoring use separate budgets.",
+      "source_references": [
+        {
+          "path": "tools/content_profile.py",
+          "symbol": "content_limits",
+          "kind": "python_dict",
+          "variable": "result",
+          "key": "floors"
+        }
+      ]
+    },
+    "ordinary_enemies": {
+      "value": 16,
+      "unit": "enemies",
+      "scope": "Ordinary saved level validation; host study and streamed authoring use separate budgets.",
+      "source_references": [
+        {
+          "path": "tools/content_profile.py",
+          "symbol": "content_limits",
+          "kind": "python_dict",
+          "variable": "result",
+          "key": "enemies"
+        },
+        {
+          "path": "src/game.h",
+          "symbol": "DL_MAX_ENEMIES",
+          "kind": "c_constant"
+        }
+      ]
+    },
+    "ordinary_interactive_objects": {
+      "value": 64,
+      "unit": "objects",
+      "scope": "Ordinary saved level validation; host study and streamed authoring use separate budgets.",
+      "source_references": [
+        {
+          "path": "tools/content_profile.py",
+          "symbol": "content_limits",
+          "kind": "python_dict",
+          "variable": "result",
+          "key": "interactive_objects"
+        },
+        {
+          "path": "src/game.h",
+          "symbol": "DL_MAX_OBJECTS",
+          "kind": "c_constant"
+        }
+      ]
+    },
+    "study_models": {
+      "value": 8192,
+      "unit": "models",
+      "scope": "external-scale-study host authoring only; Native Play and ROM compilation reject this profile.",
+      "source_references": [
+        {
+          "path": "tools/content_profile.py",
+          "symbol": "STUDY_LIMITS",
+          "kind": "python_constant",
+          "key": "models"
+        }
+      ]
+    },
+    "study_scene_vertices": {
+      "value": 262144,
+      "unit": "vertices",
+      "scope": "external-scale-study host authoring only; Native Play and ROM compilation reject this profile.",
+      "source_references": [
+        {
+          "path": "tools/content_profile.py",
+          "symbol": "STUDY_LIMITS",
+          "kind": "python_constant",
+          "key": "scene_vertices"
+        }
+      ]
+    },
+    "study_scene_triangles": {
+      "value": 131072,
+      "unit": "triangles",
+      "scope": "external-scale-study host authoring only; Native Play and ROM compilation reject this profile.",
+      "source_references": [
+        {
+          "path": "tools/content_profile.py",
+          "symbol": "STUDY_LIMITS",
+          "kind": "python_constant",
+          "key": "scene_triangles"
+        }
+      ]
+    },
+    "mission_models": {
+      "value": 1024,
+      "unit": "models",
+      "scope": "streamed-mission total authoring budget, not a resident runtime allocation.",
+      "source_references": [
+        {
+          "path": "tools/content_profile.py",
+          "symbol": "STREAM_LIMITS",
+          "kind": "python_constant",
+          "key": "models"
+        }
+      ]
+    },
+    "mission_entities": {
+      "value": 2048,
+      "unit": "entities",
+      "scope": "streamed-mission total authoring budget, not a resident runtime allocation.",
+      "source_references": [
+        {
+          "path": "tools/content_profile.py",
+          "symbol": "STREAM_LIMITS",
+          "kind": "python_constant",
+          "key": "entities"
+        }
+      ]
+    },
+    "mission_scene_vertices": {
+      "value": 131072,
+      "unit": "vertices",
+      "scope": "streamed-mission total authoring budget, not a resident runtime allocation.",
+      "source_references": [
+        {
+          "path": "tools/content_profile.py",
+          "symbol": "STREAM_LIMITS",
+          "kind": "python_constant",
+          "key": "scene_vertices"
+        }
+      ]
+    },
+    "mission_scene_triangles": {
+      "value": 32768,
+      "unit": "triangles",
+      "scope": "streamed-mission total authoring budget, not a resident runtime allocation.",
+      "source_references": [
+        {
+          "path": "tools/content_profile.py",
+          "symbol": "STREAM_LIMITS",
+          "kind": "python_constant",
+          "key": "scene_triangles"
+        }
+      ]
+    },
+    "portable_package_regions": {
+      "value": 256,
+      "unit": "regions",
+      "scope": "Portable DLM cooker; target/Native bridge is stricter.",
+      "source_references": [
+        {
+          "path": "tools/compile_mission.py",
+          "symbol": "validated_regions",
+          "kind": "pattern",
+          "pattern": "1 <= len\\(regions\\) <= ([0-9]+)"
+        }
+      ]
+    },
+    "runtime_regions": {
+      "value": 32,
+      "unit": "regions",
+      "scope": "Authored runtime bridge; stable sets and transition unions must fit.",
+      "source_references": [
+        {
+          "path": "src/stream_scene.h",
+          "symbol": "DL_STREAM_SCENE_MAX_REGIONS",
+          "kind": "c_constant"
+        },
+        {
+          "path": "tools/cook_diagnostics.py",
+          "symbol": "CAPS",
+          "kind": "python_constant",
+          "key": "region_count"
+        }
+      ]
+    },
+    "resident_regions": {
+      "value": 5,
+      "unit": "regions",
+      "scope": "Authored runtime bridge; stable sets and transition unions must fit.",
+      "source_references": [
+        {
+          "path": "src/stream_scene.h",
+          "symbol": "DL_STREAM_SCENE_MAX_RESIDENT_REGIONS",
+          "kind": "c_constant"
+        },
+        {
+          "path": "tools/cook_diagnostics.py",
+          "symbol": "CAPS",
+          "kind": "python_constant",
+          "key": "resident_regions"
+        }
+      ]
+    },
+    "stream_static_triangles": {
+      "value": 1440,
+      "unit": "triangles",
+      "scope": "Authored runtime bridge; stable sets and transition unions must fit.",
+      "source_references": [
+        {
+          "path": "src/stream_scene.h",
+          "symbol": "DL_STREAM_SCENE_MAX_TRIANGLES",
+          "kind": "c_constant"
+        },
+        {
+          "path": "tools/cook_diagnostics.py",
+          "symbol": "CAPS",
+          "kind": "python_constant",
+          "key": "triangle_count"
+        }
+      ]
+    },
+    "stream_groups": {
+      "value": 64,
+      "unit": "groups",
+      "scope": "Authored runtime bridge; stable sets and transition unions must fit.",
+      "source_references": [
+        {
+          "path": "src/stream_scene.h",
+          "symbol": "DL_STREAM_SCENE_MAX_GROUPS",
+          "kind": "c_constant"
+        },
+        {
+          "path": "tools/cook_diagnostics.py",
+          "symbol": "CAPS",
+          "kind": "python_constant",
+          "key": "group_count"
+        }
+      ]
+    },
+    "stream_colliders": {
+      "value": 400,
+      "unit": "records",
+      "scope": "Authored runtime bridge working set; collider count includes synthetic unavailable-gate barriers.",
+      "source_references": [
+        {
+          "path": "src/stream_scene.h",
+          "symbol": "DL_STREAM_SCENE_MAX_COLLIDERS",
+          "kind": "c_constant"
+        },
+        {
+          "path": "tools/cook_diagnostics.py",
+          "symbol": "CAPS",
+          "kind": "python_constant",
+          "key": "collision_records"
+        }
+      ]
+    },
+    "stream_floors": {
+      "value": 128,
+      "unit": "floor triangles",
+      "scope": "Authored runtime bridge; stable sets and transition unions must fit.",
+      "source_references": [
+        {
+          "path": "src/stream_scene.h",
+          "symbol": "DL_STREAM_SCENE_MAX_FLOORS",
+          "kind": "c_constant"
+        },
+        {
+          "path": "tools/cook_diagnostics.py",
+          "symbol": "CAPS",
+          "kind": "python_constant",
+          "key": "floor_count"
+        }
+      ]
+    },
+    "stream_directory_bytes": {
+      "value": 65536,
+      "unit": "bytes",
+      "scope": "N64 directory storage cap.",
+      "source_references": [
+        {
+          "path": "src/stream_rom.c",
+          "symbol": "MAX_DIRECTORY",
+          "kind": "c_constant"
+        },
+        {
+          "path": "tools/cook_diagnostics.py",
+          "symbol": "CAPS",
+          "kind": "python_constant",
+          "key": "directory_bytes"
+        }
+      ]
+    },
+    "stream_chunk_bytes": {
+      "value": 65536,
+      "unit": "bytes",
+      "scope": "Maximum individual runtime region chunk.",
+      "source_references": [
+        {
+          "path": "src/stream_rom.c",
+          "symbol": "MAX_CHUNK",
+          "kind": "c_constant"
+        },
+        {
+          "path": "tools/cook_diagnostics.py",
+          "symbol": "CAPS",
+          "kind": "python_constant",
+          "key": "chunk_bytes"
+        }
+      ]
+    },
+    "directed_gates": {
+      "value": 256,
+      "unit": "gates",
+      "scope": "Authored runtime policy; zero gates allowed for a single region.",
+      "source_references": [
+        {
+          "path": "tools/compile_mission.py",
+          "symbol": "authored_policy",
+          "kind": "pattern",
+          "pattern": "len\\(source\\) <= ([0-9]+)"
+        }
+      ]
+    },
+    "outgoing_gates": {
+      "value": 8,
+      "unit": "gates per region",
+      "scope": "Directed outgoing gates; paired openings occupy one gate in each direction.",
+      "source_references": [
+        {
+          "path": "tools/compile_mission.py",
+          "symbol": "authored_policy",
+          "kind": "pattern",
+          "pattern": "len\\(outgoing\\) <= ([0-9]+)"
+        }
+      ]
+    },
+    "animation_bones": {
+      "value": 32,
+      "unit": "bones",
+      "scope": "Shared resident character skeleton and caller-owned sampler matrix scratch.",
+      "source_references": [
+        {
+          "path": "src/animation.h",
+          "symbol": "DL_ANIMATION_MAX_BONES",
+          "kind": "c_constant"
+        },
+        {
+          "path": "tools/character_assets.py",
+          "symbol": "MAX_BONES",
+          "kind": "python_constant"
+        }
+      ]
+    },
+    "animation_clips": {
+      "value": 32,
+      "unit": "clips per asset",
+      "scope": "Character source validation; no streamed animated asset support.",
+      "source_references": [
+        {
+          "path": "tools/character_assets.py",
+          "symbol": "validate",
+          "kind": "pattern",
+          "pattern": "1 <= len\\(clips\\) <= ([0-9]+)"
+        }
+      ]
+    },
+    "animation_samples": {
+      "value": 4096,
+      "unit": "samples per clip",
+      "scope": "Character source validation; no streamed animated asset support.",
+      "source_references": [
+        {
+          "path": "tools/character_assets.py",
+          "symbol": "validate",
+          "kind": "pattern",
+          "pattern": "2 <= len\\(frames\\) <= ([0-9]+)"
+        }
+      ]
+    },
+    "animation_events": {
+      "value": 256,
+      "unit": "events per clip",
+      "scope": "Character source validation; no streamed animated asset support.",
+      "source_references": [
+        {
+          "path": "tools/character_assets.py",
+          "symbol": "validate",
+          "kind": "pattern",
+          "pattern": "len\\(events\\) <= ([0-9]+)"
+        }
+      ]
+    },
+    "animation_sockets": {
+      "value": 32,
+      "unit": "sockets per asset",
+      "scope": "Character source validation; no streamed animated asset support.",
+      "source_references": [
+        {
+          "path": "tools/character_assets.py",
+          "symbol": "validate",
+          "kind": "pattern",
+          "pattern": "len\\(sockets\\) <= ([0-9]+)"
+        }
+      ]
+    },
+    "inline_independent_doors": {
+      "value": 1,
+      "unit": "door",
+      "scope": "Global independent-door count for inline closed/open lighting states; multiple doors require another path.",
+      "source_references": [
+        {
+          "path": "src/lighting_policy.h",
+          "symbol": "dl_lighting_inline_payload",
+          "kind": "pattern",
+          "pattern": "doors\\s*<=\\s*([0-9]+)"
+        }
+      ]
+    },
+    "mission_directory_version": {
+      "value": 1,
+      "unit": "version",
+      "scope": "DLM1 directory format.",
+      "source_references": [
+        {
+          "path": "src/mission.h",
+          "symbol": "DL_MISSION_VERSION",
+          "kind": "c_constant"
+        }
+      ]
+    },
+    "mission_chunk_version": {
+      "value": 4,
+      "unit": "version",
+      "scope": "Newest DLR1 chunk produced when baked night environment is present; decoder accepts earlier versions.",
+      "source_references": [
+        {
+          "path": "tools/compile_mission.py",
+          "symbol": "cook_mission",
+          "kind": "pattern",
+          "pattern": "chunk_version = ([0-9]+) if document"
+        }
+      ]
+    },
+    "required_memory": {
+      "value": 8388608,
+      "unit": "bytes",
+      "scope": "N64 startup requires Expansion Pak before substantial initialization.",
+      "source_references": [
+        {
+          "path": "src/main.c",
+          "symbol": "REQUIRED_MEMORY",
+          "kind": "c_constant"
+        }
+      ]
+    }
+  },
+  "documentation": [
+    {
+      "path": "README.md",
+      "section": "summary"
+    },
+    {
+      "path": "docs/workflow.md",
+      "section": "summary"
+    },
+    {
+      "path": "docs/architecture.md",
+      "section": "summary"
+    },
+    {
+      "path": "docs/project-status.md",
+      "section": "matrix"
+    },
+    {
+      "path": "docs/character-animation.md",
+      "section": "limits",
+      "limits": ["scene_models", "scene_vertices", "scene_triangles", "animation_bones", "ordinary_enemies"]
+    }
+  ]
+}

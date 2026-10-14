@@ -571,9 +571,16 @@ def cook_mission(manifest, content_root=ROOT / "content", *, source_document=Non
                      decoded_chunk_bytes=sum(len(chunks[region_ids[name] - 1]) for name in [region["id"]] + region["neighbors"])) for region in regions]
     peak = max(overlaps, key=lambda row: (row["decoded_chunk_bytes"], row["region"]))
     omitted_models = [ident for ident in sorted(state["by_id"]) if "model" in state["by_id"][ident] and state["by_id"][ident]["kind"] != "static"]
+    try:
+        from .cook_identity import recipe_sources
+    except ImportError:
+        from cook_identity import recipe_sources
     report = dict(format="DLM1/DLR1", version=1, cook_version=COOK_VERSION, chunk_version=chunk_version, lighting=lighting,
+                  recipe_sources=recipe_sources(ROOT),
+                  canonical_partition_sha256=hashlib.sha256(json.dumps(manifest, sort_keys=True, separators=(",", ":"), allow_nan=False).encode("utf-8")).hexdigest(),
                   visibility=manifest.get("visibility", "door-distance"), experimental=True, source=manifest["source"],
-                  source_sha256=source_sha, source_file_sha256=hashlib.sha256(source_raw).hexdigest(), content_identity_sha256=identity.hex(),
+                  source_sha256=source_sha, source_file_sha256=hashlib.sha256(source_raw).hexdigest(),
+                  source_file_sha256_basis="canonical_json" if source_document is not None else "saved_bytes", content_identity_sha256=identity.hex(),
                   package_sha256=hashlib.sha256(result).hexdigest(), package_bytes=package_bytes, directory_bytes=directory_bytes,
                   directory_crc32=f"{struct.unpack_from('>I', result, 28)[0]:08x}",
                   entry_region=region_ids[manifest["entry_region"]], regions=region_reports,
@@ -621,7 +628,8 @@ def cook_mission(manifest, content_root=ROOT / "content", *, source_document=Non
                 inline_payload=entity["id"] in baked_ids, doors=len(door_ids))))
     report["renderer_diagnostics"] = diagnostics.renderer_report(model_entries, door_ids=door_ids,
         identity=dict(renderer_source_sha256=source_sha, source_sha256=source_sha,
-            source_file_sha256=report["source_file_sha256"], package_sha256=report["package_sha256"], build_id=None))
+            source_file_sha256=report["source_file_sha256"], source_file_sha256_basis=report["source_file_sha256_basis"],
+            package_sha256=report["package_sha256"], build_id=None))
     for working in report["working_sets"]:
         ids = {row["id"] for row in working["contributors"]}
         entries = [row for row in model_entries if row.get("group_id") in {group["id"] for group in working["groups"]}
@@ -846,6 +854,7 @@ def prepare_stream_level(manifest_path, output, content_root=None):
         digest.update(path.name.encode("utf-8"))
         digest.update(path.read_bytes())
     report = dict(version=2, title=document["title"], source_sha256=digest.hexdigest(),
+                  recipe_sources=package_report["recipe_sources"],
                   mission_manifest_sha256=hashlib.sha256(manifest_raw).hexdigest(),
                   authoring_only=False, playable=True, experimental_stream=True,
                   compiled_geometry_bytes=bootstrap["compiled_geometry_bytes"],

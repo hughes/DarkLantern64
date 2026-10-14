@@ -1,5 +1,11 @@
 # DarkLantern64
 
+<!-- project-capabilities:begin -->
+This section is maintained in [project_capabilities.json](tools/project_capabilities.json); run `python tools/check_project_capabilities.py` to check it.
+
+Full authoring preview: implemented; Ordinary Native Play: limited; Streamed Native Play: limited; ROM play: limited; Streamed animated assets: unavailable; Original N64 and M64 validation: pending validation. Streamed missions use DLM1 directory version 1 and DLR1 chunks through version 4. Authoring, host simulation and ROM residency have different limits. See the [capability table and project status](docs/project-status.md).
+<!-- project-capabilities:end -->
+
 DarkLantern64 is a first-person stealth game for Nintendo 64, ModRetro M64, and compatible emulators, inspired by *Thief: The Dark Project*. The platform's limitations will guide its art, spaces, and interacting gameplay systems.
 
 Our development approach is to extend **LightEngine** into a productive content editor, compile its authored content into compact N64 assets, and run the game on our **libdragon fork**. The creation loop is part of the product: author, build, play, inspect, revise.
@@ -86,6 +92,8 @@ The engine revision is recorded in [dependencies.json](dependencies.json). Proje
 | [Texture pipeline](docs/texture-pipeline.md) | Cook StreetLight textures from editor materials into the N64 ROM. |
 | [Night contrast study](docs/night-contrast.md) | Moonlight, warm lamps and dark cover in a continuous outdoor yard. |
 | [Workflow](docs/workflow.md) | Authoring, compilation, iteration, and debugging. |
+| [Project status and capabilities](docs/project-status.md) | Matching/stale artifacts, environment readiness and source-checked authoring/runtime limits. |
+| [Environment bootstrap](docs/bootstrap.md) | Tool discovery, clean-checkout setup and the standard workspace-temp test runner. |
 | [First playable](docs/first-playable.md) | A small encounter that proves the entire pipeline, with completion criteria. |
 | [Memory decision](docs/decisions/0001-memory-baseline.md) | Accepted 8 MiB requirement and its consequences. |
 | [World decision](docs/decisions/0002-full-3d-world.md) | Accepted full 3D model and level requirements. |
@@ -93,6 +101,6 @@ The engine revision is recorded in [dependencies.json](dependencies.json). Proje
 
 ## Project status
 
-Prototype implementation in progress, dated 2026-09-06. The repository now contains a portable gameplay module, N64 runtime, content compiler, LightEngine project editor, and build/debug tools. Placeholder mesh assets are authored in `content/`; generated outputs are kept in ignored `build/` and `.dev/` directories.
+Implementation remains in progress. The repository contains portable gameplay and streaming coordination, an N64 runtime, content compilers, a LightEngine project editor and build/debug/status tools. Saved mesh assets are authored in `content/`; generated outputs are kept in ignored `build/` and `.dev/` directories. The [maintained capability table](docs/project-status.md) describes current support; each [validation report](docs/validation-pipeline.md) certifies only its recorded source and tool identities.
 
-The default 3D renderer uses Tiny3D on the RSP for model transforms, skeletal deformation and clipping, followed by RDP hardware triangles/depth. CPU code samples animation clips and calculates lighting; the CPU renderer remains available for reference comparisons. The courtyard adds colored vertex lighting, occlusion, emissive surfaces and fog, with source texture pixels cooked into the ROM. The guard workshop uses connected one-influence geometry and bounded head attention. Collision uses upright rotated boxes; sloped mesh collision, richer navigation, and SDK provisioning remain future work. Original N64 and M64 validation is **pending**. See [First playable](docs/first-playable.md) for acceptance details.
+The default 3D renderer uses Tiny3D on the RSP for model transforms, skeletal deformation and clipping, followed by RDP hardware triangles/depth. CPU code samples animation clips and calculates lighting; the CPU renderer remains available for reference comparisons. The courtyard adds colored vertex lighting, occlusion, emissive surfaces and fog, with source texture pixels cooked into the ROM. The guard workshop uses connected one-influence geometry and bounded head attention. Collision combines upright rotated box solids with walkable triangle floors, including slopes and stairs; general triangle-solid sweeps, richer navigation, and SDK provisioning remain future work. Original N64 and M64 validation is **pending**. See [First playable](docs/first-playable.md) for acceptance details.

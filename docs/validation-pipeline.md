@@ -48,6 +48,11 @@ guard, an audit detects changes and aborts acceptance; those platforms do not
 claim write prevention. A project pipeline lock prevents concurrent pipeline
 builds from racing over generated output.
 
+The maintained README, workflow, architecture, project-status, character-animation
+and bootstrap pages are captured and guarded too. The required capability check
+consumes their marked sections; editing one after a run makes that evidence stale.
+Generated `docs/evidence/` exports remain outside the source snapshot.
+
 The exact parsed manifest bytes are checked again under the input guard and
 copied into the run's artifacts. Startup hashes for the controller, snapshot
 and scenario implementations are audited too, so an edited tool cannot be

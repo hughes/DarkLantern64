@@ -58,14 +58,14 @@ cc_test(
 
 cc_binary(
     name = "darklantern64_project_editor",
-    srcs = ["main.cpp", "native_play.inc", "authoring.inc", "workspace.inc", "preparation.inc", "stream_preview.inc", "stream_workspace.inc", "render_diagnostics.inc"],
+    srcs = ["main.cpp", "native_play.inc", "authoring.inc", "workspace.inc", "preparation.inc", "stream_preview.inc", "stream_workspace.inc", "render_diagnostics.inc", "project_status.inc"],
     copts = select({"@platforms//os:windows": ["/wd4005"], "//conditions:default": []}),
     deps = [":character_preview", ":character_preview_mesh", ":region_authoring", "@lightengine//:lightengine"],
 )
 
 cc_binary(
     name = "darklantern64_editor",
-    srcs = ["main.cpp", "native_play.inc", "authoring.inc", "workspace.inc", "preparation.inc", "stream_preview.inc", "stream_workspace.inc", "render_diagnostics.inc"],
+    srcs = ["main.cpp", "native_play.inc", "authoring.inc", "workspace.inc", "preparation.inc", "stream_preview.inc", "stream_workspace.inc", "render_diagnostics.inc", "project_status.inc"],
     copts = select({"@platforms//os:windows": ["/wd4005"], "//conditions:default": []}),
     deps = [":character_preview", ":character_preview_mesh", ":region_authoring", "@lightengine//:lightengine"],
 )
@@ -74,7 +74,7 @@ cc_binary(
 # remains open on Windows, where a running executable cannot be replaced.
 cc_binary(
     name = "darklantern64_scene_editor",
-    srcs = ["main.cpp", "native_play.inc", "authoring.inc", "workspace.inc", "preparation.inc", "stream_preview.inc", "stream_workspace.inc", "render_diagnostics.inc"],
+    srcs = ["main.cpp", "native_play.inc", "authoring.inc", "workspace.inc", "preparation.inc", "stream_preview.inc", "stream_workspace.inc", "render_diagnostics.inc", "project_status.inc"],
     copts = select({"@platforms//os:windows": ["/wd4005"], "//conditions:default": []}),
     deps = [":character_preview", ":character_preview_mesh", ":region_authoring", "@lightengine//:lightengine"],
 )

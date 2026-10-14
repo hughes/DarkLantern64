@@ -11,7 +11,12 @@ import shutil
 import time
 
 SOURCE_DIRS = ("src", "content", "tools", "tests", "editor", "art", "docs/models")
-SOURCE_FILES = ("dependencies.json", "build.ps1", ".gitignore")
+# The required capability check reads these maintained pages. Keep them in the
+# same source identity and Windows read guard as the tools that validate them.
+# Generated docs/evidence remains outside the snapshot so publication is safe.
+SOURCE_FILES = ("dependencies.json", "build.ps1", ".gitignore", "README.md",
+                "docs/workflow.md", "docs/architecture.md", "docs/project-status.md",
+                "docs/character-animation.md", "docs/bootstrap.md")
 EXCLUDED = {".git", "__pycache__", ".dev", "build", "build_sdk_main", ".cache", "node_modules"}
 
 

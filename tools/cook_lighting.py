@@ -13,7 +13,6 @@ import hashlib
 import json
 import os
 from pathlib import Path
-import shutil
 import struct
 import subprocess
 import tempfile
@@ -52,13 +51,11 @@ def run(command, env):
 def host_compiler():
     # Match build.py's established host-test selection. Prepending its actual
     # bin directory is essential for Windows GCC's child compiler DLLs.
-    override = os.environ.get("DL64_HOST_CC")
-    fallback = next((path for path in ("C:/ProgramData/mingw64/mingw64/bin/gcc.exe",
-                                       "C:/msys64/ucrt64/bin/gcc.exe") if Path(path).is_file()), "gcc")
-    compiler = Path((shutil.which(override) or override) if override else
-                    (shutil.which("gcc") or fallback)).resolve()
-    if not compiler.is_file():
-        raise RuntimeError("Static night-lighting cook requires host GCC (the existing portable-test compiler).")
+    try:
+        from tools.development_environment import require_host_compiler
+    except ModuleNotFoundError:
+        from development_environment import require_host_compiler
+    compiler = require_host_compiler()
     env = dict(os.environ, PATH=str(compiler.parent) + os.pathsep + os.environ.get("PATH", ""))
     identity = {"path": compiler.as_posix(), "sha256": digest(compiler.read_bytes()),
                 "version": run([compiler, "--version"], env).stdout,

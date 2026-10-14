@@ -926,6 +926,11 @@ def compile_level(source=ROOT/"content/first_room.json",output=ROOT/"build",asse
     }
     texture_report={"version":1,"textures":state["textures"], **texture_memory_summary(state["textures"])}
     report["textures"]=texture_report
+    try:
+        from .cook_identity import recipe_sources
+    except ImportError:
+        from cook_identity import recipe_sources
+    report["recipe_sources"] = recipe_sources(ROOT)
     report["renderer_diagnostics"] = diagnostics.resident_renderer(data, state,
         standalone_status="loaded" if lighting is not None else "unconfigured")
     report["renderer_diagnostics"]["identity"].update(source_sha256=report["source_sha256"],

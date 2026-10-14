@@ -24,6 +24,16 @@ newer. POSIX verifier cleanup signals only its separately created process
 group. POSIX flock crash recovery covers the lock; it does not provide the
 Windows job's abrupt-owner-death child containment guarantee.
 
+The standard Python runner also uses an outer job. Before stopping a verifier,
+`OwnedProcessJob` retains handles for its verified job members, drains the job,
+and waits for those exact handles to signal before temporary-file cleanup.
+Waits have a deadline and never select unrelated processes by name or reused
+PID. Tests check both termination status and eventual handle completion:
+[GetExitCodeProcess](https://learn.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-getexitcodeprocess)
+reports `STILL_ACTIVE` while a process is executing. Observed nested-job runs
+can expose a final exit code shortly before the retained process handle signals;
+the bounded handle wait covers that teardown interval.
+
 ```python
 from tools.emulator_lease import OwnedProcessJob
 with OwnedProcessJob() as job:
@@ -56,7 +66,7 @@ states from OS ownership and process observations; it does not mutate
 machine-owned database tables. No database adapter is applicable. The proof
 does not establish Python/OS equivalence, process-ID semantics, Windows API
 correctness, thread enumeration, clock deadlines, scheduling fairness,
-unbounded descendants or hardware performance. The separate 16-test OS suite
+unbounded descendants or hardware performance. The separate OS suite
 uses real disposable Python processes to check serialization across project
 directories, re-entry, owner crashes, nested job cleanup, timeout evidence,
 and preservation of an unrelated process. It launches no Ares instance and

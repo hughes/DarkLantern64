@@ -50,6 +50,8 @@ class _Windows:
             ("QueryInformationJobObject", w.BOOL, [w.HANDLE, ctypes.c_int, w.LPVOID, w.DWORD, w.LPVOID]),
             ("AssignProcessToJobObject", w.BOOL, [w.HANDLE, w.HANDLE]),
             ("TerminateJobObject", w.BOOL, [w.HANDLE, w.UINT]),
+            ("OpenProcess", w.HANDLE, [w.DWORD, w.BOOL, w.DWORD]),
+            ("IsProcessInJob", w.BOOL, [w.HANDLE, w.HANDLE, ctypes.POINTER(w.BOOL)]),
             ("CreateToolhelp32Snapshot", w.HANDLE, [w.DWORD, w.DWORD]),
             ("Thread32First", w.BOOL, [w.HANDLE, w.LPVOID]),
             ("Thread32Next", w.BOOL, [w.HANDLE, w.LPVOID]),
@@ -115,6 +117,65 @@ class _Windows:
     def register(self, process):
         if not self.api.AssignProcessToJobObject(self.job, int(process._handle)):
             raise ctypes.WinError(ctypes.get_last_error())
+
+    def capture_members(self, deadline):
+        """Retain exact job-member handles before termination removes their IDs.
+
+        Nested-job accounting can reach zero before terminated process objects
+        signal. A retained handle also avoids confusing teardown with PID reuse.
+        """
+        capacity, handles = 16, []
+        try:
+            while True:
+                class ProcessIds(ctypes.Structure):
+                    _fields_ = [("assigned", self.w.DWORD), ("count", self.w.DWORD),
+                                ("pids", ctypes.c_size_t * capacity)]
+                value = ProcessIds()
+                ok = self.api.QueryInformationJobObject(self.job, 3, ctypes.byref(value), ctypes.sizeof(value), None)
+                if ok and value.count >= value.assigned:
+                    break
+                error = ctypes.get_last_error()
+                if not ok and error != 234:  # ERROR_MORE_DATA
+                    raise ctypes.WinError(error)
+                if time.monotonic() >= deadline:
+                    raise TimeoutError("Owned job process inventory did not stabilize")
+                capacity = max(capacity * 2, value.assigned) if not ok else max(capacity, value.assigned)
+            for pid in value.pids[:value.count]:
+                # SYNCHRONIZE | PROCESS_QUERY_LIMITED_INFORMATION. No access to
+                # terminate an arbitrary PID is requested or used here.
+                handle = self.api.OpenProcess(0x100000 | 0x1000, False, pid)
+                if not handle:
+                    error = ctypes.get_last_error()
+                    if error == 87:  # ERROR_INVALID_PARAMETER: process exited.
+                        continue
+                    raise ctypes.WinError(error)
+                try:
+                    member = self.w.BOOL()
+                    if not self.api.IsProcessInJob(handle, self.job, ctypes.byref(member)):
+                        raise ctypes.WinError(ctypes.get_last_error())
+                    if member.value:
+                        handles.append((pid, handle))
+                        handle = None
+                finally:
+                    if handle:
+                        self.api.CloseHandle(handle)
+            return handles
+        except BaseException:
+            self.close_members(handles)
+            raise
+
+    def wait_members(self, handles, deadline):
+        for pid, handle in handles:
+            remaining = max(0, int((deadline-time.monotonic()) * 1000))
+            result = self.api.WaitForSingleObject(handle, remaining)
+            if result == 0x102:
+                raise TimeoutError("Owned job process did not finish teardown: " + str(pid))
+            if result != 0:
+                raise ctypes.WinError(ctypes.get_last_error())
+
+    def close_members(self, handles):
+        for _, handle in handles:
+            self.api.CloseHandle(handle)
 
     def resume(self, process):
         w = self.w
@@ -353,7 +414,12 @@ class OwnedProcessJob:
         return self.process
 
     def close(self):
+        members, backend = [], self.backend
         try:
+            # Capture before stopping the leader: closing its inner leased job
+            # may already remove descendants from the outer job's PID list.
+            if backend:
+                members = backend.capture_members(time.monotonic()+5)
             if self.process is not None:
                 if os.name == "nt":
                     if self.process.poll() is None:
@@ -380,10 +446,15 @@ class OwnedProcessJob:
                         pass
             if self.backend:
                 self.backend.prepare_job(time.monotonic()+5)
+                self.backend.wait_members(members, time.monotonic()+5)
         finally:
-            if self.backend:
-                self.backend.close()
-                self.backend = None
+            try:
+                if backend:
+                    backend.close_members(members)
+            finally:
+                if self.backend:
+                    self.backend.close()
+                    self.backend = None
 
     def __exit__(self, *exception):
         self.close()

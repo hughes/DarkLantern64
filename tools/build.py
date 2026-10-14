@@ -630,7 +630,7 @@ def build_rom(sdk, autoplay=False, debug_overlay=False, level=None, capture=Fals
 def run_tests():
     BUILD.mkdir(exist_ok=True)
     compile_level()
-    run([sys.executable, "-m", "unittest", "discover", "-s", "tests", "-p", "test_*.py", "-v"])
+    run([sys.executable, ROOT / "tools/run_tests.py"])
     run_portable_tests()
 
 
@@ -638,9 +638,11 @@ def run_portable_tests():
     """Run portable C checks independently of Python content regression tests."""
     BUILD.mkdir(exist_ok=True)
     compile_level()
-    compiler = shutil.which("gcc") or "C:/msys64/ucrt64/bin/gcc.exe"
-    if not Path(compiler).exists():
-        raise RuntimeError("Host GCC required for portable simulation tests (MSYS2 UCRT64 supported).")
+    try:
+        from tools.development_environment import require_host_compiler
+    except ModuleNotFoundError:
+        from development_environment import require_host_compiler
+    compiler = require_host_compiler()
     env = dict(os.environ, PATH=str(Path(compiler).parent) + os.pathsep + os.environ.get("PATH", ""))
     for name in ("test_game", "test_first_room", "test_interactions"):
         output = BUILD / (name + ".exe")

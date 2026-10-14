@@ -1,12 +1,12 @@
 # Artist-authored character animation
 
-Status: **architecture with an implemented CPU reference prototype**, updated September 6, 2026. The [guard animation study](guard-animation-prototype.md) now proves Blender export, connected one-influence geometry, simple compression, shared assets, editor playback and N64 integration. Five clips occupy 8,820 key bytes, but the measured two-guard workshop runs at roughly 10 fps; RSP acceleration and production performance remain future work. LightEngine's dynamic preview support is published in [PR #17](https://github.com/hughes/LightEngine/pull/17), pending review. Unless explicitly identified as measured, the numbers below are experiment budgets, not verified hardware limits. This extends the [architecture](architecture.md), [Blender workflow](blender-assets.md), [audio design](audio-design.md), and [scale study](scaling-guide.md).
+The resident character pipeline implements Blender export, connected one-influence geometry, compressed shared assets, editor playback and N64 integration. The default Tiny3D backend performs rigid deformation on the RSP; the [guard renderer evidence](guard-renderer-performance.md) records sustained native-refresh delivery for its specified two-guard Ares workload. The earlier roughly 10 fps CPU prototype and its 8,820 key bytes remain historical evidence in the [guard animation study](guard-animation-prototype.md). Original N64/M64 acceptance remains pending. The [maintained capability table](project-status.md) checks current source limits, including the lack of streamed animated assets. Unless identified as measured, the numbers below are experiment budgets. This extends the [architecture](architecture.md), [Blender workflow](blender-assets.md), [audio design](audio-design.md), and [scale study](scaling-guide.md).
 
 ## Recommended direction
 
 Author and rig characters in Blender, export a small deformation skeleton and named clips, and cook those into shared character assets. LightEngine should preview the actual cooked motion and let designers assign characters and behavior sets. The game should keep small independent animation state per actor, while sharing meshes, skeleton definitions and clip data.
 
-Start with a low-bone humanoid, in-place locomotion, one bone influencing each vertex, short crossfades, foot-contact events, and named attachment sockets. Evaluate an RSP geometry backend alongside the first animated guard. Tiny3D is the strongest existing candidate: its current feature set includes skeletal animation, animation blending and compressed ROM streaming. Its skinning limit is **one bone per vertex**, with up to three bones represented by a triangle; this is distinct from blending two animation clips. It requires libdragon preview and currently documents a Fast64-dependent material import path. Pin and test the SDK, library and conversion tools together before adoption. [Tiny3D](https://github.com/HailToDodongo/tiny3d)
+The guard uses a low-bone humanoid, in-place locomotion, one bone influencing each vertex, short crossfades, foot-contact events and named socket metadata. The implemented bridge uses our shared C sampler and resident keys with Tiny3D RSP geometry submission. A triangle can connect three independently transformed bones; this is distinct from blending two animation clips. The stock Tiny3D animation streaming APIs discussed later are alternative designs, not the current project asset format. The build pins its dependency and applies the tracked precision patch in a disposable stage. [Tiny3D](https://github.com/HailToDodongo/tiny3d)
 
 The N64's RSP is programmable vector hardware, suitable for transforming and lighting vertices. The RDP rasterizes the resulting triangles; it does not evaluate a Blender rig. Bone sampling, hierarchy traversal and animation decisions remain software work. Graphics and RSP-based audio share processing capacity, so test animation with the intended audio workload. Our [hardware guide](n64-hardware-guide.md) and [audio guide](audio-design.md) explain these divisions.
 
@@ -18,12 +18,27 @@ The N64's RSP is programmable vector hardware, suitable for transforming and lig
 | Level/pack assets accept `type: "character"`. | Version-1 character JSON defines stable bone, clip and socket identities with one influence per vertex. Production glTF/GLB interchange remains proposed. |
 | `tools/character_assets.py` and the level/bundle compiler cook characters. | Quantized keys, constant/rest-channel removal, conservative bounds, events, error reports and shared bundle data are implemented. Variable-rate compression is not. |
 | LightEngine provides fixed-topology mesh updates. | The project editor runs the shared C sampler and CPU skinning for connected meshes, with rigid-part previews as a fallback. Desktop lighting remains separate. |
-| `src/animation.c` samples/blends poses; `src/render.c` deforms geometry and normals on the CPU. | Idle/walk gameplay blending and bounded head attention work. RSP transforms, animation LOD and production-speed rendering remain future work. |
-| `src/game.c` retains collision and movement authority. | Actual-distance gait and foot-contact playback are integrated; the broader animation controller and shared audio/AI event queue remain proposed. |
+| `src/animation.c` samples/blends poses; Tiny3D performs default target deformation, and the CPU reference remains available. | Idle/walk gameplay blending and bounded head attention work. Animation LOD, general graphs and IK remain future work. |
+| `src/game.c` retains collision and movement authority. | Actual-distance gait and foot contacts feed the bounded world-event array and audible target playback. Terrain-specific socket contacts and guard-step AI-hearing policy remain separate work. |
 
-The present renderer reserves caches for up to **128 models, 4,096 instanced vertices and 4,096 instanced triangles**. Its limits count every placed instance, even if the source mesh is shared. Eight 500-vertex guards would consume almost the entire vertex capacity before scenery. The 16-enemy authoring limit does not establish capacity for 16 animated guards.
+Renderer storage counts every placed instance, even when the source mesh is shared. Scenery and actors compete for that storage; the enemy authoring cap does not establish capacity for that many animated guards.
 
-Bundled levels retain their static-world geometry with separate compilation per level; texture payloads have deduplication. Character geometry, skeletons, clips and sockets now use one generated C definition per source hash across the bundle. Actors share these immutable assets while retaining independent motion state and per-instance renderer caches.
+<!-- project-capabilities:begin -->
+This section is maintained in [project_capabilities.json](../tools/project_capabilities.json); run `python tools/check_project_capabilities.py` to check it.
+
+
+These are software validation/storage limits, not measured capacity for every workload. Host authoring budgets do not certify ROM residency or frame time.
+
+| Limit | Value | Scope | Source |
+| --- | ---: | --- | --- |
+| `scene_vertices` | 6,144 vertices | Resident renderer; placed instances count separately, including bootstrap/dynamic models. | [DL_MAX_SCENE_VERTICES](../src/content_limits.h), [CAPS](../tools/cook_diagnostics.py) |
+| `scene_triangles` | 4,096 triangles | Resident renderer; placed instances count separately, including bootstrap/dynamic models. | [DL_MAX_SCENE_TRIANGLES](../src/content_limits.h), [CAPS](../tools/cook_diagnostics.py) |
+| `scene_models` | 128 models | Resident renderer; placed instances count separately, including bootstrap/dynamic models. | [DL_MAX_MODELS](../src/content_limits.h), [CAPS](../tools/cook_diagnostics.py) |
+| `ordinary_enemies` | 16 enemies | Ordinary saved level validation; host study and streamed authoring use separate budgets. | [content_limits](../tools/content_profile.py), [DL_MAX_ENEMIES](../src/game.h) |
+| `animation_bones` | 32 bones | Shared resident character skeleton and caller-owned sampler matrix scratch. | [DL_ANIMATION_MAX_BONES](../src/animation.h), [MAX_BONES](../tools/character_assets.py) |
+<!-- project-capabilities:end -->
+
+Ordinary bundled levels retain separately compiled resident static-world geometry; streamed missions instead load their static regions. Texture payloads have deduplication. Character geometry, skeletons, clips and sockets use one generated C definition per source hash across the ordinary bundle. Actors share these immutable assets while retaining independent motion state and per-instance renderer caches. The host cooker caches character results by source and recipe identity, and the editor updates fixed-topology preview meshes. These caches do not provide a streamed character/clip format: the DLM cooker rejects animated characters and linked asset packs.
 
 ## Artist and designer workflow
 
@@ -34,7 +49,7 @@ Bundled levels retain their static-world geometry with separate compilation per 
 5. **Use the character in LightEngine.** Designers choose an enemy type and compatible character/animation set, place actors, and author patrols as today. Character assets own motion; level files reference them. Reimport preserves actor placement and behavior overrides.
 6. **Play the level or a named test start.** The existing launch workflow remains the entry point. Animation inspection and stress fixtures belong inside the editor and developer tools, without adding another daily VS Code task.
 
-Adopting Tiny3D would require an offline bridge from our materials to its supported target representation, or a deliberately supported Fast64 workflow. A generic GLB export is not proof that the current Tiny3D importer accepts every material or exporter version. Keep the source asset contract independent from the selected N64 converter.
+The implemented project bridge converts our materials, mesh and pose data directly for Tiny3D submission. A general external asset-import path would still need explicit compatibility checks; a generic GLB export does not prove that every material/exporter is supported. Keep the source asset contract independent from the selected N64 converter.
 
 ## Decisions to establish early
 
@@ -91,7 +106,7 @@ The package contract must define endianness, alignment, offsets, format/skeleton
 
 ## CPU, RSP and update scheduling
 
-The preferred division is CPU controller/clip sampling/bone pose work, RSP vertex transforms and suitable lighting, and RDP rasterization. Tiny3D follows that broad division: CPU sampling and skeleton code produce matrices for rendering. Keep a portable CPU reference for correctness and target preview. Evaluate Tiny3D before growing a bespoke CPU skinning and per-triangle submission path into the permanent renderer. [Animation implementation](https://github.com/HailToDodongo/tiny3d/blob/main/src/t3d/t3danim.c), [skeletal animation example](https://github.com/HailToDodongo/tiny3d/blob/main/examples/08_animation/main.c)
+The implemented division is CPU controller/clip sampling/bone pose and illumination work, RSP vertex transforms/rigid deformation/clipping, and RDP rasterization. The portable CPU reference supports comparisons and editor previews. Tiny3D's stock sampler and skeleton examples remain useful alternative designs; our shared resident sampler does not open a stream per actor. [Animation implementation](https://github.com/HailToDodongo/tiny3d/blob/main/src/t3d/t3danim.c), [skeletal animation example](https://github.com/HailToDodongo/tiny3d/blob/main/examples/08_animation/main.c)
 
 Separate static-world caches from a bounded character render path. Cook meshes into draw batches compatible with the target's matrix and vertex handling. Keep matrix/vertex buffers alive until asynchronous graphics work has consumed them; reuse through a fenced ring or equivalent bounded ownership scheme. Bone count, visible vertices, draw batches and RSP occupancy all need measurement.
 
@@ -106,9 +121,9 @@ Reduced visual update rates are an optimization to measure, not permission to re
 
 ## Footsteps, voices and gameplay events
 
-This integration is essential for DarkLantern64. Animated guards now advance authored walk contacts from actual traveled distance, including while culled, and `src/main.c` sends them through the existing audible guard-step path. Static models retain the distance-threshold fallback. These sounds still do not traverse the player-sound AI-hearing path; terrain-specific contact positions and a shared event queue remain future work. The game's single latest event is insufficient for simultaneous actor stimuli.
+Animated guards advance authored walk contacts from actual traveled distance, including while culled. `src/game.c` records contacts in the bounded world-event array and `src/main.c` dispatches audible playback. Static models retain the distance-threshold fallback. The array retains simultaneous events and records overflow; the legacy latest-event field remains for compatibility. Guard contacts still do not traverse the player-sound AI-hearing path, and terrain-specific socket contact positions remain future work.
 
-Introduce a bounded semantic event queue. A foot-contact event carries an actor ID, simulation timestamp, left/right foot, contact location and movement intensity. Resolve the surface material there, then feed the same event into player audio and AI acoustics. Listener rules can ignore self-generated steps or recognize routine friendly movement; audibility does not automatically mean alarm. Choosing or dropping a playback voice must not erase the corresponding gameplay stimulus. Define priority and overflow behavior explicitly; instrument missed deadlines or overflow.
+A foot-contact event carries an actor ID, simulation timestamp, contact kind, actor position and strength. A future terrain/acoustics extension should resolve the surface material at the actual contact and feed the same event into audio and AI hearing. Listener rules can ignore self-generated steps or recognize routine friendly movement; audibility does not automatically mean alarm. Choosing or dropping a playback voice must not erase the corresponding gameplay stimulus. Keep bounded overflow and playback deadlines observable.
 
 Advance locomotion markers from a shared gait phase across walk/run blends. Do not fire both clips' footsteps during a crossfade. Handle marker intervals, loops, large time steps, interruption and replay deterministically. Editor scrubbing should be silent by default; explicit audition can play cues without mutating gameplay. Reset/restart must reset event cursors predictably.
 
@@ -118,7 +133,7 @@ Artists specify semantic contacts and gestures, not particular audio file paths.
 
 Store sockets such as `hand_r`, `hand_l`, `head` and `belt` in the character definition. A weapon, lantern or purse uses the socket transform plus an authored offset, while keeping its own gameplay identity where needed. A swinging lantern can attach an actual dynamic light, but its illumination and shadow-query costs must be budgeted separately from the animation.
 
-Transform normals consistently with the pose. The prototype now deforms character normals and combines them with the existing environmental probes and directional lighting response. Its normal cache costs 11,964 bytes per 997-vertex guard, and lighting remains expensive. Preserve cheap environmental visibility probes when replacing the CPU geometry path; avoid per-vertex world shadow traces for every animated guard.
+Transform normals consistently with the pose. Character normals combine with environmental probes and directional lighting response; the target uses body probes to bound animated lighting queries. The original CPU prototype's 11,964-byte normal cache for its 997-vertex guard is a historical allocation, rather than a current fixed per-guard requirement. Use the renderer's measured allocation report for the exact backend and asset revision, and avoid per-vertex world shadow traces for every animated guard.
 
 Cook conservative bounds that cover full motion, attachments, transitions and allowed procedural offsets. Rest-pose bounds are insufficient. Sampled motion bounds need conservative padding or stronger bounds construction for interpolation between samples; verify extended weapons, falls and raised arms at frustum edges. A culled guard must still have valid logical state and sound events.
 
@@ -139,11 +154,11 @@ These libraries are not limited to emulator-only experiments. Cathode Quest 64 h
 
 ## First implementation milestone
 
-The initial source/export/cook/preview/runtime milestone is implemented and measured in the [guard animation study](guard-animation-prototype.md). Remaining work below focuses on backend comparison, a broader controller and scale. Idle/walk blending, manual transition preview and head attention are available; attachment rendering, skeleton/socket overlays, foot IK and the shared audio/AI event system are not yet implemented.
+The initial source/export/cook/preview/runtime milestone and default RSP backend are implemented and measured in the [guard renderer study](guard-renderer-performance.md). Remaining work below focuses on a broader controller and scale. Idle/walk blending, manual transition preview, head attention and bounded world events are available; attachment rendering, skeleton/socket overlays, foot IK and a unified guard-contact AI-hearing policy are not yet implemented.
 
 Use one asymmetric, artist-editable humanoid with idle, walk, run, notice and turn clips, a hand socket, and two foot-contact markers. Include a planted-foot loop and a wide-reaching pose specifically to expose sliding, deformation and bounds errors.
 
-First establish export, cooking, target preview and one animated guard following its existing patrol. Then compare the CPU reference against an RSP path in the same room, with the same camera, mesh, lighting and ordinary audio. Include the existing material conversion and SDK compatibility work in this spike. Do not make full smooth skinning a prerequisite for evaluating the geometry backend.
+Export, cooking, editor preview and the two-guard RSP workload have passed their recorded checks. Future backend comparisons should retain the same camera, mesh, lighting and ordinary audio, record exact material/tool identities and separate CPU reference correctness from throughput. Smooth multi-weight skinning would require a new supported format and budget.
 
 Next run 1, 2, 4 and 8 actor cases with visible and occluded groups, synchronized transitions, a moving attachment and audio-heavy moments. These are attempted workloads, not promised supported counts. Report simulation, sampling, blending, hierarchy, transforms/skinning, lighting, submission, queue waits, RSP activity and audio underruns separately. Record shared resident assets, per-actor allocations and transition high-water memory; the earlier mission-scale guard studies exclude skeletal animation, and the new prototype provides only a short two-guard runtime measurement.
 

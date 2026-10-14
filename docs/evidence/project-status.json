@@ -1,0 +1,1143 @@
+{
+  "schema_version": 1,
+  "passed": true,
+  "issue": 6,
+  "source_sha256": "84484442976f8ee5892847d5e3b8e70d3a91cc299c6e0b70d3c8d7929ee09a8f",
+  "manifest_sha256": "18f60878186906b51dec03b8651376216807a47ed97e86278bf1056d7f918e1f",
+  "scope": "Issue #6 shared status, doctor, capabilities, bootstrap and full current acceptance; original hardware validation remains separate.",
+  "pipeline": {
+    "summary": "C:\\Users\\hughe\\dev\\DarkLantern64\\build\\issue6-validation-summary.json",
+    "sha256": "e6b87e138a58783c41fb6d43524e4fa253d331f40924fca136627c1f47581b7b",
+    "profile": "all",
+    "full_acceptance": true,
+    "status": "accepted_with_known_fixture_failures",
+    "results": [
+      {
+        "id": "capability-docs",
+        "status": "passed",
+        "required": true,
+        "accepted": true,
+        "reason": null,
+        "classification": "portable"
+      },
+      {
+        "id": "portable-python",
+        "status": "known_failure",
+        "required": true,
+        "accepted": true,
+        "reason": "Exact declared fixture failure retained",
+        "classification": "portable"
+      },
+      {
+        "id": "portable-c",
+        "status": "passed",
+        "required": true,
+        "accepted": true,
+        "reason": null,
+        "classification": "portable"
+      },
+      {
+        "id": "host-build",
+        "status": "passed",
+        "required": true,
+        "accepted": true,
+        "reason": null,
+        "classification": "editor"
+      },
+      {
+        "id": "editor-tests",
+        "status": "passed",
+        "required": true,
+        "accepted": true,
+        "reason": null,
+        "classification": "editor"
+      },
+      {
+        "id": "native-metadata",
+        "status": "passed",
+        "required": true,
+        "accepted": true,
+        "reason": null,
+        "classification": "functional"
+      },
+      {
+        "id": "editor-project-status",
+        "status": "passed",
+        "required": true,
+        "accepted": true,
+        "reason": null,
+        "classification": "editor"
+      },
+      {
+        "id": "editor-authoring-preview",
+        "status": "passed",
+        "required": true,
+        "accepted": true,
+        "reason": null,
+        "classification": "editor"
+      },
+      {
+        "id": "editor-render-diagnostics",
+        "status": "passed",
+        "required": true,
+        "accepted": true,
+        "reason": null,
+        "classification": "editor"
+      },
+      {
+        "id": "editor-native-play",
+        "status": "passed",
+        "required": true,
+        "accepted": true,
+        "reason": null,
+        "classification": "functional"
+      },
+      {
+        "id": "bundle-idle",
+        "status": "passed",
+        "required": true,
+        "accepted": true,
+        "reason": null,
+        "classification": "build"
+      },
+      {
+        "id": "district-ordinary",
+        "status": "passed",
+        "required": true,
+        "accepted": true,
+        "reason": null,
+        "classification": "build"
+      },
+      {
+        "id": "district-performance",
+        "status": "passed",
+        "required": true,
+        "accepted": true,
+        "reason": null,
+        "classification": "build"
+      },
+      {
+        "id": "district-capture",
+        "status": "passed",
+        "required": true,
+        "accepted": true,
+        "reason": null,
+        "classification": "build"
+      },
+      {
+        "id": "bundle-lifecycle",
+        "status": "passed",
+        "required": true,
+        "accepted": true,
+        "reason": null,
+        "classification": "build"
+      },
+      {
+        "id": "probe-functional",
+        "status": "passed",
+        "required": true,
+        "accepted": true,
+        "reason": null,
+        "classification": "functional"
+      },
+      {
+        "id": "probe-replay",
+        "status": "passed",
+        "required": true,
+        "accepted": true,
+        "reason": null,
+        "classification": "build"
+      },
+      {
+        "id": "district-no-diagnostics",
+        "status": "skipped",
+        "required": false,
+        "accepted": false,
+        "reason": "Optional comparison not selected",
+        "classification": "build"
+      },
+      {
+        "id": "probe-rom-parity",
+        "status": "passed",
+        "required": true,
+        "accepted": true,
+        "reason": null,
+        "classification": "functional"
+      },
+      {
+        "id": "menu-idle",
+        "status": "passed",
+        "required": true,
+        "accepted": true,
+        "reason": null,
+        "classification": "lifecycle"
+      },
+      {
+        "id": "menu-4mb",
+        "status": "passed",
+        "required": true,
+        "accepted": true,
+        "reason": null,
+        "classification": "lifecycle"
+      },
+      {
+        "id": "menu-lifecycle",
+        "status": "passed",
+        "required": true,
+        "accepted": true,
+        "reason": null,
+        "classification": "lifecycle"
+      },
+      {
+        "id": "district-functional",
+        "status": "passed",
+        "required": true,
+        "accepted": true,
+        "reason": null,
+        "classification": "functional"
+      },
+      {
+        "id": "district-strict",
+        "status": "passed",
+        "required": true,
+        "accepted": true,
+        "reason": null,
+        "classification": "strict_wall_time"
+      },
+      {
+        "id": "district-views",
+        "status": "passed",
+        "required": true,
+        "accepted": true,
+        "reason": null,
+        "classification": "capture_only"
+      },
+      {
+        "id": "district-diagnostics-counterfactual",
+        "status": "skipped",
+        "required": false,
+        "accepted": false,
+        "reason": "Optional comparison not selected",
+        "classification": "strict_wall_time"
+      }
+    ]
+  },
+  "python": {
+    "tests_run": 702,
+    "tested_passes": 699,
+    "failures": [
+      {
+        "id": "test_sponza_physics.AuthoredSponzaPhysics.test_actual_core_traverses_authored_stairs_and_respects_stacked_floors",
+        "message": "Traceback (most recent call last):\n  File \"C:\\Users\\hughe\\dev\\DarkLantern64\\tests\\test_sponza_physics.py\", line 11, in test_actual_core_traverses_authored_stairs_and_respects_stacked_floors\n    report = verify(Path(directory), ROOT / \"content/sponza_courtyard.json\")\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\hughe\\dev\\DarkLantern64\\tools\\verify_sponza_physics.py\", line 93, in verify\n    report = fixture(output, level=level)\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\hughe\\dev\\DarkLantern64\\tools\\verify_sponza_physics.py\", line 32, in fixture\n    raise ValueError(\"Level collision differs from geometry: \" + row[\"id\"])\nValueError: Level collision differs from geometry: sponza-collision-parapet-north\n",
+        "known": true
+      }
+    ],
+    "skips": [
+      {
+        "id": "test_project_levels.ProjectLevelTests.test_symlink_sources_and_output_escapes_are_rejected",
+        "message": "Symlink creation unavailable: [WinError 1314] A required privilege is not held by the client: 'C:\\\\Users\\\\hughe\\\\dev\\\\DarkLantern64\\\\build\\\\project-level-test-bk0u7xx2-outside.json' -> 'C:\\\\Users\\\\hughe\\\\dev\\\\DarkLantern64\\\\build\\\\project-level-test-bk0u7xx2\\\\content\\\\linked.json'",
+        "declared": true
+      },
+      {
+        "id": "test_thief_objects.InstalledThiefObjectsTests.test_bafford_placements_and_loot_total",
+        "message": "Set DL_THIEF_GOLD to verify locally installed source assets",
+        "declared": true
+      }
+    ],
+    "temporary_cleaned": true
+  },
+  "status_snapshot": {
+    "path": "C:\\Users\\hughe\\dev\\DarkLantern64\\build\\issue6-project-status.json",
+    "sha256": "966fae13e36801e8cdda1d22b92358a57b6a76c5c2d8bc0675727a4c2613c445",
+    "consistent": true,
+    "current_acceptance_report": {
+      "kind": "validation",
+      "path": "C:\\Users\\hughe\\dev\\DarkLantern64\\build\\issue6-validation-summary.json",
+      "status": "failing",
+      "freshness": "current",
+      "outcome": "known_failure",
+      "reasons": [
+        "Test test_sponza_physics.AuthoredSponzaPhysics.test_actual_core_traverses_authored_stairs_and_respects_stacked_floors: ValueError: Level collision differs from geometry: sponza-collision-parapet-north"
+      ],
+      "source_bindings": {
+        "source_sha256": "84484442976f8ee5892847d5e3b8e70d3a91cc299c6e0b70d3c8d7929ee09a8f",
+        "manifest_sha256": "18f60878186906b51dec03b8651376216807a47ed97e86278bf1056d7f918e1f",
+        "manifest": "C:\\Users\\hughe\\dev\\DarkLantern64\\tools\\acceptance_manifest.json"
+      },
+      "profile": "all",
+      "known_fixture_failures": [
+        {
+          "report": "C:\\Users\\hughe\\dev\\DarkLantern64\\build\\issue6-validation-summary.json",
+          "id": "test_sponza_physics.AuthoredSponzaPhysics.test_actual_core_traverses_authored_stairs_and_respects_stacked_floors",
+          "message": "ValueError: Level collision differs from geometry: sponza-collision-parapet-north"
+        }
+      ],
+      "unavailable_test_data": [
+        {
+          "report": "C:\\Users\\hughe\\dev\\DarkLantern64\\build\\issue6-validation-summary.json",
+          "id": "test_project_levels.ProjectLevelTests.test_symlink_sources_and_output_escapes_are_rejected",
+          "message": "Symlink creation unavailable: [WinError 1314] A required privilege is not held by the client: 'C:\\\\Users\\\\hughe\\\\dev\\\\DarkLantern64\\\\build\\\\project-level-test-bk0u7xx2-outside.json' -> 'C:\\\\Users\\\\hughe\\\\dev\\\\DarkLantern64\\\\build\\\\project-level-test-bk0u7xx2\\\\content\\\\linked.json'",
+          "declared": true
+        },
+        {
+          "report": "C:\\Users\\hughe\\dev\\DarkLantern64\\build\\issue6-validation-summary.json",
+          "id": "test_thief_objects.InstalledThiefObjectsTests.test_bafford_placements_and_loot_total",
+          "message": "Set DL_THIEF_GOLD to verify locally installed source assets",
+          "declared": true
+        }
+      ],
+      "test_failures": [
+        {
+          "report": "C:\\Users\\hughe\\dev\\DarkLantern64\\build\\issue6-validation-summary.json",
+          "id": "test_sponza_physics.AuthoredSponzaPhysics.test_actual_core_traverses_authored_stairs_and_respects_stacked_floors",
+          "message": "ValueError: Level collision differs from geometry: sponza-collision-parapet-north",
+          "known": true
+        }
+      ],
+      "selection": null,
+      "scope": null,
+      "full_acceptance": true
+    }
+  },
+  "environment": {
+    "path": "C:\\Users\\hughe\\dev\\DarkLantern64\\build\\issue6-doctor.json",
+    "sha256": "da7b21b209e80a95b1c4e584f592de39a3792ea7b9ed4c3acf16a7235c2678f2",
+    "readiness": {
+      "portable_python": true,
+      "portable_c": true,
+      "editor_build": true,
+      "native_play": true,
+      "rom_build": true,
+      "rom_build_t3d": true,
+      "emulator": true
+    }
+  },
+  "capability_matrix": {
+    "path": "tools/project_capabilities.json",
+    "sha256": "dd249d36f0c6bbbc35829dd8bc7e96d86c26068cba2dd91c35c582089b59f383",
+    "capabilities": 9,
+    "numeric_limits": 38
+  },
+  "bootstrap": {
+    "path": "docs/evidence/bootstrap.json",
+    "sha256": "10333c6ed057a38267c652005ea3d1978623d2fee9c9caab5357bbf231f6d956"
+  },
+  "ownership_proof": {
+    "model": "docs/models/emulator-lease.machine.ts",
+    "source_sha256": "bbadb779df7aac6036cc0d641af9f6088cd491ba732da62163a87f3c656ac29c",
+    "tool_version": "0.1.7",
+    "tier": "pr",
+    "interpreter_states": 63,
+    "interpreter_edges": 192,
+    "invariant_checks": 378,
+    "release_checks": 12,
+    "recovery_checks": 12,
+    "interpreter_passed": true,
+    "trace_interpreter_steps": 0,
+    "python_os_equivalence_proven": false,
+    "limitations": [
+      "Two abstract owners and one owned child per owner; finite safety only, no scheduling fairness or wall-clock proof.",
+      "Windows mutex/job binding, process identity, thread enumeration and abrupt-crash ordering require separate OS refinement tests.",
+      "POSIX flock releases on owner death, but its child crash containment is weaker than the supported Windows job backend.",
+      "No database-owned state or generated SQL adapter is applicable; OS observations drive retained run status."
+    ],
+    "tlc_proof_passed": true,
+    "interpreter_tla_graph_equivalent": true,
+    "machine_sha256": "7a274f56d3a269b02abebba866169fbd064935da1e4cf834e49064cc81cc0048"
+  },
+  "attempts": [
+    {
+      "run_id": "05730b275bec",
+      "summary": "C:\\Users\\hughe\\dev\\DarkLantern64\\.dev\\v5\\05730b275bec\\summary.json",
+      "sha256": "5726e5c3fb8583d555eb4690eafdf30ec5a18bd0eb3e52d9611a2638bdf71e32",
+      "status": "incomplete",
+      "full_acceptance": false,
+      "reason": "Controlled stop before further acceptance: correct doctor readiness for a failed N64 compiler probe",
+      "source_sha256": "d2fa2dafd2221023b830d79e37bc1d30ba34d5094988a2abaef00e74a3502841",
+      "results": [
+        {
+          "id": "capability-docs",
+          "status": "passed",
+          "required": true,
+          "test_failures": []
+        }
+      ]
+    },
+    {
+      "run_id": "58cb1a205ede",
+      "summary": "C:\\Users\\hughe\\dev\\DarkLantern64\\.dev\\v5\\58cb1a205ede\\summary.json",
+      "sha256": "c50560e36e7ef29c9f68bdfe0111c2b13c8577ce59a5acb76080a2338c36f7f6",
+      "status": "incomplete",
+      "full_acceptance": false,
+      "reason": "Controlled stop after two new nested-job cleanup observations failed; retained separately from exact known Sponza fixture error",
+      "source_sha256": "e655b3f29aabf3b95b7586ab86e0c3cdce5d17fca475485248870220e74d623b",
+      "results": [
+        {
+          "id": "capability-docs",
+          "status": "passed",
+          "required": true,
+          "test_failures": []
+        },
+        {
+          "id": "portable-python",
+          "status": "failed",
+          "required": true,
+          "test_failures": [
+            {
+              "id": "test_emulator_lease.EmulatorLeaseTests.test_outer_command_job_contains_inner_leased_process_after_owner_crash",
+              "known": false,
+              "message": "AssertionError: True is not false"
+            },
+            {
+              "id": "test_emulator_lease.EmulatorLeaseTests.test_owner_crash_kills_only_job_child_before_next_grant",
+              "known": false,
+              "message": "AssertionError: True is not false"
+            },
+            {
+              "id": "test_sponza_physics.AuthoredSponzaPhysics.test_actual_core_traverses_authored_stairs_and_respects_stacked_floors",
+              "known": true,
+              "message": "ValueError: Level collision differs from geometry: sponza-collision-parapet-north"
+            }
+          ]
+        },
+        {
+          "id": "portable-c",
+          "status": "passed",
+          "required": true,
+          "test_failures": []
+        },
+        {
+          "id": "host-build",
+          "status": "passed",
+          "required": true,
+          "test_failures": []
+        },
+        {
+          "id": "editor-tests",
+          "status": "passed",
+          "required": true,
+          "test_failures": []
+        },
+        {
+          "id": "native-metadata",
+          "status": "passed",
+          "required": true,
+          "test_failures": []
+        },
+        {
+          "id": "editor-project-status",
+          "status": "passed",
+          "required": true,
+          "test_failures": []
+        }
+      ]
+    },
+    {
+      "run_id": "3bbab018a137",
+      "summary": "C:\\Users\\hughe\\dev\\DarkLantern64\\.dev\\v5\\3bbab018a137\\summary.json",
+      "sha256": "b212ee94ffcdcd733934026df0a0c9656869b29a1261447bfd1256e3aaf992e4",
+      "status": "incomplete",
+      "full_acceptance": false,
+      "reason": "Controlled stop to capture maintained capability documentation consumed by the new required check",
+      "source_sha256": "9fe84761ba6f3d20635eef00bc5dc546f4b3b308f4176068e21a3cdd8ca485c4",
+      "results": [
+        {
+          "id": "capability-docs",
+          "status": "passed",
+          "required": true,
+          "test_failures": []
+        },
+        {
+          "id": "portable-python",
+          "status": "known_failure",
+          "required": true,
+          "test_failures": [
+            {
+              "id": "test_sponza_physics.AuthoredSponzaPhysics.test_actual_core_traverses_authored_stairs_and_respects_stacked_floors",
+              "known": true,
+              "message": "ValueError: Level collision differs from geometry: sponza-collision-parapet-north"
+            }
+          ]
+        },
+        {
+          "id": "portable-c",
+          "status": "passed",
+          "required": true,
+          "test_failures": []
+        },
+        {
+          "id": "host-build",
+          "status": "passed",
+          "required": true,
+          "test_failures": []
+        },
+        {
+          "id": "editor-tests",
+          "status": "passed",
+          "required": true,
+          "test_failures": []
+        },
+        {
+          "id": "native-metadata",
+          "status": "passed",
+          "required": true,
+          "test_failures": []
+        }
+      ]
+    },
+    {
+      "run_id": "a4fd4c2b7843",
+      "summary": "C:\\Users\\hughe\\dev\\DarkLantern64\\.dev\\v5\\a4fd4c2b7843\\summary.json",
+      "sha256": "8cf432c325832321d3bac92ccd5535022a43c102aeef2aecfad68c3e00cd8b7f",
+      "status": "incomplete",
+      "full_acceptance": false,
+      "reason": "Controlled stop to resolve source identity from wrapped stream mission reports for target-cook status",
+      "source_sha256": "912491054819c00fe89c54d09d6009e2663f61e66215564d2bbe5f6c87de0f77",
+      "results": [
+        {
+          "id": "capability-docs",
+          "status": "passed",
+          "required": true,
+          "test_failures": []
+        },
+        {
+          "id": "portable-python",
+          "status": "known_failure",
+          "required": true,
+          "test_failures": [
+            {
+              "id": "test_sponza_physics.AuthoredSponzaPhysics.test_actual_core_traverses_authored_stairs_and_respects_stacked_floors",
+              "known": true,
+              "message": "ValueError: Level collision differs from geometry: sponza-collision-parapet-north"
+            }
+          ]
+        },
+        {
+          "id": "portable-c",
+          "status": "passed",
+          "required": true,
+          "test_failures": []
+        },
+        {
+          "id": "host-build",
+          "status": "passed",
+          "required": true,
+          "test_failures": []
+        },
+        {
+          "id": "editor-tests",
+          "status": "passed",
+          "required": true,
+          "test_failures": []
+        },
+        {
+          "id": "native-metadata",
+          "status": "passed",
+          "required": true,
+          "test_failures": []
+        },
+        {
+          "id": "editor-project-status",
+          "status": "passed",
+          "required": true,
+          "test_failures": []
+        }
+      ]
+    },
+    {
+      "run_id": "96e0908eefb8",
+      "summary": "C:\\Users\\hughe\\dev\\DarkLantern64\\.dev\\v5\\96e0908eefb8\\summary.json",
+      "sha256": "e6b87e138a58783c41fb6d43524e4fa253d331f40924fca136627c1f47581b7b",
+      "status": "accepted_with_known_fixture_failures",
+      "full_acceptance": true,
+      "reason": null,
+      "source_sha256": "84484442976f8ee5892847d5e3b8e70d3a91cc299c6e0b70d3c8d7929ee09a8f",
+      "results": [
+        {
+          "id": "capability-docs",
+          "status": "passed",
+          "required": true,
+          "test_failures": []
+        },
+        {
+          "id": "portable-python",
+          "status": "known_failure",
+          "required": true,
+          "test_failures": [
+            {
+              "id": "test_sponza_physics.AuthoredSponzaPhysics.test_actual_core_traverses_authored_stairs_and_respects_stacked_floors",
+              "known": true,
+              "message": "ValueError: Level collision differs from geometry: sponza-collision-parapet-north"
+            }
+          ]
+        },
+        {
+          "id": "portable-c",
+          "status": "passed",
+          "required": true,
+          "test_failures": []
+        },
+        {
+          "id": "host-build",
+          "status": "passed",
+          "required": true,
+          "test_failures": []
+        },
+        {
+          "id": "editor-tests",
+          "status": "passed",
+          "required": true,
+          "test_failures": []
+        },
+        {
+          "id": "native-metadata",
+          "status": "passed",
+          "required": true,
+          "test_failures": []
+        },
+        {
+          "id": "editor-project-status",
+          "status": "passed",
+          "required": true,
+          "test_failures": []
+        },
+        {
+          "id": "editor-authoring-preview",
+          "status": "passed",
+          "required": true,
+          "test_failures": []
+        },
+        {
+          "id": "editor-render-diagnostics",
+          "status": "passed",
+          "required": true,
+          "test_failures": []
+        },
+        {
+          "id": "editor-native-play",
+          "status": "passed",
+          "required": true,
+          "test_failures": []
+        },
+        {
+          "id": "bundle-idle",
+          "status": "passed",
+          "required": true,
+          "test_failures": []
+        },
+        {
+          "id": "district-ordinary",
+          "status": "passed",
+          "required": true,
+          "test_failures": []
+        },
+        {
+          "id": "district-performance",
+          "status": "passed",
+          "required": true,
+          "test_failures": []
+        },
+        {
+          "id": "district-capture",
+          "status": "passed",
+          "required": true,
+          "test_failures": []
+        },
+        {
+          "id": "bundle-lifecycle",
+          "status": "passed",
+          "required": true,
+          "test_failures": []
+        },
+        {
+          "id": "probe-functional",
+          "status": "passed",
+          "required": true,
+          "test_failures": []
+        },
+        {
+          "id": "probe-replay",
+          "status": "passed",
+          "required": true,
+          "test_failures": []
+        },
+        {
+          "id": "district-no-diagnostics",
+          "status": "skipped",
+          "required": false,
+          "test_failures": []
+        },
+        {
+          "id": "probe-rom-parity",
+          "status": "passed",
+          "required": true,
+          "test_failures": []
+        },
+        {
+          "id": "menu-idle",
+          "status": "passed",
+          "required": true,
+          "test_failures": []
+        },
+        {
+          "id": "menu-4mb",
+          "status": "passed",
+          "required": true,
+          "test_failures": []
+        },
+        {
+          "id": "menu-lifecycle",
+          "status": "passed",
+          "required": true,
+          "test_failures": []
+        },
+        {
+          "id": "district-functional",
+          "status": "passed",
+          "required": true,
+          "test_failures": []
+        },
+        {
+          "id": "district-strict",
+          "status": "passed",
+          "required": true,
+          "test_failures": []
+        },
+        {
+          "id": "district-views",
+          "status": "passed",
+          "required": true,
+          "test_failures": []
+        },
+        {
+          "id": "district-diagnostics-counterfactual",
+          "status": "skipped",
+          "required": false,
+          "test_failures": []
+        }
+      ]
+    }
+  ],
+  "builds": {
+    "bundle-idle": {
+      "rom": "C:\\Users\\hughe\\dev\\DarkLantern64\\.dev\\v5\\96e0908eefb8\\artifacts\\builds\\bundle-idle\\DarkLantern64-p-bundle-idle.z64",
+      "metadata": "C:\\Users\\hughe\\dev\\DarkLantern64\\.dev\\v5\\96e0908eefb8\\artifacts\\builds\\bundle-idle\\build.json",
+      "map": "C:\\Users\\hughe\\dev\\DarkLantern64\\.dev\\v5\\96e0908eefb8\\artifacts\\builds\\bundle-idle\\runtime_debug_map.json",
+      "build_id": "155143ad5be1923d090f68913984df7815116de3e730e6c6aaa5901add4ccbc5",
+      "rom_sha256": "89f1c2782d55ccd908957803f34093fcb635a38b0b7a6ca46cfc1af81dcc52e6",
+      "metadata_sha256": "dd5490168a2033ffec4e5b2fc1d1910c705274e1c36eb41b6b63532d1ea85f75",
+      "map_sha256": "b22af7d591b35bf3a4af8ad6f5fe883f37a089ce6a98ea3d1c02fbc83b1212a0",
+      "original_metadata": "C:\\Users\\hughe\\dev\\DarkLantern64\\build\\DarkLantern64-p-bundle-idle\\build.json",
+      "source_bindings": [
+        {
+          "level": "lantern-store",
+          "source": "C:\\Users\\hughe\\dev\\DarkLantern64\\content\\first_room.json",
+          "source_file_sha256": "c1fb19e6b114fe9fa8459922dcacf55771ed86e2f9feb7ec25fe6aadf2009105",
+          "compiled_source_sha256": "c2f27747ecb4ba71275bdcd3eea92a243f728b822e3ea7bc7d75e072873c61ac"
+        },
+        {
+          "level": "moonlit-yard",
+          "source": "C:\\Users\\hughe\\dev\\DarkLantern64\\content\\moonlit_courtyard.json",
+          "source_file_sha256": "412ec992cefcfc7dc714aeabd0618cfc50e57b22e268fd30c3346bd86a03ff8e",
+          "compiled_source_sha256": "c131d3ec48232b3449166f04a2a77632868760f594f7e79f0dc2bd5f1e3294a9"
+        },
+        {
+          "level": "enemy-workshop",
+          "source": "C:\\Users\\hughe\\dev\\DarkLantern64\\content\\enemy_patrols.json",
+          "source_file_sha256": "26d61c6300b298a6b2d73de2f32030c9759536d490e611d7d7ee2200d89e450d",
+          "compiled_source_sha256": "6925eccf961c2069a2a8dc73d1cc80889ed63d7e4a72c0b0678e675e762a2e13"
+        },
+        {
+          "level": "animation_workshop",
+          "source": "C:\\Users\\hughe\\dev\\DarkLantern64\\content\\animation_workshop.json",
+          "source_file_sha256": "0480ac4b7343b82b1f5c709c93d3496f8fd89ea846315a6b68b96028cb9fb8fd",
+          "compiled_source_sha256": "74ff81f3a3d7281fba6093bca2eba5b5d9ae8165cdb958a1029a63aee7f7a4c0"
+        },
+        {
+          "level": "sponza",
+          "source": "C:\\Users\\hughe\\dev\\DarkLantern64\\content\\sponza_courtyard.json",
+          "source_file_sha256": "4eb23dc17c272397d4c4d3f8bc503fc67b5d3a16ed2f2bddd65c9ad4727fc4ca",
+          "compiled_source_sha256": "7d919d3c4f05418fc32b94bb21261e95a6fc4ab5b6cff6eee4c54a8869b68737"
+        },
+        {
+          "level": "bafford-district",
+          "source": "C:\\Users\\hughe\\dev\\DarkLantern64\\content\\thief_bafford_district.json",
+          "source_file_sha256": "16160232d3051ba95ca0d78fa66bf02522399aa06659199a3c0285c2832fdcbe",
+          "compiled_source_sha256": "087e3095838b972f6849e3a4e6265f964e5106b51a9d8c123962b4214d16bf95",
+          "partition": "C:\\Users\\hughe\\dev\\DarkLantern64\\content\\thief_bafford_district.mission.json",
+          "partition_sha256": "2f6aeeb0911aaf4806d8a848f0609c2552621a659df66fb5e78b1125fbd329d0",
+          "package_sha256": "48b8cb50a81c6d7e07942695ea606faad98bf7b78a0fb6d3c8890ee279f882ef"
+        },
+        {
+          "level": "bafford-expanded",
+          "source": "C:\\Users\\hughe\\dev\\DarkLantern64\\content\\thief_bafford_expanded.json",
+          "source_file_sha256": "28de709c9d3f199cf21e3651cd234f801b85c19ddc5df27635a28b35cb0e7254",
+          "compiled_source_sha256": "7a985f6b9f1b996814dfb26e365ef494695ea90c409be00f83efe9184042f955",
+          "partition": "C:\\Users\\hughe\\dev\\DarkLantern64\\content\\thief_bafford_expanded.mission.json",
+          "partition_sha256": "3846d776855b17a5d051eb1a7c9f23acef19e8fb7891ae1b2f734f07e906176e",
+          "package_sha256": "0bb3bf59655c7847ddfe08408132518d392122147f8046a02904048c2b7ee381"
+        },
+        {
+          "level": "streaming-probe",
+          "source": "C:\\Users\\hughe\\dev\\DarkLantern64\\content\\streaming_probe.json",
+          "source_file_sha256": "afc8f737f2d72a3143927ee9290ec15703d7dc2ed3757b9b61c0c992d64d24f0",
+          "compiled_source_sha256": "491825221cb7bf36a5d2b992b994b4a79bb6ff2dad2ed8473236315e2622e72f",
+          "partition": "C:\\Users\\hughe\\dev\\DarkLantern64\\content\\streaming_probe.mission.json",
+          "partition_sha256": "6bd18afe4f538555db1881e03feb8f8449498a656cadcd2139b6eff454a0c2c8",
+          "package_sha256": "262da9e039e1e605060f554790b8c777fe55c92c418b528d25d7fa62fdd27394"
+        }
+      ],
+      "pipeline_source_sha256": "84484442976f8ee5892847d5e3b8e70d3a91cc299c6e0b70d3c8d7929ee09a8f"
+    },
+    "district-ordinary": {
+      "rom": "C:\\Users\\hughe\\dev\\DarkLantern64\\.dev\\v5\\96e0908eefb8\\artifacts\\builds\\district-ordinary\\DarkLantern64-p-district-ordinary.z64",
+      "metadata": "C:\\Users\\hughe\\dev\\DarkLantern64\\.dev\\v5\\96e0908eefb8\\artifacts\\builds\\district-ordinary\\build.json",
+      "map": "C:\\Users\\hughe\\dev\\DarkLantern64\\.dev\\v5\\96e0908eefb8\\artifacts\\builds\\district-ordinary\\runtime_debug_map.json",
+      "build_id": "aeff43a6904b156d5e8c9c3aef308cb9f6c74fe6b0b334dab668f659765a6e3c",
+      "rom_sha256": "2279741abae534b8b141dfaad51c5433e8611bae749d464f9068da5a9dca8974",
+      "metadata_sha256": "50880ce148521ad9432d4e430b082e8cb0f766bf69d0c1b79420d75b042815c3",
+      "map_sha256": "ad5dfe97d3d9c7f1100e56b53adcca02352d85a7e80d6047bc4d20380dcea521",
+      "original_metadata": "C:\\Users\\hughe\\dev\\DarkLantern64\\build\\DarkLantern64-p-district-ordinary\\build.json",
+      "source_bindings": [
+        {
+          "level": "lantern-store",
+          "source": "C:\\Users\\hughe\\dev\\DarkLantern64\\content\\first_room.json",
+          "source_file_sha256": "c1fb19e6b114fe9fa8459922dcacf55771ed86e2f9feb7ec25fe6aadf2009105",
+          "compiled_source_sha256": "c2f27747ecb4ba71275bdcd3eea92a243f728b822e3ea7bc7d75e072873c61ac"
+        },
+        {
+          "level": "moonlit-yard",
+          "source": "C:\\Users\\hughe\\dev\\DarkLantern64\\content\\moonlit_courtyard.json",
+          "source_file_sha256": "412ec992cefcfc7dc714aeabd0618cfc50e57b22e268fd30c3346bd86a03ff8e",
+          "compiled_source_sha256": "c131d3ec48232b3449166f04a2a77632868760f594f7e79f0dc2bd5f1e3294a9"
+        },
+        {
+          "level": "enemy-workshop",
+          "source": "C:\\Users\\hughe\\dev\\DarkLantern64\\content\\enemy_patrols.json",
+          "source_file_sha256": "26d61c6300b298a6b2d73de2f32030c9759536d490e611d7d7ee2200d89e450d",
+          "compiled_source_sha256": "6925eccf961c2069a2a8dc73d1cc80889ed63d7e4a72c0b0678e675e762a2e13"
+        },
+        {
+          "level": "animation_workshop",
+          "source": "C:\\Users\\hughe\\dev\\DarkLantern64\\content\\animation_workshop.json",
+          "source_file_sha256": "0480ac4b7343b82b1f5c709c93d3496f8fd89ea846315a6b68b96028cb9fb8fd",
+          "compiled_source_sha256": "74ff81f3a3d7281fba6093bca2eba5b5d9ae8165cdb958a1029a63aee7f7a4c0"
+        },
+        {
+          "level": "sponza",
+          "source": "C:\\Users\\hughe\\dev\\DarkLantern64\\content\\sponza_courtyard.json",
+          "source_file_sha256": "4eb23dc17c272397d4c4d3f8bc503fc67b5d3a16ed2f2bddd65c9ad4727fc4ca",
+          "compiled_source_sha256": "7d919d3c4f05418fc32b94bb21261e95a6fc4ab5b6cff6eee4c54a8869b68737"
+        },
+        {
+          "level": "bafford-district",
+          "source": "C:\\Users\\hughe\\dev\\DarkLantern64\\content\\thief_bafford_district.json",
+          "source_file_sha256": "16160232d3051ba95ca0d78fa66bf02522399aa06659199a3c0285c2832fdcbe",
+          "compiled_source_sha256": "087e3095838b972f6849e3a4e6265f964e5106b51a9d8c123962b4214d16bf95",
+          "partition": "C:\\Users\\hughe\\dev\\DarkLantern64\\content\\thief_bafford_district.mission.json",
+          "partition_sha256": "2f6aeeb0911aaf4806d8a848f0609c2552621a659df66fb5e78b1125fbd329d0",
+          "package_sha256": "48b8cb50a81c6d7e07942695ea606faad98bf7b78a0fb6d3c8890ee279f882ef"
+        },
+        {
+          "level": "bafford-expanded",
+          "source": "C:\\Users\\hughe\\dev\\DarkLantern64\\content\\thief_bafford_expanded.json",
+          "source_file_sha256": "28de709c9d3f199cf21e3651cd234f801b85c19ddc5df27635a28b35cb0e7254",
+          "compiled_source_sha256": "7a985f6b9f1b996814dfb26e365ef494695ea90c409be00f83efe9184042f955",
+          "partition": "C:\\Users\\hughe\\dev\\DarkLantern64\\content\\thief_bafford_expanded.mission.json",
+          "partition_sha256": "3846d776855b17a5d051eb1a7c9f23acef19e8fb7891ae1b2f734f07e906176e",
+          "package_sha256": "0bb3bf59655c7847ddfe08408132518d392122147f8046a02904048c2b7ee381"
+        },
+        {
+          "level": "streaming-probe",
+          "source": "C:\\Users\\hughe\\dev\\DarkLantern64\\content\\streaming_probe.json",
+          "source_file_sha256": "afc8f737f2d72a3143927ee9290ec15703d7dc2ed3757b9b61c0c992d64d24f0",
+          "compiled_source_sha256": "491825221cb7bf36a5d2b992b994b4a79bb6ff2dad2ed8473236315e2622e72f",
+          "partition": "C:\\Users\\hughe\\dev\\DarkLantern64\\content\\streaming_probe.mission.json",
+          "partition_sha256": "6bd18afe4f538555db1881e03feb8f8449498a656cadcd2139b6eff454a0c2c8",
+          "package_sha256": "262da9e039e1e605060f554790b8c777fe55c92c418b528d25d7fa62fdd27394"
+        }
+      ],
+      "pipeline_source_sha256": "84484442976f8ee5892847d5e3b8e70d3a91cc299c6e0b70d3c8d7929ee09a8f"
+    },
+    "district-performance": {
+      "rom": "C:\\Users\\hughe\\dev\\DarkLantern64\\.dev\\v5\\96e0908eefb8\\artifacts\\builds\\district-performance\\DarkLantern64-p-district-performance.z64",
+      "metadata": "C:\\Users\\hughe\\dev\\DarkLantern64\\.dev\\v5\\96e0908eefb8\\artifacts\\builds\\district-performance\\build.json",
+      "map": "C:\\Users\\hughe\\dev\\DarkLantern64\\.dev\\v5\\96e0908eefb8\\artifacts\\builds\\district-performance\\runtime_debug_map.json",
+      "build_id": "d9bdd25a9c18b77ca48b8c14e06e99c5759ec2862452a4554e7a9537e7261df4",
+      "rom_sha256": "4ceca3d66131389409741111912e053823639edeac4e1fd003c9dbb5197d4798",
+      "metadata_sha256": "6dee0c1a59991f01a974f2e7b3c6eff7870b60ff8645f9e57f0c8c17337a9814",
+      "map_sha256": "04975a4918533ecd15605dd6e0abffba07db66946d4723042f2ccaf6233bf9b4",
+      "original_metadata": "C:\\Users\\hughe\\dev\\DarkLantern64\\build\\DarkLantern64-p-district-performance\\build.json",
+      "source_bindings": [
+        {
+          "level": "lantern-store",
+          "source": "C:\\Users\\hughe\\dev\\DarkLantern64\\content\\first_room.json",
+          "source_file_sha256": "c1fb19e6b114fe9fa8459922dcacf55771ed86e2f9feb7ec25fe6aadf2009105",
+          "compiled_source_sha256": "c2f27747ecb4ba71275bdcd3eea92a243f728b822e3ea7bc7d75e072873c61ac"
+        },
+        {
+          "level": "moonlit-yard",
+          "source": "C:\\Users\\hughe\\dev\\DarkLantern64\\content\\moonlit_courtyard.json",
+          "source_file_sha256": "412ec992cefcfc7dc714aeabd0618cfc50e57b22e268fd30c3346bd86a03ff8e",
+          "compiled_source_sha256": "c131d3ec48232b3449166f04a2a77632868760f594f7e79f0dc2bd5f1e3294a9"
+        },
+        {
+          "level": "enemy-workshop",
+          "source": "C:\\Users\\hughe\\dev\\DarkLantern64\\content\\enemy_patrols.json",
+          "source_file_sha256": "26d61c6300b298a6b2d73de2f32030c9759536d490e611d7d7ee2200d89e450d",
+          "compiled_source_sha256": "6925eccf961c2069a2a8dc73d1cc80889ed63d7e4a72c0b0678e675e762a2e13"
+        },
+        {
+          "level": "animation_workshop",
+          "source": "C:\\Users\\hughe\\dev\\DarkLantern64\\content\\animation_workshop.json",
+          "source_file_sha256": "0480ac4b7343b82b1f5c709c93d3496f8fd89ea846315a6b68b96028cb9fb8fd",
+          "compiled_source_sha256": "74ff81f3a3d7281fba6093bca2eba5b5d9ae8165cdb958a1029a63aee7f7a4c0"
+        },
+        {
+          "level": "sponza",
+          "source": "C:\\Users\\hughe\\dev\\DarkLantern64\\content\\sponza_courtyard.json",
+          "source_file_sha256": "4eb23dc17c272397d4c4d3f8bc503fc67b5d3a16ed2f2bddd65c9ad4727fc4ca",
+          "compiled_source_sha256": "7d919d3c4f05418fc32b94bb21261e95a6fc4ab5b6cff6eee4c54a8869b68737"
+        },
+        {
+          "level": "bafford-district",
+          "source": "C:\\Users\\hughe\\dev\\DarkLantern64\\content\\thief_bafford_district.json",
+          "source_file_sha256": "16160232d3051ba95ca0d78fa66bf02522399aa06659199a3c0285c2832fdcbe",
+          "compiled_source_sha256": "087e3095838b972f6849e3a4e6265f964e5106b51a9d8c123962b4214d16bf95",
+          "partition": "C:\\Users\\hughe\\dev\\DarkLantern64\\content\\thief_bafford_district.mission.json",
+          "partition_sha256": "2f6aeeb0911aaf4806d8a848f0609c2552621a659df66fb5e78b1125fbd329d0",
+          "package_sha256": "48b8cb50a81c6d7e07942695ea606faad98bf7b78a0fb6d3c8890ee279f882ef"
+        },
+        {
+          "level": "bafford-expanded",
+          "source": "C:\\Users\\hughe\\dev\\DarkLantern64\\content\\thief_bafford_expanded.json",
+          "source_file_sha256": "28de709c9d3f199cf21e3651cd234f801b85c19ddc5df27635a28b35cb0e7254",
+          "compiled_source_sha256": "7a985f6b9f1b996814dfb26e365ef494695ea90c409be00f83efe9184042f955",
+          "partition": "C:\\Users\\hughe\\dev\\DarkLantern64\\content\\thief_bafford_expanded.mission.json",
+          "partition_sha256": "3846d776855b17a5d051eb1a7c9f23acef19e8fb7891ae1b2f734f07e906176e",
+          "package_sha256": "0bb3bf59655c7847ddfe08408132518d392122147f8046a02904048c2b7ee381"
+        },
+        {
+          "level": "streaming-probe",
+          "source": "C:\\Users\\hughe\\dev\\DarkLantern64\\content\\streaming_probe.json",
+          "source_file_sha256": "afc8f737f2d72a3143927ee9290ec15703d7dc2ed3757b9b61c0c992d64d24f0",
+          "compiled_source_sha256": "491825221cb7bf36a5d2b992b994b4a79bb6ff2dad2ed8473236315e2622e72f",
+          "partition": "C:\\Users\\hughe\\dev\\DarkLantern64\\content\\streaming_probe.mission.json",
+          "partition_sha256": "6bd18afe4f538555db1881e03feb8f8449498a656cadcd2139b6eff454a0c2c8",
+          "package_sha256": "262da9e039e1e605060f554790b8c777fe55c92c418b528d25d7fa62fdd27394"
+        }
+      ],
+      "pipeline_source_sha256": "84484442976f8ee5892847d5e3b8e70d3a91cc299c6e0b70d3c8d7929ee09a8f"
+    },
+    "district-capture": {
+      "rom": "C:\\Users\\hughe\\dev\\DarkLantern64\\.dev\\v5\\96e0908eefb8\\artifacts\\builds\\district-capture\\DarkLantern64-p-district-capture.z64",
+      "metadata": "C:\\Users\\hughe\\dev\\DarkLantern64\\.dev\\v5\\96e0908eefb8\\artifacts\\builds\\district-capture\\build.json",
+      "map": "C:\\Users\\hughe\\dev\\DarkLantern64\\.dev\\v5\\96e0908eefb8\\artifacts\\builds\\district-capture\\runtime_debug_map.json",
+      "build_id": "71d80f4bbeecd8ec1fc370c481bd2e001f5661bf2bd6067d422fc0945b4235d2",
+      "rom_sha256": "da9a2f81fab1a783cd4f266e46af3b1752f7d89c8bb9c0716079ece18a4e47a9",
+      "metadata_sha256": "4804f528b1d9482f48b57db35cdc613c9517fc82159757ab2965e7d8de630842",
+      "map_sha256": "d8f258823ded70a202956debfba2718a7b9ffb5d4e790dbd2b6966c5a6f93f02",
+      "original_metadata": "C:\\Users\\hughe\\dev\\DarkLantern64\\build\\DarkLantern64-p-district-capture\\build.json",
+      "source_bindings": [
+        {
+          "level": "lantern-store",
+          "source": "C:\\Users\\hughe\\dev\\DarkLantern64\\content\\first_room.json",
+          "source_file_sha256": "c1fb19e6b114fe9fa8459922dcacf55771ed86e2f9feb7ec25fe6aadf2009105",
+          "compiled_source_sha256": "c2f27747ecb4ba71275bdcd3eea92a243f728b822e3ea7bc7d75e072873c61ac"
+        },
+        {
+          "level": "moonlit-yard",
+          "source": "C:\\Users\\hughe\\dev\\DarkLantern64\\content\\moonlit_courtyard.json",
+          "source_file_sha256": "412ec992cefcfc7dc714aeabd0618cfc50e57b22e268fd30c3346bd86a03ff8e",
+          "compiled_source_sha256": "c131d3ec48232b3449166f04a2a77632868760f594f7e79f0dc2bd5f1e3294a9"
+        },
+        {
+          "level": "enemy-workshop",
+          "source": "C:\\Users\\hughe\\dev\\DarkLantern64\\content\\enemy_patrols.json",
+          "source_file_sha256": "26d61c6300b298a6b2d73de2f32030c9759536d490e611d7d7ee2200d89e450d",
+          "compiled_source_sha256": "6925eccf961c2069a2a8dc73d1cc80889ed63d7e4a72c0b0678e675e762a2e13"
+        },
+        {
+          "level": "animation_workshop",
+          "source": "C:\\Users\\hughe\\dev\\DarkLantern64\\content\\animation_workshop.json",
+          "source_file_sha256": "0480ac4b7343b82b1f5c709c93d3496f8fd89ea846315a6b68b96028cb9fb8fd",
+          "compiled_source_sha256": "74ff81f3a3d7281fba6093bca2eba5b5d9ae8165cdb958a1029a63aee7f7a4c0"
+        },
+        {
+          "level": "sponza",
+          "source": "C:\\Users\\hughe\\dev\\DarkLantern64\\content\\sponza_courtyard.json",
+          "source_file_sha256": "4eb23dc17c272397d4c4d3f8bc503fc67b5d3a16ed2f2bddd65c9ad4727fc4ca",
+          "compiled_source_sha256": "7d919d3c4f05418fc32b94bb21261e95a6fc4ab5b6cff6eee4c54a8869b68737"
+        },
+        {
+          "level": "bafford-district",
+          "source": "C:\\Users\\hughe\\dev\\DarkLantern64\\content\\thief_bafford_district.json",
+          "source_file_sha256": "16160232d3051ba95ca0d78fa66bf02522399aa06659199a3c0285c2832fdcbe",
+          "compiled_source_sha256": "087e3095838b972f6849e3a4e6265f964e5106b51a9d8c123962b4214d16bf95",
+          "partition": "C:\\Users\\hughe\\dev\\DarkLantern64\\content\\thief_bafford_district.mission.json",
+          "partition_sha256": "2f6aeeb0911aaf4806d8a848f0609c2552621a659df66fb5e78b1125fbd329d0",
+          "package_sha256": "48b8cb50a81c6d7e07942695ea606faad98bf7b78a0fb6d3c8890ee279f882ef"
+        },
+        {
+          "level": "bafford-expanded",
+          "source": "C:\\Users\\hughe\\dev\\DarkLantern64\\content\\thief_bafford_expanded.json",
+          "source_file_sha256": "28de709c9d3f199cf21e3651cd234f801b85c19ddc5df27635a28b35cb0e7254",
+          "compiled_source_sha256": "7a985f6b9f1b996814dfb26e365ef494695ea90c409be00f83efe9184042f955",
+          "partition": "C:\\Users\\hughe\\dev\\DarkLantern64\\content\\thief_bafford_expanded.mission.json",
+          "partition_sha256": "3846d776855b17a5d051eb1a7c9f23acef19e8fb7891ae1b2f734f07e906176e",
+          "package_sha256": "0bb3bf59655c7847ddfe08408132518d392122147f8046a02904048c2b7ee381"
+        },
+        {
+          "level": "streaming-probe",
+          "source": "C:\\Users\\hughe\\dev\\DarkLantern64\\content\\streaming_probe.json",
+          "source_file_sha256": "afc8f737f2d72a3143927ee9290ec15703d7dc2ed3757b9b61c0c992d64d24f0",
+          "compiled_source_sha256": "491825221cb7bf36a5d2b992b994b4a79bb6ff2dad2ed8473236315e2622e72f",
+          "partition": "C:\\Users\\hughe\\dev\\DarkLantern64\\content\\streaming_probe.mission.json",
+          "partition_sha256": "6bd18afe4f538555db1881e03feb8f8449498a656cadcd2139b6eff454a0c2c8",
+          "package_sha256": "262da9e039e1e605060f554790b8c777fe55c92c418b528d25d7fa62fdd27394"
+        }
+      ],
+      "pipeline_source_sha256": "84484442976f8ee5892847d5e3b8e70d3a91cc299c6e0b70d3c8d7929ee09a8f"
+    },
+    "bundle-lifecycle": {
+      "rom": "C:\\Users\\hughe\\dev\\DarkLantern64\\.dev\\v5\\96e0908eefb8\\artifacts\\builds\\bundle-lifecycle\\DarkLantern64-p-bundle-lifecycle.z64",
+      "metadata": "C:\\Users\\hughe\\dev\\DarkLantern64\\.dev\\v5\\96e0908eefb8\\artifacts\\builds\\bundle-lifecycle\\build.json",
+      "map": "C:\\Users\\hughe\\dev\\DarkLantern64\\.dev\\v5\\96e0908eefb8\\artifacts\\builds\\bundle-lifecycle\\runtime_debug_map.json",
+      "build_id": "c159f78b68a5579bc9e2985c0aaa0881ec26a96cfe0edaddbf1c3e87775c9187",
+      "rom_sha256": "7f1a115066bef4297b1f84c0cb537deddc44118f966db98572afd6ef3f2797ee",
+      "metadata_sha256": "1ceac73cb95679c31864186b5d26ce81717ffbe3353a9e0e0f1d84bf7d96d4c6",
+      "map_sha256": "6f12522c05efdea9816c2546d6056bdec404c4c710b7a931160332211161fd6d",
+      "original_metadata": "C:\\Users\\hughe\\dev\\DarkLantern64\\build\\DarkLantern64-p-bundle-lifecycle\\build.json",
+      "source_bindings": [
+        {
+          "level": "lantern-store",
+          "source": "C:\\Users\\hughe\\dev\\DarkLantern64\\content\\first_room.json",
+          "source_file_sha256": "c1fb19e6b114fe9fa8459922dcacf55771ed86e2f9feb7ec25fe6aadf2009105",
+          "compiled_source_sha256": "c2f27747ecb4ba71275bdcd3eea92a243f728b822e3ea7bc7d75e072873c61ac"
+        },
+        {
+          "level": "moonlit-yard",
+          "source": "C:\\Users\\hughe\\dev\\DarkLantern64\\content\\moonlit_courtyard.json",
+          "source_file_sha256": "412ec992cefcfc7dc714aeabd0618cfc50e57b22e268fd30c3346bd86a03ff8e",
+          "compiled_source_sha256": "c131d3ec48232b3449166f04a2a77632868760f594f7e79f0dc2bd5f1e3294a9"
+        },
+        {
+          "level": "enemy-workshop",
+          "source": "C:\\Users\\hughe\\dev\\DarkLantern64\\content\\enemy_patrols.json",
+          "source_file_sha256": "26d61c6300b298a6b2d73de2f32030c9759536d490e611d7d7ee2200d89e450d",
+          "compiled_source_sha256": "6925eccf961c2069a2a8dc73d1cc80889ed63d7e4a72c0b0678e675e762a2e13"
+        },
+        {
+          "level": "animation_workshop",
+          "source": "C:\\Users\\hughe\\dev\\DarkLantern64\\content\\animation_workshop.json",
+          "source_file_sha256": "0480ac4b7343b82b1f5c709c93d3496f8fd89ea846315a6b68b96028cb9fb8fd",
+          "compiled_source_sha256": "74ff81f3a3d7281fba6093bca2eba5b5d9ae8165cdb958a1029a63aee7f7a4c0"
+        },
+        {
+          "level": "sponza",
+          "source": "C:\\Users\\hughe\\dev\\DarkLantern64\\content\\sponza_courtyard.json",
+          "source_file_sha256": "4eb23dc17c272397d4c4d3f8bc503fc67b5d3a16ed2f2bddd65c9ad4727fc4ca",
+          "compiled_source_sha256": "7d919d3c4f05418fc32b94bb21261e95a6fc4ab5b6cff6eee4c54a8869b68737"
+        },
+        {
+          "level": "bafford-district",
+          "source": "C:\\Users\\hughe\\dev\\DarkLantern64\\content\\thief_bafford_district.json",
+          "source_file_sha256": "16160232d3051ba95ca0d78fa66bf02522399aa06659199a3c0285c2832fdcbe",
+          "compiled_source_sha256": "087e3095838b972f6849e3a4e6265f964e5106b51a9d8c123962b4214d16bf95",
+          "partition": "C:\\Users\\hughe\\dev\\DarkLantern64\\content\\thief_bafford_district.mission.json",
+          "partition_sha256": "2f6aeeb0911aaf4806d8a848f0609c2552621a659df66fb5e78b1125fbd329d0",
+          "package_sha256": "48b8cb50a81c6d7e07942695ea606faad98bf7b78a0fb6d3c8890ee279f882ef"
+        },
+        {
+          "level": "bafford-expanded",
+          "source": "C:\\Users\\hughe\\dev\\DarkLantern64\\content\\thief_bafford_expanded.json",
+          "source_file_sha256": "28de709c9d3f199cf21e3651cd234f801b85c19ddc5df27635a28b35cb0e7254",
+          "compiled_source_sha256": "7a985f6b9f1b996814dfb26e365ef494695ea90c409be00f83efe9184042f955",
+          "partition": "C:\\Users\\hughe\\dev\\DarkLantern64\\content\\thief_bafford_expanded.mission.json",
+          "partition_sha256": "3846d776855b17a5d051eb1a7c9f23acef19e8fb7891ae1b2f734f07e906176e",
+          "package_sha256": "0bb3bf59655c7847ddfe08408132518d392122147f8046a02904048c2b7ee381"
+        },
+        {
+          "level": "streaming-probe",
+          "source": "C:\\Users\\hughe\\dev\\DarkLantern64\\content\\streaming_probe.json",
+          "source_file_sha256": "afc8f737f2d72a3143927ee9290ec15703d7dc2ed3757b9b61c0c992d64d24f0",
+          "compiled_source_sha256": "491825221cb7bf36a5d2b992b994b4a79bb6ff2dad2ed8473236315e2622e72f",
+          "partition": "C:\\Users\\hughe\\dev\\DarkLantern64\\content\\streaming_probe.mission.json",
+          "partition_sha256": "6bd18afe4f538555db1881e03feb8f8449498a656cadcd2139b6eff454a0c2c8",
+          "package_sha256": "262da9e039e1e605060f554790b8c777fe55c92c418b528d25d7fa62fdd27394"
+        }
+      ],
+      "pipeline_source_sha256": "84484442976f8ee5892847d5e3b8e70d3a91cc299c6e0b70d3c8d7929ee09a8f"
+    },
+    "probe-replay": {
+      "rom": "C:\\Users\\hughe\\dev\\DarkLantern64\\.dev\\v5\\96e0908eefb8\\artifacts\\builds\\probe-replay\\DarkLantern64-p-probe-replay.z64",
+      "metadata": "C:\\Users\\hughe\\dev\\DarkLantern64\\.dev\\v5\\96e0908eefb8\\artifacts\\builds\\probe-replay\\build.json",
+      "map": "C:\\Users\\hughe\\dev\\DarkLantern64\\.dev\\v5\\96e0908eefb8\\artifacts\\builds\\probe-replay\\runtime_debug_map.json",
+      "build_id": "efdb8de1c9653677056ff74f11b6a9d6977c0da9e279b392f901f905088f46bb",
+      "rom_sha256": "fbeb3b74ed0d4c3ce3658570dd504f732f8f82c26522d62ca09976a889b70cc1",
+      "metadata_sha256": "51409aa7a7599b2d59f6e671f038a2ed27281064e47326babb402b0fa78ada90",
+      "map_sha256": "116a78931222997e7138d0b279a4d38ec11f8d4d05e23ebff1f4e0d4818461e9",
+      "original_metadata": "C:\\Users\\hughe\\dev\\DarkLantern64\\build\\DarkLantern64-p-probe-replay\\build.json",
+      "source_bindings": [
+        {
+          "level": "lantern-store",
+          "source": "C:\\Users\\hughe\\dev\\DarkLantern64\\content\\first_room.json",
+          "source_file_sha256": "c1fb19e6b114fe9fa8459922dcacf55771ed86e2f9feb7ec25fe6aadf2009105",
+          "compiled_source_sha256": "c2f27747ecb4ba71275bdcd3eea92a243f728b822e3ea7bc7d75e072873c61ac"
+        },
+        {
+          "level": "moonlit-yard",
+          "source": "C:\\Users\\hughe\\dev\\DarkLantern64\\content\\moonlit_courtyard.json",
+          "source_file_sha256": "412ec992cefcfc7dc714aeabd0618cfc50e57b22e268fd30c3346bd86a03ff8e",
+          "compiled_source_sha256": "c131d3ec48232b3449166f04a2a77632868760f594f7e79f0dc2bd5f1e3294a9"
+        },
+        {
+          "level": "enemy-workshop",
+          "source": "C:\\Users\\hughe\\dev\\DarkLantern64\\content\\enemy_patrols.json",
+          "source_file_sha256": "26d61c6300b298a6b2d73de2f32030c9759536d490e611d7d7ee2200d89e450d",
+          "compiled_source_sha256": "6925eccf961c2069a2a8dc73d1cc80889ed63d7e4a72c0b0678e675e762a2e13"
+        },
+        {
+          "level": "animation_workshop",
+          "source": "C:\\Users\\hughe\\dev\\DarkLantern64\\content\\animation_workshop.json",
+          "source_file_sha256": "0480ac4b7343b82b1f5c709c93d3496f8fd89ea846315a6b68b96028cb9fb8fd",
+          "compiled_source_sha256": "74ff81f3a3d7281fba6093bca2eba5b5d9ae8165cdb958a1029a63aee7f7a4c0"
+        },
+        {
+          "level": "sponza",
+          "source": "C:\\Users\\hughe\\dev\\DarkLantern64\\content\\sponza_courtyard.json",
+          "source_file_sha256": "4eb23dc17c272397d4c4d3f8bc503fc67b5d3a16ed2f2bddd65c9ad4727fc4ca",
+          "compiled_source_sha256": "7d919d3c4f05418fc32b94bb21261e95a6fc4ab5b6cff6eee4c54a8869b68737"
+        },
+        {
+          "level": "bafford-district",
+          "source": "C:\\Users\\hughe\\dev\\DarkLantern64\\content\\thief_bafford_district.json",
+          "source_file_sha256": "16160232d3051ba95ca0d78fa66bf02522399aa06659199a3c0285c2832fdcbe",
+          "compiled_source_sha256": "087e3095838b972f6849e3a4e6265f964e5106b51a9d8c123962b4214d16bf95",
+          "partition": "C:\\Users\\hughe\\dev\\DarkLantern64\\content\\thief_bafford_district.mission.json",
+          "partition_sha256": "2f6aeeb0911aaf4806d8a848f0609c2552621a659df66fb5e78b1125fbd329d0",
+          "package_sha256": "48b8cb50a81c6d7e07942695ea606faad98bf7b78a0fb6d3c8890ee279f882ef"
+        },
+        {
+          "level": "bafford-expanded",
+          "source": "C:\\Users\\hughe\\dev\\DarkLantern64\\content\\thief_bafford_expanded.json",
+          "source_file_sha256": "28de709c9d3f199cf21e3651cd234f801b85c19ddc5df27635a28b35cb0e7254",
+          "compiled_source_sha256": "7a985f6b9f1b996814dfb26e365ef494695ea90c409be00f83efe9184042f955",
+          "partition": "C:\\Users\\hughe\\dev\\DarkLantern64\\content\\thief_bafford_expanded.mission.json",
+          "partition_sha256": "3846d776855b17a5d051eb1a7c9f23acef19e8fb7891ae1b2f734f07e906176e",
+          "package_sha256": "0bb3bf59655c7847ddfe08408132518d392122147f8046a02904048c2b7ee381"
+        },
+        {
+          "level": "streaming-probe",
+          "source": "C:\\Users\\hughe\\dev\\DarkLantern64\\content\\streaming_probe.json",
+          "source_file_sha256": "afc8f737f2d72a3143927ee9290ec15703d7dc2ed3757b9b61c0c992d64d24f0",
+          "compiled_source_sha256": "491825221cb7bf36a5d2b992b994b4a79bb6ff2dad2ed8473236315e2622e72f",
+          "partition": "C:\\Users\\hughe\\dev\\DarkLantern64\\content\\streaming_probe.mission.json",
+          "partition_sha256": "6bd18afe4f538555db1881e03feb8f8449498a656cadcd2139b6eff454a0c2c8",
+          "package_sha256": "262da9e039e1e605060f554790b8c777fe55c92c418b528d25d7fa62fdd27394"
+        }
+      ],
+      "pipeline_source_sha256": "84484442976f8ee5892847d5e3b8e70d3a91cc299c6e0b70d3c8d7929ee09a8f"
+    }
+  }
+}

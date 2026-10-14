@@ -72,6 +72,23 @@ authored ID map, gate/interaction diagnostics and complete-capture checks.
 
 ## Verification and automation
 
+For a single acceptance report tied to captured source, content, dependency and
+build identities, run the tracked manifest through the project pipeline:
+
+```powershell
+python tools/validate_project.py --host-audio-none --output build/project-acceptance.json
+python tools/validate_project.py --profile portable --output build/portable-acceptance.json
+```
+
+The [validation pipeline guide](validation-pipeline.md) explains required
+phases, explicit skips and known fixture errors, object-cache invalidation,
+owned emulator jobs, and data-driven routes. The full profile separates
+functional replay, strict wall-time performance, framebuffer capture and
+menu/lifecycle evidence. The portable profile is a partial run and cannot
+certify the required editor or ROM phases. `--host-audio-none` changes an owned
+settings copy only; its report labels host audio output disabled while guest
+callbacks/underruns remain checked.
+
 ```powershell
 # Content/compiler Python tests and portable C gameplay/runtime checks
 python tools/build.py --test

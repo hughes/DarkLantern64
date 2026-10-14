@@ -19,13 +19,21 @@ try:
     from compile_level import compile_level
     from compile_bundle import prepare_bundle, read_manifest, selection
     from input_replay import load as load_input_replay, header as input_replay_header
+    import object_cache
 except ModuleNotFoundError:
     from tools.compile_level import compile_level
     from tools.compile_bundle import prepare_bundle, read_manifest, selection
     from tools.input_replay import load as load_input_replay, header as input_replay_header
+    from tools import object_cache
 
 ROOT = Path(__file__).resolve().parents[1]
 BUILD = ROOT / "build"
+
+
+def build_tag_name(tag):
+    if not isinstance(tag, str) or not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9_-]{0,23}", tag):
+        raise ValueError("Build tag must be a 1..24 character ASCII identifier")
+    return "DarkLantern64-" + tag
 
 
 def run(args, *, cwd=ROOT, env=None, capture=False):
@@ -44,6 +52,16 @@ def fingerprint(paths, flags, *, content_hashes=()):
         digest.update(str(path).encode())
         digest.update(path.read_bytes())
     return digest.hexdigest()
+
+
+def sdk_link_inputs(sdk):
+    # The driver also selects libc/libm/libgcc, C++ support and startup objects.
+    # Keep the installed target/runtime library trees in the link recipe, even
+    # when an archive is implicit in GCC's specs rather than on our command.
+    # This conservative link set does not enter individual object cache keys.
+    roots = (Path(sdk) / "mips64-elf/lib", Path(sdk) / "lib/gcc")
+    return sorted({path.resolve() for root in roots for path in root.rglob("*")
+                   if path.is_file()}, key=lambda path: path.as_posix())
 
 
 def scene_paths(level=None):
@@ -117,8 +135,18 @@ def build_rom(sdk, autoplay=False, debug_overlay=False, level=None, capture=Fals
               stream_test_capture=False, bafford_stream_test=False, bafford_stream_test_capture=False,
               bafford_expanded_test=False, bafford_expanded_test_capture=False,
               bafford_district_test=False, bafford_district_test_capture=False,
-              bafford_district_performance_test=False, runtime_trace=False, disable_render_diagnostics=False):
+              bafford_district_performance_test=False, runtime_trace=False, disable_render_diagnostics=False,
+              clean_build=False, build_tag=None):
+    if build_tag is not None:
+        build_tag_name(build_tag)
     start = time.perf_counter()
+    # Include complete authored assets before cooking: a global shadow
+    # occluder/light dependency must not be weakened to a regional cache key.
+    # Generated outputs live under build/.dev and are deliberately excluded.
+    project_paths = [path for folder in (ROOT / "src", ROOT / "content") for path in folder.rglob("*") if path.is_file()]
+    project_paths += [path for path in (ROOT / "tools").rglob("*") if path.is_file() and
+                     path.suffix in (".py", ".c", ".h", ".inc", ".def", ".json") and "__pycache__" not in path.parts]
+    project_inputs = object_cache.snapshot(project_paths)
     replay = None
     if bafford_district_performance_test:
         if bafford_district_test_capture:
@@ -225,6 +253,8 @@ def build_rom(sdk, autoplay=False, debug_overlay=False, level=None, capture=Fals
         name += "-no-rdiag"
     if renderer != "cpu":
         name += "-" + renderer
+    if build_tag is not None:
+        name = build_tag_name(build_tag)
     work = BUILD / name
     work.mkdir(parents=True, exist_ok=True)
     bundle_output = work / "catalog"
@@ -363,58 +393,158 @@ def build_rom(sdk, autoplay=False, debug_overlay=False, level=None, capture=Fals
     headers += [ROOT / "tools" / name for name in ("compile_bundle.py", "compile_level.py", "cook_textures.py", "cook_lighting.py",
                                                   "bake_lighting.c", "cook_stream_lighting.py", "bake_stream_lighting.c",
                                                   "character_assets.py", "asset_pack.py", "cook_music.py", "cook_diagnostics.py")]
-    sdk_inputs = [lib / n for n in ("libdragon.a", "libdragonsys.a", "n64.ld")]
+    sdk_inputs = sdk_link_inputs(sdk)
     sdk_inputs += sorted((sdk / "mips64-elf/include").rglob("*.h"))
     compiler_version = run([tools["mips64-elf-gcc"], "--version"], env=env, capture=True).stdout.splitlines()[0]
     kernel_flags = {name: ["-O3"] for name in (
         "render_lighting.c", "render_transform.c", "render.c", "render_batches.c", "game.c",
         "mission.c", "stream_scene.c", "stream_coordinator.c", "stream_rom.c", "runtime_trace_text.c")}
-    signature = fingerprint(sources + headers + sdk_inputs + renderer_inputs + [Path(__file__)],
-                            {"flags": common, "kernel_flags": kernel_flags, "compiler": compiler_version, "renderer": renderer,
-                             "tools": {n: (p.stat().st_size, p.stat().st_mtime_ns) for n, p in tools.items()}},
-                            content_hashes=[entry["content"]["source_sha256"] for entry in catalog["levels"]])
-    # Bind diagnostics to every executable. Generate after fingerprinting so
-    # the identity does not feed back into its own recipe.
+    # Consumers use a stable declaration; only the tiny binding TU contains
+    # the changing build hash. Unrelated objects no longer depend on its value.
     trace_header = work / "runtime_trace_build.h"
-    trace_header.write_text("#ifndef DL_RUNTIME_TRACE_BUILD_H\n#define DL_RUNTIME_TRACE_BUILD_H\n" +
-                            "#define DL_RUNTIME_BUILD_ID " + json.dumps(signature) +
-                            "\n#define DL_RUNTIME_TRACE_BUILD_ID DL_RUNTIME_BUILD_ID\n#endif\n", encoding="utf-8")
-    common += ["-include", str(trace_header)]
+    trace_text = ("#ifndef DL_RUNTIME_TRACE_BUILD_H\n#define DL_RUNTIME_TRACE_BUILD_H\n"
+                  "extern const char dl_runtime_build_id[];\n#define DL_RUNTIME_BUILD_ID dl_runtime_build_id\n"
+                  "#define DL_RUNTIME_TRACE_BUILD_ID DL_RUNTIME_BUILD_ID\n#endif\n")
+    if not trace_header.is_file() or trace_header.read_text() != trace_text:
+        trace_header.write_text(trace_text, encoding="utf-8")
+    compiler_info = object_cache.compiler_identity(tools["mips64-elf-gcc"], env=env, cwd=ROOT)
+    cache = object_cache.ObjectCache(work / "object-cache", tools["mips64-elf-gcc"], compiler_info, cwd=ROOT, env=env)
+    attempt = work / "build-attempts" / uuid.uuid4().hex[:12]
+    attempt.mkdir(parents=True)
+    attempt_report = dict(schema_version=1, status="discovering", build_tag=build_tag, clean_build=clean_build,
+                          compiler_identity=compiler_info, compilation=dict(objects=[]))
+    object_cache.write_json(attempt / "report.json", attempt_report)
+    discovered, flags_by_source = {}, {}
+    try:
+        for source in sources:
+            flags = [*common, *kernel_flags.get(source.name, [])]
+            if source.name in ("render.c", "stream_rom.c"):
+                flags += ["-include", str(trace_header)]
+            flags_by_source[source] = flags
+            print("[dependencies] " + str(source), flush=True)
+            discovered[source] = cache.discover(source, flags)
+        actual_dependencies = [Path(row["path"]) for item in discovered.values() for row in item["dependency_hashes"]]
+        object_cache.assert_unchanged(project_inputs)
+        paths = list(dict.fromkeys(sources + headers + sdk_inputs + renderer_inputs + actual_dependencies + project_paths +
+                                  [Path(__file__), Path(object_cache.__file__).resolve(), *tools.values()] +
+                                  [Path(row["path"]) for row in compiler_info["files"]]))
+        frozen_inputs = object_cache.snapshot(paths)
+        object_cache.assert_unchanged(project_inputs)
+        for row in compiler_info["files"]:
+            if object_cache.digest(row["path"]) != row["sha256"]:
+                raise RuntimeError("Compiler changed during dependency discovery: " + row["path"])
+        signature = fingerprint(paths, {"flags": common, "kernel_flags": kernel_flags, "compiler": compiler_info,
+                                       "renderer": renderer, "build_tag": build_tag},
+                                content_hashes=[entry["content"]["source_sha256"] for entry in catalog["levels"]])
+        binding = work / "runtime_build_identity.c"
+        binding_text = "const char dl_runtime_build_id[] = " + json.dumps(signature) + ";\n"
+        if not binding.is_file() or binding.read_text() != binding_text:
+            binding.write_text(binding_text, encoding="utf-8")
+        sources.append(binding)
+        flags_by_source[binding] = list(common)
+        discovered[binding] = cache.discover(binding, flags_by_source[binding])
+        frozen_inputs += object_cache.snapshot([binding])
+        input_manifest = attempt / "inputs.json"
+        object_cache.write_json(input_manifest, dict(schema_version=1, recipe_signature=signature, inputs=frozen_inputs))
+        attempt_report.update(status="compiling", signature=signature, input_manifest=str(input_manifest),
+                              input_manifest_sha256=object_cache.digest(input_manifest))
+        objects = []
+        for source in sources:
+            obj = work / (source.stem + ".o")
+            result = cache.compile(source, obj, flags_by_source[source], discovery=discovered[source], clean=clean_build)
+            print("[" + result["status"] + "] " + str(source) + ": " + ", ".join(result["reasons"]), flush=True)
+            objects.append(obj)
+            attempt_report["compilation"]["objects"] = cache.reports
+            object_cache.write_json(attempt / "report.json", attempt_report)
+        object_cache.assert_unchanged(frozen_inputs)
+    except Exception as error:
+        reports = list(cache.reports)
+        if isinstance(error, object_cache.CompileFailure) and error.report not in reports:
+            reports.append(error.report)
+        attempt_report.update(status="failed", error=str(error), compilation=dict(objects=reports))
+        object_cache.write_json(attempt / "report.json", attempt_report)
+        print("[partial build report] " + str(attempt / "report.json"), flush=True)
+        raise
+    compilation = dict(schema_version=1, cache_enabled=not clean_build, objects=cache.reports,
+                       rebuilt=sum(item["status"] == "rebuilt" for item in cache.reports),
+                       reused=sum(item["status"] == "reused" for item in cache.reports),
+                       attempt_report=str(attempt / "report.json"))
     manifest = work / "build.json"
     rom = BUILD / (name + ".z64")
+    previous, artifact_reasons = None, []
     if manifest.exists() and rom.exists():
         previous = json.loads(manifest.read_text())
-        if previous.get("signature") == signature and previous.get("rom_sha256") == hashlib.sha256(rom.read_bytes()).hexdigest():
+        artifacts_valid = all(Path(path).is_file() and object_cache.digest(path) == checksum
+                              for path, checksum in previous.get("artifact_hashes", {}).items())
+        if not clean_build and previous.get("signature") == signature and previous.get("rom_sha256") == object_cache.digest(rom) and not compilation["rebuilt"] and previous.get("artifact_hashes") and artifacts_valid:
             debug_map = build_runtime_debug_map(catalog, signature, previous["rom_sha256"],
                 {"bake_enabled": not disable_lighting_bake, "renderer": renderer, "reporting_enabled": not disable_render_diagnostics})
             debug_map_path = work / "runtime_debug_map.json"
             debug_map_path.write_text(json.dumps(debug_map, indent=2) + "\n", encoding="utf-8")
-            map_metadata = dict(runtime_trace=runtime_trace,
-                                runtime_debug_map=str(debug_map_path.relative_to(ROOT)),
-                                runtime_debug_map_sha256=hashlib.sha256(debug_map_path.read_bytes()).hexdigest())
-            if any(previous.get(key) != value for key, value in map_metadata.items()):
-                previous.update(map_metadata)
-                manifest.write_text(json.dumps(previous, indent=2) + "\n", encoding="utf-8")
+            previous.update(runtime_trace=runtime_trace, runtime_debug_map=str(debug_map_path.relative_to(ROOT)),
+                            runtime_debug_map_sha256=object_cache.digest(debug_map_path), compilation=compilation,
+                            input_hashes=frozen_inputs, input_manifest=str(input_manifest),
+                            input_manifest_sha256=object_cache.digest(input_manifest),
+                            artifact_decisions={"elf": {"status": "reused", "reasons": ["recipe_and_object_bytes_unchanged"]},
+                                                "rom": {"status": "reused", "reasons": ["recipe_and_rom_bytes_unchanged"]}})
+            object_cache.write_json(manifest, previous)
+            attempt_report.update(status="complete", compilation=compilation, artifact_decisions=previous["artifact_decisions"])
+            object_cache.write_json(attempt / "report.json", attempt_report)
+            object_cache.assert_unchanged(frozen_inputs)
             print(f"[cached] {rom}")
             return rom
-    objects = []
-    for source in sources:
-        obj = work / (source.stem + ".o")
-        run([tools["mips64-elf-gcc"], *common, *kernel_flags.get(source.name, []), "-c", source, "-o", obj], env=env)
-        objects.append(obj)
+        if previous.get("signature") != signature:
+            before, now = object_cache.hashes(previous.get("input_hashes", [])), object_cache.hashes(frozen_inputs)
+            artifact_reasons += ["input_changed:" + path for path in sorted(set(before) | set(now)) if before.get(path) != now.get(path)]
+            artifact_reasons.append("build_recipe_changed")
+        if previous.get("rom_sha256") != object_cache.digest(rom):
+            artifact_reasons.append("rom_bytes_changed")
+        if not previous.get("artifact_hashes") or not artifacts_valid:
+            artifact_reasons.append("linked_or_packaged_artifact_missing_or_changed")
+    else:
+        artifact_reasons.append("no_valid_existing_artifact")
+    if clean_build:
+        artifact_reasons.append("clean_build_requested")
+    if compilation["rebuilt"]:
+        artifact_reasons.append("objects_rebuilt")
+    attempt_report.update(status="linking", compilation=compilation,
+                          artifact_decisions={"elf": {"status": "rebuilding", "reasons": artifact_reasons},
+                                              "rom": {"status": "rebuilding", "reasons": artifact_reasons}})
+    object_cache.write_json(attempt / "report.json", attempt_report)
+    def artifact_run(args, *, capture=False, env=env):
+        index = len(attempt_report.get("artifact_steps", []))
+        log = attempt / ("artifact-" + str(index) + ".log")
+        command = [arg.as_posix() if isinstance(arg, Path) else str(arg) for arg in args]
+        try:
+            result = run(command, env=env, capture=True)
+            log.write_text(result.stdout + result.stderr, encoding="utf-8")
+            if not capture and result.stdout:
+                print(result.stdout, end="", flush=True)
+            if result.stderr:
+                print(result.stderr, end="", file=sys.stderr, flush=True)
+            attempt_report.setdefault("artifact_steps", []).append(dict(command=command, log=str(log), returncode=0))
+            object_cache.write_json(attempt / "report.json", attempt_report)
+            return result
+        except Exception as error:
+            log.write_text((getattr(error, "stdout", "") or "") + (getattr(error, "stderr", "") or str(error)), encoding="utf-8")
+            attempt_report.setdefault("artifact_steps", []).append(dict(command=command, log=str(log), returncode=getattr(error, "returncode", None)))
+            attempt_report.update(status="failed", error=str(error))
+            object_cache.write_json(attempt / "report.json", attempt_report)
+            print("[partial build report] " + str(attempt / "report.json"), flush=True)
+            raise
     elf = work / (name + ".elf")
-    run([tools["mips64-elf-g++"], "-mabi=o64", "-g", "-o", elf, *objects,
+    artifact_run([tools["mips64-elf-g++"], "-mabi=o64", "-g", "-o", elf, *objects,
          *renderer_libraries, "-L" + str(lib), "-lc", "-ldragon", "-lm", "-ldragonsys",
          "-Wl,-T," + str(lib / "n64.ld"), "-Wl,--gc-sections,--wrap,__do_global_ctors",
          "-Wl,-Map=" + str(work / (name + ".map"))], env=env)
     symbols = work / (name + ".sym")
-    run([tools["n64sym"], elf, symbols], env=env)
+    artifact_run([tools["n64sym"], elf, symbols], env=env)
     stripped = work / "uncompressed/program.elf"
     compressed_dir = work / "compressed"
     stripped.parent.mkdir(exist_ok=True)
     compressed_dir.mkdir(exist_ok=True)
-    run([tools["mips64-elf-strip"], "-s", "-o", stripped, elf], env=env)
-    run([tools["n64elfcompress"], "-o", compressed_dir, "-c", "1", stripped], env=env)
+    artifact_run([tools["mips64-elf-strip"], "-s", "-o", stripped, elf], env=env)
+    artifact_run([tools["n64elfcompress"], "-o", compressed_dir, "-c", "1", stripped], env=env)
     if not (compressed_dir / "program.elf").is_file():
         raise RuntimeError("n64elfcompress did not produce the expected output.")
     candidate = work / (name + ".z64")
@@ -425,16 +555,17 @@ def build_rom(sdk, autoplay=False, debug_overlay=False, level=None, capture=Fals
         # Keep the established artifact name for the video-study freezer;
         # the filesystem now contains lighting as well as texture assets.
         filesystem = work / "textures.dfs"
-        run([tools["mkdfs"], filesystem, bundle_output / "romfs"], env=env, capture=True)
+        artifact_run([tools["mkdfs"], filesystem, bundle_output / "romfs"], env=env, capture=True)
         pack = pack[:-2] + ["--align", "16", filesystem]
-    run(pack, env=env)
-    size = run([tools["mips64-elf-size"], elf], env=env, capture=True).stdout
+    artifact_run(pack, env=env)
+    size = artifact_run([tools["mips64-elf-size"], elf], env=env, capture=True).stdout
     print(size)
     # Keep a bootable image small enough to reach the 4 MiB error screen.
     values = size.splitlines()[-1].split()
     image_bytes = sum(int(v) for v in values[:3])
     if image_bytes > 3 * 1024 * 1024:
         raise RuntimeError("Startup image exceeds the prototype 3 MiB guard; inspect static allocations.")
+    object_cache.assert_unchanged(frozen_inputs)
     rom_temp = rom.with_suffix(".z64.tmp")
     shutil.copyfile(candidate, rom_temp)
     os.replace(rom_temp, rom)
@@ -455,6 +586,11 @@ def build_rom(sdk, autoplay=False, debug_overlay=False, level=None, capture=Fals
               "scale_bench": scale_bench, "model_culling": not disable_model_cull,
               "lighting_bake_verify": lighting_bake_verify, "disable_lighting_bake": disable_lighting_bake,
               "render_diagnostics": not disable_render_diagnostics,
+              "build_tag": build_tag, "compilation": compilation, "input_hashes": frozen_inputs,
+              "input_manifest": str(input_manifest), "input_manifest_sha256": object_cache.digest(input_manifest),
+              "artifact_hashes": {str(path): object_cache.digest(path) for path in (elf, symbols, candidate, stripped, compressed_dir / "program.elf")},
+              "artifact_decisions": {"elf": {"status": "rebuilt", "reasons": artifact_reasons},
+                                     "rom": {"status": "rebuilt", "reasons": artifact_reasons}},
               "level": str(level.relative_to(ROOT)) if level is not None else None,
               "bundle": str(bundle.relative_to(ROOT)) if bundle is not None else None,
               "start_level": start_level, "start_preset": start_preset, "menu_test": menu_test, "stream_test": stream_test,
@@ -468,6 +604,9 @@ def build_rom(sdk, autoplay=False, debug_overlay=False, level=None, capture=Fals
               "bafford_district_performance_test": bafford_district_performance_test,
               "level_catalog": catalog, "textures": texture_report, "lighting": catalog["lighting"], "size_output": size}
     manifest.write_text(json.dumps(report, indent=2) + "\n")
+    attempt_report.update(status="complete", compilation=compilation, artifact_decisions=report["artifact_decisions"],
+                          rom_sha256=rom_sha256, manifest=str(manifest))
+    object_cache.write_json(attempt / "report.json", attempt_report)
     print(json.dumps({"manifest": str(manifest.relative_to(ROOT)), "rom": report["rom"],
                       "renderer": renderer,
                       "runtime_trace": runtime_trace, "runtime_debug_map": report["runtime_debug_map"],
@@ -639,6 +778,9 @@ def main():
     parser.add_argument("--verify-lighting-bake", action="store_true", help="Diagnostic comparison of baked colors with runtime lighting")
     parser.add_argument("--disable-lighting-bake", action="store_true", help="Diagnostic runtime lighting fallback for load comparisons")
     parser.add_argument("--disable-render-diagnostics", action="store_true", help="Suppress renderer policy reporting for controlled overhead measurements")
+    parser.add_argument("--clean-build", "--no-object-cache", dest="clean_build", action="store_true",
+                        help="Compile every object and relink without removing or updating reusable object cache entries")
+    parser.add_argument("--build-tag", help="Compact 1..24 character ASCII output identifier for owned validation variants")
     parser.add_argument("--editor", action="store_true")
     parser.add_argument("--test", action="store_true")
     args = parser.parse_args()
@@ -663,7 +805,8 @@ def main():
                             bafford_district_test=args.bafford_district_test,
                             bafford_district_test_capture=args.bafford_district_test_capture,
                             bafford_district_performance_test=args.bafford_district_performance_test,
-                            runtime_trace=args.runtime_trace, disable_render_diagnostics=args.disable_render_diagnostics)
+                            runtime_trace=args.runtime_trace, disable_render_diagnostics=args.disable_render_diagnostics,
+                            clean_build=args.clean_build, build_tag=args.build_tag)
             if args.run:
                 ares = os.environ.get("ARES_EXE", str(Path(os.environ.get("LOCALAPPDATA", "")) / "ares/ares.exe"))
                 if not Path(ares).is_file():

@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import argparse
 import copy
+import errno
 import hashlib
 import json
 import os
@@ -45,6 +46,58 @@ def write_json(path, data):
     path.write_text(json.dumps(data, indent=2) + "\n", encoding="utf-8")
 
 
+def _native_response_read_error(path):
+    # Windows CRT file reads expose errno=EACCES without a winerror. Probe
+    # read access with cooperative sharing to obtain a fresh native code.
+    import ctypes
+    from ctypes import wintypes
+    kernel = ctypes.WinDLL("kernel32", use_last_error=True)
+    create = kernel.CreateFileW
+    create.argtypes = [wintypes.LPCWSTR, wintypes.DWORD, wintypes.DWORD,
+                       ctypes.c_void_p, wintypes.DWORD, wintypes.DWORD, wintypes.HANDLE]
+    create.restype = wintypes.HANDLE
+    close = kernel.CloseHandle
+    close.argtypes = [wintypes.HANDLE]
+    close.restype = wintypes.BOOL
+    handle = create(str(path), 0x80000000, 7, None, 3, 0x80, None)
+    if handle == wintypes.HANDLE(-1).value:
+        return ctypes.get_last_error()
+    if not close(handle):
+        raise ctypes.WinError(ctypes.get_last_error())
+    return 0
+
+
+def _response_read_retryable(error, path):
+    code = getattr(error, "winerror", None)
+    if code is None and os.name == "nt" and error.errno == errno.EACCES:
+        code = _native_response_read_error(path)
+        # A successful probe means read access recovered after the CRT error.
+        if code == 0:
+            return True
+    return code in (5, 32, 33)
+
+
+def _read_response_bytes(path, *, deadline, alive):
+    retry_deadline = None
+    last_error = None
+    while True:
+        if retry_deadline is not None and time.monotonic() >= retry_deadline:
+            raise last_error
+        try:
+            return path.read_bytes()
+        except OSError as error:
+            if not _response_read_retryable(error, path):
+                raise
+            last_error = error
+            now = time.monotonic()
+            if retry_deadline is None:
+                retry_deadline = min(deadline, now + 2)
+            if now >= retry_deadline:
+                raise
+            alive()
+            time.sleep(min(.1, retry_deadline - now))
+
+
 class EditorClient:
     def __init__(self, queue, process):
         self.queue, self.process = queue, process
@@ -59,13 +112,10 @@ class EditorClient:
         while time.monotonic() < deadline:
             self.alive()
             if path.exists():
-                try:
-                    session = json.loads(path.read_bytes())
-                    if session.get("pid") == self.process.pid:
-                        require(session.get("project_editor") is True, "Executable did not start a project editor session")
-                        return session
-                except (OSError, ValueError):
-                    pass
+                session = json.loads(_read_response_bytes(path, deadline=deadline, alive=self.alive))
+                if session.get("pid") == self.process.pid:
+                    require(session.get("project_editor") is True, "Executable did not start a project editor session")
+                    return session
             time.sleep(.1)
         raise TimeoutError(f"Editor did not publish {path}")
 
@@ -83,7 +133,7 @@ class EditorClient:
         deadline = time.monotonic() + timeout
         while time.monotonic() < deadline:
             if response.exists():
-                result = json.loads(response.read_bytes())
+                result = json.loads(_read_response_bytes(response, deadline=deadline, alive=self.alive))
                 require(result.get("id") == ident and result.get("ok") is expect_ok,
                         f"Unexpected {operation} response: {result}")
                 return result["result"]

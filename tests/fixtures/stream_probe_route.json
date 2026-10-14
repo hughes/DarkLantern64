@@ -2,6 +2,16 @@
   "description": "Amber spawn: open doorway, cross and close it, collect blue-room loot, retire and reload both rooms, then restart.",
   "start_preset": "west",
   "stream_boundary": "settled",
+  "expectations": [
+    {"id": "not-caught", "field": "caught", "op": "eq", "value": false},
+    {"id": "three-working-views", "field": "stream.published_mask", "op": "contains_all", "values": [1, 2, 3]},
+    {"id": "repeated-publication", "field": "stream.published_mask", "op": "min_changes", "value": 6},
+    {"id": "loot-collected", "field": "loot_value", "op": "any_gt", "value": 0},
+    {"id": "loot-persists", "select": "after_match_until_input", "start_match": {"field": "loot_value", "op": "gt", "value": 0}, "until_input": "restart", "field": "loot_value", "op": "constant"},
+    {"id": "retirement-after-loot", "select": "after_match_until_input", "start_match": {"field": "loot_value", "op": "gt", "value": 0}, "until_input": "restart", "field": "stream.published_mask", "op": "contains_all", "values": [1, 2]},
+    {"id": "restart-clears-loot", "select": "final", "field": "loot_value", "op": "eq", "value": 0},
+    {"id": "restart-closes-door", "select": "final", "field": "door_open", "op": "eq", "value": false}
+  ],
   "segments": [
     {"ticks": 111, "input": {"forward": 1}},
     {"ticks": 1, "input": {"use": true}},

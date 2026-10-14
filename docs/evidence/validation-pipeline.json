@@ -1,0 +1,2518 @@
+{
+  "schema_version": 1,
+  "issue": 5,
+  "command": "python tools/validate_project.py --host-audio-none --output build/issue5-validation-summary.json",
+  "accepted": true,
+  "status": "accepted_with_known_fixture_failures",
+  "pure_test_pass": false,
+  "primary_run_id": "04503586c8d1",
+  "required_nodes": 22,
+  "required_passes": 21,
+  "required_known_fixture_failures": 1,
+  "new_required_failures": [],
+  "optional_unselected": [
+    "district-no-diagnostics",
+    "district-diagnostics-counterfactual"
+  ],
+  "source_sha256": "e9d9694e03a41ff82d623f0c3bc41f38d40fdefc3f4d6e480105d7f0965faf59",
+  "external_inputs_sha256": "e3dd6a84edd266fd8f99883920d894d230afc16c5eb928c69d23fa8a0fd5aa9d",
+  "manifest_sha256": "daf6ce8cf1eabe2991476e6684f8d13e8c9c24cce7ba11b40e07204e2245204e",
+  "summary": {
+    "path": ".dev/v5/04503586c8d1/summary.json",
+    "sha256": "b8ba8812c3326a27be6ccf63f44f2040d12f80962a462d0d7183a8bfd7d3d04e",
+    "bytes": 5866532
+  },
+  "published_summary": {
+    "path": "build/issue5-validation-summary.json",
+    "sha256": "b8ba8812c3326a27be6ccf63f44f2040d12f80962a462d0d7183a8bfd7d3d04e",
+    "bytes": 5866532
+  },
+  "input_manifest": {
+    "path": ".dev/v5/04503586c8d1/input-manifest.json",
+    "sha256": "db9465d5514ae460b01611571be764f50fb81b26e188d1f30faf82865c899fa3",
+    "bytes": 1296099
+  },
+  "captured_acceptance_manifest": {
+    "path": ".dev/v5/04503586c8d1/artifacts/acceptance-manifest.json",
+    "sha256": "daf6ce8cf1eabe2991476e6684f8d13e8c9c24cce7ba11b40e07204e2245204e",
+    "bytes": 8514
+  },
+  "freeze_method": "Windows share-read handles and inventory audits",
+  "host_audio": {
+    "output": "disabled",
+    "original_settings_sha256": "d3917400079a47105fa6bd7df53e4f530915aa3b4b70e79769f1b389bc2b196a",
+    "owned_settings_sha256": "0276ff94f095e05df973bd0a7a296a8a4433603ec932c8e19f1a766ead37cddc",
+    "scope": "Owned emulator host output; guest audio still measured"
+  },
+  "nodes": [
+    {
+      "id": "portable-python",
+      "required": true,
+      "classification": "portable",
+      "status": "known_failure",
+      "passed": false,
+      "accepted": true,
+      "reason": "Exact declared fixture failure retained",
+      "result": {
+        "path": ".dev/v5/04503586c8d1/artifacts/nodes/portable-python/result.json",
+        "sha256": "ec0cf5944b9ebc11864ab4def5f81e565f9ed9cab2803f1dc14f9f48f662365a",
+        "bytes": 3810
+      },
+      "evidence": [
+        {
+          "path": ".dev/v5/04503586c8d1/artifacts/nodes/portable-python/command.log",
+          "sha256": "0faea9b28a1a4f1958e60cd5a549e82c408cc73ce01619b78c4e5da01f86588e",
+          "bytes": 110031
+        },
+        {
+          "path": ".dev/v5/04503586c8d1/artifacts/nodes/portable-python/unittest.json",
+          "sha256": "878835bba92648b7fccaa0bcb3371f234e8167bf71d211b415b66a573967d8d4",
+          "bytes": 1925
+        }
+      ]
+    },
+    {
+      "id": "portable-c",
+      "required": true,
+      "classification": "portable",
+      "status": "passed",
+      "passed": true,
+      "accepted": true,
+      "reason": null,
+      "result": {
+        "path": ".dev/v5/04503586c8d1/artifacts/nodes/portable-c/result.json",
+        "sha256": "bd2baac445f94cde3c08d690ccc85a47c1a17cec55d8b032dbb02e03103f73ec",
+        "bytes": 1289
+      },
+      "evidence": [
+        {
+          "path": ".dev/v5/04503586c8d1/artifacts/nodes/portable-c/command.log",
+          "sha256": "cd70ca8a68d556790cc4e286f79515ffcce98f8f1a308f83947483baae14f3f7",
+          "bytes": 25374
+        }
+      ]
+    },
+    {
+      "id": "host-build",
+      "required": true,
+      "classification": "editor",
+      "status": "passed",
+      "passed": true,
+      "accepted": true,
+      "reason": null,
+      "result": {
+        "path": ".dev/v5/04503586c8d1/artifacts/nodes/host-build/result.json",
+        "sha256": "c85fedfde6b812581288a9dc81bee1ac848cd4ae6572f6e6d4b8386fe3ee8bfd",
+        "bytes": 1386
+      },
+      "evidence": [
+        {
+          "path": ".dev/v5/04503586c8d1/artifacts/nodes/host-build/command.log",
+          "sha256": "ef8f66ce2c5ea202283ed688d6143e22bc276133683256cbda3923be0a6f5443",
+          "bytes": 13633
+        }
+      ]
+    },
+    {
+      "id": "editor-tests",
+      "required": true,
+      "classification": "editor",
+      "status": "passed",
+      "passed": true,
+      "accepted": true,
+      "reason": null,
+      "result": {
+        "path": ".dev/v5/04503586c8d1/artifacts/nodes/editor-tests/result.json",
+        "sha256": "e79d65a13fcf6960e360e5235ef9ee03a1ad29274954b59f95c3ce809992328a",
+        "bytes": 1425
+      },
+      "evidence": [
+        {
+          "path": ".dev/v5/04503586c8d1/artifacts/nodes/editor-tests/command.log",
+          "sha256": "75a1acac28cac34f43d7a13571233420508a8239166f1e5a5e074a1ac9fec4ab",
+          "bytes": 1482
+        }
+      ]
+    },
+    {
+      "id": "native-metadata",
+      "required": true,
+      "classification": "functional",
+      "status": "passed",
+      "passed": true,
+      "accepted": true,
+      "reason": null,
+      "result": {
+        "path": ".dev/v5/04503586c8d1/artifacts/nodes/native-metadata/result.json",
+        "sha256": "dd99b9b14e75cae97a8ea2692f30c006da5bdea3d739c063796997f297bb0fac",
+        "bytes": 8658
+      },
+      "evidence": [
+        {
+          "path": ".dev/v5/04503586c8d1/artifacts/nodes/native-metadata/command.log",
+          "sha256": "703b9129558d19c462fce9314fb134473b6a01e54b8f9e2db8d396f194d8d73c",
+          "bytes": 190
+        },
+        {
+          "path": ".dev/v5/04503586c8d1/artifacts/native-metadata.json",
+          "sha256": "5519d828ebd6f59e0db0cc66dae73ac1dfaf0acb81a822dcd5c637e7683a56f3",
+          "bytes": 6478
+        }
+      ]
+    },
+    {
+      "id": "editor-authoring-preview",
+      "required": true,
+      "classification": "editor",
+      "status": "passed",
+      "passed": true,
+      "accepted": true,
+      "reason": null,
+      "result": {
+        "path": ".dev/v5/04503586c8d1/artifacts/nodes/editor-authoring-preview/result.json",
+        "sha256": "509299bf5c6a697d302c8c5ee55e52ed44dacbfb86fa4f70cede6a01d250541b",
+        "bytes": 4427
+      },
+      "evidence": [
+        {
+          "path": ".dev/v5/04503586c8d1/artifacts/nodes/editor-authoring-preview/command.log",
+          "sha256": "7205550fb921213ad594912007f6e1632148280c32aea373ad4b47ee8a66122b",
+          "bytes": 2629
+        },
+        {
+          "path": ".dev/stream-authoring-preview-verification/046fbda571fb420ba494e1348ec61f1f/result.json",
+          "sha256": "7205550fb921213ad594912007f6e1632148280c32aea373ad4b47ee8a66122b",
+          "bytes": 2629
+        }
+      ]
+    },
+    {
+      "id": "editor-render-diagnostics",
+      "required": true,
+      "classification": "editor",
+      "status": "passed",
+      "passed": true,
+      "accepted": true,
+      "reason": null,
+      "result": {
+        "path": ".dev/v5/04503586c8d1/artifacts/nodes/editor-render-diagnostics/result.json",
+        "sha256": "822ee4affdde2cf9ca922af82cab4ba558caf4b37b4a9fd8c4f65ca264cc065e",
+        "bytes": 3691333
+      },
+      "evidence": [
+        {
+          "path": ".dev/v5/04503586c8d1/artifacts/nodes/editor-render-diagnostics/command.log",
+          "sha256": "7ccc80bffe9691cf1a97e21eccf96cd356b7a14c96cb4bced866199ba77f34e0",
+          "bytes": 1339
+        },
+        {
+          "path": ".dev/render-diagnostics-verification/af14f53c893642c6a050bba96747d199/result.json",
+          "sha256": "97be7b8bf03f59ee412378386e3cae112e649cc12e95c547aa726b8aa93e2627",
+          "bytes": 3487219
+        }
+      ]
+    },
+    {
+      "id": "editor-native-play",
+      "required": true,
+      "classification": "functional",
+      "status": "passed",
+      "passed": true,
+      "accepted": true,
+      "reason": null,
+      "result": {
+        "path": ".dev/v5/04503586c8d1/artifacts/nodes/editor-native-play/result.json",
+        "sha256": "1802fcdefa2fe1f7669745c721542befb881683ae26caad291f4cf1dfc203de6",
+        "bytes": 3292
+      },
+      "evidence": [
+        {
+          "path": ".dev/v5/04503586c8d1/artifacts/nodes/editor-native-play/command.log",
+          "sha256": "ac16bf7620c0360f47837542fcb28cbf30d5f04848b0462d1ea438734b4551da",
+          "bytes": 1542
+        },
+        {
+          "path": ".dev/stream-native-verification/413d1951c07f4230b748fcfb51a499af/result.json",
+          "sha256": "f6fcb614c361e25a4a94a1bb15d90204271c88261c2944f22bfcc5b40c8b59e7",
+          "bytes": 1540
+        }
+      ]
+    },
+    {
+      "id": "bundle-idle",
+      "required": true,
+      "classification": "build",
+      "status": "passed",
+      "passed": true,
+      "accepted": true,
+      "reason": null,
+      "result": {
+        "path": ".dev/v5/04503586c8d1/artifacts/nodes/bundle-idle/result.json",
+        "sha256": "d2c7792ec4a825857825b43e05d752dccccc0a63d6d5107c89989a4ca99ece2a",
+        "bytes": 6849
+      },
+      "evidence": [
+        {
+          "path": ".dev/v5/04503586c8d1/artifacts/nodes/bundle-idle/command.log",
+          "sha256": "afdf090c214bc4caffabd36bcb33562e69749384765ebc3b074d1908eda73838",
+          "bytes": 14874
+        },
+        {
+          "path": ".dev/v5/04503586c8d1/artifacts/builds/bundle-idle/DarkLantern64-p-bundle-idle.z64",
+          "sha256": "32690130a616048aec61cb80793af25abde6f6a707520529fcc4257b4518a42d",
+          "bytes": 1622016
+        },
+        {
+          "path": ".dev/v5/04503586c8d1/artifacts/builds/bundle-idle/build.json",
+          "sha256": "397d063d79f5b651b774d2637dfe6cd49f4e9af9a6a6d371d6e7932cbba07ccd",
+          "bytes": 84716904
+        },
+        {
+          "path": ".dev/v5/04503586c8d1/artifacts/builds/bundle-idle/runtime_debug_map.json",
+          "sha256": "873447c1446b84f5c539d448d983ae236fae44c24541e596ac6e1c459e8cf0aa",
+          "bytes": 31466328
+        }
+      ]
+    },
+    {
+      "id": "district-ordinary",
+      "required": true,
+      "classification": "build",
+      "status": "passed",
+      "passed": true,
+      "accepted": true,
+      "reason": null,
+      "result": {
+        "path": ".dev/v5/04503586c8d1/artifacts/nodes/district-ordinary/result.json",
+        "sha256": "6695095a9fcc1871f7c8f37980857767e1d9eedc9c2f78aef23f4599b6fd97fb",
+        "bytes": 6933
+      },
+      "evidence": [
+        {
+          "path": ".dev/v5/04503586c8d1/artifacts/nodes/district-ordinary/command.log",
+          "sha256": "8fb082bafd74d7e4f4c56352df102df414a6f5f929b425199afe9278e1b0bb2d",
+          "bytes": 15384
+        },
+        {
+          "path": ".dev/v5/04503586c8d1/artifacts/builds/district-ordinary/DarkLantern64-p-district-ordinary.z64",
+          "sha256": "edb3c477a1b67f27a2c12caed7f9766f611666587ec2020c1ec55596c649b845",
+          "bytes": 1638400
+        },
+        {
+          "path": ".dev/v5/04503586c8d1/artifacts/builds/district-ordinary/build.json",
+          "sha256": "2d48edd68758776d4c19cb3d75aa3588c5d816b27f1079c8442318e4d20d828b",
+          "bytes": 84722639
+        },
+        {
+          "path": ".dev/v5/04503586c8d1/artifacts/builds/district-ordinary/runtime_debug_map.json",
+          "sha256": "bfa28106f2558482323d39e05c8eae44946195202f1dbfdd84620d762df44e6a",
+          "bytes": 31466328
+        }
+      ]
+    },
+    {
+      "id": "district-performance",
+      "required": true,
+      "classification": "build",
+      "status": "passed",
+      "passed": true,
+      "accepted": true,
+      "reason": null,
+      "result": {
+        "path": ".dev/v5/04503586c8d1/artifacts/nodes/district-performance/result.json",
+        "sha256": "0086c1fd1842239377f014dff25ce5545d2ce51f0e5ca1efb6fba295937292d4",
+        "bytes": 6975
+      },
+      "evidence": [
+        {
+          "path": ".dev/v5/04503586c8d1/artifacts/nodes/district-performance/command.log",
+          "sha256": "4f57b31aa00078a41a54396420e44ab4713105bbf9f70c224a9f7b94225f1fe5",
+          "bytes": 15639
+        },
+        {
+          "path": ".dev/v5/04503586c8d1/artifacts/builds/district-performance/DarkLantern64-p-district-performance.z64",
+          "sha256": "61965fca7d31db72fab9eba3e953042f9ab8318905c0ce125147336cf90c7a83",
+          "bytes": 1638400
+        },
+        {
+          "path": ".dev/v5/04503586c8d1/artifacts/builds/district-performance/build.json",
+          "sha256": "7c6bd914aaab369c05e316af5e2838ea7e5c3f67d2585bcd7d74a340b153c1d5",
+          "bytes": 84727749
+        },
+        {
+          "path": ".dev/v5/04503586c8d1/artifacts/builds/district-performance/runtime_debug_map.json",
+          "sha256": "73df78c0132ba9354cf92a050bcb60fa1db0754a426cb5e4d89dd8a5b84e5612",
+          "bytes": 31466328
+        }
+      ]
+    },
+    {
+      "id": "district-capture",
+      "required": true,
+      "classification": "build",
+      "status": "passed",
+      "passed": true,
+      "accepted": true,
+      "reason": null,
+      "result": {
+        "path": ".dev/v5/04503586c8d1/artifacts/nodes/district-capture/result.json",
+        "sha256": "fac52526ae4c4cccb8f3b6a2eecc15e2a3b9d42f47c72f309b164e6ac12187b0",
+        "bytes": 6918
+      },
+      "evidence": [
+        {
+          "path": ".dev/v5/04503586c8d1/artifacts/nodes/district-capture/command.log",
+          "sha256": "0a4b022598d3f103015879db9f985037f415801b60f052e1248a5388aab94ff4",
+          "bytes": 15299
+        },
+        {
+          "path": ".dev/v5/04503586c8d1/artifacts/builds/district-capture/DarkLantern64-p-district-capture.z64",
+          "sha256": "af44e408a1d840f3f834ebefb775bc38cd01045dcb2810f67e302724383fc9b4",
+          "bytes": 1638400
+        },
+        {
+          "path": ".dev/v5/04503586c8d1/artifacts/builds/district-capture/build.json",
+          "sha256": "7581bb1887511d0fbb0579d88f0baec9de226c191eb9ff13234e9c7c3d5ea994",
+          "bytes": 84725579
+        },
+        {
+          "path": ".dev/v5/04503586c8d1/artifacts/builds/district-capture/runtime_debug_map.json",
+          "sha256": "f9defcea6cc1ae21e85a882ac24cc326d99b4ca56cb20039dbb9f6acfb744e04",
+          "bytes": 31466328
+        }
+      ]
+    },
+    {
+      "id": "bundle-lifecycle",
+      "required": true,
+      "classification": "build",
+      "status": "passed",
+      "passed": true,
+      "accepted": true,
+      "reason": null,
+      "result": {
+        "path": ".dev/v5/04503586c8d1/artifacts/nodes/bundle-lifecycle/result.json",
+        "sha256": "a17202eba25038c30fa44af28f23b983e422290aa483d6281b3fa50c8bd9f24f",
+        "bytes": 6919
+      },
+      "evidence": [
+        {
+          "path": ".dev/v5/04503586c8d1/artifacts/nodes/bundle-lifecycle/command.log",
+          "sha256": "81751e1d231920d1ac2fa55042c311a8eab962638f783721d66f153bacaa818d",
+          "bytes": 15299
+        },
+        {
+          "path": ".dev/v5/04503586c8d1/artifacts/builds/bundle-lifecycle/DarkLantern64-p-bundle-lifecycle.z64",
+          "sha256": "73fc05757fc07c19fae8db86adca60404776139fe747407beed92630f1efe581",
+          "bytes": 1622016
+        },
+        {
+          "path": ".dev/v5/04503586c8d1/artifacts/builds/bundle-lifecycle/build.json",
+          "sha256": "062bd8228c17a08b7c7be9646c1db8f5a3a4c6de4eccbd08bfd6956452648598",
+          "bytes": 84721358
+        },
+        {
+          "path": ".dev/v5/04503586c8d1/artifacts/builds/bundle-lifecycle/runtime_debug_map.json",
+          "sha256": "7e5b0029f5fb9b241049b1cbf9063eb5b1e11764fc16c3565ce7b1efdb24e341",
+          "bytes": 31466328
+        }
+      ]
+    },
+    {
+      "id": "probe-functional",
+      "required": true,
+      "classification": "functional",
+      "status": "passed",
+      "passed": true,
+      "accepted": true,
+      "reason": null,
+      "result": {
+        "path": ".dev/v5/04503586c8d1/artifacts/nodes/probe-functional/result.json",
+        "sha256": "3b8cbb7c2e4d3eebacf859b4fff59dc076e7d0380b29cb2370638a67019173ee",
+        "bytes": 5662
+      },
+      "evidence": [
+        {
+          "path": ".dev/v5/04503586c8d1/artifacts/nodes/probe-functional/command.log",
+          "sha256": "563ae9f9034091fdb062e9888fe037af4ba2ea81411752f3a0ea86d262516754",
+          "bytes": 8546422
+        },
+        {
+          "path": ".dev/v5/04503586c8d1/artifacts/replays/probe-functional/native-states.json",
+          "sha256": "5730dedadb385b4a3033ad493864bf29bf9fb90b03b19e8f7fa411adad9a45b6",
+          "bytes": 8521518
+        },
+        {
+          "path": ".dev/v5/04503586c8d1/artifacts/replays/probe-functional/input.json",
+          "sha256": "80cf688347dfa0b7549c817e8a06a63e62f26570a1044080cb5bc7bcdc259625",
+          "bytes": 37028
+        },
+        {
+          "path": ".dev/v5/04503586c8d1/artifacts/replays/probe-functional/c/generated/play.json",
+          "sha256": "1226725a40cf33a7cf3eb7fa9349694f879887d943625df96d9081784bb8b164",
+          "bytes": 464005
+        },
+        {
+          "path": "tests/fixtures/stream_probe_route.json",
+          "sha256": "cb36eb55b24587c726843698e0a7601f6837f6d928a6971a62accf943408aba5",
+          "bytes": 2260
+        }
+      ]
+    },
+    {
+      "id": "probe-replay",
+      "required": true,
+      "classification": "build",
+      "status": "passed",
+      "passed": true,
+      "accepted": true,
+      "reason": null,
+      "result": {
+        "path": ".dev/v5/04503586c8d1/artifacts/nodes/probe-replay/result.json",
+        "sha256": "ec6e96cc3d0cb0516bf7f4e8d094b87b7ef44bd2f957e33ae6b42b66b79c4144",
+        "bytes": 6862
+      },
+      "evidence": [
+        {
+          "path": ".dev/v5/04503586c8d1/artifacts/nodes/probe-replay/command.log",
+          "sha256": "c15faa2340f48180f921cd99b6ed45bd1fbf9f29748ed07d466c5470abd82a79",
+          "bytes": 14959
+        },
+        {
+          "path": ".dev/v5/04503586c8d1/artifacts/builds/probe-replay/DarkLantern64-p-probe-replay.z64",
+          "sha256": "43beb2035e3f083f4ba4a17cc8b5c022b7edec2b0832610eb04ce41ddf530a3a",
+          "bytes": 1622016
+        },
+        {
+          "path": ".dev/v5/04503586c8d1/artifacts/builds/probe-replay/build.json",
+          "sha256": "7ebd01be63ddb8ecf7bcbfea640fd1fadbdca561e2d6f0af1dfae4dd59287c74",
+          "bytes": 84723899
+        },
+        {
+          "path": ".dev/v5/04503586c8d1/artifacts/builds/probe-replay/runtime_debug_map.json",
+          "sha256": "f3441878bc09bb525ece659a9756f1886b593f4eff1211e6b376e373a2f7fee2",
+          "bytes": 31466328
+        }
+      ]
+    },
+    {
+      "id": "district-no-diagnostics",
+      "required": false,
+      "classification": "build",
+      "status": "skipped",
+      "passed": false,
+      "accepted": false,
+      "reason": "Optional comparison not selected",
+      "result": {
+        "path": ".dev/v5/04503586c8d1/artifacts/nodes/district-no-diagnostics/result.json",
+        "sha256": "ff97b7b0ad9e63d70c4700ba958dc4eea2b442952eb37660e17553364f82f068",
+        "bytes": 552
+      },
+      "evidence": []
+    },
+    {
+      "id": "probe-rom-parity",
+      "required": true,
+      "classification": "functional",
+      "status": "passed",
+      "passed": true,
+      "accepted": true,
+      "reason": null,
+      "result": {
+        "path": ".dev/v5/04503586c8d1/artifacts/nodes/probe-rom-parity/result.json",
+        "sha256": "603f0ca672e5769f57bdc87356a4fec8a70070187a2adcad237242f1f466a402",
+        "bytes": 14489
+      },
+      "evidence": [
+        {
+          "path": ".dev/ares/runs/eab344fd8fc1499a9f041e03ef3dea4a/probe-rom-parity.log",
+          "sha256": "ec26d2d8ac465bf8d85a98348b706ce96d0a08045bf8cabd122aa715dc0c6064",
+          "bytes": 769174,
+          "role": "log"
+        },
+        {
+          "path": ".dev/ares/runs/eab344fd8fc1499a9f041e03ef3dea4a/probe-rom-parity.stderr.log",
+          "sha256": "b2a8738df5d4edb83db8c6ba4804df9ba294fbe69eff7a7fc6be36a7b55d23f2",
+          "bytes": 4965,
+          "role": "stderr_log"
+        },
+        {
+          "path": ".dev/ares/runs/eab344fd8fc1499a9f041e03ef3dea4a/run-status.json",
+          "sha256": "effcf353feaafc9517e3002ffcd4e7efe5a971847e10cbd0f1331a3112a70e27",
+          "bytes": 7448,
+          "role": "run_status"
+        },
+        {
+          "path": ".dev/ares/runs/eab344fd8fc1499a9f041e03ef3dea4a/DarkLantern64-p-probe-replay.z64",
+          "sha256": "43beb2035e3f083f4ba4a17cc8b5c022b7edec2b0832610eb04ce41ddf530a3a",
+          "bytes": 1622016,
+          "role": "tested_rom"
+        },
+        {
+          "path": ".dev/ares/runs/eab344fd8fc1499a9f041e03ef3dea4a/settings.bml",
+          "sha256": "3fa4b894a1b03117de8dacddbc46604bc02fb4c4ace58522546e2c3fbb4e6018",
+          "bytes": 41426,
+          "role": "settings"
+        },
+        {
+          "path": ".dev/v5/04503586c8d1/artifacts/replays/probe-functional/input.json",
+          "sha256": "80cf688347dfa0b7549c817e8a06a63e62f26570a1044080cb5bc7bcdc259625",
+          "bytes": 37028
+        },
+        {
+          "path": ".dev/v5/04503586c8d1/artifacts/replays/probe-functional/c/generated/play.json",
+          "sha256": "1226725a40cf33a7cf3eb7fa9349694f879887d943625df96d9081784bb8b164",
+          "bytes": 464005
+        },
+        {
+          "path": "tests/fixtures/stream_probe_route.json",
+          "sha256": "cb36eb55b24587c726843698e0a7601f6837f6d928a6971a62accf943408aba5",
+          "bytes": 2260
+        },
+        {
+          "path": ".dev/v5/04503586c8d1/artifacts/replays/probe-functional/native-states.json",
+          "sha256": "5730dedadb385b4a3033ad493864bf29bf9fb90b03b19e8f7fa411adad9a45b6",
+          "bytes": 8521518
+        }
+      ]
+    },
+    {
+      "id": "menu-idle",
+      "required": true,
+      "classification": "lifecycle",
+      "status": "passed",
+      "passed": true,
+      "accepted": true,
+      "reason": null,
+      "result": {
+        "path": ".dev/v5/04503586c8d1/artifacts/nodes/menu-idle/result.json",
+        "sha256": "69f1718aa5038191b6ad1591cd69c9d16729f302db5b41741ed3ea8770170b88",
+        "bytes": 10685
+      },
+      "evidence": [
+        {
+          "path": ".dev/ares/runs/fbb409c2fae14d24a05a9439a6d1f407/menu-idle.log",
+          "sha256": "bd59972bc7d9db8ba32ea116f25d39d67b5329d74ebf703387df56f409a6f097",
+          "bytes": 2778,
+          "role": "log"
+        },
+        {
+          "path": ".dev/ares/runs/fbb409c2fae14d24a05a9439a6d1f407/menu-idle.stderr.log",
+          "sha256": "a6ea0b50f69cae29467425094b2f78fe43b6ef2d35b9fb3740ba085de5eb5fea",
+          "bytes": 2648,
+          "role": "stderr_log"
+        },
+        {
+          "path": ".dev/ares/runs/fbb409c2fae14d24a05a9439a6d1f407/run-status.json",
+          "sha256": "fb51dae126de37ff733a6ecc1c62b6edcd7fff3091fc94ebabaf419b8e518a78",
+          "bytes": 7158,
+          "role": "run_status"
+        },
+        {
+          "path": ".dev/ares/runs/fbb409c2fae14d24a05a9439a6d1f407/DarkLantern64-p-bundle-idle.z64",
+          "sha256": "32690130a616048aec61cb80793af25abde6f6a707520529fcc4257b4518a42d",
+          "bytes": 1622016,
+          "role": "tested_rom"
+        },
+        {
+          "path": ".dev/ares/runs/fbb409c2fae14d24a05a9439a6d1f407/settings.bml",
+          "sha256": "6e318036f00f6cf18d5485c24bb7356493b23b07c54d1b767fe860aa046d0e1b",
+          "bytes": 41426,
+          "role": "settings"
+        },
+        {
+          "path": ".dev/ares/runs/fbb409c2fae14d24a05a9439a6d1f407/verification-run.json",
+          "sha256": "bb160c30f9de8be7403dc52978256cbf833fcd6180b82b4c2ae364323a2296fb",
+          "bytes": 7337
+        },
+        {
+          "path": ".dev/ares/runs/fbb409c2fae14d24a05a9439a6d1f407/verification-build.json",
+          "sha256": "397d063d79f5b651b774d2637dfe6cd49f4e9af9a6a6d371d6e7932cbba07ccd",
+          "bytes": 84716904
+        }
+      ]
+    },
+    {
+      "id": "menu-4mb",
+      "required": true,
+      "classification": "lifecycle",
+      "status": "passed",
+      "passed": true,
+      "accepted": true,
+      "reason": null,
+      "result": {
+        "path": ".dev/v5/04503586c8d1/artifacts/nodes/menu-4mb/result.json",
+        "sha256": "bf5092bcbf6478e178e4a17c2b9100997b8fd97a3fdf1536f5f0b9f42c942225",
+        "bytes": 10731
+      },
+      "evidence": [
+        {
+          "path": ".dev/ares/runs/db6c1056c2774b409506ce84e043fab0/menu-4mb.log",
+          "sha256": "0780657592f416ed92618a50c1275ba627ca0b7d31ff7fb18b43eb2f4ff2f928",
+          "bytes": 372,
+          "role": "log"
+        },
+        {
+          "path": ".dev/ares/runs/db6c1056c2774b409506ce84e043fab0/menu-4mb.stderr.log",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0,
+          "role": "stderr_log"
+        },
+        {
+          "path": ".dev/ares/runs/db6c1056c2774b409506ce84e043fab0/run-status.json",
+          "sha256": "0221e54f6c7d3bf61684620621254c5a6f4d010a23250a2c2155f355ee714f35",
+          "bytes": 7182,
+          "role": "run_status"
+        },
+        {
+          "path": ".dev/ares/runs/db6c1056c2774b409506ce84e043fab0/DarkLantern64-p-bundle-idle.z64",
+          "sha256": "32690130a616048aec61cb80793af25abde6f6a707520529fcc4257b4518a42d",
+          "bytes": 1622016,
+          "role": "tested_rom"
+        },
+        {
+          "path": ".dev/ares/runs/db6c1056c2774b409506ce84e043fab0/settings.bml",
+          "sha256": "2a1e1b0e86bc3c29b582c10132b1acb6b0030d8f090989cb1683bf6af0354073",
+          "bytes": 41427,
+          "role": "settings"
+        },
+        {
+          "path": ".dev/ares/runs/db6c1056c2774b409506ce84e043fab0/verification-run.json",
+          "sha256": "f609497b521382c33a016d4e417a25642b5bdd95ab09e043ebc63b8c44037533",
+          "bytes": 7361
+        },
+        {
+          "path": ".dev/ares/runs/db6c1056c2774b409506ce84e043fab0/verification-build.json",
+          "sha256": "397d063d79f5b651b774d2637dfe6cd49f4e9af9a6a6d371d6e7932cbba07ccd",
+          "bytes": 84716904
+        }
+      ]
+    },
+    {
+      "id": "menu-lifecycle",
+      "required": true,
+      "classification": "lifecycle",
+      "status": "passed",
+      "passed": true,
+      "accepted": true,
+      "reason": null,
+      "result": {
+        "path": ".dev/v5/04503586c8d1/artifacts/nodes/menu-lifecycle/result.json",
+        "sha256": "fe070b0898f4419db85b674dbc0ac0e33a5251f5cab01c4f2e07f3e9d9802b68",
+        "bytes": 19373
+      },
+      "evidence": [
+        {
+          "path": ".dev/ares/runs/142b6edbc56e48e198d189a61740445a/menu-lifecycle.log",
+          "sha256": "b8d0fc75848360070688bf506929a019e9fc095e08f54fa391c4b1cdbaaf0103",
+          "bytes": 1646191,
+          "role": "log"
+        },
+        {
+          "path": ".dev/ares/runs/142b6edbc56e48e198d189a61740445a/menu-lifecycle.stderr.log",
+          "sha256": "6f2fa858b6d88a2c6e6d959af8de21264ba420e3bfaf29c846ea9c652e5940c9",
+          "bytes": 7282,
+          "role": "stderr_log"
+        },
+        {
+          "path": ".dev/ares/runs/142b6edbc56e48e198d189a61740445a/run-status.json",
+          "sha256": "36b1bf894a33cbf3f68ed106e1de505c486c8a63393a86be821634f6b339ca5b",
+          "bytes": 7457,
+          "role": "run_status"
+        },
+        {
+          "path": ".dev/ares/runs/142b6edbc56e48e198d189a61740445a/DarkLantern64-p-bundle-lifecycle.z64",
+          "sha256": "73fc05757fc07c19fae8db86adca60404776139fe747407beed92630f1efe581",
+          "bytes": 1622016,
+          "role": "tested_rom"
+        },
+        {
+          "path": ".dev/ares/runs/142b6edbc56e48e198d189a61740445a/settings.bml",
+          "sha256": "db39c6b7aad8e6afa8c4e8b696277f390e566237fb9f54c157b372773e29097a",
+          "bytes": 41426,
+          "role": "settings"
+        },
+        {
+          "path": ".dev/ares/runs/142b6edbc56e48e198d189a61740445a/verification-run.json",
+          "sha256": "8d15674dab071461fbe5cac7104f511a16daa8f71e21f071ccf1ae5b400f696a",
+          "bytes": 7636
+        },
+        {
+          "path": ".dev/ares/runs/142b6edbc56e48e198d189a61740445a/verification-build.json",
+          "sha256": "062bd8228c17a08b7c7be9646c1db8f5a3a4c6de4eccbd08bfd6956452648598",
+          "bytes": 84721358
+        }
+      ]
+    },
+    {
+      "id": "district-functional",
+      "required": true,
+      "classification": "functional",
+      "status": "passed",
+      "passed": true,
+      "accepted": true,
+      "reason": null,
+      "result": {
+        "path": ".dev/v5/04503586c8d1/artifacts/nodes/district-functional/result.json",
+        "sha256": "d4e7788a9a6cdca5cfab42f0fd958ba19381cdecd6a679a13e5679707f30a5df",
+        "bytes": 65857
+      },
+      "evidence": [
+        {
+          "path": ".dev/ares/runs/a2b11a9994594343aa208b23059a6f4b/district-functional.log",
+          "sha256": "a27e2b56a8689f14430099d30cfdfeea01cd307ebdd45dec3736797d025ed89e",
+          "bytes": 307702,
+          "role": "log"
+        },
+        {
+          "path": ".dev/ares/runs/a2b11a9994594343aa208b23059a6f4b/district-functional.stderr.log",
+          "sha256": "ec2054ac2a5bd02b336b2703f44a39834652fd671241c0dc89a8ab9234c7fa17",
+          "bytes": 5296,
+          "role": "stderr_log"
+        },
+        {
+          "path": ".dev/ares/runs/a2b11a9994594343aa208b23059a6f4b/run-status.json",
+          "sha256": "8d958f29469e13429f04afb79cd3914e52abfacd52809acc7df60917ce7673fc",
+          "bytes": 7672,
+          "role": "run_status"
+        },
+        {
+          "path": ".dev/ares/runs/a2b11a9994594343aa208b23059a6f4b/DarkLantern64-p-district-ordinary.z64",
+          "sha256": "edb3c477a1b67f27a2c12caed7f9766f611666587ec2020c1ec55596c649b845",
+          "bytes": 1638400,
+          "role": "tested_rom"
+        },
+        {
+          "path": ".dev/ares/runs/a2b11a9994594343aa208b23059a6f4b/settings.bml",
+          "sha256": "e2f046d4d3d140fa4107d1e4743c0d991961e54829e450244dc158f0b03d9d29",
+          "bytes": 41426,
+          "role": "settings"
+        },
+        {
+          "path": ".dev/ares/runs/a2b11a9994594343aa208b23059a6f4b/verification-run.json",
+          "sha256": "80e2dd8b2b8721c7e08ad5f3ec18e8c9b9ca1915c677fad150533577de4ce05e",
+          "bytes": 7851
+        },
+        {
+          "path": ".dev/ares/runs/a2b11a9994594343aa208b23059a6f4b/verification-build.json",
+          "sha256": "2d48edd68758776d4c19cb3d75aa3588c5d816b27f1079c8442318e4d20d828b",
+          "bytes": 84722639
+        },
+        {
+          "path": ".dev/v5/04503586c8d1/artifacts/nodes/district-functional/command.log",
+          "sha256": "f2f5a732a652dd899f2ca93136c4b43dd4fa442711f19d145d035b9202ffd1e5",
+          "bytes": 184
+        },
+        {
+          "path": ".dev/v5/04503586c8d1/artifacts/nodes/district-functional/legacy-report.json",
+          "sha256": "0897985395d90f3234c941698b60a02f670046371d9c792343bbd42f6b4559e5",
+          "bytes": 48531
+        }
+      ]
+    },
+    {
+      "id": "district-strict",
+      "required": true,
+      "classification": "strict_wall_time",
+      "status": "passed",
+      "passed": true,
+      "accepted": true,
+      "reason": null,
+      "result": {
+        "path": ".dev/v5/04503586c8d1/artifacts/nodes/district-strict/result.json",
+        "sha256": "c3cca5a7f95e21019fc7c4754f37343cbd3aca89b3e43e50483a053d1655ce6e",
+        "bytes": 111554
+      },
+      "evidence": [
+        {
+          "path": ".dev/ares/runs/693f88bd5eff455c8d9aa72671fe52ad/district-strict.log",
+          "sha256": "077986fb20f19ffd04012b69c6f29e11d42f50f951cd58d32648fc4f2ba350d5",
+          "bytes": 671239,
+          "role": "log"
+        },
+        {
+          "path": ".dev/ares/runs/693f88bd5eff455c8d9aa72671fe52ad/district-strict.stderr.log",
+          "sha256": "7840bd5bfa7b5bcb7ea8c7dbb0c02bf9f226099c3f458894cf5b2213afa2d7c5",
+          "bytes": 105,
+          "role": "stderr_log"
+        },
+        {
+          "path": ".dev/ares/runs/693f88bd5eff455c8d9aa72671fe52ad/run-status.json",
+          "sha256": "ed495ccaae4818cbb64cc75d1696e603754b1a9765859d2c2d2ce714addba99d",
+          "bytes": 7596,
+          "role": "run_status"
+        },
+        {
+          "path": ".dev/ares/runs/693f88bd5eff455c8d9aa72671fe52ad/DarkLantern64-p-district-performance.z64",
+          "sha256": "61965fca7d31db72fab9eba3e953042f9ab8318905c0ce125147336cf90c7a83",
+          "bytes": 1638400,
+          "role": "tested_rom"
+        },
+        {
+          "path": ".dev/ares/runs/693f88bd5eff455c8d9aa72671fe52ad/settings.bml",
+          "sha256": "df76e703eecd18cdbfcb77d940f6fc857fd53a2821a4f3f0a2cbba3666f76aba",
+          "bytes": 41426,
+          "role": "settings"
+        },
+        {
+          "path": ".dev/ares/runs/693f88bd5eff455c8d9aa72671fe52ad/verification-run.json",
+          "sha256": "ec3e113da40d130d18c0e3a106ca11284f5892b8d3c91a21551c5ff77c42792f",
+          "bytes": 7775
+        },
+        {
+          "path": ".dev/ares/runs/693f88bd5eff455c8d9aa72671fe52ad/verification-build.json",
+          "sha256": "7c6bd914aaab369c05e316af5e2838ea7e5c3f67d2585bcd7d74a340b153c1d5",
+          "bytes": 84727749
+        },
+        {
+          "path": ".dev/v5/04503586c8d1/artifacts/nodes/district-strict/command.log",
+          "sha256": "f4190abe449e2bafa6df93a286f2ce7e578ce5672ab75b3734775b839e9ae2cd",
+          "bytes": 64
+        },
+        {
+          "path": ".dev/v5/04503586c8d1/artifacts/nodes/district-strict/legacy-report.json",
+          "sha256": "071ad10486d2319fd13bf3f2276ae7d52280998f9dbe6e5024449664ec638aa2",
+          "bytes": 91717
+        }
+      ]
+    },
+    {
+      "id": "district-views",
+      "required": true,
+      "classification": "capture_only",
+      "status": "passed",
+      "passed": true,
+      "accepted": true,
+      "reason": null,
+      "result": {
+        "path": ".dev/v5/04503586c8d1/artifacts/nodes/district-views/result.json",
+        "sha256": "2de56c6d2f5c01a596657b4d1fd6b09e3a78b377d9592b9528aa1038eed3fb96",
+        "bytes": 67274
+      },
+      "evidence": [
+        {
+          "path": ".dev/ares/runs/835acbf3061f4132a7d0df92af6a8108/district-views.log",
+          "sha256": "535ae1c0c156087873456860a37a8a6131f2385452367f0489e3eb76aba7eae1",
+          "bytes": 1261769,
+          "role": "log"
+        },
+        {
+          "path": ".dev/ares/runs/835acbf3061f4132a7d0df92af6a8108/district-views.stderr.log",
+          "sha256": "6bac0fb3f5581297e0630524d41ed72dc05ad3979fb5fffd5dc84ff8f32fb290",
+          "bytes": 105,
+          "role": "stderr_log"
+        },
+        {
+          "path": ".dev/ares/runs/835acbf3061f4132a7d0df92af6a8108/run-status.json",
+          "sha256": "4b4b784dec1c8912bc10dfa8db6490b4a1d90f51d87eedffdbecd8ead65bd723",
+          "bytes": 7423,
+          "role": "run_status"
+        },
+        {
+          "path": ".dev/ares/runs/835acbf3061f4132a7d0df92af6a8108/DarkLantern64-p-district-capture.z64",
+          "sha256": "af44e408a1d840f3f834ebefb775bc38cd01045dcb2810f67e302724383fc9b4",
+          "bytes": 1638400,
+          "role": "tested_rom"
+        },
+        {
+          "path": ".dev/ares/runs/835acbf3061f4132a7d0df92af6a8108/settings.bml",
+          "sha256": "31852d45bf1a989d17487da4333deb568cd342885d12cb3046166099ee66f248",
+          "bytes": 41426,
+          "role": "settings"
+        },
+        {
+          "path": ".dev/ares/runs/835acbf3061f4132a7d0df92af6a8108/verification-run.json",
+          "sha256": "343f34e58a5df01358defe01ea0702a52d6a0b07a29fa16d3e86fadd05bfa100",
+          "bytes": 7602
+        },
+        {
+          "path": ".dev/ares/runs/835acbf3061f4132a7d0df92af6a8108/verification-build.json",
+          "sha256": "7581bb1887511d0fbb0579d88f0baec9de226c191eb9ff13234e9c7c3d5ea994",
+          "bytes": 84725579
+        },
+        {
+          "path": ".dev/v5/04503586c8d1/artifacts/nodes/district-views/command.log",
+          "sha256": "887bcdd1974db242647b490a9b05004878d185ee5ca2f78cef26aea85c24d662",
+          "bytes": 185
+        },
+        {
+          "path": ".dev/v5/04503586c8d1/artifacts/nodes/district-views/captures/bafford-district-interior.png",
+          "sha256": "828ffa158f2d69107cab0869669fdf22f0689c3e7b8c64a5fe565a288ec48370",
+          "bytes": 29978
+        },
+        {
+          "path": ".dev/v5/04503586c8d1/artifacts/nodes/district-views/captures/bafford-district-courtyard.png",
+          "sha256": "1ea40538506cb57f7122eb73c31e611f5ef0d7321ab618838e23eee13ff2e507",
+          "bytes": 30348
+        },
+        {
+          "path": ".dev/v5/04503586c8d1/artifacts/nodes/district-views/captures/bafford-district-east-alley.png",
+          "sha256": "f3ed288cd76bcb17683cbf03f538f8f8d733fe39874b7257a28cd7212ba71a62",
+          "bytes": 38191
+        },
+        {
+          "path": ".dev/v5/04503586c8d1/artifacts/nodes/district-views/legacy-report.json",
+          "sha256": "28cc87a80533034a7582e3293d601a2f6c8b2b2ae6d36da8674424d3716afa00",
+          "bytes": 49364
+        }
+      ]
+    },
+    {
+      "id": "district-diagnostics-counterfactual",
+      "required": false,
+      "classification": "strict_wall_time",
+      "status": "skipped",
+      "passed": false,
+      "accepted": false,
+      "reason": "Optional comparison not selected",
+      "result": {
+        "path": ".dev/v5/04503586c8d1/artifacts/nodes/district-diagnostics-counterfactual/result.json",
+        "sha256": "d64280e9249c9e91d3d7af1d4dc2356f063029ef34b7fc5bf531394cddf91b10",
+        "bytes": 587
+      },
+      "evidence": []
+    }
+  ],
+  "builds": [
+    {
+      "id": "bundle-idle",
+      "build_id": "6842527245441ffcc69dd6b9f28f980d48c3a31d9053183f7cd564f405957825",
+      "rom_sha256": "32690130a616048aec61cb80793af25abde6f6a707520529fcc4257b4518a42d",
+      "rom": {
+        "path": ".dev/v5/04503586c8d1/artifacts/builds/bundle-idle/DarkLantern64-p-bundle-idle.z64",
+        "sha256": "32690130a616048aec61cb80793af25abde6f6a707520529fcc4257b4518a42d",
+        "bytes": 1622016
+      },
+      "metadata": {
+        "path": ".dev/v5/04503586c8d1/artifacts/builds/bundle-idle/build.json",
+        "sha256": "397d063d79f5b651b774d2637dfe6cd49f4e9af9a6a6d371d6e7932cbba07ccd",
+        "bytes": 84716904
+      },
+      "runtime_map": {
+        "path": ".dev/v5/04503586c8d1/artifacts/builds/bundle-idle/runtime_debug_map.json",
+        "sha256": "873447c1446b84f5c539d448d983ae236fae44c24541e596ac6e1c459e8cf0aa",
+        "bytes": 31466328
+      },
+      "source_bindings": [
+        {
+          "level": "lantern-store",
+          "source": "C:\\Users\\hughe\\dev\\DarkLantern64\\content\\first_room.json",
+          "source_file_sha256": "c1fb19e6b114fe9fa8459922dcacf55771ed86e2f9feb7ec25fe6aadf2009105",
+          "compiled_source_sha256": "c2f27747ecb4ba71275bdcd3eea92a243f728b822e3ea7bc7d75e072873c61ac"
+        },
+        {
+          "level": "moonlit-yard",
+          "source": "C:\\Users\\hughe\\dev\\DarkLantern64\\content\\moonlit_courtyard.json",
+          "source_file_sha256": "412ec992cefcfc7dc714aeabd0618cfc50e57b22e268fd30c3346bd86a03ff8e",
+          "compiled_source_sha256": "c131d3ec48232b3449166f04a2a77632868760f594f7e79f0dc2bd5f1e3294a9"
+        },
+        {
+          "level": "enemy-workshop",
+          "source": "C:\\Users\\hughe\\dev\\DarkLantern64\\content\\enemy_patrols.json",
+          "source_file_sha256": "26d61c6300b298a6b2d73de2f32030c9759536d490e611d7d7ee2200d89e450d",
+          "compiled_source_sha256": "6925eccf961c2069a2a8dc73d1cc80889ed63d7e4a72c0b0678e675e762a2e13"
+        },
+        {
+          "level": "animation_workshop",
+          "source": "C:\\Users\\hughe\\dev\\DarkLantern64\\content\\animation_workshop.json",
+          "source_file_sha256": "0480ac4b7343b82b1f5c709c93d3496f8fd89ea846315a6b68b96028cb9fb8fd",
+          "compiled_source_sha256": "74ff81f3a3d7281fba6093bca2eba5b5d9ae8165cdb958a1029a63aee7f7a4c0"
+        },
+        {
+          "level": "sponza",
+          "source": "C:\\Users\\hughe\\dev\\DarkLantern64\\content\\sponza_courtyard.json",
+          "source_file_sha256": "4eb23dc17c272397d4c4d3f8bc503fc67b5d3a16ed2f2bddd65c9ad4727fc4ca",
+          "compiled_source_sha256": "7d919d3c4f05418fc32b94bb21261e95a6fc4ab5b6cff6eee4c54a8869b68737"
+        },
+        {
+          "level": "bafford-district",
+          "source": "C:\\Users\\hughe\\dev\\DarkLantern64\\content\\thief_bafford_district.json",
+          "source_file_sha256": "16160232d3051ba95ca0d78fa66bf02522399aa06659199a3c0285c2832fdcbe",
+          "compiled_source_sha256": "236bd4db4d2a58fd4b9052e2e8a2e9c54438f63085ab85749810d2c879cac6cc",
+          "partition": "C:\\Users\\hughe\\dev\\DarkLantern64\\content\\thief_bafford_district.mission.json",
+          "partition_sha256": "2f6aeeb0911aaf4806d8a848f0609c2552621a659df66fb5e78b1125fbd329d0",
+          "package_sha256": "11e59ed82b3fb6711f94a1afc6767fe7d828204d486d767213857a9202823230"
+        },
+        {
+          "level": "bafford-expanded",
+          "source": "C:\\Users\\hughe\\dev\\DarkLantern64\\content\\thief_bafford_expanded.json",
+          "source_file_sha256": "28de709c9d3f199cf21e3651cd234f801b85c19ddc5df27635a28b35cb0e7254",
+          "compiled_source_sha256": "f758d23d05ff897d82f2a32e1b9719a6554bab7797b0d183c293205dfbe7bd2e",
+          "partition": "C:\\Users\\hughe\\dev\\DarkLantern64\\content\\thief_bafford_expanded.mission.json",
+          "partition_sha256": "3846d776855b17a5d051eb1a7c9f23acef19e8fb7891ae1b2f734f07e906176e",
+          "package_sha256": "16b089f92192a5b028f51a405418391728491c8df0b651e0ece45447ff1366f2"
+        },
+        {
+          "level": "streaming-probe",
+          "source": "C:\\Users\\hughe\\dev\\DarkLantern64\\content\\streaming_probe.json",
+          "source_file_sha256": "afc8f737f2d72a3143927ee9290ec15703d7dc2ed3757b9b61c0c992d64d24f0",
+          "compiled_source_sha256": "a9fdc82b0e8f8664b3d0edf83abeed87c0a49a13f0257741630c3c2f17faff9f",
+          "partition": "C:\\Users\\hughe\\dev\\DarkLantern64\\content\\streaming_probe.mission.json",
+          "partition_sha256": "6bd18afe4f538555db1881e03feb8f8449498a656cadcd2139b6eff454a0c2c8",
+          "package_sha256": "db46f7dbd700ef2b192ddcc9c512b14e501691275b56165a94043791501cd517"
+        }
+      ]
+    },
+    {
+      "id": "district-ordinary",
+      "build_id": "38c3693f038809cd3902d1a5b659ddae31c35c88a63fb41564574d078989a7d1",
+      "rom_sha256": "edb3c477a1b67f27a2c12caed7f9766f611666587ec2020c1ec55596c649b845",
+      "rom": {
+        "path": ".dev/v5/04503586c8d1/artifacts/builds/district-ordinary/DarkLantern64-p-district-ordinary.z64",
+        "sha256": "edb3c477a1b67f27a2c12caed7f9766f611666587ec2020c1ec55596c649b845",
+        "bytes": 1638400
+      },
+      "metadata": {
+        "path": ".dev/v5/04503586c8d1/artifacts/builds/district-ordinary/build.json",
+        "sha256": "2d48edd68758776d4c19cb3d75aa3588c5d816b27f1079c8442318e4d20d828b",
+        "bytes": 84722639
+      },
+      "runtime_map": {
+        "path": ".dev/v5/04503586c8d1/artifacts/builds/district-ordinary/runtime_debug_map.json",
+        "sha256": "bfa28106f2558482323d39e05c8eae44946195202f1dbfdd84620d762df44e6a",
+        "bytes": 31466328
+      },
+      "source_bindings": [
+        {
+          "level": "lantern-store",
+          "source": "C:\\Users\\hughe\\dev\\DarkLantern64\\content\\first_room.json",
+          "source_file_sha256": "c1fb19e6b114fe9fa8459922dcacf55771ed86e2f9feb7ec25fe6aadf2009105",
+          "compiled_source_sha256": "c2f27747ecb4ba71275bdcd3eea92a243f728b822e3ea7bc7d75e072873c61ac"
+        },
+        {
+          "level": "moonlit-yard",
+          "source": "C:\\Users\\hughe\\dev\\DarkLantern64\\content\\moonlit_courtyard.json",
+          "source_file_sha256": "412ec992cefcfc7dc714aeabd0618cfc50e57b22e268fd30c3346bd86a03ff8e",
+          "compiled_source_sha256": "c131d3ec48232b3449166f04a2a77632868760f594f7e79f0dc2bd5f1e3294a9"
+        },
+        {
+          "level": "enemy-workshop",
+          "source": "C:\\Users\\hughe\\dev\\DarkLantern64\\content\\enemy_patrols.json",
+          "source_file_sha256": "26d61c6300b298a6b2d73de2f32030c9759536d490e611d7d7ee2200d89e450d",
+          "compiled_source_sha256": "6925eccf961c2069a2a8dc73d1cc80889ed63d7e4a72c0b0678e675e762a2e13"
+        },
+        {
+          "level": "animation_workshop",
+          "source": "C:\\Users\\hughe\\dev\\DarkLantern64\\content\\animation_workshop.json",
+          "source_file_sha256": "0480ac4b7343b82b1f5c709c93d3496f8fd89ea846315a6b68b96028cb9fb8fd",
+          "compiled_source_sha256": "74ff81f3a3d7281fba6093bca2eba5b5d9ae8165cdb958a1029a63aee7f7a4c0"
+        },
+        {
+          "level": "sponza",
+          "source": "C:\\Users\\hughe\\dev\\DarkLantern64\\content\\sponza_courtyard.json",
+          "source_file_sha256": "4eb23dc17c272397d4c4d3f8bc503fc67b5d3a16ed2f2bddd65c9ad4727fc4ca",
+          "compiled_source_sha256": "7d919d3c4f05418fc32b94bb21261e95a6fc4ab5b6cff6eee4c54a8869b68737"
+        },
+        {
+          "level": "bafford-district",
+          "source": "C:\\Users\\hughe\\dev\\DarkLantern64\\content\\thief_bafford_district.json",
+          "source_file_sha256": "16160232d3051ba95ca0d78fa66bf02522399aa06659199a3c0285c2832fdcbe",
+          "compiled_source_sha256": "236bd4db4d2a58fd4b9052e2e8a2e9c54438f63085ab85749810d2c879cac6cc",
+          "partition": "C:\\Users\\hughe\\dev\\DarkLantern64\\content\\thief_bafford_district.mission.json",
+          "partition_sha256": "2f6aeeb0911aaf4806d8a848f0609c2552621a659df66fb5e78b1125fbd329d0",
+          "package_sha256": "11e59ed82b3fb6711f94a1afc6767fe7d828204d486d767213857a9202823230"
+        },
+        {
+          "level": "bafford-expanded",
+          "source": "C:\\Users\\hughe\\dev\\DarkLantern64\\content\\thief_bafford_expanded.json",
+          "source_file_sha256": "28de709c9d3f199cf21e3651cd234f801b85c19ddc5df27635a28b35cb0e7254",
+          "compiled_source_sha256": "f758d23d05ff897d82f2a32e1b9719a6554bab7797b0d183c293205dfbe7bd2e",
+          "partition": "C:\\Users\\hughe\\dev\\DarkLantern64\\content\\thief_bafford_expanded.mission.json",
+          "partition_sha256": "3846d776855b17a5d051eb1a7c9f23acef19e8fb7891ae1b2f734f07e906176e",
+          "package_sha256": "16b089f92192a5b028f51a405418391728491c8df0b651e0ece45447ff1366f2"
+        },
+        {
+          "level": "streaming-probe",
+          "source": "C:\\Users\\hughe\\dev\\DarkLantern64\\content\\streaming_probe.json",
+          "source_file_sha256": "afc8f737f2d72a3143927ee9290ec15703d7dc2ed3757b9b61c0c992d64d24f0",
+          "compiled_source_sha256": "a9fdc82b0e8f8664b3d0edf83abeed87c0a49a13f0257741630c3c2f17faff9f",
+          "partition": "C:\\Users\\hughe\\dev\\DarkLantern64\\content\\streaming_probe.mission.json",
+          "partition_sha256": "6bd18afe4f538555db1881e03feb8f8449498a656cadcd2139b6eff454a0c2c8",
+          "package_sha256": "db46f7dbd700ef2b192ddcc9c512b14e501691275b56165a94043791501cd517"
+        }
+      ]
+    },
+    {
+      "id": "district-performance",
+      "build_id": "574bfcc3b4282ecf168a8dd58c7cd0035f577544fba0b9f564e3a3b0d8c1a56a",
+      "rom_sha256": "61965fca7d31db72fab9eba3e953042f9ab8318905c0ce125147336cf90c7a83",
+      "rom": {
+        "path": ".dev/v5/04503586c8d1/artifacts/builds/district-performance/DarkLantern64-p-district-performance.z64",
+        "sha256": "61965fca7d31db72fab9eba3e953042f9ab8318905c0ce125147336cf90c7a83",
+        "bytes": 1638400
+      },
+      "metadata": {
+        "path": ".dev/v5/04503586c8d1/artifacts/builds/district-performance/build.json",
+        "sha256": "7c6bd914aaab369c05e316af5e2838ea7e5c3f67d2585bcd7d74a340b153c1d5",
+        "bytes": 84727749
+      },
+      "runtime_map": {
+        "path": ".dev/v5/04503586c8d1/artifacts/builds/district-performance/runtime_debug_map.json",
+        "sha256": "73df78c0132ba9354cf92a050bcb60fa1db0754a426cb5e4d89dd8a5b84e5612",
+        "bytes": 31466328
+      },
+      "source_bindings": [
+        {
+          "level": "lantern-store",
+          "source": "C:\\Users\\hughe\\dev\\DarkLantern64\\content\\first_room.json",
+          "source_file_sha256": "c1fb19e6b114fe9fa8459922dcacf55771ed86e2f9feb7ec25fe6aadf2009105",
+          "compiled_source_sha256": "c2f27747ecb4ba71275bdcd3eea92a243f728b822e3ea7bc7d75e072873c61ac"
+        },
+        {
+          "level": "moonlit-yard",
+          "source": "C:\\Users\\hughe\\dev\\DarkLantern64\\content\\moonlit_courtyard.json",
+          "source_file_sha256": "412ec992cefcfc7dc714aeabd0618cfc50e57b22e268fd30c3346bd86a03ff8e",
+          "compiled_source_sha256": "c131d3ec48232b3449166f04a2a77632868760f594f7e79f0dc2bd5f1e3294a9"
+        },
+        {
+          "level": "enemy-workshop",
+          "source": "C:\\Users\\hughe\\dev\\DarkLantern64\\content\\enemy_patrols.json",
+          "source_file_sha256": "26d61c6300b298a6b2d73de2f32030c9759536d490e611d7d7ee2200d89e450d",
+          "compiled_source_sha256": "6925eccf961c2069a2a8dc73d1cc80889ed63d7e4a72c0b0678e675e762a2e13"
+        },
+        {
+          "level": "animation_workshop",
+          "source": "C:\\Users\\hughe\\dev\\DarkLantern64\\content\\animation_workshop.json",
+          "source_file_sha256": "0480ac4b7343b82b1f5c709c93d3496f8fd89ea846315a6b68b96028cb9fb8fd",
+          "compiled_source_sha256": "74ff81f3a3d7281fba6093bca2eba5b5d9ae8165cdb958a1029a63aee7f7a4c0"
+        },
+        {
+          "level": "sponza",
+          "source": "C:\\Users\\hughe\\dev\\DarkLantern64\\content\\sponza_courtyard.json",
+          "source_file_sha256": "4eb23dc17c272397d4c4d3f8bc503fc67b5d3a16ed2f2bddd65c9ad4727fc4ca",
+          "compiled_source_sha256": "7d919d3c4f05418fc32b94bb21261e95a6fc4ab5b6cff6eee4c54a8869b68737"
+        },
+        {
+          "level": "bafford-district",
+          "source": "C:\\Users\\hughe\\dev\\DarkLantern64\\content\\thief_bafford_district.json",
+          "source_file_sha256": "16160232d3051ba95ca0d78fa66bf02522399aa06659199a3c0285c2832fdcbe",
+          "compiled_source_sha256": "236bd4db4d2a58fd4b9052e2e8a2e9c54438f63085ab85749810d2c879cac6cc",
+          "partition": "C:\\Users\\hughe\\dev\\DarkLantern64\\content\\thief_bafford_district.mission.json",
+          "partition_sha256": "2f6aeeb0911aaf4806d8a848f0609c2552621a659df66fb5e78b1125fbd329d0",
+          "package_sha256": "11e59ed82b3fb6711f94a1afc6767fe7d828204d486d767213857a9202823230"
+        },
+        {
+          "level": "bafford-expanded",
+          "source": "C:\\Users\\hughe\\dev\\DarkLantern64\\content\\thief_bafford_expanded.json",
+          "source_file_sha256": "28de709c9d3f199cf21e3651cd234f801b85c19ddc5df27635a28b35cb0e7254",
+          "compiled_source_sha256": "f758d23d05ff897d82f2a32e1b9719a6554bab7797b0d183c293205dfbe7bd2e",
+          "partition": "C:\\Users\\hughe\\dev\\DarkLantern64\\content\\thief_bafford_expanded.mission.json",
+          "partition_sha256": "3846d776855b17a5d051eb1a7c9f23acef19e8fb7891ae1b2f734f07e906176e",
+          "package_sha256": "16b089f92192a5b028f51a405418391728491c8df0b651e0ece45447ff1366f2"
+        },
+        {
+          "level": "streaming-probe",
+          "source": "C:\\Users\\hughe\\dev\\DarkLantern64\\content\\streaming_probe.json",
+          "source_file_sha256": "afc8f737f2d72a3143927ee9290ec15703d7dc2ed3757b9b61c0c992d64d24f0",
+          "compiled_source_sha256": "a9fdc82b0e8f8664b3d0edf83abeed87c0a49a13f0257741630c3c2f17faff9f",
+          "partition": "C:\\Users\\hughe\\dev\\DarkLantern64\\content\\streaming_probe.mission.json",
+          "partition_sha256": "6bd18afe4f538555db1881e03feb8f8449498a656cadcd2139b6eff454a0c2c8",
+          "package_sha256": "db46f7dbd700ef2b192ddcc9c512b14e501691275b56165a94043791501cd517"
+        }
+      ]
+    },
+    {
+      "id": "district-capture",
+      "build_id": "e69597485bbbb8c2d713f8d78d461895a86e68ee57efb686c56a2a5bb4ce1a3a",
+      "rom_sha256": "af44e408a1d840f3f834ebefb775bc38cd01045dcb2810f67e302724383fc9b4",
+      "rom": {
+        "path": ".dev/v5/04503586c8d1/artifacts/builds/district-capture/DarkLantern64-p-district-capture.z64",
+        "sha256": "af44e408a1d840f3f834ebefb775bc38cd01045dcb2810f67e302724383fc9b4",
+        "bytes": 1638400
+      },
+      "metadata": {
+        "path": ".dev/v5/04503586c8d1/artifacts/builds/district-capture/build.json",
+        "sha256": "7581bb1887511d0fbb0579d88f0baec9de226c191eb9ff13234e9c7c3d5ea994",
+        "bytes": 84725579
+      },
+      "runtime_map": {
+        "path": ".dev/v5/04503586c8d1/artifacts/builds/district-capture/runtime_debug_map.json",
+        "sha256": "f9defcea6cc1ae21e85a882ac24cc326d99b4ca56cb20039dbb9f6acfb744e04",
+        "bytes": 31466328
+      },
+      "source_bindings": [
+        {
+          "level": "lantern-store",
+          "source": "C:\\Users\\hughe\\dev\\DarkLantern64\\content\\first_room.json",
+          "source_file_sha256": "c1fb19e6b114fe9fa8459922dcacf55771ed86e2f9feb7ec25fe6aadf2009105",
+          "compiled_source_sha256": "c2f27747ecb4ba71275bdcd3eea92a243f728b822e3ea7bc7d75e072873c61ac"
+        },
+        {
+          "level": "moonlit-yard",
+          "source": "C:\\Users\\hughe\\dev\\DarkLantern64\\content\\moonlit_courtyard.json",
+          "source_file_sha256": "412ec992cefcfc7dc714aeabd0618cfc50e57b22e268fd30c3346bd86a03ff8e",
+          "compiled_source_sha256": "c131d3ec48232b3449166f04a2a77632868760f594f7e79f0dc2bd5f1e3294a9"
+        },
+        {
+          "level": "enemy-workshop",
+          "source": "C:\\Users\\hughe\\dev\\DarkLantern64\\content\\enemy_patrols.json",
+          "source_file_sha256": "26d61c6300b298a6b2d73de2f32030c9759536d490e611d7d7ee2200d89e450d",
+          "compiled_source_sha256": "6925eccf961c2069a2a8dc73d1cc80889ed63d7e4a72c0b0678e675e762a2e13"
+        },
+        {
+          "level": "animation_workshop",
+          "source": "C:\\Users\\hughe\\dev\\DarkLantern64\\content\\animation_workshop.json",
+          "source_file_sha256": "0480ac4b7343b82b1f5c709c93d3496f8fd89ea846315a6b68b96028cb9fb8fd",
+          "compiled_source_sha256": "74ff81f3a3d7281fba6093bca2eba5b5d9ae8165cdb958a1029a63aee7f7a4c0"
+        },
+        {
+          "level": "sponza",
+          "source": "C:\\Users\\hughe\\dev\\DarkLantern64\\content\\sponza_courtyard.json",
+          "source_file_sha256": "4eb23dc17c272397d4c4d3f8bc503fc67b5d3a16ed2f2bddd65c9ad4727fc4ca",
+          "compiled_source_sha256": "7d919d3c4f05418fc32b94bb21261e95a6fc4ab5b6cff6eee4c54a8869b68737"
+        },
+        {
+          "level": "bafford-district",
+          "source": "C:\\Users\\hughe\\dev\\DarkLantern64\\content\\thief_bafford_district.json",
+          "source_file_sha256": "16160232d3051ba95ca0d78fa66bf02522399aa06659199a3c0285c2832fdcbe",
+          "compiled_source_sha256": "236bd4db4d2a58fd4b9052e2e8a2e9c54438f63085ab85749810d2c879cac6cc",
+          "partition": "C:\\Users\\hughe\\dev\\DarkLantern64\\content\\thief_bafford_district.mission.json",
+          "partition_sha256": "2f6aeeb0911aaf4806d8a848f0609c2552621a659df66fb5e78b1125fbd329d0",
+          "package_sha256": "11e59ed82b3fb6711f94a1afc6767fe7d828204d486d767213857a9202823230"
+        },
+        {
+          "level": "bafford-expanded",
+          "source": "C:\\Users\\hughe\\dev\\DarkLantern64\\content\\thief_bafford_expanded.json",
+          "source_file_sha256": "28de709c9d3f199cf21e3651cd234f801b85c19ddc5df27635a28b35cb0e7254",
+          "compiled_source_sha256": "f758d23d05ff897d82f2a32e1b9719a6554bab7797b0d183c293205dfbe7bd2e",
+          "partition": "C:\\Users\\hughe\\dev\\DarkLantern64\\content\\thief_bafford_expanded.mission.json",
+          "partition_sha256": "3846d776855b17a5d051eb1a7c9f23acef19e8fb7891ae1b2f734f07e906176e",
+          "package_sha256": "16b089f92192a5b028f51a405418391728491c8df0b651e0ece45447ff1366f2"
+        },
+        {
+          "level": "streaming-probe",
+          "source": "C:\\Users\\hughe\\dev\\DarkLantern64\\content\\streaming_probe.json",
+          "source_file_sha256": "afc8f737f2d72a3143927ee9290ec15703d7dc2ed3757b9b61c0c992d64d24f0",
+          "compiled_source_sha256": "a9fdc82b0e8f8664b3d0edf83abeed87c0a49a13f0257741630c3c2f17faff9f",
+          "partition": "C:\\Users\\hughe\\dev\\DarkLantern64\\content\\streaming_probe.mission.json",
+          "partition_sha256": "6bd18afe4f538555db1881e03feb8f8449498a656cadcd2139b6eff454a0c2c8",
+          "package_sha256": "db46f7dbd700ef2b192ddcc9c512b14e501691275b56165a94043791501cd517"
+        }
+      ]
+    },
+    {
+      "id": "bundle-lifecycle",
+      "build_id": "69e1a94febb31655329186f952730f28b77e9276961b9b69f4ab9ad8c6c8bd85",
+      "rom_sha256": "73fc05757fc07c19fae8db86adca60404776139fe747407beed92630f1efe581",
+      "rom": {
+        "path": ".dev/v5/04503586c8d1/artifacts/builds/bundle-lifecycle/DarkLantern64-p-bundle-lifecycle.z64",
+        "sha256": "73fc05757fc07c19fae8db86adca60404776139fe747407beed92630f1efe581",
+        "bytes": 1622016
+      },
+      "metadata": {
+        "path": ".dev/v5/04503586c8d1/artifacts/builds/bundle-lifecycle/build.json",
+        "sha256": "062bd8228c17a08b7c7be9646c1db8f5a3a4c6de4eccbd08bfd6956452648598",
+        "bytes": 84721358
+      },
+      "runtime_map": {
+        "path": ".dev/v5/04503586c8d1/artifacts/builds/bundle-lifecycle/runtime_debug_map.json",
+        "sha256": "7e5b0029f5fb9b241049b1cbf9063eb5b1e11764fc16c3565ce7b1efdb24e341",
+        "bytes": 31466328
+      },
+      "source_bindings": [
+        {
+          "level": "lantern-store",
+          "source": "C:\\Users\\hughe\\dev\\DarkLantern64\\content\\first_room.json",
+          "source_file_sha256": "c1fb19e6b114fe9fa8459922dcacf55771ed86e2f9feb7ec25fe6aadf2009105",
+          "compiled_source_sha256": "c2f27747ecb4ba71275bdcd3eea92a243f728b822e3ea7bc7d75e072873c61ac"
+        },
+        {
+          "level": "moonlit-yard",
+          "source": "C:\\Users\\hughe\\dev\\DarkLantern64\\content\\moonlit_courtyard.json",
+          "source_file_sha256": "412ec992cefcfc7dc714aeabd0618cfc50e57b22e268fd30c3346bd86a03ff8e",
+          "compiled_source_sha256": "c131d3ec48232b3449166f04a2a77632868760f594f7e79f0dc2bd5f1e3294a9"
+        },
+        {
+          "level": "enemy-workshop",
+          "source": "C:\\Users\\hughe\\dev\\DarkLantern64\\content\\enemy_patrols.json",
+          "source_file_sha256": "26d61c6300b298a6b2d73de2f32030c9759536d490e611d7d7ee2200d89e450d",
+          "compiled_source_sha256": "6925eccf961c2069a2a8dc73d1cc80889ed63d7e4a72c0b0678e675e762a2e13"
+        },
+        {
+          "level": "animation_workshop",
+          "source": "C:\\Users\\hughe\\dev\\DarkLantern64\\content\\animation_workshop.json",
+          "source_file_sha256": "0480ac4b7343b82b1f5c709c93d3496f8fd89ea846315a6b68b96028cb9fb8fd",
+          "compiled_source_sha256": "74ff81f3a3d7281fba6093bca2eba5b5d9ae8165cdb958a1029a63aee7f7a4c0"
+        },
+        {
+          "level": "sponza",
+          "source": "C:\\Users\\hughe\\dev\\DarkLantern64\\content\\sponza_courtyard.json",
+          "source_file_sha256": "4eb23dc17c272397d4c4d3f8bc503fc67b5d3a16ed2f2bddd65c9ad4727fc4ca",
+          "compiled_source_sha256": "7d919d3c4f05418fc32b94bb21261e95a6fc4ab5b6cff6eee4c54a8869b68737"
+        },
+        {
+          "level": "bafford-district",
+          "source": "C:\\Users\\hughe\\dev\\DarkLantern64\\content\\thief_bafford_district.json",
+          "source_file_sha256": "16160232d3051ba95ca0d78fa66bf02522399aa06659199a3c0285c2832fdcbe",
+          "compiled_source_sha256": "236bd4db4d2a58fd4b9052e2e8a2e9c54438f63085ab85749810d2c879cac6cc",
+          "partition": "C:\\Users\\hughe\\dev\\DarkLantern64\\content\\thief_bafford_district.mission.json",
+          "partition_sha256": "2f6aeeb0911aaf4806d8a848f0609c2552621a659df66fb5e78b1125fbd329d0",
+          "package_sha256": "11e59ed82b3fb6711f94a1afc6767fe7d828204d486d767213857a9202823230"
+        },
+        {
+          "level": "bafford-expanded",
+          "source": "C:\\Users\\hughe\\dev\\DarkLantern64\\content\\thief_bafford_expanded.json",
+          "source_file_sha256": "28de709c9d3f199cf21e3651cd234f801b85c19ddc5df27635a28b35cb0e7254",
+          "compiled_source_sha256": "f758d23d05ff897d82f2a32e1b9719a6554bab7797b0d183c293205dfbe7bd2e",
+          "partition": "C:\\Users\\hughe\\dev\\DarkLantern64\\content\\thief_bafford_expanded.mission.json",
+          "partition_sha256": "3846d776855b17a5d051eb1a7c9f23acef19e8fb7891ae1b2f734f07e906176e",
+          "package_sha256": "16b089f92192a5b028f51a405418391728491c8df0b651e0ece45447ff1366f2"
+        },
+        {
+          "level": "streaming-probe",
+          "source": "C:\\Users\\hughe\\dev\\DarkLantern64\\content\\streaming_probe.json",
+          "source_file_sha256": "afc8f737f2d72a3143927ee9290ec15703d7dc2ed3757b9b61c0c992d64d24f0",
+          "compiled_source_sha256": "a9fdc82b0e8f8664b3d0edf83abeed87c0a49a13f0257741630c3c2f17faff9f",
+          "partition": "C:\\Users\\hughe\\dev\\DarkLantern64\\content\\streaming_probe.mission.json",
+          "partition_sha256": "6bd18afe4f538555db1881e03feb8f8449498a656cadcd2139b6eff454a0c2c8",
+          "package_sha256": "db46f7dbd700ef2b192ddcc9c512b14e501691275b56165a94043791501cd517"
+        }
+      ]
+    },
+    {
+      "id": "probe-replay",
+      "build_id": "03c09d6a77e316f4c8e050b11ae5b4717589184b83aac8f0502fc2e8310708b3",
+      "rom_sha256": "43beb2035e3f083f4ba4a17cc8b5c022b7edec2b0832610eb04ce41ddf530a3a",
+      "rom": {
+        "path": ".dev/v5/04503586c8d1/artifacts/builds/probe-replay/DarkLantern64-p-probe-replay.z64",
+        "sha256": "43beb2035e3f083f4ba4a17cc8b5c022b7edec2b0832610eb04ce41ddf530a3a",
+        "bytes": 1622016
+      },
+      "metadata": {
+        "path": ".dev/v5/04503586c8d1/artifacts/builds/probe-replay/build.json",
+        "sha256": "7ebd01be63ddb8ecf7bcbfea640fd1fadbdca561e2d6f0af1dfae4dd59287c74",
+        "bytes": 84723899
+      },
+      "runtime_map": {
+        "path": ".dev/v5/04503586c8d1/artifacts/builds/probe-replay/runtime_debug_map.json",
+        "sha256": "f3441878bc09bb525ece659a9756f1886b593f4eff1211e6b376e373a2f7fee2",
+        "bytes": 31466328
+      },
+      "source_bindings": [
+        {
+          "level": "lantern-store",
+          "source": "C:\\Users\\hughe\\dev\\DarkLantern64\\content\\first_room.json",
+          "source_file_sha256": "c1fb19e6b114fe9fa8459922dcacf55771ed86e2f9feb7ec25fe6aadf2009105",
+          "compiled_source_sha256": "c2f27747ecb4ba71275bdcd3eea92a243f728b822e3ea7bc7d75e072873c61ac"
+        },
+        {
+          "level": "moonlit-yard",
+          "source": "C:\\Users\\hughe\\dev\\DarkLantern64\\content\\moonlit_courtyard.json",
+          "source_file_sha256": "412ec992cefcfc7dc714aeabd0618cfc50e57b22e268fd30c3346bd86a03ff8e",
+          "compiled_source_sha256": "c131d3ec48232b3449166f04a2a77632868760f594f7e79f0dc2bd5f1e3294a9"
+        },
+        {
+          "level": "enemy-workshop",
+          "source": "C:\\Users\\hughe\\dev\\DarkLantern64\\content\\enemy_patrols.json",
+          "source_file_sha256": "26d61c6300b298a6b2d73de2f32030c9759536d490e611d7d7ee2200d89e450d",
+          "compiled_source_sha256": "6925eccf961c2069a2a8dc73d1cc80889ed63d7e4a72c0b0678e675e762a2e13"
+        },
+        {
+          "level": "animation_workshop",
+          "source": "C:\\Users\\hughe\\dev\\DarkLantern64\\content\\animation_workshop.json",
+          "source_file_sha256": "0480ac4b7343b82b1f5c709c93d3496f8fd89ea846315a6b68b96028cb9fb8fd",
+          "compiled_source_sha256": "74ff81f3a3d7281fba6093bca2eba5b5d9ae8165cdb958a1029a63aee7f7a4c0"
+        },
+        {
+          "level": "sponza",
+          "source": "C:\\Users\\hughe\\dev\\DarkLantern64\\content\\sponza_courtyard.json",
+          "source_file_sha256": "4eb23dc17c272397d4c4d3f8bc503fc67b5d3a16ed2f2bddd65c9ad4727fc4ca",
+          "compiled_source_sha256": "7d919d3c4f05418fc32b94bb21261e95a6fc4ab5b6cff6eee4c54a8869b68737"
+        },
+        {
+          "level": "bafford-district",
+          "source": "C:\\Users\\hughe\\dev\\DarkLantern64\\content\\thief_bafford_district.json",
+          "source_file_sha256": "16160232d3051ba95ca0d78fa66bf02522399aa06659199a3c0285c2832fdcbe",
+          "compiled_source_sha256": "236bd4db4d2a58fd4b9052e2e8a2e9c54438f63085ab85749810d2c879cac6cc",
+          "partition": "C:\\Users\\hughe\\dev\\DarkLantern64\\content\\thief_bafford_district.mission.json",
+          "partition_sha256": "2f6aeeb0911aaf4806d8a848f0609c2552621a659df66fb5e78b1125fbd329d0",
+          "package_sha256": "11e59ed82b3fb6711f94a1afc6767fe7d828204d486d767213857a9202823230"
+        },
+        {
+          "level": "bafford-expanded",
+          "source": "C:\\Users\\hughe\\dev\\DarkLantern64\\content\\thief_bafford_expanded.json",
+          "source_file_sha256": "28de709c9d3f199cf21e3651cd234f801b85c19ddc5df27635a28b35cb0e7254",
+          "compiled_source_sha256": "f758d23d05ff897d82f2a32e1b9719a6554bab7797b0d183c293205dfbe7bd2e",
+          "partition": "C:\\Users\\hughe\\dev\\DarkLantern64\\content\\thief_bafford_expanded.mission.json",
+          "partition_sha256": "3846d776855b17a5d051eb1a7c9f23acef19e8fb7891ae1b2f734f07e906176e",
+          "package_sha256": "16b089f92192a5b028f51a405418391728491c8df0b651e0ece45447ff1366f2"
+        },
+        {
+          "level": "streaming-probe",
+          "source": "C:\\Users\\hughe\\dev\\DarkLantern64\\content\\streaming_probe.json",
+          "source_file_sha256": "afc8f737f2d72a3143927ee9290ec15703d7dc2ed3757b9b61c0c992d64d24f0",
+          "compiled_source_sha256": "a9fdc82b0e8f8664b3d0edf83abeed87c0a49a13f0257741630c3c2f17faff9f",
+          "partition": "C:\\Users\\hughe\\dev\\DarkLantern64\\content\\streaming_probe.mission.json",
+          "partition_sha256": "6bd18afe4f538555db1881e03feb8f8449498a656cadcd2139b6eff454a0c2c8",
+          "package_sha256": "db46f7dbd700ef2b192ddcc9c512b14e501691275b56165a94043791501cd517"
+        }
+      ]
+    }
+  ],
+  "host_artifacts": {
+    "editor": {
+      "original": "C:\\Users\\hughe\\_bazel_hughe\\nw7efple\\execroot\\_main\\bazel-out\\x64_windows-fastbuild\\bin\\darklantern64_project_editor.exe",
+      "executable": "C:\\Users\\hughe\\dev\\DarkLantern64\\.dev\\v5\\04503586c8d1\\artifacts\\host\\darklantern64_project_editor.exe",
+      "sha256": "eb17957996cfad85ce5d9b4d4203d7c2017754f8fd2e8d9c00449ff79cbdcce3",
+      "pipeline_source_sha256": "e9d9694e03a41ff82d623f0c3bc41f38d40fdefc3f4d6e480105d7f0965faf59"
+    },
+    "runner": {
+      "original": "C:\\Users\\hughe\\_bazel_hughe\\nw7efple\\execroot\\_main\\bazel-out\\x64_windows-fastbuild\\bin\\play_runner.exe",
+      "executable": "C:\\Users\\hughe\\dev\\DarkLantern64\\.dev\\v5\\04503586c8d1\\artifacts\\host\\play_runner.exe",
+      "sha256": "f5fd1a709baf14ee6860003d6b8b50a6e59c2f54d73ee7a62fbdeb6a9bc94b65",
+      "pipeline_source_sha256": "e9d9694e03a41ff82d623f0c3bc41f38d40fdefc3f4d6e480105d7f0965faf59"
+    }
+  },
+  "generic_replay": {
+    "native_passed": true,
+    "rom_parity_passed": true,
+    "ticks": 1070,
+    "expectations": [
+      {
+        "id": "not-caught",
+        "passed": true,
+        "samples": 1070,
+        "select": "all",
+        "field": "caught",
+        "op": "eq"
+      },
+      {
+        "id": "three-working-views",
+        "passed": true,
+        "samples": 1070,
+        "select": "all",
+        "field": "stream.published_mask",
+        "op": "contains_all"
+      },
+      {
+        "id": "repeated-publication",
+        "passed": true,
+        "samples": 1070,
+        "select": "all",
+        "field": "stream.published_mask",
+        "op": "min_changes"
+      },
+      {
+        "id": "loot-collected",
+        "passed": true,
+        "samples": 1070,
+        "select": "all",
+        "field": "loot_value",
+        "op": "any_gt"
+      },
+      {
+        "id": "loot-persists",
+        "passed": true,
+        "samples": 694,
+        "select": "after_match_until_input",
+        "field": "loot_value",
+        "op": "constant"
+      },
+      {
+        "id": "retirement-after-loot",
+        "passed": true,
+        "samples": 694,
+        "select": "after_match_until_input",
+        "field": "stream.published_mask",
+        "op": "contains_all"
+      },
+      {
+        "id": "restart-clears-loot",
+        "passed": true,
+        "samples": 1,
+        "select": "final",
+        "field": "loot_value",
+        "op": "eq"
+      },
+      {
+        "id": "restart-closes-door",
+        "passed": true,
+        "samples": 1,
+        "select": "final",
+        "field": "door_open",
+        "op": "eq"
+      }
+    ],
+    "numeric_tolerance": 0.002,
+    "package_sha256": "db46f7dbd700ef2b192ddcc9c512b14e501691275b56165a94043791501cd517",
+    "fingerprint": "dbf18a653b969522490672c57aae46c88e5fc1d013a11e532c5e9cfd5b4eef6c",
+    "replay_sha256": "80cf688347dfa0b7549c817e8a06a63e62f26570a1044080cb5bc7bcdc259625",
+    "route_sha256": "cb36eb55b24587c726843698e0a7601f6837f6d928a6971a62accf943408aba5",
+    "stream_boundary": "settled",
+    "timing_accepted": false
+  },
+  "strict": {
+    "passed": true,
+    "accepted": true,
+    "complete": true,
+    "frames": 3463,
+    "limits": {
+      "frame_ms": 33.333333333333336,
+      "service_cpu_ms": 8
+    },
+    "maximum_frame_ms": 32.0464,
+    "maximum_interval_ms": 32.322026666666666,
+    "maximum_service_cpu_ms": 7.990485333333333,
+    "dropped_ticks": 0,
+    "blocked_ticks": 0,
+    "loading_wait_frames": 0,
+    "guest_audio_continuity_passed": true,
+    "host_audio_output": "disabled",
+    "scope": "Complete Ares continuous wall-time workload, unchanged strict maxima; original hardware unverified",
+    "result": {
+      "path": ".dev/v5/04503586c8d1/artifacts/nodes/district-strict/result.json",
+      "sha256": "c3cca5a7f95e21019fc7c4754f37343cbd3aca89b3e43e50483a053d1655ce6e",
+      "bytes": 111554
+    }
+  },
+  "attempts": [
+    {
+      "run_id": "65e8a3c5ae56",
+      "summary": {
+        "path": ".dev/v5/65e8a3c5ae56/summary.json",
+        "sha256": "3ef2487efd1c4132f14e5b0e0d319fd04bd4e01273b5f4e9c5b1561967a0e5d6",
+        "bytes": 1325781
+      },
+      "status": "incomplete",
+      "full_acceptance": false,
+      "selected_scope_accepted": false,
+      "source_sha256": "10317482b348bc2a4b1886640f205c211ff03b0308984803737d1d727ef08821",
+      "manifest_sha256": "bd38e9b902898064792c626c656b4e85bd30b416b1e1904e0312205f0773adf6",
+      "error": "Agent stopped this owned attempt to repair interim-publication and concurrent-publisher races; partial evidence retained",
+      "node_statuses": [
+        {
+          "id": "portable-python",
+          "status": "failed",
+          "accepted": false,
+          "reason": "Unlisted test failure",
+          "result": {
+            "path": ".dev/v5/65e8a3c5ae56/artifacts/nodes/portable-python/result.json",
+            "sha256": "32b3ff4c2b456ce8b0660ba51e78a81fd3b1c1f2c7aea7ca502127cc90f29bf7",
+            "bytes": 5284
+          }
+        },
+        {
+          "id": "portable-c",
+          "status": "incomplete",
+          "accepted": false,
+          "reason": "Owned pipeline stopped to fix publication races",
+          "result": {
+            "path": ".dev/v5/65e8a3c5ae56/artifacts/nodes/portable-c/result.json",
+            "sha256": "1567f2b4bac43982c9cefac36505012c296c2b59448207f14ef87a92b4b14ef4",
+            "bytes": 789
+          }
+        }
+      ],
+      "python": {
+        "tests_run": 612,
+        "tested_passes": 607,
+        "failures": [
+          {
+            "id": "test_project_levels.ProjectLevelTests.test_missing_native_stream_cooker_keeps_source_editable_with_error_status",
+            "message": "Traceback (most recent call last):\n  File \"C:\\Users\\hughe\\dev\\DarkLantern64\\tests\\test_project_levels.py\", line 465, in test_missing_native_stream_cooker_keeps_source_editable_with_error_status\n    self.assertFalse(entry[\"streaming\"][\"status\"][\"valid\"])\nAssertionError: True is not false\n",
+            "known": false
+          },
+          {
+            "id": "test_lighting_diagnostics_fixtures.LightingDiagnosticsFixtureTests.test_over_capacity_portable_cook_retains_actionable_source_witnesses",
+            "message": "Traceback (most recent call last):\n  File \"C:\\Users\\hughe\\dev\\DarkLantern64\\tests\\test_lighting_diagnostics_fixtures.py\", line 108, in test_over_capacity_portable_cook_retains_actionable_source_witnesses\n    validate_stream_bridge(report)\n  File \"C:\\Users\\hughe\\dev\\DarkLantern64\\tools\\compile_mission.py\", line 768, in validate_stream_bridge\n    level.require(diagnostics_report[\"valid\"], diagnostics_report[\"failures\"][0][\"message\"] if diagnostics_report[\"failures\"] else \"Invalid stream bridge\")\n  File \"C:\\Users\\hughe\\dev\\DarkLantern64\\tools\\compile_level.py\", line 62, in require\n    raise ContentError(message)\ncompile_level.ContentError: Working set courtyard,hub from courtyard: at most 1440 resident static triangles\n",
+            "known": false
+          },
+          {
+            "id": "test_sponza_physics.AuthoredSponzaPhysics.test_actual_core_traverses_authored_stairs_and_respects_stacked_floors",
+            "message": "Traceback (most recent call last):\n  File \"C:\\Users\\hughe\\dev\\DarkLantern64\\tests\\test_sponza_physics.py\", line 11, in test_actual_core_traverses_authored_stairs_and_respects_stacked_floors\n    report = verify(Path(directory), ROOT / \"content/sponza_courtyard.json\")\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\hughe\\dev\\DarkLantern64\\tools\\verify_sponza_physics.py\", line 93, in verify\n    report = fixture(output, level=level)\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\hughe\\dev\\DarkLantern64\\tools\\verify_sponza_physics.py\", line 32, in fixture\n    raise ValueError(\"Level collision differs from geometry: \" + row[\"id\"])\nValueError: Level collision differs from geometry: sponza-collision-parapet-north\n",
+            "known": true
+          }
+        ],
+        "skipped_tests": [
+          {
+            "id": "test_project_levels.ProjectLevelTests.test_symlink_sources_and_output_escapes_are_rejected",
+            "message": "Symlink creation unavailable: [WinError 1314] A required privilege is not held by the client: 'C:\\\\Users\\\\hughe\\\\dev\\\\DarkLantern64\\\\build\\\\project-level-test-wzo7inmc-outside.json' -> 'C:\\\\Users\\\\hughe\\\\dev\\\\DarkLantern64\\\\build\\\\project-level-test-wzo7inmc\\\\content\\\\linked.json'",
+            "declared": false
+          },
+          {
+            "id": "test_thief_objects.InstalledThiefObjectsTests.test_bafford_placements_and_loot_total",
+            "message": "Set DL_THIEF_GOLD to verify locally installed source assets",
+            "declared": true
+          }
+        ]
+      },
+      "execution_scope": "Controlled incomplete attempt; not acceptance"
+    },
+    {
+      "run_id": "76edb221877c",
+      "summary": {
+        "path": ".dev/v5/76edb221877c/summary.json",
+        "sha256": "172c7b3fc7e8786619ac7586d922dc33387a9d5be97c3bc3688c08765f2f6477",
+        "bytes": 1339195
+      },
+      "status": "incomplete",
+      "full_acceptance": false,
+      "selected_scope_accepted": false,
+      "source_sha256": "36486bc9c4cad212d2255407296de3fcb946a4e2401e37e6cb8dfdb419395a3e",
+      "manifest_sha256": "daf6ce8cf1eabe2991476e6684f8d13e8c9c24cce7ba11b40e07204e2245204e",
+      "error": "Agent stopped owned attempt to fix observed Windows atomic-publication sharing violation; prior failures and partial evidence retained",
+      "node_statuses": [
+        {
+          "id": "portable-python",
+          "status": "failed",
+          "accepted": false,
+          "reason": "Unlisted test failure",
+          "result": {
+            "path": ".dev/v5/76edb221877c/artifacts/nodes/portable-python/result.json",
+            "sha256": "3c006ac9ac6e9f29bc1c779a4e3cff47a211bddd1baac72bedf7dac1ef2f83ae",
+            "bytes": 4436
+          }
+        },
+        {
+          "id": "portable-c",
+          "status": "passed",
+          "accepted": true,
+          "reason": null,
+          "result": {
+            "path": ".dev/v5/76edb221877c/artifacts/nodes/portable-c/result.json",
+            "sha256": "f59bcf091d9a3f26063e790f28a32ae0fef9bc9f08c9f39b3e4e451f9b95bfe9",
+            "bytes": 1289
+          }
+        },
+        {
+          "id": "host-build",
+          "status": "passed",
+          "accepted": true,
+          "reason": null,
+          "result": {
+            "path": ".dev/v5/76edb221877c/artifacts/nodes/host-build/result.json",
+            "sha256": "b6707dd66a2198326ac5ba48166b0ee845637164e8e54dfe8298069fd0b27827",
+            "bytes": 1385
+          }
+        },
+        {
+          "id": "editor-tests",
+          "status": "passed",
+          "accepted": true,
+          "reason": null,
+          "result": {
+            "path": ".dev/v5/76edb221877c/artifacts/nodes/editor-tests/result.json",
+            "sha256": "3be07fea723ab37094da8791f8ae1d3fcad6d520659af1738dc4b742fd961d85",
+            "bytes": 1424
+          }
+        },
+        {
+          "id": "native-metadata",
+          "status": "passed",
+          "accepted": true,
+          "reason": null,
+          "result": {
+            "path": ".dev/v5/76edb221877c/artifacts/nodes/native-metadata/result.json",
+            "sha256": "ac4e3139a1ebfa1acc55cf9e286fe17bae488a0d2c76fb51b81af9d146efff02",
+            "bytes": 8657
+          }
+        },
+        {
+          "id": "editor-authoring-preview",
+          "status": "incomplete",
+          "accepted": false,
+          "reason": "Owned attempt stopped to fix Windows publication sharing violation",
+          "result": {
+            "path": ".dev/v5/76edb221877c/artifacts/nodes/editor-authoring-preview/result.json",
+            "sha256": "9f83285d32117e88285212ac553c7a47e46848231251d12b5f9745db86d4456a",
+            "bytes": 848
+          }
+        }
+      ],
+      "python": {
+        "tests_run": 617,
+        "tested_passes": 613,
+        "failures": [
+          {
+            "id": "test_validation_pipeline.ValidationPipelineTests.test_concurrent_json_writers_use_distinct_atomic_staging_files",
+            "message": "Traceback (most recent call last):\n  File \"C:\\Users\\hughe\\dev\\DarkLantern64\\tests\\test_validation_pipeline.py\", line 353, in test_concurrent_json_writers_use_distinct_atomic_staging_files\n    self.assertEqual(failures, [])\nAssertionError: Lists differ: [PermissionError(13, 'Access is denied')] != []\n\nFirst list contains 1 additional elements.\nFirst extra element 0:\nPermissionError(13, 'Access is denied')\n\n- [PermissionError(13, 'Access is denied')]\n+ []\n",
+            "known": false
+          },
+          {
+            "id": "test_sponza_physics.AuthoredSponzaPhysics.test_actual_core_traverses_authored_stairs_and_respects_stacked_floors",
+            "message": "Traceback (most recent call last):\n  File \"C:\\Users\\hughe\\dev\\DarkLantern64\\tests\\test_sponza_physics.py\", line 11, in test_actual_core_traverses_authored_stairs_and_respects_stacked_floors\n    report = verify(Path(directory), ROOT / \"content/sponza_courtyard.json\")\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\hughe\\dev\\DarkLantern64\\tools\\verify_sponza_physics.py\", line 93, in verify\n    report = fixture(output, level=level)\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\hughe\\dev\\DarkLantern64\\tools\\verify_sponza_physics.py\", line 32, in fixture\n    raise ValueError(\"Level collision differs from geometry: \" + row[\"id\"])\nValueError: Level collision differs from geometry: sponza-collision-parapet-north\n",
+            "known": true
+          }
+        ],
+        "skipped_tests": [
+          {
+            "id": "test_project_levels.ProjectLevelTests.test_symlink_sources_and_output_escapes_are_rejected",
+            "message": "Symlink creation unavailable: [WinError 1314] A required privilege is not held by the client: 'C:\\\\Users\\\\hughe\\\\dev\\\\DarkLantern64\\\\build\\\\project-level-test-vuncoj9u-outside.json' -> 'C:\\\\Users\\\\hughe\\\\dev\\\\DarkLantern64\\\\build\\\\project-level-test-vuncoj9u\\\\content\\\\linked.json'",
+            "declared": true
+          },
+          {
+            "id": "test_thief_objects.InstalledThiefObjectsTests.test_bafford_placements_and_loot_total",
+            "message": "Set DL_THIEF_GOLD to verify locally installed source assets",
+            "declared": true
+          }
+        ]
+      },
+      "execution_scope": "Controlled incomplete attempt; not acceptance"
+    },
+    {
+      "run_id": "413c1834f917",
+      "summary": {
+        "path": ".dev/v5/413c1834f917/summary.json",
+        "sha256": "2865f4a0b210d2f4990f4c6494a107882a0da5f163aa66d282d54f060cd21ced",
+        "bytes": 5860532
+      },
+      "status": "failed_or_incomplete",
+      "full_acceptance": false,
+      "selected_scope_accepted": false,
+      "source_sha256": "a1217a1ca1088514a0bf1b6066149da42d2b5e7cc5f71f18333ec00ac8594525",
+      "manifest_sha256": "daf6ce8cf1eabe2991476e6684f8d13e8c9c24cce7ba11b40e07204e2245204e",
+      "error": null,
+      "node_statuses": [
+        {
+          "id": "portable-python",
+          "status": "known_failure",
+          "accepted": true,
+          "reason": "Exact declared fixture failure retained",
+          "result": {
+            "path": ".dev/v5/413c1834f917/artifacts/nodes/portable-python/result.json",
+            "sha256": "4f8e7484d598ad49331d8f2902ddc15ae6bed4da0135e5d311b587164bfde393",
+            "bytes": 3809
+          }
+        },
+        {
+          "id": "portable-c",
+          "status": "passed",
+          "accepted": true,
+          "reason": null,
+          "result": {
+            "path": ".dev/v5/413c1834f917/artifacts/nodes/portable-c/result.json",
+            "sha256": "dc2225896aa2ea1e049a2f42c76e2cf2493aa30af3aa55336a773017e135fed6",
+            "bytes": 1289
+          }
+        },
+        {
+          "id": "host-build",
+          "status": "passed",
+          "accepted": true,
+          "reason": null,
+          "result": {
+            "path": ".dev/v5/413c1834f917/artifacts/nodes/host-build/result.json",
+            "sha256": "6cd36a32f20b15ab89f26f4c13a64b1c77fd9a79a357dc48d257523ec1286ac3",
+            "bytes": 1385
+          }
+        },
+        {
+          "id": "editor-tests",
+          "status": "passed",
+          "accepted": true,
+          "reason": null,
+          "result": {
+            "path": ".dev/v5/413c1834f917/artifacts/nodes/editor-tests/result.json",
+            "sha256": "b212037fbbb8980e6d10feb501edc029797bca7a5e16e9cb15e139792d8dde1a",
+            "bytes": 1424
+          }
+        },
+        {
+          "id": "native-metadata",
+          "status": "passed",
+          "accepted": true,
+          "reason": null,
+          "result": {
+            "path": ".dev/v5/413c1834f917/artifacts/nodes/native-metadata/result.json",
+            "sha256": "2624a4dcebfb0e43ba4753542cb338e35dc79d5a3c702525a6558b715f55ffc9",
+            "bytes": 8658
+          }
+        },
+        {
+          "id": "editor-authoring-preview",
+          "status": "failed",
+          "accepted": false,
+          "reason": "Command did not emit a final JSON result",
+          "result": {
+            "path": ".dev/v5/413c1834f917/artifacts/nodes/editor-authoring-preview/result.json",
+            "sha256": "12e70ea2356624ed26f2dde09f08b908ef93370fddaae58be8d2a06a376125cc",
+            "bytes": 1480
+          }
+        },
+        {
+          "id": "editor-render-diagnostics",
+          "status": "passed",
+          "accepted": true,
+          "reason": null,
+          "result": {
+            "path": ".dev/v5/413c1834f917/artifacts/nodes/editor-render-diagnostics/result.json",
+            "sha256": "f68a4e73c2f898f257435ddc101fad331ea25c8d1073526e7632bdfe1a302e47",
+            "bytes": 3691333
+          }
+        },
+        {
+          "id": "editor-native-play",
+          "status": "passed",
+          "accepted": true,
+          "reason": null,
+          "result": {
+            "path": ".dev/v5/413c1834f917/artifacts/nodes/editor-native-play/result.json",
+            "sha256": "90adf1dd1c3e4c15197be6287b66815b0480dc0eb2e123cba3267f97d48f02c3",
+            "bytes": 3292
+          }
+        },
+        {
+          "id": "bundle-idle",
+          "status": "passed",
+          "accepted": true,
+          "reason": null,
+          "result": {
+            "path": ".dev/v5/413c1834f917/artifacts/nodes/bundle-idle/result.json",
+            "sha256": "6887565f70687d29d1be7bf708c9982aa2bc783264162837d12a7a6f2bf5d2a2",
+            "bytes": 6849
+          }
+        },
+        {
+          "id": "district-ordinary",
+          "status": "passed",
+          "accepted": true,
+          "reason": null,
+          "result": {
+            "path": ".dev/v5/413c1834f917/artifacts/nodes/district-ordinary/result.json",
+            "sha256": "d7a2325e8a4e0da5b94b70460653ac7e9154beaf660c9b5b93c073d8e324f4cf",
+            "bytes": 6933
+          }
+        },
+        {
+          "id": "district-performance",
+          "status": "passed",
+          "accepted": true,
+          "reason": null,
+          "result": {
+            "path": ".dev/v5/413c1834f917/artifacts/nodes/district-performance/result.json",
+            "sha256": "2c2492b9b89b0873adb7da6e2ce4e36e29b5c7741f7772cd673483a0cdc02d92",
+            "bytes": 6974
+          }
+        },
+        {
+          "id": "district-capture",
+          "status": "passed",
+          "accepted": true,
+          "reason": null,
+          "result": {
+            "path": ".dev/v5/413c1834f917/artifacts/nodes/district-capture/result.json",
+            "sha256": "a6e620da4ddb4ca4c388f4d489ecd2f381b340cb66bc2fb7f0388adab3b92508",
+            "bytes": 6918
+          }
+        },
+        {
+          "id": "bundle-lifecycle",
+          "status": "passed",
+          "accepted": true,
+          "reason": null,
+          "result": {
+            "path": ".dev/v5/413c1834f917/artifacts/nodes/bundle-lifecycle/result.json",
+            "sha256": "c9bc2c2b7f6a57ab065660111824aa58093292f593ea111996e8ae53e6c683d7",
+            "bytes": 6918
+          }
+        },
+        {
+          "id": "probe-functional",
+          "status": "passed",
+          "accepted": true,
+          "reason": null,
+          "result": {
+            "path": ".dev/v5/413c1834f917/artifacts/nodes/probe-functional/result.json",
+            "sha256": "d472967080fb9d76bf45f07f9cd245767b6d36844001e79fc89d8d44c2644f82",
+            "bytes": 5662
+          }
+        },
+        {
+          "id": "probe-replay",
+          "status": "passed",
+          "accepted": true,
+          "reason": null,
+          "result": {
+            "path": ".dev/v5/413c1834f917/artifacts/nodes/probe-replay/result.json",
+            "sha256": "134181b7c130364b0f87c37666e606dbc9d2058cd639922b606765a9faaf191e",
+            "bytes": 6863
+          }
+        },
+        {
+          "id": "district-no-diagnostics",
+          "status": "skipped",
+          "accepted": false,
+          "reason": "Optional comparison not selected",
+          "result": {
+            "path": ".dev/v5/413c1834f917/artifacts/nodes/district-no-diagnostics/result.json",
+            "sha256": "a23f622977e00d4ea06872ddc3a4b1f573909dfbfd2c1353a59dc15c0c206294",
+            "bytes": 552
+          }
+        },
+        {
+          "id": "probe-rom-parity",
+          "status": "failed",
+          "accepted": false,
+          "reason": "Replay expectation failed: not-caught, restart-closes-door",
+          "result": {
+            "path": ".dev/v5/413c1834f917/artifacts/nodes/probe-rom-parity/result.json",
+            "sha256": "cdf5525439f5342e1875e480c7357cf539b278ac44494eeb8b602e08c3a1fbad",
+            "bytes": 12008
+          }
+        },
+        {
+          "id": "menu-idle",
+          "status": "passed",
+          "accepted": true,
+          "reason": null,
+          "result": {
+            "path": ".dev/v5/413c1834f917/artifacts/nodes/menu-idle/result.json",
+            "sha256": "5c2d3c5a448577a65b9b7bb6a661871b3be6b55ac6efed2f5051f927f00dd7c0",
+            "bytes": 10685
+          }
+        },
+        {
+          "id": "menu-4mb",
+          "status": "passed",
+          "accepted": true,
+          "reason": null,
+          "result": {
+            "path": ".dev/v5/413c1834f917/artifacts/nodes/menu-4mb/result.json",
+            "sha256": "930c81349c403ac32a451eaf791898698b47d0e128545cfc719b46888ec96447",
+            "bytes": 10731
+          }
+        },
+        {
+          "id": "menu-lifecycle",
+          "status": "passed",
+          "accepted": true,
+          "reason": null,
+          "result": {
+            "path": ".dev/v5/413c1834f917/artifacts/nodes/menu-lifecycle/result.json",
+            "sha256": "e4178487b4902f5158ae0332ff9e7f7cea4a47b683e36a3739a1c8167016b662",
+            "bytes": 19373
+          }
+        },
+        {
+          "id": "district-functional",
+          "status": "passed",
+          "accepted": true,
+          "reason": null,
+          "result": {
+            "path": ".dev/v5/413c1834f917/artifacts/nodes/district-functional/result.json",
+            "sha256": "0726412396904c537d18b5cceb8d7f7756ed2d8679f28efec11b7a491da2e74e",
+            "bytes": 65872
+          }
+        },
+        {
+          "id": "district-strict",
+          "status": "passed",
+          "accepted": true,
+          "reason": null,
+          "result": {
+            "path": ".dev/v5/413c1834f917/artifacts/nodes/district-strict/result.json",
+            "sha256": "52c9adbab922f821c803a2a02d0dc2bae054b78d727eaeafa8d4e617016cf8cb",
+            "bytes": 111562
+          }
+        },
+        {
+          "id": "district-views",
+          "status": "passed",
+          "accepted": true,
+          "reason": null,
+          "result": {
+            "path": ".dev/v5/413c1834f917/artifacts/nodes/district-views/result.json",
+            "sha256": "10699706a0c1154d4a0dcbfe442178e2d02a71d9a347f01ec7623ea8e02062e3",
+            "bytes": 67284
+          }
+        },
+        {
+          "id": "district-diagnostics-counterfactual",
+          "status": "skipped",
+          "accepted": false,
+          "reason": "Optional comparison not selected",
+          "result": {
+            "path": ".dev/v5/413c1834f917/artifacts/nodes/district-diagnostics-counterfactual/result.json",
+            "sha256": "4ace75a947d4e4c2a14d7bb3c40068b6c25928ce0dd4e755fa5218bef9701158",
+            "bytes": 587
+          }
+        }
+      ],
+      "python": {
+        "tests_run": 619,
+        "tested_passes": 616,
+        "failures": [
+          {
+            "id": "test_sponza_physics.AuthoredSponzaPhysics.test_actual_core_traverses_authored_stairs_and_respects_stacked_floors",
+            "message": "Traceback (most recent call last):\n  File \"C:\\Users\\hughe\\dev\\DarkLantern64\\tests\\test_sponza_physics.py\", line 11, in test_actual_core_traverses_authored_stairs_and_respects_stacked_floors\n    report = verify(Path(directory), ROOT / \"content/sponza_courtyard.json\")\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\hughe\\dev\\DarkLantern64\\tools\\verify_sponza_physics.py\", line 93, in verify\n    report = fixture(output, level=level)\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\hughe\\dev\\DarkLantern64\\tools\\verify_sponza_physics.py\", line 32, in fixture\n    raise ValueError(\"Level collision differs from geometry: \" + row[\"id\"])\nValueError: Level collision differs from geometry: sponza-collision-parapet-north\n",
+            "known": true
+          }
+        ],
+        "skipped_tests": [
+          {
+            "id": "test_project_levels.ProjectLevelTests.test_symlink_sources_and_output_escapes_are_rejected",
+            "message": "Symlink creation unavailable: [WinError 1314] A required privilege is not held by the client: 'C:\\\\Users\\\\hughe\\\\dev\\\\DarkLantern64\\\\build\\\\project-level-test-jsyveylh-outside.json' -> 'C:\\\\Users\\\\hughe\\\\dev\\\\DarkLantern64\\\\build\\\\project-level-test-jsyveylh\\\\content\\\\linked.json'",
+            "declared": true
+          },
+          {
+            "id": "test_thief_objects.InstalledThiefObjectsTests.test_bafford_placements_and_loot_total",
+            "message": "Set DL_THIEF_GOLD to verify locally installed source assets",
+            "declared": true
+          }
+        ]
+      },
+      "strict": {
+        "passed": true,
+        "accepted": true,
+        "complete": true,
+        "frames": 3463,
+        "limits": {
+          "frame_ms": 33.333333333333336,
+          "service_cpu_ms": 8
+        },
+        "maximum_frame_ms": 32.064192,
+        "maximum_interval_ms": 32.332288,
+        "maximum_service_cpu_ms": 7.99008,
+        "dropped_ticks": 0,
+        "blocked_ticks": 0,
+        "loading_wait_frames": 0,
+        "guest_audio_continuity_passed": true,
+        "host_audio_output": "disabled",
+        "scope": "Complete Ares continuous wall-time workload, unchanged strict maxima; original hardware unverified",
+        "result": {
+          "path": ".dev/v5/413c1834f917/artifacts/nodes/district-strict/result.json",
+          "sha256": "52c9adbab922f821c803a2a02d0dc2bae054b78d727eaeafa8d4e617016cf8cb",
+          "bytes": 111562
+        }
+      },
+      "execution_scope": "Complete execution with two verifier failures; not acceptance"
+    },
+    {
+      "run_id": "04503586c8d1",
+      "summary": {
+        "path": ".dev/v5/04503586c8d1/summary.json",
+        "sha256": "b8ba8812c3326a27be6ccf63f44f2040d12f80962a462d0d7183a8bfd7d3d04e",
+        "bytes": 5866532
+      },
+      "status": "accepted_with_known_fixture_failures",
+      "full_acceptance": true,
+      "selected_scope_accepted": true,
+      "source_sha256": "e9d9694e03a41ff82d623f0c3bc41f38d40fdefc3f4d6e480105d7f0965faf59",
+      "manifest_sha256": "daf6ce8cf1eabe2991476e6684f8d13e8c9c24cce7ba11b40e07204e2245204e",
+      "error": null,
+      "node_statuses": [
+        {
+          "id": "portable-python",
+          "status": "known_failure",
+          "accepted": true,
+          "reason": "Exact declared fixture failure retained",
+          "result": {
+            "path": ".dev/v5/04503586c8d1/artifacts/nodes/portable-python/result.json",
+            "sha256": "ec0cf5944b9ebc11864ab4def5f81e565f9ed9cab2803f1dc14f9f48f662365a",
+            "bytes": 3810
+          }
+        },
+        {
+          "id": "portable-c",
+          "status": "passed",
+          "accepted": true,
+          "reason": null,
+          "result": {
+            "path": ".dev/v5/04503586c8d1/artifacts/nodes/portable-c/result.json",
+            "sha256": "bd2baac445f94cde3c08d690ccc85a47c1a17cec55d8b032dbb02e03103f73ec",
+            "bytes": 1289
+          }
+        },
+        {
+          "id": "host-build",
+          "status": "passed",
+          "accepted": true,
+          "reason": null,
+          "result": {
+            "path": ".dev/v5/04503586c8d1/artifacts/nodes/host-build/result.json",
+            "sha256": "c85fedfde6b812581288a9dc81bee1ac848cd4ae6572f6e6d4b8386fe3ee8bfd",
+            "bytes": 1386
+          }
+        },
+        {
+          "id": "editor-tests",
+          "status": "passed",
+          "accepted": true,
+          "reason": null,
+          "result": {
+            "path": ".dev/v5/04503586c8d1/artifacts/nodes/editor-tests/result.json",
+            "sha256": "e79d65a13fcf6960e360e5235ef9ee03a1ad29274954b59f95c3ce809992328a",
+            "bytes": 1425
+          }
+        },
+        {
+          "id": "native-metadata",
+          "status": "passed",
+          "accepted": true,
+          "reason": null,
+          "result": {
+            "path": ".dev/v5/04503586c8d1/artifacts/nodes/native-metadata/result.json",
+            "sha256": "dd99b9b14e75cae97a8ea2692f30c006da5bdea3d739c063796997f297bb0fac",
+            "bytes": 8658
+          }
+        },
+        {
+          "id": "editor-authoring-preview",
+          "status": "passed",
+          "accepted": true,
+          "reason": null,
+          "result": {
+            "path": ".dev/v5/04503586c8d1/artifacts/nodes/editor-authoring-preview/result.json",
+            "sha256": "509299bf5c6a697d302c8c5ee55e52ed44dacbfb86fa4f70cede6a01d250541b",
+            "bytes": 4427
+          }
+        },
+        {
+          "id": "editor-render-diagnostics",
+          "status": "passed",
+          "accepted": true,
+          "reason": null,
+          "result": {
+            "path": ".dev/v5/04503586c8d1/artifacts/nodes/editor-render-diagnostics/result.json",
+            "sha256": "822ee4affdde2cf9ca922af82cab4ba558caf4b37b4a9fd8c4f65ca264cc065e",
+            "bytes": 3691333
+          }
+        },
+        {
+          "id": "editor-native-play",
+          "status": "passed",
+          "accepted": true,
+          "reason": null,
+          "result": {
+            "path": ".dev/v5/04503586c8d1/artifacts/nodes/editor-native-play/result.json",
+            "sha256": "1802fcdefa2fe1f7669745c721542befb881683ae26caad291f4cf1dfc203de6",
+            "bytes": 3292
+          }
+        },
+        {
+          "id": "bundle-idle",
+          "status": "passed",
+          "accepted": true,
+          "reason": null,
+          "result": {
+            "path": ".dev/v5/04503586c8d1/artifacts/nodes/bundle-idle/result.json",
+            "sha256": "d2c7792ec4a825857825b43e05d752dccccc0a63d6d5107c89989a4ca99ece2a",
+            "bytes": 6849
+          }
+        },
+        {
+          "id": "district-ordinary",
+          "status": "passed",
+          "accepted": true,
+          "reason": null,
+          "result": {
+            "path": ".dev/v5/04503586c8d1/artifacts/nodes/district-ordinary/result.json",
+            "sha256": "6695095a9fcc1871f7c8f37980857767e1d9eedc9c2f78aef23f4599b6fd97fb",
+            "bytes": 6933
+          }
+        },
+        {
+          "id": "district-performance",
+          "status": "passed",
+          "accepted": true,
+          "reason": null,
+          "result": {
+            "path": ".dev/v5/04503586c8d1/artifacts/nodes/district-performance/result.json",
+            "sha256": "0086c1fd1842239377f014dff25ce5545d2ce51f0e5ca1efb6fba295937292d4",
+            "bytes": 6975
+          }
+        },
+        {
+          "id": "district-capture",
+          "status": "passed",
+          "accepted": true,
+          "reason": null,
+          "result": {
+            "path": ".dev/v5/04503586c8d1/artifacts/nodes/district-capture/result.json",
+            "sha256": "fac52526ae4c4cccb8f3b6a2eecc15e2a3b9d42f47c72f309b164e6ac12187b0",
+            "bytes": 6918
+          }
+        },
+        {
+          "id": "bundle-lifecycle",
+          "status": "passed",
+          "accepted": true,
+          "reason": null,
+          "result": {
+            "path": ".dev/v5/04503586c8d1/artifacts/nodes/bundle-lifecycle/result.json",
+            "sha256": "a17202eba25038c30fa44af28f23b983e422290aa483d6281b3fa50c8bd9f24f",
+            "bytes": 6919
+          }
+        },
+        {
+          "id": "probe-functional",
+          "status": "passed",
+          "accepted": true,
+          "reason": null,
+          "result": {
+            "path": ".dev/v5/04503586c8d1/artifacts/nodes/probe-functional/result.json",
+            "sha256": "3b8cbb7c2e4d3eebacf859b4fff59dc076e7d0380b29cb2370638a67019173ee",
+            "bytes": 5662
+          }
+        },
+        {
+          "id": "probe-replay",
+          "status": "passed",
+          "accepted": true,
+          "reason": null,
+          "result": {
+            "path": ".dev/v5/04503586c8d1/artifacts/nodes/probe-replay/result.json",
+            "sha256": "ec6e96cc3d0cb0516bf7f4e8d094b87b7ef44bd2f957e33ae6b42b66b79c4144",
+            "bytes": 6862
+          }
+        },
+        {
+          "id": "district-no-diagnostics",
+          "status": "skipped",
+          "accepted": false,
+          "reason": "Optional comparison not selected",
+          "result": {
+            "path": ".dev/v5/04503586c8d1/artifacts/nodes/district-no-diagnostics/result.json",
+            "sha256": "ff97b7b0ad9e63d70c4700ba958dc4eea2b442952eb37660e17553364f82f068",
+            "bytes": 552
+          }
+        },
+        {
+          "id": "probe-rom-parity",
+          "status": "passed",
+          "accepted": true,
+          "reason": null,
+          "result": {
+            "path": ".dev/v5/04503586c8d1/artifacts/nodes/probe-rom-parity/result.json",
+            "sha256": "603f0ca672e5769f57bdc87356a4fec8a70070187a2adcad237242f1f466a402",
+            "bytes": 14489
+          }
+        },
+        {
+          "id": "menu-idle",
+          "status": "passed",
+          "accepted": true,
+          "reason": null,
+          "result": {
+            "path": ".dev/v5/04503586c8d1/artifacts/nodes/menu-idle/result.json",
+            "sha256": "69f1718aa5038191b6ad1591cd69c9d16729f302db5b41741ed3ea8770170b88",
+            "bytes": 10685
+          }
+        },
+        {
+          "id": "menu-4mb",
+          "status": "passed",
+          "accepted": true,
+          "reason": null,
+          "result": {
+            "path": ".dev/v5/04503586c8d1/artifacts/nodes/menu-4mb/result.json",
+            "sha256": "bf5092bcbf6478e178e4a17c2b9100997b8fd97a3fdf1536f5f0b9f42c942225",
+            "bytes": 10731
+          }
+        },
+        {
+          "id": "menu-lifecycle",
+          "status": "passed",
+          "accepted": true,
+          "reason": null,
+          "result": {
+            "path": ".dev/v5/04503586c8d1/artifacts/nodes/menu-lifecycle/result.json",
+            "sha256": "fe070b0898f4419db85b674dbc0ac0e33a5251f5cab01c4f2e07f3e9d9802b68",
+            "bytes": 19373
+          }
+        },
+        {
+          "id": "district-functional",
+          "status": "passed",
+          "accepted": true,
+          "reason": null,
+          "result": {
+            "path": ".dev/v5/04503586c8d1/artifacts/nodes/district-functional/result.json",
+            "sha256": "d4e7788a9a6cdca5cfab42f0fd958ba19381cdecd6a679a13e5679707f30a5df",
+            "bytes": 65857
+          }
+        },
+        {
+          "id": "district-strict",
+          "status": "passed",
+          "accepted": true,
+          "reason": null,
+          "result": {
+            "path": ".dev/v5/04503586c8d1/artifacts/nodes/district-strict/result.json",
+            "sha256": "c3cca5a7f95e21019fc7c4754f37343cbd3aca89b3e43e50483a053d1655ce6e",
+            "bytes": 111554
+          }
+        },
+        {
+          "id": "district-views",
+          "status": "passed",
+          "accepted": true,
+          "reason": null,
+          "result": {
+            "path": ".dev/v5/04503586c8d1/artifacts/nodes/district-views/result.json",
+            "sha256": "2de56c6d2f5c01a596657b4d1fd6b09e3a78b377d9592b9528aa1038eed3fb96",
+            "bytes": 67274
+          }
+        },
+        {
+          "id": "district-diagnostics-counterfactual",
+          "status": "skipped",
+          "accepted": false,
+          "reason": "Optional comparison not selected",
+          "result": {
+            "path": ".dev/v5/04503586c8d1/artifacts/nodes/district-diagnostics-counterfactual/result.json",
+            "sha256": "d64280e9249c9e91d3d7af1d4dc2356f063029ef34b7fc5bf531394cddf91b10",
+            "bytes": 587
+          }
+        }
+      ],
+      "python": {
+        "tests_run": 631,
+        "tested_passes": 628,
+        "failures": [
+          {
+            "id": "test_sponza_physics.AuthoredSponzaPhysics.test_actual_core_traverses_authored_stairs_and_respects_stacked_floors",
+            "message": "Traceback (most recent call last):\n  File \"C:\\Users\\hughe\\dev\\DarkLantern64\\tests\\test_sponza_physics.py\", line 11, in test_actual_core_traverses_authored_stairs_and_respects_stacked_floors\n    report = verify(Path(directory), ROOT / \"content/sponza_courtyard.json\")\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\hughe\\dev\\DarkLantern64\\tools\\verify_sponza_physics.py\", line 93, in verify\n    report = fixture(output, level=level)\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\hughe\\dev\\DarkLantern64\\tools\\verify_sponza_physics.py\", line 32, in fixture\n    raise ValueError(\"Level collision differs from geometry: \" + row[\"id\"])\nValueError: Level collision differs from geometry: sponza-collision-parapet-north\n",
+            "known": true
+          }
+        ],
+        "skipped_tests": [
+          {
+            "id": "test_project_levels.ProjectLevelTests.test_symlink_sources_and_output_escapes_are_rejected",
+            "message": "Symlink creation unavailable: [WinError 1314] A required privilege is not held by the client: 'C:\\\\Users\\\\hughe\\\\dev\\\\DarkLantern64\\\\build\\\\project-level-test-ou86mqc9-outside.json' -> 'C:\\\\Users\\\\hughe\\\\dev\\\\DarkLantern64\\\\build\\\\project-level-test-ou86mqc9\\\\content\\\\linked.json'",
+            "declared": true
+          },
+          {
+            "id": "test_thief_objects.InstalledThiefObjectsTests.test_bafford_placements_and_loot_total",
+            "message": "Set DL_THIEF_GOLD to verify locally installed source assets",
+            "declared": true
+          }
+        ]
+      },
+      "strict": {
+        "passed": true,
+        "accepted": true,
+        "complete": true,
+        "frames": 3463,
+        "limits": {
+          "frame_ms": 33.333333333333336,
+          "service_cpu_ms": 8
+        },
+        "maximum_frame_ms": 32.0464,
+        "maximum_interval_ms": 32.322026666666666,
+        "maximum_service_cpu_ms": 7.990485333333333,
+        "dropped_ticks": 0,
+        "blocked_ticks": 0,
+        "loading_wait_frames": 0,
+        "guest_audio_continuity_passed": true,
+        "host_audio_output": "disabled",
+        "scope": "Complete Ares continuous wall-time workload, unchanged strict maxima; original hardware unverified",
+        "result": {
+          "path": ".dev/v5/04503586c8d1/artifacts/nodes/district-strict/result.json",
+          "sha256": "c3cca5a7f95e21019fc7c4754f37343cbd3aca89b3e43e50483a053d1655ce6e",
+          "bytes": 111554
+        }
+      },
+      "execution_scope": "Final captured-input acceptance"
+    }
+  ],
+  "repaired_verifier_failures": [
+    {
+      "attempt": "65e8a3c5ae56",
+      "diagnosis": "Script-directory import path loaded both plain and tools.* compiler modules, splitting exception identities and mocks; canonical package discovery fixed the two new failures."
+    },
+    {
+      "attempt": "76edb221877c",
+      "diagnosis": "Intermittent Windows JSON replacement sharing failure; bounded replacement retry retains persistent/unknown failures."
+    },
+    {
+      "attempt": "413c1834f917",
+      "node": "editor-authoring-preview",
+      "diagnosis": "Client saw response existence before readable complete JSON; bounded response-read retries preserve process/deadline and nontransient errors."
+    },
+    {
+      "attempt": "413c1834f917",
+      "node": "probe-rom-parity",
+      "diagnosis": "Native flags are bool and ROM wire flags are int0/1. All1070 underlying functional states agreed; exact bool/int0/1 equality fixed the data verifier, without coercing float/string/other integers.",
+      "diagnostic": {
+        "path": ".dev/issue5-bool-diagnostic.json",
+        "sha256": "c3f7b0fc7663912cc74a2deb0b49ba9c648f62365973838e71da80665a6ea015",
+        "bytes": 1873
+      }
+    }
+  ],
+  "historical_diagnostics_comparison": {
+    "evidence": {
+      "path": "docs/evidence/render-diagnostics.json",
+      "sha256": "0d9e668e574fbccc538f4a57971d6df9fc2e5381bb0ce8136d378ea4b9bc50d4",
+      "bytes": 36954
+    },
+    "default_strict_accepted": true,
+    "disabled_counterfactual_strict_accepted": false,
+    "scope": "Issue4 historical whole captures only; optional comparison was not selected for this run"
+  },
+  "limitations": [
+    "Known Sponza geometry/collision fixture error remains, with its exact ID and terminal exception disclosed.",
+    "Two declared skips remain: Windows symlink privilege capability and locally installed Thief source assets; their exact reasons are in primary Python result.",
+    "Settled fixed60Hz replay is functional evidence, not IO-latency/frame/audio acceptance.",
+    "Framebuffer captures are separate from strict wall-time checks.",
+    "Host audio output is disabled only in owned settings copies; guest audio continuity is checked, audible host output and original hardware are unverified.",
+    "Earlier incomplete/failed runs are retained and do not establish acceptance. Historical reports do not certify later changed inputs."
+  ],
+  "supplementary_import_diagnostics": [
+    {
+      "status": "failed",
+      "tests_run": 614,
+      "tested_passes": 562,
+      "failure_count": 50,
+      "skipped": [
+        {
+          "id": "test_project_levels.ProjectLevelTests.test_symlink_sources_and_output_escapes_are_rejected",
+          "message": "Symlink creation unavailable: [WinError 1314] A required privilege is not held by the client: 'C:\\\\Users\\\\hughe\\\\dev\\\\DarkLantern64\\\\build\\\\project-level-test-_e9co135-outside.json' -> 'C:\\\\Users\\\\hughe\\\\dev\\\\DarkLantern64\\\\build\\\\project-level-test-_e9co135\\\\content\\\\linked.json'",
+          "declared": true
+        },
+        {
+          "id": "test_thief_objects.InstalledThiefObjectsTests.test_bafford_placements_and_loot_total",
+          "message": "Set DL_THIEF_GOLD to verify locally installed source assets",
+          "declared": true
+        }
+      ],
+      "artifacts": [
+        {
+          "path": ".dev/import-consistency/bbe4dd1e/unittest.json",
+          "sha256": "2a884ec27dd725181237da3fd5e642900860dc2eb534c6ca918eb38245c3e398",
+          "bytes": 78579
+        },
+        {
+          "path": ".dev/import-consistency/bbe4dd1e/package-child.log",
+          "sha256": "ba8774a42d77f1bd20aad02fafafaec9ca9248b14d582f9bdfc3667d1483fbf3",
+          "bytes": 185654
+        }
+      ],
+      "acceptance_evidence": false,
+      "scope": "Standalone package-namespace diagnostic; no guarded-input full acceptance. Sandbox invocation retained49 OS-temp errors plus knownSponza; normal-filesystem invocation confirms namespace fixes."
+    },
+    {
+      "status": "known_failure",
+      "tests_run": 617,
+      "tested_passes": 614,
+      "failure_count": 1,
+      "skipped": [
+        {
+          "id": "test_project_levels.ProjectLevelTests.test_symlink_sources_and_output_escapes_are_rejected",
+          "message": "Symlink creation unavailable: [WinError 1314] A required privilege is not held by the client: 'C:\\\\Users\\\\hughe\\\\dev\\\\DarkLantern64\\\\build\\\\project-level-test-8tw7hbs4-outside.json' -> 'C:\\\\Users\\\\hughe\\\\dev\\\\DarkLantern64\\\\build\\\\project-level-test-8tw7hbs4\\\\content\\\\linked.json'",
+          "declared": true
+        },
+        {
+          "id": "test_thief_objects.InstalledThiefObjectsTests.test_bafford_placements_and_loot_total",
+          "message": "Set DL_THIEF_GOLD to verify locally installed source assets",
+          "declared": true
+        }
+      ],
+      "artifacts": [
+        {
+          "path": ".dev/import-consistency/bbe4dd1e/unittest-escalated.json",
+          "sha256": "8f2d0564e69a59ae0674de09e9fff17762e294828b05a28372421cddc5a290b8",
+          "bytes": 1925
+        },
+        {
+          "path": ".dev/import-consistency/bbe4dd1e/package-child-escalated.log",
+          "sha256": "9d1eeed7712cc39e75b97ccd5f2db41f119f17d7ab74d32bdffa6e36e2fa32a6",
+          "bytes": 107495
+        }
+      ],
+      "acceptance_evidence": false,
+      "scope": "Standalone package-namespace diagnostic; no guarded-input full acceptance. Sandbox invocation retained49 OS-temp errors plus knownSponza; normal-filesystem invocation confirms namespace fixes."
+    }
+  ]
+}

@@ -1,0 +1,201 @@
+{
+  "issue": "https://github.com/hughes/DarkLantern64/issues/5",
+  "verified_date": "2026-10-14",
+  "passed": true,
+  "implementation_sha256": {
+    "tools/verify_project_editor.py": "ef8f3bbd22f3a653b3f4f88141022b6a1c914a195ca12992f3def643d85880df",
+    "tests/test_editor_response_polling.py": "7553d1c4e6013cb13aa3ddae554613a379600981a2c456b698477daeb23613c1"
+  },
+  "retry_policy": {
+    "explicit_native_errors": [
+      5,
+      32,
+      33
+    ],
+    "crt_errno_without_winerror": {
+      "platform": "Windows",
+      "errno": 13,
+      "action": "Fresh native read-open probe; retry only native 5/32/33 or recovered read access (0)."
+    },
+    "sharing_budget_seconds": 2,
+    "request_deadline_preserved": true,
+    "submitted_once": true,
+    "liveness_polled_before_each_retry_sleep": true,
+    "exhaustion": "Raise the last original I/O error.",
+    "other_io_errors_json_errors_and_response_identity_errors": "Propagate immediately."
+  },
+  "deterministic_tests": {
+    "command": "python -m unittest tests.test_editor_response_polling -v",
+    "passed": 10,
+    "log": ".dev/response-poll-patch/3c72c77e/canonical-tests.log",
+    "log_sha256": "ff71d1ad8e22ebb642dbc4c641740bf924930da6260c34bb5fc77fd351462ec6",
+    "verified_date": "2026-10-13"
+  },
+  "native_locked_file_check": {
+    "path": ".dev/response-poll-patch/3c72c77e/canonical-native-check.json",
+    "sha256": "0ea70fbb93556f7f2627668fc82d1c97dd8690a79abbfffe13b8310f2304fdb2",
+    "passed": true,
+    "python_read_error": {
+      "class": "PermissionError",
+      "errno": 13,
+      "winerror": null
+    },
+    "native_error_while_locked": 32,
+    "native_error_after_release": 0,
+    "result": {
+      "recovered": true
+    },
+    "polling": {
+      "simulated_clock_seconds": 0.1,
+      "liveness_polls": 1,
+      "sleeps": 1
+    },
+    "scope": "Actual Windows exclusive file handle and native error codes; clock, liveness callback and sleep are deterministic test fixtures. No editor or GUI process was launched.",
+    "verified_date": "2026-10-13"
+  },
+  "actual_gui_verification": {
+    "status": "passed",
+    "passed": true,
+    "verified_date": "2026-10-14",
+    "run_id": "04503586c8d1",
+    "source_sha256": "e9d9694e03a41ff82d623f0c3bc41f38d40fdefc3f4d6e480105d7f0965faf59",
+    "manifest_sha256": "daf6ce8cf1eabe2991476e6684f8d13e8c9c24cce7ba11b40e07204e2245204e",
+    "pipeline_status": "accepted_with_known_fixture_failures",
+    "full_acceptance": true,
+    "summary": {
+      "path": ".dev/v5/04503586c8d1/summary.json",
+      "sha256": "b8ba8812c3326a27be6ccf63f44f2040d12f80962a462d0d7183a8bfd7d3d04e",
+      "bytes": 5866532
+    },
+    "input_manifest": {
+      "path": ".dev/v5/04503586c8d1/input-manifest.json",
+      "sha256": "db9465d5514ae460b01611571be764f50fb81b26e188d1f30faf82865c899fa3",
+      "bytes": 1296099
+    },
+    "acceptance_manifest": {
+      "path": ".dev/v5/04503586c8d1/artifacts/acceptance-manifest.json",
+      "sha256": "daf6ce8cf1eabe2991476e6684f8d13e8c9c24cce7ba11b40e07204e2245204e",
+      "bytes": 8514
+    },
+    "editor": {
+      "path": ".dev/v5/04503586c8d1/artifacts/host/darklantern64_project_editor.exe",
+      "sha256": "eb17957996cfad85ce5d9b4d4203d7c2017754f8fd2e8d9c00449ff79cbdcce3",
+      "bytes": 31032832
+    },
+    "nodes": [
+      {
+        "id": "editor-authoring-preview",
+        "status": "passed",
+        "passed": true,
+        "accepted": true,
+        "source_sha256": "e9d9694e03a41ff82d623f0c3bc41f38d40fdefc3f4d6e480105d7f0965faf59",
+        "manifest_sha256": "daf6ce8cf1eabe2991476e6684f8d13e8c9c24cce7ba11b40e07204e2245204e",
+        "node_result": {
+          "path": ".dev/v5/04503586c8d1/artifacts/nodes/editor-authoring-preview/result.json",
+          "sha256": "509299bf5c6a697d302c8c5ee55e52ed44dacbfb86fa4f70cede6a01d250541b",
+          "bytes": 4427
+        },
+        "invocation_exit_code": 0,
+        "checks": [
+          "Region create/rename/duplicate/delete preserves homes, repairs references and participates in paired Undo/Redo",
+          "Region and gate viewport handles commit one paired history step and leave source geometry unchanged",
+          "New, duplicated and prefab-placed objects expose missing homes until explicitly assigned; Undo restores the source scene",
+          "Selected source region exposes both outgoing openings, independent destination unions and checked capacity witnesses",
+          "A missing view through the second opening is repaired by working_set alone; stale prepared identity remains explicit until recook",
+          "Delayed IO/renderer/fence preview retains the published scene; reversal cancels obsolete demand and later reloads the complete working set",
+          "Independent RSP and RDP delays retain retiring slot generations until both domains complete, then permit reload",
+          "Paired checked Save rejects stale partition identity without losing drafts, then publishes the policy-only repair",
+          "Legacy free camera can leave and return without losing the published bank; invalid simulation and transport commands reject atomically",
+          "Active cooked preview hands off to Native Play, which restores complete authored rendering on Stop",
+          "Deleting down to one region with explicit reassignment and fitted coverage produces a valid gate-free preview; Undo restores the saved partition"
+        ],
+        "evidence": [
+          {
+            "path": ".dev/v5/04503586c8d1/artifacts/nodes/editor-authoring-preview/command.log",
+            "sha256": "7205550fb921213ad594912007f6e1632148280c32aea373ad4b47ee8a66122b",
+            "bytes": 2629
+          },
+          {
+            "path": ".dev/stream-authoring-preview-verification/046fbda571fb420ba494e1348ec61f1f/result.json",
+            "sha256": "7205550fb921213ad594912007f6e1632148280c32aea373ad4b47ee8a66122b",
+            "bytes": 2629
+          }
+        ]
+      },
+      {
+        "id": "editor-render-diagnostics",
+        "status": "passed",
+        "passed": true,
+        "accepted": true,
+        "source_sha256": "e9d9694e03a41ff82d623f0c3bc41f38d40fdefc3f4d6e480105d7f0965faf59",
+        "manifest_sha256": "daf6ce8cf1eabe2991476e6684f8d13e8c9c24cce7ba11b40e07204e2245204e",
+        "node_result": {
+          "path": ".dev/v5/04503586c8d1/artifacts/nodes/editor-render-diagnostics/result.json",
+          "sha256": "822ee4affdde2cf9ca922af82cab4ba558caf4b37b4a9fd8c4f65ca264cc065e",
+          "bytes": 3691333
+        },
+        "invocation_exit_code": 0,
+        "checks": [
+          "Single/two independent doors: cooked model buckets match shared C renderer policy on decoded package and every door-state combination",
+          "stream_lighting_single_door: pre-Play path notice, source-bound cook and region/gate/group/object navigation",
+          "stream_lighting_single_door: stale cooked groups cannot navigate or certify modified content; repaired draft recooks",
+          "stream_lighting_single_door: published target policy and actual door interactions match cooked publication/change buckets",
+          "stream_lighting_multiple_doors: pre-Play path notice, source-bound cook and region/gate/group/object navigation",
+          "stream_lighting_multiple_doors: stale cooked groups cannot navigate or certify modified content; repaired draft recooks",
+          "stream_lighting_multiple_doors: published target policy and actual door interactions match cooked publication/change buckets",
+          "Six-slot invalid target draft stays editable and source-navigable; preview rejects it; stale repair recooks to valid capacity",
+          "External imported mesh edits invalidate source-bound diagnostics; restoring exact dependency and recooking revalidates"
+        ],
+        "evidence": [
+          {
+            "path": ".dev/v5/04503586c8d1/artifacts/nodes/editor-render-diagnostics/command.log",
+            "sha256": "7ccc80bffe9691cf1a97e21eccf96cd356b7a14c96cb4bced866199ba77f34e0",
+            "bytes": 1339
+          },
+          {
+            "path": ".dev/render-diagnostics-verification/af14f53c893642c6a050bba96747d199/result.json",
+            "sha256": "97be7b8bf03f59ee412378386e3cae112e649cc12e95c547aa726b8aa93e2627",
+            "bytes": 3487219
+          }
+        ]
+      },
+      {
+        "id": "editor-native-play",
+        "status": "passed",
+        "passed": true,
+        "accepted": true,
+        "source_sha256": "e9d9694e03a41ff82d623f0c3bc41f38d40fdefc3f4d6e480105d7f0965faf59",
+        "manifest_sha256": "daf6ce8cf1eabe2991476e6684f8d13e8c9c24cce7ba11b40e07204e2245204e",
+        "node_result": {
+          "path": ".dev/v5/04503586c8d1/artifacts/nodes/editor-native-play/result.json",
+          "sha256": "1802fcdefa2fe1f7669745c721542befb881683ae26caad291f4cf1dfc203de6",
+          "bytes": 3292
+        },
+        "invocation_exit_code": 0,
+        "checks": [
+          "Cooked-package startup uses bounded slots, a published collision bank and matching viewport membership",
+          "Streamed editor replay reproduces identical headless gameplay and coordinator state",
+          "Host transport rejects a package whose cooked SHA-256 no longer matches",
+          "Editor import/export preserves settled replay boundaries and rejects invalid metadata before changing the session",
+          "The recorded door/loot/retire/reload/restart route reproduces the editor's final gameplay and coordinator state",
+          "Restart resets stream/game state; Stop restores authoring without changing sources",
+          "Native Play cooks unsaved scene and partition drafts together without changing canonical files",
+          "Viewport visibility and collision queries reveal a region only after its working bank publishes"
+        ],
+        "evidence": [
+          {
+            "path": ".dev/v5/04503586c8d1/artifacts/nodes/editor-native-play/command.log",
+            "sha256": "ac16bf7620c0360f47837542fcb28cbf30d5f04848b0462d1ea438734b4551da",
+            "bytes": 1542
+          },
+          {
+            "path": ".dev/stream-native-verification/413d1951c07f4230b748fcfb51a499af/result.json",
+            "sha256": "f6fcb614c361e25a4a94a1bb15d90204271c88261c2944f22bfcc5b40c8b59e7",
+            "bytes": 1540
+          }
+        ]
+      }
+    ],
+    "scope": "The shared EditorClient was exercised by all three passed GUI nodes bound to the frozen source. The separate locked-file fixture above directly verifies sharing-error recovery."
+  }
+}

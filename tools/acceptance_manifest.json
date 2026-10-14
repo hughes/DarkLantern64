@@ -1,0 +1,98 @@
+{
+  "schema_version": 1,
+  "description": "Required project acceptance; capture, settled replay and strict wall time remain separate evidence classes.",
+  "historical_context": {
+    "evidence": "docs/evidence/render-diagnostics.json",
+    "default_district_strict_accepted": true,
+    "disabled_diagnostics_counterfactual_strict_accepted": false,
+    "scope": "Historical issue #4 results only; neither result certifies the current input snapshot."
+  },
+  "checks": [
+    {
+      "id": "portable-python", "kind": "python_unittest", "required": true,
+      "profiles": ["portable", "host", "all"], "dependencies": [],
+      "start_directory": "tests", "pattern": "test_*.py", "classification": "portable",
+      "known_failures": [{
+        "id": "test_sponza_physics.AuthoredSponzaPhysics.test_actual_core_traverses_authored_stairs_and_respects_stacked_floors",
+        "message_pattern": "ValueError: Level collision differs from geometry: sponza-collision-parapet-north"
+      }],
+      "allowed_skips": [
+        {"id": "test_character_assets.CharacterAssetTests.test_blender_guard_generated_c_matches_cooked_reference", "message_pattern": "Blender guard example is not installed"},
+        {"id": "test_thief_objects.InstalledThiefObjectsTests.test_bafford_placements_and_loot_total", "message_pattern": "Set DL_THIEF_GOLD to verify locally installed source assets"},
+        {"id":"test_project_levels.ProjectLevelTests.test_symlink_sources_and_output_escapes_are_rejected","message_pattern":"Symlink creation unavailable: \\[WinError 1314\\] A required privilege is not held by the client: '([^'\\r\\n]+project-level-test-[a-z0-9_-]+)-outside\\.json' -> '\\1\\\\+content\\\\+linked\\.json'"}
+      ]
+    },
+    {
+      "id": "portable-c", "kind": "command", "required": true,
+      "profiles": ["portable", "host", "all"], "dependencies": [], "classification": "portable",
+      "argv": ["{python}", "-c", "from tools.build import run_portable_tests; run_portable_tests()"],
+      "parser": {"kind": "exit_code"}
+    },
+    {
+      "id": "host-build", "kind": "command", "required": true,
+      "profiles": ["host", "all"], "dependencies": ["portable-c"], "classification": "editor",
+      "cwd": "editor",
+      "argv": ["{bazel}", "build", "//:play_runner", "//:darklantern64_project_editor"],
+      "parser": {"kind": "exit_code"}, "timeout_seconds": 1800
+    },
+    {
+      "id": "editor-tests", "kind": "command", "required": true,
+      "profiles": ["host", "all"], "dependencies": ["host-build"], "classification": "editor",
+      "cwd": "editor",
+      "argv": ["{bazel}", "test", "//:region_authoring_test", "//:play_floors_test", "//:character_preview_test"],
+      "parser": {"kind": "exit_code"}
+    },
+    {
+      "id": "native-metadata", "kind": "command", "required": true,
+      "profiles": ["host", "all"], "dependencies": ["editor-tests"], "classification": "functional",
+      "argv": ["{python}", "{snapshot_root}/tools/verify_native_lighting_metadata.py", "--runner", "{runner}", "--evidence", "{artifacts_dir}/native-metadata.json"],
+      "parser": {"kind": "json_file", "path": "{artifacts_dir}/native-metadata.json"}
+    },
+    {
+      "id": "editor-authoring-preview", "kind": "command", "required": true,
+      "profiles": ["host", "all"], "dependencies": ["editor-tests"], "classification": "editor", "gpu": true,
+      "argv": ["{python}", "{snapshot_root}/tools/verify_stream_authoring_preview.py", "--editor", "{editor}"],
+      "parser": {"kind": "stdout_json"}, "timeout_seconds": 1200
+    },
+    {
+      "id": "editor-render-diagnostics", "kind": "command", "required": true,
+      "profiles": ["host", "all"], "dependencies": ["editor-tests"], "classification": "editor", "gpu": true,
+      "argv": ["{python}", "{snapshot_root}/tools/verify_render_diagnostics.py", "--editor", "{editor}"],
+      "parser": {"kind": "stdout_json"}, "timeout_seconds": 1200
+    },
+    {
+      "id": "editor-native-play", "kind": "command", "required": true,
+      "profiles": ["host", "all"], "dependencies": ["native-metadata"], "classification": "functional", "gpu": true,
+      "argv": ["{python}", "{snapshot_root}/tools/verify_stream_native_play.py", "--editor", "{editor}"],
+      "parser": {"kind": "stdout_json"}, "timeout_seconds": 900
+    }
+  ],
+  "builds": [
+    {"id": "bundle-idle", "kind": "rom", "required": true, "profiles": ["all"], "dependencies": ["portable-c"], "kwargs": {"bundle": "content/level_bundle.json", "renderer": "t3d"}},
+    {"id": "district-ordinary", "kind": "rom", "required": true, "profiles": ["all"], "dependencies": ["portable-c"], "kwargs": {"bundle": "content/level_bundle.json", "renderer": "t3d", "bafford_district_test": true}},
+    {"id": "district-performance", "kind": "rom", "required": true, "profiles": ["all"], "dependencies": ["portable-c"], "kwargs": {"bundle": "content/level_bundle.json", "renderer": "t3d", "bafford_district_performance_test": true}},
+    {"id": "district-capture", "kind": "rom", "required": true, "profiles": ["all"], "dependencies": ["portable-c"], "kwargs": {"bundle": "content/level_bundle.json", "renderer": "t3d", "bafford_district_test": true, "bafford_district_test_capture": true}},
+    {"id": "bundle-lifecycle", "kind": "rom", "required": true, "profiles": ["all"], "dependencies": ["portable-c"], "kwargs": {"bundle": "content/level_bundle.json", "renderer": "t3d", "menu_test": true}},
+    {"id": "probe-replay", "kind": "rom", "required": true, "profiles": ["all"], "dependencies": ["probe-functional"], "prepared_replay": "probe-functional", "kwargs": {"bundle": "content/level_bundle.json", "renderer": "t3d", "start_level": "streaming-probe", "start_preset": "west"}},
+    {"id": "district-no-diagnostics", "kind": "rom", "required": false, "profiles": ["all"], "dependencies": ["portable-c"], "kwargs": {"bundle": "content/level_bundle.json", "renderer": "t3d", "bafford_district_performance_test": true, "disable_render_diagnostics": true}}
+  ],
+  "scenarios": [
+    {
+      "id": "probe-functional", "kind": "generic_replay", "adapter": "native", "required": true,
+      "profiles": ["host", "all"], "dependencies": ["native-metadata"], "classification": "functional",
+      "mission": "content/streaming_probe.mission.json", "route": "tests/fixtures/stream_probe_route.json"
+    },
+    {
+      "id": "probe-rom-parity", "kind": "generic_replay", "adapter": "rom", "required": true,
+      "profiles": ["all"], "dependencies": ["probe-replay", "probe-functional"], "classification": "functional", "gpu": true,
+      "build_id": "probe-replay", "prepared_replay": "probe-functional", "timeout_seconds": 180
+    },
+    {"id": "menu-idle", "kind": "legacy_route", "adapter": "menu_idle", "required": true, "profiles": ["all"], "dependencies": ["bundle-idle"], "classification": "lifecycle", "gpu": true, "build_id": "bundle-idle", "timeout_seconds": 180},
+    {"id": "menu-4mb", "kind": "legacy_route", "adapter": "expansion_gate", "required": true, "profiles": ["all"], "dependencies": ["bundle-idle"], "classification": "lifecycle", "gpu": true, "build_id": "bundle-idle", "memory_mib": 4, "timeout_seconds": 90},
+    {"id": "menu-lifecycle", "kind": "legacy_route", "adapter": "menu_lifecycle", "required": true, "profiles": ["all"], "dependencies": ["bundle-lifecycle"], "classification": "lifecycle", "gpu": true, "build_id": "bundle-lifecycle", "timeout_seconds": 600},
+    {"id": "district-functional", "kind": "legacy_route", "adapter": "district_functional", "required": true, "profiles": ["all"], "dependencies": ["district-ordinary"], "classification": "functional", "gpu": true, "build_id": "district-ordinary", "timeout_seconds": 420},
+    {"id": "district-strict", "kind": "legacy_route", "adapter": "district_strict", "required": true, "profiles": ["all"], "dependencies": ["district-performance"], "classification": "strict_wall_time", "gpu": true, "build_id": "district-performance", "timeout_seconds": 420},
+    {"id": "district-views", "kind": "legacy_route", "adapter": "district_capture", "required": true, "profiles": ["all"], "dependencies": ["district-capture"], "classification": "capture_only", "gpu": true, "build_id": "district-capture", "timeout_seconds": 600},
+    {"id": "district-diagnostics-counterfactual", "kind": "legacy_route", "adapter": "district_strict", "required": false, "profiles": ["all"], "dependencies": ["district-no-diagnostics"], "classification": "strict_wall_time", "gpu": true, "build_id": "district-no-diagnostics", "timeout_seconds": 420}
+  ]
+}

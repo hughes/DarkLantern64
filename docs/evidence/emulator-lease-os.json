@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "passed": true,
+  "status": "complete",
+  "platform": "Windows-10-10.0.26200-SP0",
+  "python": "3.11.0 (main, Oct 24 2022, 18:26:48) [MSC v.1933 64 bit (AMD64)]",
+  "tests_run": 16,
+  "elapsed_seconds": 2.505,
+  "skipped": [],
+  "failures": [],
+  "test_output": "test_alternate_import_form_shares_process_guard (test_emulator_lease.EmulatorLeaseTests.test_alternate_import_form_shares_process_guard) ... ok\ntest_command_timeout_owns_descendants_and_preserves_unrelated_process (test_emulator_lease.EmulatorLeaseTests.test_command_timeout_owns_descendants_and_preserves_unrelated_process) ... ok\ntest_crashed_owner_releases_os_lease (test_emulator_lease.EmulatorLeaseTests.test_crashed_owner_releases_os_lease) ... ok\ntest_cross_process_cross_directory_owners_serialize (test_emulator_lease.EmulatorLeaseTests.test_cross_process_cross_directory_owners_serialize) ... ok\ntest_interrupt_during_stopping_still_cleans_owned_process (test_emulator_lease.EmulatorLeaseTests.test_interrupt_during_stopping_still_cleans_owned_process) ... ok\ntest_outer_command_job_contains_inner_leased_process_after_owner_crash (test_emulator_lease.EmulatorLeaseTests.test_outer_command_job_contains_inner_leased_process_after_owner_crash) ... ok\ntest_owner_crash_kills_only_job_child_before_next_grant (test_emulator_lease.EmulatorLeaseTests.test_owner_crash_kills_only_job_child_before_next_grant) ... ok\ntest_reporting_failure_cannot_skip_process_cleanup (test_emulator_lease.EmulatorLeaseTests.test_reporting_failure_cannot_skip_process_cleanup) ... ok\ntest_same_thread_reentrant_attempt_cannot_launch_another_owner (test_emulator_lease.EmulatorLeaseTests.test_same_thread_reentrant_attempt_cannot_launch_another_owner) ... ok\ntest_assertion_and_early_exit_keep_failure_and_cleanup (test_smoke_ares.OwnedExerciseTests.test_assertion_and_early_exit_keep_failure_and_cleanup) ... ok\ntest_bad_verified_hash_retains_snapshot_without_starting_process (test_smoke_ares.OwnedExerciseTests.test_bad_verified_hash_retains_snapshot_without_starting_process) ... ok\ntest_observed_os_lifecycle_executes_through_dsl_interpreter (test_smoke_ares.OwnedExerciseTests.test_observed_os_lifecycle_executes_through_dsl_interpreter) ... ok\ntest_process_launch_failure_retains_evidence_and_releases_lease (test_smoke_ares.OwnedExerciseTests.test_process_launch_failure_retains_evidence_and_releases_lease) ... ok\ntest_success_holds_lease_through_owned_cleanup_and_preserves_unrelated_process (test_smoke_ares.OwnedExerciseTests.test_success_holds_lease_through_owned_cleanup_and_preserves_unrelated_process) ... ok\ntest_timeout_keeps_rom_partial_metrics_stderr_and_structured_failure (test_smoke_ares.OwnedExerciseTests.test_timeout_keeps_rom_partial_metrics_stderr_and_structured_failure) ... ok\ntest_wait_timeout_reports_queue_and_never_starts_process (test_smoke_ares.OwnedExerciseTests.test_wait_timeout_reports_queue_and_never_starts_process) ... ok\n\n----------------------------------------------------------------------\nRan 16 tests in 2.475s\n\nOK\n",
+  "source_sha256": {
+    "tools/emulator_lease.py": "28ec4184a4b48df29ca2f328dbf47b26c870a9386db7f2330c290302460a9fbb",
+    "tools/smoke_ares.py": "b45f65cd3f3cec84da1ebf6cb3a9ae0e3995704fcf8ebf822c61f3465902665e",
+    "tests/test_emulator_lease.py": "1f75357a9b2cbcdfe1bbf08b98161f49bd431f740484fc59f1703fe9ca67112f",
+    "tests/test_smoke_ares.py": "ee23c93b2cedce9e06658684d600b40320b61477e1e2d68a02fc971ca961cf57",
+    "docs/models/emulator-lease.machine.ts": "bbadb779df7aac6036cc0d641af9f6088cd491ba732da62163a87f3c656ac29c",
+    "tools/check_emulator_lease.mjs": "0fb83092e2a1737f842a87c9baec8ecea361e49b7b55b9229e15a0018aa9560d"
+  },
+  "boundary": "Real OS lease, real disposable Python processes, observed lifecycle through DSL interpreter when available; no Ares, ROM, GPU-performance or Python/OS formal-equivalence claim.",
+  "windows_crash_job_tested": true
+}

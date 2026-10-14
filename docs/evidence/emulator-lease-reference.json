@@ -1,0 +1,23 @@
+{
+  "model": "docs/models/emulator-lease.machine.ts",
+  "source_sha256": "bbadb779df7aac6036cc0d641af9f6088cd491ba732da62163a87f3c656ac29c",
+  "tool_version": "0.1.7",
+  "tier": "pr",
+  "interpreter_states": 63,
+  "interpreter_edges": 192,
+  "invariant_checks": 378,
+  "release_checks": 12,
+  "recovery_checks": 12,
+  "interpreter_passed": true,
+  "trace_interpreter_steps": 0,
+  "python_os_equivalence_proven": false,
+  "limitations": [
+    "Two abstract owners and one owned child per owner; finite safety only, no scheduling fairness or wall-clock proof.",
+    "Windows mutex/job binding, process identity, thread enumeration and abrupt-crash ordering require separate OS refinement tests.",
+    "POSIX flock releases on owner death, but its child crash containment is weaker than the supported Windows job backend.",
+    "No database-owned state or generated SQL adapter is applicable; OS observations drive retained run status."
+  ],
+  "tlc_proof_passed": true,
+  "interpreter_tla_graph_equivalent": true,
+  "machine_sha256": "7a274f56d3a269b02abebba866169fbd064935da1e4cf834e49064cc81cc0048"
+}

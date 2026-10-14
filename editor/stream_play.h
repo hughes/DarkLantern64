@@ -11,6 +11,7 @@
 #include <string>
 #include <vector>
 #include <unordered_map>
+#include <deque>
 
 // Desktop transport owns only the directory, fixed slot pool and shared
 // bootstrap. Static geometry/collision enters exclusively through DLM decoding.
@@ -18,6 +19,28 @@ class DlStreamPlay {
 public:
     using Json=nlohmann::json;
     DlStreamCoordinator coordinator{};
+    struct Transport {
+        uint32_t read_delay_ticks=0,read_slice_bytes=256,renderer_delay_ticks=0,rsp_delay_ticks=0,rdp_delay_ticks=0;
+    };
+    void ConfigureTransport(const Json& args) {
+        Transport next=transport_;
+        const auto field=[&](const char* name,uint32_t& value,uint32_t low,uint32_t high){
+            if(!args.contains(name))return;
+            if(!args.at(name).is_number_integer()||args.at(name)<low||args.at(name)>high)
+                throw std::runtime_error(std::string(name)+" is outside its supported range");
+            value=args.at(name).get<uint32_t>();
+        };
+        field("read_delay_ticks",next.read_delay_ticks,0,600);
+        field("read_slice_bytes",next.read_slice_bytes,1,4096);
+        field("renderer_delay_ticks",next.renderer_delay_ticks,0,600);
+        field("rsp_delay_ticks",next.rsp_delay_ticks,0,600);
+        field("rdp_delay_ticks",next.rdp_delay_ticks,0,600);
+        transport_=next;transportEnabled_=true;
+    }
+    Json TransportState() const {return {{"read_delay_ticks",transport_.read_delay_ticks},{"read_slice_bytes",transport_.read_slice_bytes},
+        {"renderer_delay_ticks",transport_.renderer_delay_ticks},{"rsp_delay_ticks",transport_.rsp_delay_ticks},{"rdp_delay_ticks",transport_.rdp_delay_ticks},
+        {"service_tick",serviceTick_},{"submitted_serial",submitted_},{"read_stalls",coordinator.world.stats.read_stalls}};}
+    const DlLevel* PublishedLevel() const {return dl_stream_scene_level(&coordinator.scene);}
     explicit DlStreamPlay(Json& package,DlLevel& bootstrap):package_(package),bootstrap_(bootstrap) {
         const auto& data=package_.at("stream");
         file_.open(data.at("package_path").get<std::string>(),std::ios::binary);
@@ -93,8 +116,12 @@ public:
         if(!ready)throw std::runtime_error("Native mission startup did not complete");
         Check(dl_stream_coordinator_initial_publish(&coordinator,&game));
         dl_stream_coordinator_initial_renderer_ready(&coordinator,&game);
+        bootstrapping_=false;
     }
-    void Service(DlGame& game){Check(dl_stream_coordinator_service(&coordinator,&game));}
+    void Service(DlGame& game){
+        ++serviceTick_;Check(dl_stream_coordinator_service(&coordinator,&game));
+        if(transportEnabled_){submitted_=serviceTick_;Check(dl_stream_coordinator_submitted(&coordinator,submitted_,submitted_));}
+    }
     void Settle(DlGame& game) {
         for(unsigned work=0;work<65536;++work){Service(game);if(dl_stream_coordinator_settled(&coordinator))return;}
         throw std::runtime_error("Native mission did not settle at replay boundary");
@@ -111,13 +138,15 @@ public:
         Json slots=Json::array();
         for(const auto& row:slots_)slots.push_back({{"region",row.region_id},{"generation",row.generation},{"state",row.state},{"bytes_read",row.bytes_read},{"cpu_pins",row.cpu_pins}});
         const auto& w=coordinator.world.stats;
-        return {{"current_region",s.current_region},{"demand_mask",s.wanted_mask},{"physical_mask",s.physical_mask},{"published_mask",s.published_mask},
+        Json result={{"current_region",s.current_region},{"demand_mask",s.wanted_mask},{"physical_mask",s.physical_mask},{"published_mask",s.published_mask},
             {"pending_mask",s.candidate_mask},{"pending_transition",s.pending_transition},{"revision",s.revision},{"preparing",s.preparing},{"cpu_ready",s.cpu_ready},{"gpu_ready",s.gpu_ready},
             {"candidate_job",s.candidate_job},{"settled",s.settled},{"queued_use",s.queued_use},{"queued_object",s.queued_object},{"queued_transition",s.queued_transition},
             {"active_enemy_mask",game.active_enemy_mask},{"slots",slots},{"slot_count",slots_.size()},{"allocated_slot_bytes",w.allocated_slot_bytes},{"reserved_bytes",w.reserved_bytes},
             {"resident_bytes",w.resident_bytes},{"peak_reserved_bytes",w.peak_reserved_bytes},{"completed_loads",w.completed_loads},{"retired",s.retired},
             {"colliders",game.level->collider_count},{"floors",game.level->floor_count},{"query_cache_ready",dl_game_query_cache_ready(game.level)},
             {"assembly_records",coordinator.config.assembly_records},{"pump_byte_budget",coordinator.config.pump_byte_budget}};
+        if(transportEnabled_){result["transport"]=TransportState();result["events"]=transportEvents_;result["completed_rsp"]=s.completed_rsp;result["completed_rdp"]=s.completed_rdp;}
+        return result;
     }
 private:
     Json& package_;DlLevel& bootstrap_;
@@ -128,15 +157,47 @@ private:
     std::vector<DlMesh> meshes_;std::vector<DlModelInstance> models_;
     std::vector<std::vector<uint8_t>> buffers_;std::vector<DlRegionSlot> slots_;
     std::unordered_map<std::string,uint32_t> staticHomes_;
+    Transport transport_{};bool transportEnabled_=false,bootstrapping_=true;
+    uint64_t serviceTick_=0,submitted_=0,rendererJob_=0,rendererReadyTick_=0;
+    std::unordered_map<uint64_t,uint64_t> readReadyTicks_;
+    Json transportEvents_=Json::array();
     static DlVec3 V(const Json& row){return {row.at(0),row.at(1),row.at(2)};}
     static void Check(DlStreamCoordinatorStatus status){if(status!=DL_COORDINATOR_OK)throw std::runtime_error(std::string("Native stream: ")+dl_stream_coordinator_status_name(status));}
     static size_t Read(void* context,uint32_t offset,void* target,size_t size) {
-        auto& self=*static_cast<DlStreamPlay*>(context);self.file_.clear();self.file_.seekg(offset);self.file_.read(static_cast<char*>(target),size);
+        auto& self=*static_cast<DlStreamPlay*>(context);
+        if(self.transportEnabled_&&!self.bootstrapping_){
+            for(const auto& slot:self.slots_)if(slot.region_id&&offset>=slot.region.chunk_offset&&offset<slot.region.chunk_offset+slot.region.chunk_bytes){
+                const uint64_t key=(uint64_t(slot.generation)<<32)|slot.region_id;
+                const auto [it,inserted]=self.readReadyTicks_.emplace(key,self.serviceTick_+self.transport_.read_delay_ticks);
+                if(self.serviceTick_<it->second)return 0;
+                break;
+            }
+            size=std::min(size,size_t(self.transport_.read_slice_bytes));
+        }
+        self.file_.clear();self.file_.seekg(offset);self.file_.read(static_cast<char*>(target),size);
         return self.file_?size:SIZE_MAX;
     }
     void Initialize() {
+        serviceTick_=submitted_=rendererJob_=rendererReadyTick_=0;bootstrapping_=true;readReadyTicks_.clear();transportEvents_=Json::array();
         DlStreamCoordinatorCallbacks callbacks{};callbacks.read=Read;
-        callbacks.renderer_step=[](void*,const DlGame*,uint32_t,uint64_t){return true;};
+        callbacks.abandon=[](void* context,const DlRegionSlot* slot){auto& self=*static_cast<DlStreamPlay*>(context);
+            self.readReadyTicks_.erase((uint64_t(slot->generation)<<32)|slot->region_id);};
+        callbacks.renderer_begin=[](void* context,const DlGame*,uint64_t job){auto& self=*static_cast<DlStreamPlay*>(context);
+            self.rendererJob_=job;self.rendererReadyTick_=self.serviceTick_+(self.transportEnabled_?self.transport_.renderer_delay_ticks:0);};
+        callbacks.renderer_step=[](void* context,const DlGame*,uint32_t,uint64_t job){auto& self=*static_cast<DlStreamPlay*>(context);
+            return self.rendererJob_==job&&self.serviceTick_>=self.rendererReadyTick_;};
+        callbacks.renderer_cancel=[](void* context,uint64_t job){auto& self=*static_cast<DlStreamPlay*>(context);if(self.rendererJob_==job)self.rendererJob_=0;};
+        callbacks.graphics_completed=[](void* context,uint64_t* rsp,uint64_t* rdp){auto& self=*static_cast<DlStreamPlay*>(context);
+            const uint64_t nextRsp=self.transportEnabled_&&self.serviceTick_>self.transport_.rsp_delay_ticks?
+                std::min(self.submitted_,self.serviceTick_-self.transport_.rsp_delay_ticks):0;
+            const uint64_t nextRdp=self.transportEnabled_&&self.serviceTick_>self.transport_.rdp_delay_ticks?
+                std::min(self.submitted_,self.serviceTick_-self.transport_.rdp_delay_ticks):0;
+            *rsp=std::max(self.coordinator.world.completed_rsp,nextRsp);*rdp=std::max(self.coordinator.world.completed_rdp,nextRdp);};
+        callbacks.observe=[](void* context,const DlStreamCoordinator*,const DlGame*,const DlStreamCoordinatorEvent* event){
+            auto& self=*static_cast<DlStreamPlay*>(context);if(!self.transportEnabled_)return;
+            if(self.transportEvents_.size()>=256)self.transportEvents_.erase(self.transportEvents_.begin());
+            self.transportEvents_.push_back({{"tick",self.serviceTick_},{"kind",event->kind},{"reason",event->reason},{"job",event->job},{"mask",event->mask},{"region",event->region}});
+        };
         const auto config=dl_stream_coordinator_default_config();
         Check(dl_stream_coordinator_init(&coordinator,&bootstrap_,&mission_,slots_.data(),slots_.size(),&callbacks,&config,this));
     }

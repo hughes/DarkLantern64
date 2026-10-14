@@ -5,6 +5,7 @@
     bool debugCollision_=false,debugSight_=false;
 
     void DrawSimulationDebug(Scene& scene,DebugRenderer& renderer) {
+        DrawStreamOverlays(scene,renderer);
         const auto line=[&](DlVec3 a,DlVec3 b,glm::vec4 color){renderer.DrawDebugLine({a.x,a.y,a.z},{b.x,b.y,b.z},color);};
         if(native_&&engine_.IsPlaying()) {
             const auto& g=native_->game;
@@ -57,7 +58,7 @@
             throw std::runtime_error("Streamed mission source needs a mission partition and bounded cook before Native Play.");
         if(document_.contains("authoring_profile")&&document_.at("authoring_profile")=="external-scale-study")
             throw std::runtime_error("This source study is available for editor and Blender inspection. Open its bounded runtime level for Native Play; the full mission needs streaming and runtime capacity work.");
-        SyncPreviewTransforms();
+        StopStreamPreview();ClearStreamBoundsHandle();SyncPreviewTransforms();
         const auto stage=queue_/"native-snapshot.json";
         AtomicWrite(stage,document_.dump(2)+"\n");
         std::vector<std::wstring> args{L"cook",L"--level",source_.wstring(),L"--staged",stage.wstring()};

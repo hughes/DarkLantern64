@@ -86,7 +86,8 @@ DlStreamSceneStatus dl_stream_scene_init(DlStreamScene *scene,const DlLevel *boo
     if(definition->max_resident_regions>DL_STREAM_SCENE_MAX_RESIDENT_REGIONS)return DL_STREAM_SCENE_CAPACITY;
     if(definition->policy==DL_STREAM_POLICY_AUTHORED){
         if(!definition->policy_regions||!definition->max_resident_regions||definition->keep_neighbors_resident||
-            !definition->transitions||!definition->transition_count||definition->transition_count>256)return DL_STREAM_SCENE_ARGUMENT;
+            (definition->transition_count&&!definition->transitions)||
+            (!definition->transition_count&&mission->region_count!=1)||definition->transition_count>256)return DL_STREAM_SCENE_ARGUMENT;
         uint32_t allowed=all_regions(mission->region_count);
         for(uint32_t id=1;id<=mission->region_count;++id){
             const DlStreamPolicyRegion *row=&definition->policy_regions[id-1];

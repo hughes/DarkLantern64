@@ -257,7 +257,7 @@
         return {{"created",created},{"dirty",true},{"selection",selection_}};
     }
     Json StreamCommand(const std::string& op,const Json& args) {
-        if(op=="get_streaming")return {{"draft",streamDraft_},{"saved_sha256",streamSavedSha_},{"dirty",dirty_}};
+        if(op=="get_streaming")return {{"draft",streamDraft_},{"saved_sha256",streamSavedSha_},{"dirty",dirty_},{"homes",DlRegionAuthoring::Homes(streamDraft_,document_)}};
         if(streamDraft_.is_null())throw std::runtime_error("This scene has no stream partition");
         if(engine_.IsPlaying()||Busy())throw std::runtime_error("Finish Play/build before editing regions");
         ObserveDocument();Json candidate=streamDraft_;
@@ -267,7 +267,9 @@
             for(auto& row:regions)if(row.is_object()&&row.contains("id")&&row.at("id")==id)return row;
             throw std::runtime_error("Unknown region: "+id);
         };
-        if(op=="assign_region") {
+        if(DlRegionAuthoring::Supports(op)) {
+            candidate=DlRegionAuthoring::Apply(candidate,document_,op,args);
+        }else if(op=="assign_region") {
             const std::string home=args.at("region");findRegion(home);
             const auto ids=SelectedIds(args);
             for(auto& row:regions){

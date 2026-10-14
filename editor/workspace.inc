@@ -54,6 +54,7 @@
     std::map<std::string,StreamBoundsInput> streamBoundsInputs_;
     char newTransitionId_[65]="new-gate";
     std::string newTransitionFrom_,newTransitionTo_;
+    float newGateMinimum_[3]={-.03f,-1,-.5f},newGateMaximum_[3]={.03f,3,.5f};
     void DrawPolicyBounds(const std::string& id,const std::string& key,const Json& bounds,const char* label,const std::string& op) {
         ImGui::PushID((op+":"+id+":"+key).c_str());
         auto [iterator,inserted]=streamBoundsInputs_.try_emplace(op+":"+id+":"+key);auto& input=iterator->second;
@@ -72,9 +73,7 @@
     void DrawStreaming() {
         if(BeginPanel("Streaming")) {
             if(const auto* info=StreamingInfo()) {
-                ImGui::TextWrapped("Experimental stream mission");
-                ImGui::TextWrapped("%s",info->value("preview_mode",std::string()).c_str());
-                ImGui::TextWrapped("%s",info->value("native_play_reason",std::string()).c_str());
+                DrawStreamPreviewControls();
                 ImGui::Separator();
                 ImGui::TextWrapped("Partition: %s",info->value("mission_manifest",std::string()).c_str());
                 const Json emptyRegions=Json::array();
@@ -83,6 +82,7 @@
                 if(!regionList)ImGui::TextWrapped("Partition regions must be an array. Repair the manifest structure and reload; the scene remains editable.");
                 const auto visibility=StreamText(streamDraft_,"visibility","door-distance");
                 ImGui::BeginDisabled(engine_.IsPlaying()||Busy()||!pendingAction_.empty());
+                DrawRegionLifecycle(regions);
                 if(ImGui::BeginCombo("Visibility",visibility.c_str())){
                     for(const char* value:{"door-distance","all-regions","authored-sets"})if(ImGui::Selectable(value,visibility==value))
                         Defer([this,value]{StreamCommand("set_streaming",{{"patch",{{"visibility",value}}}});});
@@ -116,6 +116,7 @@
                     float checkedMinimum[3],checkedMaximum[3];
                     const bool boundsValid=ReadStreamBounds(region,checkedMinimum,checkedMaximum);
                     if(ImGui::TreeNodeEx(id.c_str(),ImGuiTreeNodeFlags_DefaultOpen)) {
+                        DrawStreamHandles("region",id,"bounds");
                         if(!boundsValid)ImGui::TextWrapped("Bounds need two finite XYZ vectors. Apply replacement bounds below or fit bounds to owned objects.");
                         input.pending|=ImGui::InputFloat3("Minimum (m)",input.minimum,"%.3f");
                         input.pending|=ImGui::InputFloat3("Maximum (m)",input.maximum,"%.3f");
@@ -126,6 +127,7 @@
                         ImGui::EndDisabled();
                         if(ImGui::Button("Fit bounds to owned objects"))Defer([this,id]{StreamCommand("fit_region_bounds",{{"id",id}});});
                         if(visibility=="authored-sets"){
+                            DrawStreamHandles("region",id,"activation_bounds");
                             DrawPolicyBounds(id,"activation_bounds",region.contains("activation_bounds")?region.at("activation_bounds"):Json(),"Player activation bounds","set_region");
                             ImGui::TextWrapped("Conservative visible working set (include every region visible from this activation area):");
                             Json working=region.contains("working_set")&&region.at("working_set").is_array()?region.at("working_set"):Json::array({id});
@@ -164,6 +166,7 @@
                     for(const auto& gate:gates){
                         const auto id=StreamText(gate,"id");if(id.empty()){ImGui::TextWrapped("Malformed transition; repair its ID and endpoints in the manifest.");continue;}
                         if(ImGui::TreeNodeEx(("Gate "+id).c_str(),ImGuiTreeNodeFlags_DefaultOpen)){
+                            DrawStreamHandles("gate",id,"bounds");
                             for(const char* key:{"from","to"}){
                                 const auto selected=StreamText(gate,key);
                                 if(ImGui::BeginCombo(key,selected.c_str())){
@@ -187,6 +190,8 @@
                         }
                     }
                     ImGui::InputText("New gate ID",newTransitionId_,sizeof newTransitionId_);
+                    ImGui::Checkbox("Create both travel directions",&pairedGate_);
+                    if(pairedGate_)ImGui::InputText("Reverse gate ID",reverseGateId_,sizeof reverseGateId_);
                     for(const char* key:{"from","to"}){
                         auto& selected=std::string(key)=="from"?newTransitionFrom_:newTransitionTo_;
                         if(ImGui::BeginCombo((std::string("New gate ")+key).c_str(),selected.c_str())){
@@ -194,15 +199,19 @@
                             ImGui::EndCombo();
                         }
                     }
+                    ImGui::InputFloat3("New gate minimum",newGateMinimum_);ImGui::InputFloat3("New gate maximum",newGateMaximum_);
                     if(ImGui::Button("Add directed gate")){
                         const std::string id=newTransitionId_,from=newTransitionFrom_,to=newTransitionTo_;
-                        Defer([this,id,from,to]{StreamCommand("add_transition",{{"id",id},{"patch",{{"from",from},{"to",to},{"bounds",{{-.5,-.5,-.5},{.5,3,.5}}}}}});});
+                        const std::string reverse=reverseGateId_;const bool pair=pairedGate_;
+                        const Json bounds={{newGateMinimum_[0],newGateMinimum_[1],newGateMinimum_[2]},{newGateMaximum_[0],newGateMaximum_[1],newGateMaximum_[2]}};
+                        Defer([this,id,from,to,reverse,pair,bounds]{
+                            if(pair)StreamCommand("add_transition_pair",{{"id",id},{"reverse_id",reverse},{"from",from},{"to",to},{"bounds",bounds}});
+                            else StreamCommand("add_transition",{{"id",id},{"patch",{{"from",from},{"to",to},{"bounds",bounds}}}});
+                        });
                     }
                 }
                 if(!selected_.empty()) {
-                    std::string home;
-                    for(const auto& region:regions)if(StreamRegion(region)&&region.contains("entities")&&region.at("entities").is_array())
-                        for(const auto& entity:region.at("entities"))if(entity==selected_)home=StreamText(region,"id");
+                    const auto home=ObjectRegionHome(selected_);
                     ImGui::TextWrapped("Selected %s | home: %s",selected_.c_str(),home.empty()?"UNASSIGNED - assign before ROM cook":home.c_str());
                     if(ImGui::BeginCombo("Selection home",home.empty()?"Unassigned":home.c_str())){
                         for(const auto& region:regions)if(StreamRegion(region)){const std::string id=StreamText(region,"id");
@@ -210,7 +219,7 @@
                         ImGui::EndCombo();
                     }
                 }
-                ImGui::TextWrapped("Native Play uses the cooked mission and bounded working sets. Create/delete regions and viewport bounds handles remain future work.");
+                ImGui::TextWrapped("Drag the selected minimum, maximum or center handle with the viewport translation gizmo. Each completed drag is one paired Undo step.");
                 ImGui::EndDisabled();
             } else ImGui::TextWrapped("This scene uses the resident level format. Streaming partition controls are experimental.");
         }
@@ -310,14 +319,16 @@
         }
     }
     void FinishWorkspace() {
+        UpdateStreamObjectSelection();
         if(panels_.at("Streaming"))DrawStreaming();
         if(!engine_.IsPlaying()) {
             if(selected_.empty())selection_.clear();
             else if(!selection_.contains(selected_)){selection_.clear();selection_.insert(selected_);}
             std::optional<EntityId> selected;
             for(const auto& [id,name]:previewIds_)if(name==selected_){selected=id;break;}
-            engine_.SetEditorSelection(Busy()?std::nullopt:selected);
+            engine_.SetEditorSelection(Busy()?std::nullopt:streamBoundsHandle_?streamBoundsHandle_:selected);
         }
+        DrawStreamViewportStatus();
         if(!focusPanel_.empty()) {
             if(auto* window=ImGui::FindWindowByName(focusPanel_.c_str());window&&window->Active) {
                 ImGui::SetWindowFocus(window->Name);

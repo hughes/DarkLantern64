@@ -6,6 +6,18 @@ cc_library(
     deps = ["@dl64_animation//:animation", "@nlohmann_json//:json"],
 )
 
+cc_library(
+    name = "region_authoring",
+    hdrs = ["region_authoring.h"],
+    deps = ["@nlohmann_json//:json"],
+)
+
+cc_test(
+    name = "region_authoring_test",
+    srcs = ["test_region_authoring.cpp"],
+    deps = [":region_authoring"],
+)
+
 cc_binary(
     name = "play_runner",
     srcs = ["play_runner.cpp"],
@@ -46,23 +58,23 @@ cc_test(
 
 cc_binary(
     name = "darklantern64_project_editor",
-    srcs = ["main.cpp", "native_play.inc", "authoring.inc", "workspace.inc", "preparation.inc"],
+    srcs = ["main.cpp", "native_play.inc", "authoring.inc", "workspace.inc", "preparation.inc", "stream_preview.inc", "stream_workspace.inc"],
     copts = select({"@platforms//os:windows": ["/wd4005"], "//conditions:default": []}),
-    deps = [":character_preview", ":character_preview_mesh", "@lightengine//:lightengine"],
+    deps = [":character_preview", ":character_preview_mesh", ":region_authoring", "@lightengine//:lightengine"],
 )
 
 cc_binary(
     name = "darklantern64_editor",
-    srcs = ["main.cpp", "native_play.inc", "authoring.inc", "workspace.inc", "preparation.inc"],
+    srcs = ["main.cpp", "native_play.inc", "authoring.inc", "workspace.inc", "preparation.inc", "stream_preview.inc", "stream_workspace.inc"],
     copts = select({"@platforms//os:windows": ["/wd4005"], "//conditions:default": []}),
-    deps = [":character_preview", ":character_preview_mesh", "@lightengine//:lightengine"],
+    deps = [":character_preview", ":character_preview_mesh", ":region_authoring", "@lightengine//:lightengine"],
 )
 
 # Separate executable lets a scene workshop build while the original workshop
 # remains open on Windows, where a running executable cannot be replaced.
 cc_binary(
     name = "darklantern64_scene_editor",
-    srcs = ["main.cpp", "native_play.inc", "authoring.inc", "workspace.inc", "preparation.inc"],
+    srcs = ["main.cpp", "native_play.inc", "authoring.inc", "workspace.inc", "preparation.inc", "stream_preview.inc", "stream_workspace.inc"],
     copts = select({"@platforms//os:windows": ["/wd4005"], "//conditions:default": []}),
-    deps = [":character_preview", ":character_preview_mesh", "@lightengine//:lightengine"],
+    deps = [":character_preview", ":character_preview_mesh", ":region_authoring", "@lightengine//:lightengine"],
 )

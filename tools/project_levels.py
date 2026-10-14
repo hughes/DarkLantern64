@@ -249,7 +249,8 @@ class ProjectLevels:
                     visibility=partition["document"].get("visibility", "door-distance"),
                     bundle_id=row["id"] if row and "mission" in row else None,
                     native_play_supported=status["valid"], native_play_reason="" if status["valid"] else STREAM_NATIVE_REASON,
-                    preview_mode="Complete authoring scene; streaming residency and visibility are not simulated",
+                    preview_mode="Full authoring scene; optional cooked runtime preview uses shared streaming residency and publication",
+                    runtime_preview_supported=status["valid"],
                     regions=copy.deepcopy(partition["document"].get("regions", [])),
                     working_sets=copy.deepcopy(report["working_sets"]) if report else [], status=status)
 
@@ -583,7 +584,7 @@ class ProjectLevels:
                 report = compile_level(snapshot, cooked, self.content, authoring=True)
                 if streaming:
                     report.update(playable=streaming["native_play_supported"], native_play_supported=streaming["native_play_supported"], streaming=streaming,
-                                  preview_mode="Complete authoring scene; Native Play publishes bounded stream working sets")
+                                  preview_mode="Full authoring scene; cooked runtime preview and Native Play publish bounded stream working sets")
                 changes = {output / item.relative_to(cooked): item.read_bytes()
                            for item in cooked.rglob("*") if item.is_file() and
                            (not streaming or item.relative_to(cooked).as_posix() not in ("generated/demo_level.h", "generated/play.json"))}

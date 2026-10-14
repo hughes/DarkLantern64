@@ -8,8 +8,8 @@ does not complete this architecture.
 
 For the current practical workflow, including changing which rooms stay visible
 through an opening, see [Expanding Bafford content by hand](bafford-content-authoring.md).
-The sections below also describe future work; the hand-authoring guide labels
-the operations the editor supports today.
+The hand-authoring guide describes current controls. The sections below distinguish
+those controls from the remaining compiler and geometry work.
 
 ## Current integration and its limits
 
@@ -118,18 +118,74 @@ or fitting.
 After a successful publication, an ancillary cache/catalog failure reports a
 warning and retains the new saved identities so the next save can proceed.
 
-Region create/rename/delete controls, viewport bounds handles and selection
-overlays remain future work. The following
-work is necessary before the complete larger-level workflow is accepted.
+## Region authoring and cooked runtime preview
 
-## Region authoring as first-class scene editing
+The **Streaming** panel creates, renames, duplicates and deletes regions. New
+and duplicated regions start with empty homes and no outgoing gates; duplication
+copies bounds and replaces the region's own ID in its visible set. Assign
+objects, connect directed gates and validate before cooking. Renaming repairs
+entry, neighbor, working-set and gate references. Deleting an owned region
+requires an explicit **Reassign owned objects to** destination; deletion repairs
+references and removes endpoint gates in the same paired Undo step.
+Visible-set references follow the reassignment destination, with duplicates
+removed, so previously visible owned geometry remains included after deletion.
+A remaining single region can cook without gates after its transferred homes
+and test starts have valid geometry and activation coverage.
 
-Add a Regions panel and region overlay to the viewport. Authors need to create,
-rename, duplicate and delete regions; edit bounds with handles; choose an entry
-region; inspect neighbors; and assign selected objects to a home region from
-the Inspector. Region objects should be selectable from either the scene or
-region list. Display incomplete assignments and shared boundaries directly on
-the geometry. Support snapping, multi-selection and undo for these actions.
+Select a region or gate from its panel or viewport label. Geometry ownership
+bounds are blue, activation bounds cyan and gates orange. The minimum, maximum
+and center handles use the viewport translation gizmo. Release a drag to commit
+one paired Undo/Redo step; authoring objects keep their original transforms.
+Numeric Apply actions remain available for exact placement. New, duplicated,
+prefab and imported objects without a valid home remain marked as unresolved;
+the panel reports missing and duplicate assignments and the viewport marks
+unassigned objects in red. Empty or disconnected region drafts remain editable
+until their assignments and connections are complete.
+
+**Cook runtime preview** prepares both current drafts and switches the viewport
+to geometry copied from the shared coordinator's complete published bank.
+**Full authoring view** restores all editable source objects. A pending bank is
+never displayed, including when its CPU assembly finishes before its renderer.
+The mode label, saved scene/partition hashes, package SHA256 and play fingerprint
+identify the prepared snapshot. Editing either draft marks it **STALE DRAFT**;
+**Recook runtime preview** applies that change without silently replacing the
+running snapshot. Stale capacity witnesses are labeled too.
+
+Move the **Live preview camera** through the actual directed cuts, or use
+**Step preview** for deterministic inspection. Published sets are green,
+physical residency purple and pending sets yellow. Selecting an opening shows
+its source stable set, destination set, transition union and matching cooked
+capacity witnesses. **Delayed-load controls** exercise bounded reads, renderer
+preparation and independent RSP/RDP completion delays. Door and loot state
+belongs to the mission and survives working-set retirement and reload.
+
+The synthetic `tests/fixtures/stream_multi_opening.json` and paired manifest
+contain a hub with two independent openings. Its initial hub working set omits
+courtyard geometry visible through the second opening. Adding `courtyard` to
+that set repairs the view without changing scene geometry or any region chunk;
+the new manifest changes the prepared package identity. Verify the actual editor
+workflow in a private copied project with:
+
+```powershell
+python tools/verify_stream_authoring_preview.py
+```
+
+These captures use the same camera and source geometry. Only the hub's visible
+working set changes; the second opening reveals the courtyard after recooking.
+
+| Missing courtyard in the published set | Courtyard included in the published set |
+| --- | --- |
+| ![Missing geometry through the right opening](evidence/stream-multi-opening-missing.png) | ![Published courtyard through the right opening](evidence/stream-multi-opening-corrected.png) |
+
+The [verification evidence](evidence/stream-authoring-preview.json) records the
+tested editor build, isolated workflow checks and regression limits.
+
+This checks region lifecycle/reference repair, bounds handles, paired history,
+policy-only visibility repair, stale snapshots, delayed unpublished work,
+reversal, retirement, persistent mission state and checked paired Save. The
+portable fixture tests also verify unobstructed sight through both openings and
+unchanged region payloads after the visibility repair. Neither check certifies
+N64 timing; the console performance and lifecycle gates remain separate.
 
 Keep authored intent separate from derived compiler output. The authored
 manifest contains stable region IDs, canonical entity IDs, bounds/partition
@@ -172,7 +228,7 @@ Make derived results inspectable in the viewport: region bounds, portal
 polygons, visible candidate sets, walkable areas, actor clearance, missing
 collision and light/probe influence. A doorway should show its sight,
 navigation, collision, light and acoustic associations. Triangle/BVH collision
-and richer movement must eventually replace the current box-only demo without
+and richer movement must eventually extend the current box and exact-floor demo without
 changing how authors inspect a problematic stair or opening.
 
 The resource panel must distinguish ROM storage from resident RAM. Show current

@@ -151,6 +151,10 @@ public:
     void ResetGame(){if(stream_)stream_->Restart(game,preset);else dl_game_start(&game,&level,preset);}
     void Restart(){ResetGame();clock={};trace=Json::array();inputs=Json::array();traceDropped=0;injected={};}
     bool Streamed() const{return stream_!=nullptr;}
+    DlStreamPlay* Stream(){return stream_.get();}
+    const DlStreamPlay* Stream() const{return stream_.get();}
+    void ServiceStream(){if(stream_)stream_->Service(game);}
+    void ConfigureStreamTransport(const Json& options){if(!stream_)throw std::runtime_error("Session is not streamed");stream_->ConfigureTransport(options);}
     bool StreamVisible(const std::string& id) const{return !stream_||stream_->Visible(id);}
     static void Tick(void* context,const DlInput* input,uint64_t tick) {
         auto& s=*static_cast<DlPlaySession*>(context);

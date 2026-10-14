@@ -1,9 +1,10 @@
 # Expanding Bafford content by hand
 
 Start with the local **Bafford District** and make one doorway or room change at
-a time. The scene editor can place geometry, edit existing region ownership,
-change visible working sets and author movement gates. The viewport shows the
-complete authoring scene; check the rebuilt ROM to see the actual streamed view.
+a time. The scene editor places geometry, authors region ownership and bounds,
+changes visible working sets and creates movement gates. Switch between the
+complete authoring scene and the cooked runtime preview to inspect the actual
+published working view before checking the rebuilt ROM.
 
 ## Open the right source
 
@@ -95,9 +96,12 @@ For a doorway between rooms A and B:
 3. Apply any numeric **Player activation bounds** changes. Keep activation areas
    coherent with the walkable layout. Geometry ownership bounds may overlap;
    they have a separate purpose.
-4. Click **Validate draft**, then rebuild and check the ROM from both sides.
-   Missing distant walls/roofs or a view that appears only when approaching a
-   different doorway usually needs a broader stable `working_set`.
+4. Click **Validate draft**, then **Cook runtime preview** in Streaming. Enable
+   **Live preview camera** and inspect both sides; **Step preview** advances
+   pending work explicitly. Missing distant walls/roofs or a view that appears
+   only when approaching a different doorway usually needs a broader stable
+   `working_set`. Change the visible checkboxes and **Recook runtime preview**
+   to compare the result. Check the rebuilt ROM after the preview is correct.
 
 Transition prefetch considers movement direction and proximity, within a 5 m
 approach window, and selects only one target. It cannot cover another room
@@ -123,9 +127,11 @@ cut, separate from the visible opening and its working set.
 - Cover the full traversable opening, body height and jump range. The gate must
   intersect both endpoint activation boxes. A narrow floor-level strip can
   leave a path over or around the unavailable-region blocker.
-- Add a separate reverse gate for return travel. Use **Open gate** for an
-  unobstructed passage, or choose an existing canonical door. A door's home must
-  be one endpoint; use the same door for the two directions of that opening.
+- Check **Create both travel directions**, enter a unique **Reverse gate ID**,
+  then add the pair in one Undo step. Each direction retains its own visible
+  working set. Use **Open gate** for an unobstructed passage, or choose an
+  existing canonical door. A door's home must be one endpoint; use the same
+  door for both directions of that opening.
 - Gate add/edit/delete regenerates authored **Prefetch neighbors** from outgoing
   destinations. In JSON, keep those neighbor lists equal to the outgoing gate
   destinations. Every region must be reachable from **Entry region**, with at
@@ -167,28 +173,72 @@ adjust/reuse an existing light before adding another.
 
 ## Add a new region when existing ones stop fitting
 
-Existing region ownership and policy are editable in the GUI. Creating,
-renaming, duplicating or deleting a **region** still requires manifest editing.
-Viewport bounds handles are unavailable; use the Streaming panel's numeric
-controls. **Levels > Duplicate** copies a whole mission; it does not add a region
-inside that mission.
+Use **Streaming > Region authoring**, enter a **New region ID** and click
+**Create region**. New regions start empty. Select its viewport label or bounds
+handle, assign objects through **Selection home**, and fit or position its real
+bounds. Activation bounds and visible sets have separate controls and meaning.
+Add the directed opening connections before validating the cook.
 
-Save both drafts before external editing. In the paired `.mission.json`:
+For an existing region, **Rename region** rewrites region references throughout
+the partition. **Duplicate region** copies bounds and its visible set, replacing
+its own ID with the new ID, while leaving homes and connections empty. It does
+not duplicate geometry. **Levels > Duplicate** copies the complete paired
+mission instead.
 
-1. Add a unique region row with `id`, `bounds`, `entities`, `neighbors`,
-   `activation_bounds` and `working_set`. Give it real, ordered finite XYZ
-   bounds and include its own ID in its working set.
-2. Move the intended canonical entity IDs into its `entities` list, removing
-   their previous homes. Split geometry/proxies first when necessary. Keep at
-   least one home entity in each region.
-3. Add directed transitions and matching outgoing neighbors, ensure entry
-   reachability, and update every affected visible working set.
-4. Use **File > Reload saved level** before continuing GUI work. An external
-   source/partition change while the editor has drafts produces a hash conflict;
-   reconcile the drafts instead of overwriting the changed file.
+Select **Minimum**, **Maximum** or **Center** on a region, activation area or
+gate to move its handle with the viewport translation gizmo. Release the drag to
+commit one paired Undo step. Numeric bounds and **Apply bounds** remain useful
+for exact coordinates. Geometry transforms do not change when these partition
+handles move.
 
-Mesh cuts and new region rows are explicit manual work today. There is no
-automatic portal extraction, visibility proof or streamed Native Play preview.
+Before **Delete region...**, choose **Reassign owned objects to**. **Delete and
+repair** moves those home IDs, removes gates that end at the deleted region and
+repairs entry/neighbors/visible-set references together. An owned region cannot
+be deleted without that destination. Undo restores the complete partition state.
+Visible-set references change to the new home rather than dropping the visible
+geometry; outgoing movement gates are removed independently.
+New, duplicated and imported scene objects remain visibly unassigned until a
+valid home is chosen; empty or disconnected drafts remain editable for repair.
+Deleting down to one region is valid after fitting its transferred homes and
+activation coverage. That final authored region needs no transition gates.
+
+Mesh cuts, visibility sets and region placement are still explicit authoring
+work. There is no automatic portal extraction or visibility proof.
+
+## Compare authoring with the published runtime view
+
+**Cook runtime preview** cooks the current scene and partition drafts together.
+The viewport shows geometry from complete published banks, rather than hiding
+source objects solely by their home labels. **Full authoring view** returns to
+the editable scene. Source/partition hashes, package SHA256 and the play
+fingerprint identify the snapshot. Editing a draft marks it **STALE DRAFT**;
+recook when ready to update the preview.
+
+Enable **Streaming overlays** to see blue geometry bounds, cyan activation
+areas, orange gates, green published sets, purple physical residency and yellow
+pending work. Select a region or opening to inspect its stable visible set,
+destination set, transition union and cooked capacity witnesses. Move the live
+camera through the directed gates; arbitrary movement through a wall does not
+become a new transition.
+
+Use **Delayed-load controls** to slow reads, renderer preparation or independent
+graphics completion. Turn back while a candidate is loading and confirm that
+the published architecture remains complete. Leave a region and return; doors
+and collected loot retain their mission state. **Native Play** uses the same
+cooked coordinator with simulation and interactions. Desktop preview is a
+visibility/content check; ROM rendering, audio and performance acceptance remain
+separate.
+
+For a small reproducible multiple-opening example without imported Bafford art,
+see `tests/fixtures/stream_multi_opening.json` and its `.mission.json`. The hub
+can see north and courtyard through separate openings; its intentionally narrow
+working set hides the courtyard landmark. Add courtyard to the hub working set
+and recook. This fixes the view without changing any source geometry. The owned
+editor verifier runs that repair, region authoring, delays and paired Save:
+
+```powershell
+python tools/verify_stream_authoring_preview.py
+```
 
 ## Save, check budgets and walk the result
 
@@ -227,8 +277,9 @@ costs need additional measurement.
 
 Use **Test start** in Build & Diagnostics and **Build > Run level in Ares** for
 the actual streamed mission. New `test_starts` are authored in scene JSON; keep
-them supported, clear of blockers and inside an activation area. The editor's
-ordinary **Play** is disabled for stream scenes.
+them supported, clear of blockers and inside an activation area. Ordinary
+**Play** starts the streamed Native Play simulation; use the separate runtime
+preview while authoring region bounds or visible sets.
 
 Equivalent district build/run command:
 

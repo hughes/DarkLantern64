@@ -60,6 +60,15 @@ Choose a context or transition to inspect its RAM components, active channels, r
 
 ## Native Play and authoring
 
+For streamed scenes, **Window > Streaming** provides region create, rename,
+duplicate and delete, explicit home reassignment, atomic bidirectional gates,
+and viewport minimum/maximum/center bounds handles. **Cook runtime preview**
+shows the shared coordinator's complete published geometry while the full
+authoring view remains available. Draft edits mark the cooked snapshot stale;
+recook to update it. The Inspector and Objects list mark missing homes.
+See the [streaming editor contract](../docs/streaming-editor.md) for identity,
+capacity witnesses, camera controls and delayed-load inspection.
+
 **Play** on the menu bar runs the same C physics, guard AI, interactions and
 animation decisions as the ROM, from the active unsaved document. Pause, step,
 restart and stop preserve authoring state. **Window → Blockout & Groups** adds blockout primitives,

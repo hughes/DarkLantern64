@@ -328,6 +328,43 @@ static int cooked_fixture(const char *path){
     free(bytes);return 0;
 }
 #endif
+static int authored_single_region_without_gates(void){
+    enum { DIR=144,CHUNK=68,BYTES=212 };
+    uint8_t bytes[BYTES]={0},data[CHUNK];static DlStreamScene adapter;
+    memcpy(bytes,"DLM1",4);put16(bytes+4,1);put16(bytes+6,64);put32(bytes+8,BYTES);
+    put32(bytes+12,1);put32(bytes+16,1);put32(bytes+20,DIR);put32(bytes+24,1);
+    uint8_t *chunk=bytes+DIR;memcpy(chunk,"DLR1",4);put16(chunk+4,1);put16(chunk+6,32);
+    put32(chunk+8,CHUNK);put32(chunk+12,1);section(chunk+32,3,64,1,4);put32(chunk+64,1);
+    uint8_t *region=bytes+64;put32(region,1);put32(region+4,DIR);put32(region+8,CHUNK);put32(region+12,CHUNK);
+    put32(region+16,crc32(chunk,CHUNK));putfloat(region+32,-4);putfloat(region+36,-1);putfloat(region+40,-2);
+    putfloat(region+44,4);putfloat(region+48,3);putfloat(region+52,2);
+    put32(bytes+128,1);put32(bytes+132,1);put32(bytes+28,crc32(bytes,DIR));
+    DlMission parsed;CHECK(dl_mission_open(bytes,DIR,BYTES,&parsed)==DL_MISSION_OK);
+    DlStreamPolicyRegion policy={.activation_minimum={-4,-1,-2},.activation_maximum={4,3,2},.working_mask=1};
+    DlStreamDefinition def={.package_path="single",.directory_bytes=DIR,.file_bytes=BYTES,.max_region_bytes=CHUNK,
+        .region_count=1,.policy=DL_STREAM_POLICY_AUTHORED,.policy_regions=&policy,.max_resident_regions=1};
+    DlLevel base={.version=2,.title="single region",.spawn={-2,0,0},.stream=&def};
+    CHECK(dl_stream_scene_init(&adapter,&base,&parsed)==DL_STREAM_SCENE_OK);
+    DlStreamPolicyState state={0};
+    CHECK(dl_stream_scene_policy_update(&adapter,base.spawn,0,&state)==1&&state.current_region==1&&!state.pending_transition);
+    CHECK(!dl_stream_scene_gate_waiting(&adapter,base.spawn,0)&&!dl_stream_scene_transition_at(&adapter,1,1,base.spawn));
+    DlRegionSlot slot={.buffer=data,.capacity=CHUNK};DlWorldStream manager;LargeReader reader={bytes,BYTES};DlRegionHandle h;
+    CHECK(dl_world_stream_init(&manager,&parsed,&slot,1,read_large,&reader)==DL_STREAM_OK);
+    CHECK(dl_world_stream_request(&manager,1,&h)==DL_STREAM_OK);
+    for(unsigned i=0;i<16&&slot.state!=DL_STREAM_RESIDENT;++i)dl_world_stream_pump(&manager,23);
+    CHECK(slot.state==DL_STREAM_RESIDENT&&dl_stream_scene_refresh(&adapter,&manager,NULL)==DL_STREAM_SCENE_OK);
+    const DlLevel *published=dl_stream_scene_level(&adapter);
+    CHECK(published&&published->collider_count==0&&published->floor_count==0&&dl_game_query_cache_ready(published));
+    CHECK(dl_stream_scene_region_resident(&adapter,1)&&slot.cpu_pins==0);
+    def.transition_count=1;CHECK(dl_stream_scene_init(&adapter,&base,&parsed)==DL_STREAM_SCENE_ARGUMENT);
+    def.transition_count=0;def.policy_regions=NULL;CHECK(dl_stream_scene_init(&adapter,&base,&parsed)==DL_STREAM_SCENE_ARGUMENT);
+    /* A disconnected multi-region descriptor remains rejected at init. */
+    prepare();CHECK(dl_mission_open(package,DIRECTORY,FILE_BYTES,&parsed)==DL_MISSION_OK);
+    def=definition;DlStreamPolicyRegion disconnected[2]={policy,policy};disconnected[1].working_mask=2;
+    def.policy=DL_STREAM_POLICY_AUTHORED;def.policy_regions=disconnected;def.max_resident_regions=2;base=bootstrap;base.stream=&def;
+    CHECK(dl_stream_scene_init(&adapter,&base,&parsed)==DL_STREAM_SCENE_ARGUMENT);
+    return 0;
+}
 static int authored_five_region_floor_views(void){
     enum { COUNT=5,DIR=464,STRIDE=256,CHUNK=244,BYTES=DIR+(COUNT-1)*STRIDE+CHUNK };
     static uint8_t bytes[BYTES],data[2][CHUNK];static DlStreamScene adapter;
@@ -824,7 +861,7 @@ static int contiguous_validated_fill(void){
     CHECK(loaded[0][0].cpu_pins==0&&loaded[0][1].cpu_pins==0);return 0;
 }
 int main(int argc,char **argv){
-    if(working_views()||atomic_failures()||initialization_limits()||refresh_capacity()||textured_v2_scene()||authored_five_region_floor_views()||authored_swept_gate_crossings()||authored_door_target()||staged_publication()||stable_key_material_bits()||incremental_assembly()||pending_guard_membership()||masked_preparation()||authored_door_barrier_interaction()||contiguous_validated_fill())return 1;
+    if(working_views()||atomic_failures()||initialization_limits()||refresh_capacity()||textured_v2_scene()||authored_single_region_without_gates()||authored_five_region_floor_views()||authored_swept_gate_crossings()||authored_door_target()||staged_publication()||stable_key_material_bits()||incremental_assembly()||pending_guard_membership()||masked_preparation()||authored_door_barrier_interaction()||contiguous_validated_fill())return 1;
 #ifdef DL_STREAM_SCENE_INTEGRATION
     if(argc>1&&cooked_fixture(argv[1]))return 1;
 #else

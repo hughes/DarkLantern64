@@ -1,0 +1,140 @@
+{
+  "version": 1,
+  "issue": "https://github.com/hughes/DarkLantern64/issues/3",
+  "measured_at_utc": "2026-10-14T00:46:05.502792+00:00",
+  "base_commit": "dea024de6a491d5eccc95a42a7381c6b052b1a3a",
+  "sources_sha256": {
+    "editor/main.cpp": "d0f5d23904a5260fb7d5cb5bdc1119462ab359264205291523ba157508435eec",
+    "editor/authoring.inc": "78e6f5ac30f16d390951464948545b19ad24be75cb032d233976787db9aaf508",
+    "editor/native_play.inc": "7a7f521aa29dcc2bbc63d0da4e91fbea0f5a305414da3ecb7283babc2d6683e7",
+    "editor/preparation.inc": "a74c41aa1eeacbac7bf73c7f2d192a32c3455db1b10fa782b4d9ca5b5f292185",
+    "editor/workspace.inc": "52bf0b917f881840b0f4ad54a58ff89b5dafc4607ad2345deed64c9edd90c76b",
+    "editor/region_authoring.h": "f64f7d16ab25867b5142fdf54074dafa0f6111cf8d5ce329c2686dc5c00d84fe",
+    "editor/stream_preview.inc": "448ddf51a31a54ab55eef2d3860b166bdb372660a3c3d03062699ed1c991871e",
+    "editor/stream_workspace.inc": "18d027185e8b78d3ce240682405336167c3a7c88a1d8514ffc7994cf6250335e",
+    "editor/stream_play.h": "daa6f4397a1e6f7d722db02d7cdac552daaa729cdf8244310360eca93942344c",
+    "editor/play_session.h": "01b240c0250744e22259125ae8ff080bda324d71eb3b40b120015948d433a250",
+    "src/stream_scene.c": "2a794612f5e24c74d6f9b6c008ee6ca9dc50b343fe3a9af6dbe8081bf34cbe73",
+    "tools/compile_mission.py": "17160c64efe2b5d6d4cf382968bc285588bca625afd4767d459ba0788c914372",
+    "tools/project_levels.py": "e6b4ac26a0d7011ebec881915651686bc008cb66ab4a03456a6fa7e3a9eef60e",
+    "tools/verify_stream_authoring_preview.py": "30697eec969ba57c3c74e46a3390a896fd962a11e2847fff3821310e3644e9b6",
+    "tests/fixtures/stream_multi_opening.json": "e8dd56ca56d68a1c122689fb49895a95018040c8c31d49eb9137bc0c2ae98f22",
+    "tests/fixtures/stream_multi_opening.mission.json": "e20c5d6960d4c2a322fa5a6110f338038a6574a9dfad67a914606091e0e5c893",
+    "editor/test_region_authoring.cpp": "75d39a772c65e3cb388bc7e286c1dbec857f4222f0b4cdcc0935ece17bafd77b",
+    "tests/test_compile_mission.py": "ca237ea1608c7a0291a9da0307db8f358b0905f8f6acd7dec5eef76481a44ade",
+    "tests/test_stream_scene.c": "54319c7e36fc7bb42f8507e2db0e591966667cf656b4cc04143322e6290d21f3",
+    "tests/test_multi_opening_fixture.py": "9422f7165150e2cdfb33c3fd242f34368c0adf264a403c962fb63c795e7b470c"
+  },
+  "authoring_preview": {
+    "private_root": "C:\\Users\\hughe\\dev\\DarkLantern64\\.dev\\stream-authoring-preview-verification\\7c2c3b806162400299516352908ab68b",
+    "editor": "C:\\Users\\hughe\\_bazel_hughe\\nw7efple\\execroot\\_main\\bazel-out\\x64_windows-fastbuild\\bin\\darklantern64_project_editor.exe",
+    "editor_sha256": "2a4df30f27e0f28552ef44951e5eca16ec46b7973858b39c24953a1c93687d7e",
+    "passed": true,
+    "checks": [
+      "Region create/rename/duplicate/delete preserves homes, repairs references and participates in paired Undo/Redo",
+      "Region and gate viewport handles commit one paired history step and leave source geometry unchanged",
+      "New, duplicated and prefab-placed objects expose missing homes until explicitly assigned; Undo restores the source scene",
+      "Selected source region exposes both outgoing openings, independent destination unions and checked capacity witnesses",
+      "A missing view through the second opening is repaired by working_set alone; stale prepared identity remains explicit until recook",
+      "Delayed IO/renderer/fence preview retains the published scene; reversal cancels obsolete demand and later reloads the complete working set",
+      "Independent RSP and RDP delays retain retiring slot generations until both domains complete, then permit reload",
+      "Paired checked Save rejects stale partition identity without losing drafts, then publishes the policy-only repair",
+      "Legacy free camera can leave and return without losing the published bank; invalid simulation and transport commands reject atomically",
+      "Active cooked preview hands off to Native Play, which restores complete authored rendering on Stop",
+      "Deleting down to one region with explicit reassignment and fitted coverage produces a valid gate-free preview; Undo restores the saved partition"
+    ],
+    "captures": [
+      {
+        "label": "multi-opening-missing-courtyard",
+        "path": "C:/Users/hughe/dev/DarkLantern64/.dev/stream-authoring-preview-verification/7c2c3b806162400299516352908ab68b/.dev/editor/project/captures/4c1e7ae73153499482f244431b2ec552.png",
+        "sha256": "b52ae2f38ad19cc59e3a943f81c87de7f0fea08faee959aee0559adceb69d176",
+        "size": [
+          541,
+          406
+        ],
+        "published_artifact": "docs/evidence/stream-multi-opening-missing.png"
+      },
+      {
+        "label": "multi-opening-corrected-working-set",
+        "path": "C:/Users/hughe/dev/DarkLantern64/.dev/stream-authoring-preview-verification/7c2c3b806162400299516352908ab68b/.dev/editor/project/captures/bb56d40ccb56431fa3ce66a5d8bf9923.png",
+        "sha256": "28032afb161cc7254534482bc87d1901ec15cf9d2dd9be5637e245ea123cc8a7",
+        "size": [
+          541,
+          406
+        ],
+        "published_artifact": "docs/evidence/stream-multi-opening-corrected.png"
+      }
+    ]
+  },
+  "native_play": {
+    "root": "C:\\Users\\hughe\\dev\\DarkLantern64\\.dev\\stream-native-verification\\dd94c7487b31400a886dd7141ee619da",
+    "passed": true,
+    "checks": [
+      "Cooked-package startup uses bounded slots, a published collision bank and matching viewport membership",
+      "Streamed editor replay reproduces identical headless gameplay and coordinator state",
+      "Host transport rejects a package whose cooked SHA-256 no longer matches",
+      "Editor import/export preserves settled replay boundaries and rejects invalid metadata before changing the session",
+      "The recorded door/loot/retire/reload/restart route reproduces the editor's final gameplay and coordinator state",
+      "Restart resets stream/game state; Stop restores authoring without changing sources",
+      "Native Play cooks unsaved scene and partition drafts together without changing canonical files",
+      "Viewport visibility and collision queries reveal a region only after its working bank publishes"
+    ],
+    "route": {
+      "ticks": 1070,
+      "published_masks": [
+        1,
+        2,
+        3
+      ],
+      "publication_changes": 7,
+      "loot_persisted": true,
+      "reset_passed": true
+    },
+    "capture": {
+      "label": "stream-native-west",
+      "path": "C:/Users/hughe/dev/DarkLantern64/.dev/stream-native-verification/dd94c7487b31400a886dd7141ee619da/.dev/editor/project/captures/80843e0a9050487b8a0cceef7e274dfb.png",
+      "sha256": "720ba6d4c2af23f9f42bcf74efeea5017b8099dec7de60250942353141b4e2b9",
+      "size": [
+        944,
+        406
+      ]
+    }
+  },
+  "headless_route": {
+    "ticks": 1070,
+    "passed": true,
+    "publication_changes": 7,
+    "loot_persisted": true,
+    "reset_passed": true,
+    "stream_boundary": "settled",
+    "package_sha256": "4b2b44e5d97923e47f71d6261bbd7c9b22e1ef577949e5c0dcca310ef413cdb0"
+  },
+  "checks": {
+    "editor_build": "passed",
+    "bazel_tests": [
+      "region_authoring_test",
+      "play_floors_test",
+      "character_preview_test"
+    ],
+    "portable_c_suite": "passed",
+    "python_suite": {
+      "tests": 515,
+      "passed": 512,
+      "skipped": 2,
+      "errors": 1,
+      "existing_error": "test_sponza_physics: Level collision differs from geometry: sponza-collision-parapet-north",
+      "baseline_reference": "docs/evidence/stream-coordinator-integration.json"
+    },
+    "latest_fixture_tests": {
+      "module": "tests.test_multi_opening_fixture",
+      "tests": 3,
+      "passed": 3,
+      "scope": "Run separately after the full-suite collection; includes the final single-region fixture regression."
+    }
+  },
+  "limitations": [
+    "The desktop preview validates cooked geometry visibility, policy and publication; it is not a console pixel, timing or audio measurement.",
+    "Renderer and graphics delays are controlled host callbacks; portable C tests independently exercise scheduler and lifetime failures.",
+    "The Python suite retains the previously recorded Sponza fixture error."
+  ]
+}

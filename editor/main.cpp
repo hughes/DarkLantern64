@@ -22,6 +22,7 @@
 #include "character_preview.h"
 #include "character_preview_mesh.h"
 #include "play_session.h"
+#include "region_authoring.h"
 #include <core/FrameContext.h>
 #include <util/DocumentHistory.h>
 #include <util/TransformTools.h>
@@ -297,6 +298,7 @@ class DemoEditor
     {
         while (engine_.IsRunning())
         {
+            SyncStreamBoundsHandle();
             SyncPreviewTransforms();
             PollPreparation();
             if(!ImGui::GetCurrentContext()||!ImGui::IsAnyItemActive())ObserveDocument();
@@ -309,7 +311,8 @@ class DemoEditor
                 if(engine_.IsPlaying()||Busy())continue;
                 Json args=Json::object();
                 if(id&&previewIds_.contains(*id)){selected_=previewIds_.at(*id);args["ids"]=Json::array({selected_});}
-                if(op=="select"){selection_.clear();if(id)selection_.insert(selected_);else selected_.clear();continue;}
+                if(op=="select"){if(!id||!streamBoundsHandle_||*id!=*streamBoundsHandle_)ClearStreamBoundsHandle();selection_.clear();if(id&&previewIds_.contains(*id))selection_.insert(selected_);else if(!streamBoundsHandle_)selected_.clear();continue;}
+                if(id&&streamBoundsHandle_&&*id==*streamBoundsHandle_)continue;
                 if(op=="add_box")AuthorCommand("add_blockout",args);
                 else if(op=="add_light")AuthorCommand("add_game_object",{{"kind","light"}});
                 else AuthorCommand(op=="duplicate"?"duplicate_entities":op=="delete"?"delete_entities":op,args);
@@ -402,6 +405,8 @@ class DemoEditor
 #include "authoring.inc"
 #include "workspace.inc"
 #include "preparation.inc"
+#include "stream_preview.inc"
+#include "stream_workspace.inc"
 
     bool Busy() const { return job_.valid()||preparation_.valid(); }
     static std::string LevelLabel(std::string title)
@@ -427,7 +432,7 @@ class DemoEditor
             const auto path="levels/"+level.at("stem").get<std::string>()+".json";
             levels.emplace_back(path,LevelLabel(level.at("title"))+" ("+level.at("file").get<std::string>()+")");
             engine_.OnLevelLoaded(path,[this](Scene& scene) { BindScene(scene); });
-            engine_.OnUpdate(path,[this](Scene& scene,bool playing,FrameContext& frame) { if(!playing)UpdateCharacters(scene,frame.dt); });
+            engine_.OnUpdate(path,[this](Scene& scene,bool playing,FrameContext& frame) { if(!playing){UpdateCharacters(scene,frame.dt);UpdateStreamPreview(scene,frame);} });
             engine_.OnImGui(path,[this] { Draw(); });
         }
         engine_.SetRegisteredLevels(std::move(levels));
@@ -445,7 +450,7 @@ class DemoEditor
             {"source",source_.string()},{"output",output_.string()},{"scene_path",scenePath_},{"project_editor",true},
             {"operations",{"pick_editor","inspect","list_levels","open_level","create_level","duplicate_level","delete_level","update_level","play_level","play_menu",
                 "drop_selection","save_prefab","place_prefab","add_game_object","set_game_object","undo","redo","add_blockout","select_entities","transform_selection","group_entities","duplicate_entities","delete_entities","refresh_preview","add_floor","add_transition","set_transition","delete_transition","import_blender_scene","import_asset_pack","add_prop","set_entity","add_enemy","duplicate_enemy","add_waypoint","delete_entity","set_environment","set_material",
-                "set_preview_transform","get_animation","set_animation","focus_character","save","build","capture","get_layout","set_panel","reset_layout","get_streaming","assign_region","set_region","set_streaming","fit_region_bounds","start_play","stop_play","inspect_scene","query_play","set_play_debug","inspect_play","pause_play","step_play","restart_play","set_play_input","get_play_trace","export_replay","replay_play","reload","get_audio_memory","set_audio_config","recalculate_audio","quit"}}}.dump(2));
+                "set_preview_transform","get_animation","set_animation","focus_character","save","build","capture","get_layout","set_panel","reset_layout","get_streaming","assign_region","set_region","set_streaming","fit_region_bounds","create_region","rename_region","duplicate_region","delete_region","add_transition_pair","select_stream_bounds","move_stream_bounds","clear_stream_bounds","start_stream_preview","stop_stream_preview","inspect_stream_preview","step_stream_preview","set_stream_preview_camera","set_stream_preview_transport","select_stream_preview","start_play","stop_play","inspect_scene","query_play","set_play_debug","inspect_play","pause_play","step_play","restart_play","set_play_input","get_play_trace","export_replay","replay_play","reload","get_audio_memory","set_audio_config","recalculate_audio","quit"}}}.dump(2));
     }
     void InvalidatePreviewAssets(const Json& cooked)
     {
@@ -458,6 +463,7 @@ class DemoEditor
     }
     void AdoptLevel(const Json& cooked)
     {
+        StopStreamPreview();ClearStreamBoundsHandle();streamSelectionId_.clear();streamSelectionKind_.clear();
         const fs::path source=cooked.at("source").get<std::string>();
         const auto snapshot=ReadText(source);
         if(cooked.contains("source_text")&&cooked.at("source_text")!=snapshot)
@@ -747,6 +753,7 @@ class DemoEditor
     }
     void BindScene(Scene& scene)
     {
+        streamBoundsHandle_.reset();streamHandleBounds_=nullptr;
         scene_ = &scene;
         previewIds_.clear(); previewTransforms_.clear();
         for (EntityId id : scene.AliveEntities())
@@ -757,6 +764,7 @@ class DemoEditor
                 previewTransforms_[id] = scene.transforms[id];
             }
         BindCharacters(scene);
+        BindStreamPreview(scene);
         scene.renderablesDirty = true;
     }
     static bool UniformScale(const Transform& transform)
@@ -1642,12 +1650,15 @@ class DemoEditor
                 if(preparation_.valid()&&op!="inspect"&&op!="get_layout"&&op!="get_animation"&&op!="get_audio_memory")continue;
                 fs::remove(path);
                 const Json args = request.value("args",Json::object());
+                SyncStreamBoundsHandle();
                 ObserveDocument();
-                if (op == "inspect") { Respond(id,true,{{"document",document_},{"source",source_.string()},{"output",output_.string()},{"scene_path",scenePath_},{"catalog",catalog_},{"pending_action",pendingAction_},{"dirty",dirty_},{"busy",Busy()},{"status",status_},{"report",report_},{"stream_cook_report",streamCookReport_},{"stream_cook_report_path",streamCookReportPath_.string()},{"enemy_types",EnemyTypes()},{"prefabs",PrefabCatalog()},{"frame",frame_},{"preparing",preparationKind_},{"last_preparation",lastPreparation_},{"preview_refresh_pending",structureDirty_},{"audio",AudioState()},{"animation",AnimationState()},{"play",NativeState()},{"selection",selection_},{"history",{{"can_undo",history_.CanUndo()},{"can_redo",history_.CanRedo()}}}}); continue; }
+                if (op == "inspect") { Respond(id,true,{{"document",document_},{"source",source_.string()},{"output",output_.string()},{"scene_path",scenePath_},{"catalog",catalog_},{"pending_action",pendingAction_},{"dirty",dirty_},{"busy",Busy()},{"status",status_},{"report",report_},{"stream_cook_report",streamCookReport_},{"stream_cook_report_path",streamCookReportPath_.string()},{"enemy_types",EnemyTypes()},{"prefabs",PrefabCatalog()},{"frame",frame_},{"preparing",preparationKind_},{"last_preparation",lastPreparation_},{"preview_refresh_pending",structureDirty_},{"audio",AudioState()},{"animation",AnimationState()},{"play",NativeState()},{"stream_preview",StreamPreviewState()},{"stream_bounds_handle",StreamBoundsState()},{"selection",selection_},{"history",{{"can_undo",history_.CanUndo()},{"can_redo",history_.CanRedo()}}}}); continue; }
                 if (op == "get_audio_memory") { Respond(id,true,AudioState()); continue; }
                 if (op == "get_animation") { Respond(id,true,AnimationState()); continue; }
                 if (op == "get_layout") { Respond(id,true,Layout()); continue; }
                 if (op == "get_streaming") { Respond(id,true,StreamCommand(op,args)); continue; }
+                if(op=="start_stream_preview"||op=="stop_stream_preview"||op=="inspect_stream_preview"||op=="step_stream_preview"||op=="set_stream_preview_camera"||op=="set_stream_preview_transport"||op=="select_stream_preview") {Respond(id,true,StreamPreviewCommand(op,args));continue;}
+                if(op=="select_stream_bounds"||op=="move_stream_bounds"||op=="clear_stream_bounds") {Respond(id,true,StreamBoundsCommand(op,args));continue;}
                 if (op == "set_panel") { ShowPanel(args.at("name"),args.value("visible",true)); Respond(id,true,Layout()); continue; }
                 if (op == "reset_layout") { ResetWorkspace(); Respond(id,true,{{"scheduled",true}}); continue; }
                 if (op=="inspect_scene"||op=="query_play"||op=="set_play_debug"||op=="inspect_play"||op=="get_play_trace"||op=="export_replay"||op=="stop_play"||op=="pause_play"||op=="restart_play"||op=="set_play_input"||op=="step_play"||op=="replay_play"||op=="start_play") {
@@ -1689,7 +1700,7 @@ class DemoEditor
                     testStart_=preset; Save(true,id,op=="play_menu"?"menu":"level");
                 }
                 else if(op=="drop_selection"||op=="save_prefab"||op=="place_prefab"||op=="add_game_object"||op=="set_game_object"||op=="undo"||op=="redo"||op=="add_blockout"||op=="add_floor"||op=="select_entities"||op=="transform_selection"||op=="group_entities"||op=="duplicate_entities"||op=="delete_entities"||op=="refresh_preview")Respond(id,true,AuthorCommand(op,args));
-                else if(op=="assign_region"||op=="set_region"||op=="set_streaming"||op=="fit_region_bounds"||op=="add_transition"||op=="set_transition"||op=="delete_transition")Respond(id,true,StreamCommand(op,args));
+                else if(op=="assign_region"||op=="set_region"||op=="set_streaming"||op=="fit_region_bounds"||op=="add_transition"||op=="set_transition"||op=="delete_transition"||op=="create_region"||op=="rename_region"||op=="duplicate_region"||op=="delete_region"||op=="add_transition_pair")Respond(id,true,StreamCommand(op,args));
                 else if (op == "set_entity") { SetEntity(args); Respond(id,true,{{"entity",*Entity(args.at("id"))},{"dirty",true},{"validation","pending save"}}); }
                 else if (op == "import_blender_scene") Respond(id,true,ImportBlenderScene(args));
                 else if (op == "import_asset_pack") Respond(id,true,ImportAssetPack(args));
@@ -1905,8 +1916,10 @@ class DemoEditor
             for(const auto& e:document_["entities"]) {
                 const std::string id=e["id"],kind=e["kind"];
                 if(*objectFilter_&&id.find(objectFilter_)==std::string::npos&&kind.find(objectFilter_)==std::string::npos)continue;
-                ImGui::PushStyleColor(ImGuiCol_Text,MarkerColor(kind));
-                if(ImGui::Selectable((id+"##object").c_str(),selection_.empty()?id==selected_:selection_.contains(id))) {
+                const auto home=ObjectRegionHome(id);const bool unresolved=!streamDraft_.is_null()&&(home.empty()||home=="MULTIPLE HOMES");
+                ImGui::PushStyleColor(ImGuiCol_Text,unresolved?IM_COL32(255,77,51,255):MarkerColor(kind));
+                if(ImGui::Selectable((id+(unresolved?"  [HOME REQUIRED]":"")+"##object").c_str(),selection_.empty()?id==selected_:selection_.contains(id))) {
+                    ClearStreamBoundsHandle();
                     if(ImGui::GetIO().KeyCtrl&&selection_.contains(id)) {
                         selection_.erase(id);
                         if(selected_==id)selected_=selection_.empty()?"":*selection_.begin();
@@ -2105,6 +2118,17 @@ class DemoEditor
                 ImGui::TextUnformatted(selected_.c_str());
                 ImGui::TextDisabled("Kind: %s",(*entity)["kind"].get<std::string>().c_str());
                 ImGui::BeginDisabled(Busy());
+                if(streamDraft_.is_object()&&streamDraft_.contains("regions")&&streamDraft_.at("regions").is_array()) {
+                    const auto home=ObjectRegionHome(selected_);
+                    if(home.empty()||home=="MULTIPLE HOMES")ImGui::TextColored(ImVec4(1,.3f,.2f,1),"Valid home assignment required before cooking");
+                    if(ImGui::BeginCombo("Home region",home.empty()?"Unassigned":home.c_str())) {
+                        for(const auto& row:streamDraft_.at("regions"))if(StreamRegion(row)) {
+                            const auto id=StreamText(row,"id"),object=selected_;
+                            if(ImGui::Selectable(id.c_str(),home==id))Defer([this,id,object]{StreamCommand("assign_region",{{"region",id},{"ids",Json::array({object})}});});
+                        }
+                        ImGui::EndCombo();
+                    }
+                }
                 for (const char* name : {"position","rotation","scale"})
                 {
                     const auto& value = (*entity)["transform"][name];

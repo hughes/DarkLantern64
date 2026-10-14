@@ -143,7 +143,7 @@ def authored_policy(manifest, regions, state, homes):
         return None
     by_id = {row["id"]: row for row in regions}
     source = manifest.get("transitions")
-    level.require(isinstance(source, list) and source and len(source) <= 256, "Authored transitions need 1..256 directed gates")
+    level.require(isinstance(source, list) and len(source) <= 256, "Authored transitions need 0..256 directed gates")
     gates, ids = [], set()
     for row in source:
         fields(row, {"id", "from", "to", "bounds"}, "transition", {"door"})
@@ -648,7 +648,8 @@ def bootstrap_header(document, state, package_report, package_path):
         values = ["    {" + str(row["from_region"]) + "," + str(row["to_region"]) + "," +
                   vector(row["bounds"][0]) + "," + vector(row["bounds"][1]) + "," +
                   str(entity_ids[row["door"]] if row.get("door") else 0) + "}" for row in package_report["transitions"]]
-        links.append("static const DlStreamTransition dl_stream_transitions[] = {\n" + ",\n".join(values) + "\n};")
+        if values:
+            links.append("static const DlStreamTransition dl_stream_transitions[] = {\n" + ",\n".join(values) + "\n};")
     links.append("static const DlStreamDefinition dl_stream_definition = {\n" +
                  "    .package_path=" + json.dumps(package_path) + ",\n" +
                  "    .package_sha256=" + json.dumps(package_report["package_sha256"]) + ",\n" +
@@ -656,7 +657,7 @@ def bootstrap_header(document, state, package_report, package_path):
                  f".max_region_bytes={max(row['chunk_bytes'] for row in package_report['regions'])}, .region_count={len(package_report['regions'])},\n" +
                  "    .model_entity_ids=dl_stream_model_ids, .object_entity_ids=dl_stream_object_ids, .enemy_entity_ids=dl_stream_enemy_ids,\n" +
                  "    .keep_neighbors_resident=" + str(package_report.get("visibility") == "all-regions").lower() + ",\n" +
-                 (f"    .policy=DL_STREAM_POLICY_AUTHORED, .policy_regions=dl_stream_policy_regions, .transitions=dl_stream_transitions, .transition_count={len(package_report['transitions'])},\n"
+                 (f"    .policy=DL_STREAM_POLICY_AUTHORED, .policy_regions=dl_stream_policy_regions, .transitions={'dl_stream_transitions' if package_report['transitions'] else 'NULL'}, .transition_count={len(package_report['transitions'])},\n"
                   if package_report.get("visibility") == "authored-sets" else "") +
                  f"    .max_resident_regions={package_report['max_resident_regions']},\n" +
                  f"    .materials=dl_stream_materials, .material_count={len(materials)}\n" + "};")

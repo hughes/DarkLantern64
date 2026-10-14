@@ -93,6 +93,7 @@ python tools/build.py --editor
 python tools/verify_project_editor.py
 python tools/verify_asset_editor.py --editor editor/bazel-bin/darklantern64_project_editor.exe
 python tools/verify_enemy_editor.py --editor editor/bazel-bin/darklantern64_project_editor.exe
+python tools/verify_stream_authoring_preview.py
 
 # Shared streaming state machine and every-tick host/MIPS functional replay
 node tools/check_stream_coordinator.mjs --proof

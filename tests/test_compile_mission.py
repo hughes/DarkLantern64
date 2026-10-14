@@ -155,6 +155,43 @@ class MissionCookTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,"reachable"):
             self.cook()
 
+    def test_single_authored_region_after_reassignment_cooks_without_gates(self):
+        # Deleting one of two regions transfers its homes and removes the pair.
+        # The remaining region still owns both rooms and their global objects.
+        bounds = [[-8.1, -.5, -4.1], [8.1, 4.1, 4.1]]
+        self.manifest.update(entry_region="whole", visibility="authored-sets", transitions=[],
+                             regions=[dict(id="whole", bounds=bounds, activation_bounds=bounds,
+                                           entities=[row["id"] for row in self.document["entities"]],
+                                           neighbors=[], working_set=["whole"])])
+        package, report = self.cook()
+        mission.validate_stream_bridge(report)
+        self.assertEqual(report["transitions"], [])
+        self.assertEqual(report["max_resident_regions"], 1)
+        self.assertEqual(report["policy_regions"][0]["working_mask"], 1)
+        self.assertEqual(report["working_sets"][0]["barrier_count"], 0)
+        prepared, header = self.prepare_bootstrap()
+        text = header.read_text()
+        self.assertIn(".transitions=NULL, .transition_count=0", text)
+        self.assertNotIn("dl_stream_transitions[]", text)
+        self.assertEqual((self.root / "bootstrap" / prepared["mission"]["path"]).read_bytes(), package)
+        native = json.loads((header.parent / "play.json").read_bytes())
+        self.assertEqual(native["stream"]["transitions"], [])
+        self.assertEqual(native["stream"]["max_resident_regions"], 1)
+        # The generated descriptor must be standard C, not a zero-sized array.
+        unit = self.root / "single-header.c"
+        unit.write_text('#include "demo_level.h"\nint main(void) { return dl_demo_level.stream->transition_count != 0; }\n')
+        subprocess.run([os.environ.get("CC", "gcc"), "-std=c17", "-pedantic-errors", "-Wall", "-Wextra", "-Werror",
+                        "-I" + str(ROOT / "src"), "-I" + str(header.parent), str(unit), "-o", str(self.root / "single-header.exe")],
+                       check=True, capture_output=True, text=True)
+
+    def test_zero_gates_still_rejects_unreachable_multiple_regions(self):
+        self.authored_five_regions()
+        self.manifest["transitions"] = []
+        for region in self.manifest["regions"]:
+            region["neighbors"] = []
+        with self.assertRaisesRegex(ValueError, "reachable"):
+            self.cook()
+
     def test_v3_exact_floor_records_preserve_transformed_vertices_and_bootstrap_omits_contacts(self):
         self.document["entities"].append(dict(id="ramp-plane",kind="static",
             transform=dict(position=[-4,0,0],rotation=[0,0,0],scale=[2,1,1]),

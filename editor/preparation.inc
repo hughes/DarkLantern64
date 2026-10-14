@@ -9,6 +9,8 @@
             transform=scene_->transforms[*scene_->cameraId];
             camera=scene_->cameras[*scene_->cameraId];
         }
+        if(scene_)RestoreStreamPreviewScene(*scene_);
+        ClearStreamBoundsHandle();
         engine_.LoadScene(scenePath_);
         if(transform&&camera&&scene_&&scene_->cameraId) {
             scene_->transforms[*scene_->cameraId]=*transform;

@@ -36,6 +36,14 @@ typedef struct {
 #endif
 } StreamRom;
 static StreamRom *active;
+void dl_stream_rom_lighting_view(const DlGame *game,uint32_t *revision,uint32_t *mask){
+    if(revision)*revision=0;
+    if(mask)*mask=0;
+    if(!active||!game||game->level!=dl_stream_scene_level(&active->coordinator.scene))return;
+    const DlStreamScene *scene=&active->coordinator.scene;const DlStreamSceneBank *bank=&scene->banks[scene->active_bank];
+    if(revision)*revision=scene->revision;
+    if(mask)for(uint32_t i=0;i<bank->resident_count;++i)*mask|=UINT32_C(1)<<(bank->resident_ids[i]-1);
+}
 #if DL_RUNTIME_TRACE
 static uint32_t resident_mask(const StreamRom *s);
 #ifndef DL_RUNTIME_TRACE_BUILD_ID

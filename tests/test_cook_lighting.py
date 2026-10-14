@@ -33,7 +33,7 @@ class LightingCookTests(unittest.TestCase):
         compiler, env, _ = cook_lighting.host_compiler()
         output = self.directory / "test.exe"
         cook_lighting.run([compiler, *cook_lighting.FLAGS, "-I" + str(ROOT / "src"),
-                           ROOT / "src/game.c", ROOT / "src/static_lighting.c",
+                           ROOT / "src/game.c", ROOT / "src/static_lighting.c", ROOT / "src/lighting_policy.c",
                            ROOT / "tests/test_static_lighting.c", "-lm", "-o", output], env)
         result = cook_lighting.run([output], env)
         self.assertIn("480 exact legacy comparisons passed", result.stdout)

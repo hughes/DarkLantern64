@@ -1,6 +1,7 @@
 #pragma once
 #include "tick.h"
 #include "stream_play.h"
+#include "lighting_policy.h"
 #include <nlohmann/json.hpp>
 #include <cmath>
 #include <deque>
@@ -191,6 +192,43 @@ public:
     void Event(Json row){if(trace.size()>=2048){trace.erase(trace.begin());++traceDropped;}trace.push_back(std::move(row));}
     void Advance(double dt,DlInput input){dl_tick_advance(&clock,dt,input,Tick,this);}
     void Step(DlInput input){dl_tick_step(&clock,input,Tick,this);}
+    Json RendererRuntime() const {
+        if(!stream_)return {{"supported",false},{"basis","unknown"},{"cases",nullptr},{"change_cases",nullptr},
+            {"models",nullptr},{"door_object_count",nullptr},{"identity",{{"play_fingerprint",package.at("fingerprint")},
+                {"renderer_source_sha256",nullptr},{"package_sha256",nullptr},{"build_id",nullptr}}},
+            {"reason","Resident Native packets do not carry the ROM model and lighting-cache definitions"}};
+        const DlLevel& published=*game.level;
+        const DlLightingSettings settings{true,false,false,dl_lighting_independent_doors(&published)};
+        DlLightingPolicyReport initial{},changed{};
+        dl_lighting_policy_report(&published,settings,false,&initial);dl_lighting_policy_report(&published,settings,true,&changed);
+        const auto cases=[](const DlLightingPolicyReport& report){Json result=Json::array();
+            for(unsigned mode=0;mode<DL_LIGHT_MODE_COUNT;++mode)for(unsigned reason=0;reason<DL_LIGHT_REASON_COUNT;++reason){
+                const auto& count=report.cases[mode][reason];if(count.models)result.push_back({{"mode",dl_lighting_mode_name((DlLightingMode)mode)},
+                    {"reason",dl_lighting_reason_name((DlLightingReason)reason)},{"models",count.models},{"triangles",count.triangles}});}
+            return result;};
+        Json models=Json::array();
+        for(int i=0;i<published.model_count;++i){const auto& model=published.models[i];const auto& mesh=published.meshes[model.mesh];
+            const auto d=dl_lighting_decision(&published,i,settings);
+            models.push_back({{"model_index",i},{"entity_id",model.id?Json(model.id):Json(nullptr)},
+                {"region_id",uint32_t(mesh.stream_key>>40)},{"material_id",uint32_t((mesh.stream_key>>8)&UINT32_MAX)},
+                {"role",model.role},{"triangles",d.triangles},{"eligible",d.static_eligible},
+                {"inline_payload",model.baked_colors[0]!=nullptr&&model.baked_colors[1]!=nullptr},{"inline_eligible",d.inline_eligible},
+                {"mode",dl_lighting_mode_name(d.mode)},{"reason",dl_lighting_reason_name(d.reason)},
+                {"change_mode",dl_lighting_mode_name(d.change_mode)},{"change_reason",dl_lighting_reason_name(d.change_reason)}});
+        }
+        const auto state=stream_->State(game);
+        return {{"supported",true},{"basis","published_model_policy"},{"scope","published_models"},
+            {"identity",{{"renderer_source_sha256",published.renderer_source_sha256?Json(published.renderer_source_sha256):Json(nullptr)},
+                {"package_sha256",package.at("stream").at("package_sha256")},{"play_fingerprint",package.at("fingerprint")},{"build_id",nullptr}}},
+            {"models",initial.models},{"triangles",initial.triangles},{"door_object_count",settings.independent_doors},
+            {"revision",state.at("revision")},{"published_mask",state.at("published_mask")},
+            {"settings",{{"bake_enabled",settings.bake_enabled},{"standalone_loaded",settings.standalone_loaded},
+                {"standalone_rejected",settings.standalone_rejected},{"independent_doors",settings.independent_doors}}},
+            {"cases",cases(initial)},{"change_cases",cases(changed)},{"model_entries",models},
+            {"measured_timing",nullptr},{"measured_heap",nullptr},
+            {"limitations",Json::array({"Shared target policy applied to decoded published models; desktop GPU presentation and ROM timing remain separate observations",
+                "ROM build flags may override these host classification settings; verified ROM records carry their own build identity"})}};
+    }
     Json State() const {
         Json actors=Json::array(),objectState=Json::array(),events=Json::array();
         for(unsigned i=0;i<game.event_count;++i){const auto& e=game.events[i];events.push_back({
@@ -216,6 +254,7 @@ public:
             {"open_objects",game.open_objects},{"collected_objects",game.collected_objects},{"completed_objectives",game.completed_objectives},{"active_enemy_mask",game.active_enemy_mask},
             {"stream_boundary",settleBeforeTick?"settled":"frame"}};
         if(stream_)result["stream"]=stream_->State(game);
+        result["renderer_runtime"]=RendererRuntime();
         return result;
     }
 private:

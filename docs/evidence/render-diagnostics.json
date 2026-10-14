@@ -1,0 +1,891 @@
+{
+  "issue": "https://github.com/hughes/DarkLantern64/issues/4",
+  "verified_date": "2026-10-13",
+  "acceptance": {
+    "default_strict_accepted": true,
+    "overhead_measurement_complete": true,
+    "disabled_strict_accepted": false,
+    "strict_pair_passed": false
+  },
+  "editor": {
+    "passed": true,
+    "checks": [
+      "Single/two independent doors: cooked model buckets match shared C renderer policy on decoded package and every door-state combination",
+      "stream_lighting_single_door: pre-Play path notice, source-bound cook and region/gate/group/object navigation",
+      "stream_lighting_single_door: stale cooked groups cannot navigate or certify modified content; repaired draft recooks",
+      "stream_lighting_single_door: published target policy and actual door interactions match cooked publication/change buckets",
+      "stream_lighting_multiple_doors: pre-Play path notice, source-bound cook and region/gate/group/object navigation",
+      "stream_lighting_multiple_doors: stale cooked groups cannot navigate or certify modified content; repaired draft recooks",
+      "stream_lighting_multiple_doors: published target policy and actual door interactions match cooked publication/change buckets",
+      "Six-slot invalid target draft stays editable and source-navigable; preview rejects it; stale repair recooks to valid capacity",
+      "External imported mesh edits invalidate source-bound diagnostics; restoring exact dependency and recooking revalidates"
+    ],
+    "editor_sha256": "1bb7ba24f1a4a9dfda1a05a12ec091d6a50b00bbeb916f86912cc8b7f2384bdd",
+    "result": {
+      "path": ".dev/render-diagnostics-verification/1286bd5586e94f3bb405f75e952eacb0/result.json",
+      "sha256": "a2b49be6102f24efd625740759e800c76d8c8f7d024540e570f0a9c08ae3bd89"
+    },
+    "captures": [
+      {
+        "label": "stream_lighting_single_door",
+        "path": "C:/Users/hughe/dev/DarkLantern64/.dev/render-diagnostics-verification/1286bd5586e94f3bb405f75e952eacb0/project/.dev/editor/project/captures/ff53d1c6a1434cf9a760f58907ea0476.png",
+        "sha256": "43b220ccb12c875534477e477f655320ba1f2e1652fd8e26f30296a5d18f1a47",
+        "size": [
+          346,
+          391
+        ]
+      },
+      {
+        "label": "stream_lighting_multiple_doors",
+        "path": "C:/Users/hughe/dev/DarkLantern64/.dev/render-diagnostics-verification/1286bd5586e94f3bb405f75e952eacb0/project/.dev/editor/project/captures/34687d890d824f32955aa632fb1b2ce7.png",
+        "sha256": "6d21b5e6b729eb734295bb3583a54510b9c5f735485bc7bf53bad517a7421673",
+        "size": [
+          346,
+          391
+        ]
+      }
+    ]
+  },
+  "native_metadata": {
+    "passed": true,
+    "runner_sha256": "be1d9a2e90a25e55b2ce7f74b06d5a13fdc3f539e723fea4ed46f28827c978c7",
+    "rejections": [
+      {
+        "case": "short model vector",
+        "error": "Expected shared XYZ vector"
+      },
+      {
+        "case": "overflowed shared float",
+        "error": "Non-finite shared vector"
+      },
+      {
+        "case": "short mesh vector",
+        "error": "Expected shared XYZ vector"
+      },
+      {
+        "case": "out-of-range color",
+        "error": "Invalid model color channel"
+      },
+      {
+        "case": "float emissive",
+        "error": "Invalid model emissive channel"
+      },
+      {
+        "case": "string sidedness",
+        "error": "Invalid model sidedness"
+      },
+      {
+        "case": "invalid source identity",
+        "error": "Invalid renderer source SHA-256"
+      },
+      {
+        "case": "short baked hex",
+        "error": "Model baked lighting length mismatch"
+      },
+      {
+        "case": "non-hex baked byte",
+        "error": "Invalid model baked lighting hexadecimal byte"
+      },
+      {
+        "case": "transparent baked alpha",
+        "error": "Model baked lighting requires opaque RGBA"
+      },
+      {
+        "case": "one baked state",
+        "error": "Model baked lighting capacity exceeded"
+      },
+      {
+        "case": "out-of-range mesh index",
+        "error": "Shared mesh index outside vertices"
+      },
+      {
+        "case": "out-of-range model mesh",
+        "error": "Invalid shared model mesh"
+      },
+      {
+        "case": "oversized model table",
+        "error": "Mission shared visual capacity exceeded"
+      }
+    ],
+    "checks": [
+      "Valid decoded publication and change policy match the cook with owned bootstrap RGBA",
+      "Malformed metadata rejects before starting a Native session",
+      "A valid packet still loads after the malformed input checks"
+    ],
+    "result": {
+      "path": ".dev/native-lighting-metadata-verification/d485f8026db24ee98f97dd4ded84d9cd/result.json",
+      "sha256": "18d5e2585d580ea239fa7d36b3699109291d4a7845e8037c28fca39ef9ea5110"
+    }
+  },
+  "target_fixtures": [
+    {
+      "fixture": "stream_lighting_single_door",
+      "passed": true,
+      "build_id": "791235861e76da1c81cbeb5f526270c35814ce6854bb7da5fc379c00dc6b735d",
+      "rom_sha256": "37eac34da44e5dd4109262d42103150d2579cd9c43985b25b7e3bcbe223870de",
+      "package_sha256": "b689b3c90d96d90a9e9f2016dde19a7531e4623030c8e35800356a2fae75805e",
+      "door_combinations": 2,
+      "native_parity": {
+        "passed": true,
+        "states": 289,
+        "path": "C:\\Users\\hughe\\dev\\DarkLantern64\\.dev\\rd4-rom\\836d82f6\\stream_lighting_single_door-native.json",
+        "runner_sha256": "be1d9a2e90a25e55b2ce7f74b06d5a13fdc3f539e723fea4ed46f28827c978c7",
+        "scope": "Functional state parity on identical package and settled input ticks; host speed is separate."
+      },
+      "log": {
+        "path": ".dev/ares/runs/c4f05880d4574bc9ade2886787f05679/stream_lighting_single_door.log",
+        "sha256": "d099c12594c81d50e21a90f27711bcc7d249a037be6ca67054a7c15400e23570"
+      },
+      "settings_source_sha256": "0276ff94f095e05df973bd0a7a296a8a4433603ec932c8e19f1a766ead37cddc",
+      "observed_policy": [
+        {
+          "phase": "publication",
+          "source_sha256": "1b441c458b7ec091f04993f2e74ef2b76d83b6df82afecf601496495bef67ee9",
+          "published_mask": 7,
+          "cases": [
+            {
+              "version": 1,
+              "report": 1,
+              "mode": "inline_two_state",
+              "reason": "inline_payload",
+              "models": 6,
+              "triangles": 228,
+              "line": 8,
+              "path": "baked"
+            }
+          ],
+          "measured_policy_transport": {
+            "version": 1,
+            "report": 1,
+            "ticks": 19500,
+            "ticks_per_second": 46875000,
+            "scope": "policy_rows_and_transport",
+            "line": 9,
+            "basis": "measured_elapsed",
+            "elapsed_ms": 0.416,
+            "active_cpu_ms": null,
+            "note": "Elapsed policy rows and transport; includes interrupts and excludes the cost row itself."
+          }
+        },
+        {
+          "phase": "lighting_change",
+          "source_sha256": "1b441c458b7ec091f04993f2e74ef2b76d83b6df82afecf601496495bef67ee9",
+          "published_mask": 7,
+          "cases": [
+            {
+              "version": 1,
+              "report": 2,
+              "mode": "inline_two_state",
+              "reason": "inline_payload",
+              "models": 6,
+              "triangles": 228,
+              "line": 394,
+              "path": "baked"
+            }
+          ],
+          "measured_policy_transport": {
+            "version": 1,
+            "report": 2,
+            "ticks": 20746,
+            "ticks_per_second": 46875000,
+            "scope": "policy_rows_and_transport",
+            "line": 395,
+            "basis": "measured_elapsed",
+            "elapsed_ms": 0.4425813333333333,
+            "active_cpu_ms": null,
+            "note": "Elapsed policy rows and transport; includes interrupts and excludes the cost row itself."
+          }
+        },
+        {
+          "phase": "lighting_change",
+          "source_sha256": "1b441c458b7ec091f04993f2e74ef2b76d83b6df82afecf601496495bef67ee9",
+          "published_mask": 7,
+          "cases": [
+            {
+              "version": 1,
+              "report": 3,
+              "mode": "inline_two_state",
+              "reason": "inline_payload",
+              "models": 6,
+              "triangles": 228,
+              "line": 411,
+              "path": "baked"
+            }
+          ],
+          "measured_policy_transport": {
+            "version": 1,
+            "report": 3,
+            "ticks": 20871,
+            "ticks_per_second": 46875000,
+            "scope": "policy_rows_and_transport",
+            "line": 412,
+            "basis": "measured_elapsed",
+            "elapsed_ms": 0.445248,
+            "active_cpu_ms": null,
+            "note": "Elapsed policy rows and transport; includes interrupts and excludes the cost row itself."
+          }
+        }
+      ],
+      "inspector": {
+        "path": ".dev/rd4-rom/836d82f6/stream_lighting_single_door-inspector.html",
+        "sha256": "13819be804f369740d26b8c9c20236c158a66768e262690b46c6ea9646b24788"
+      }
+    },
+    {
+      "fixture": "stream_lighting_multiple_doors",
+      "passed": true,
+      "build_id": "7d0d61c3e6479d85ee07a94819362ce5f9eeedce0a579b2331612190cd809951",
+      "rom_sha256": "08a49d1ab9eb9be7ec0ce3b4baaecf0473ba3248c1fc5d1ffaa0d7ea6318a69b",
+      "package_sha256": "d9c84e7e753f858fcb0b923419cc303724d37e4f4d6b6d1dad01c69e5211db9a",
+      "door_combinations": 4,
+      "native_parity": {
+        "passed": true,
+        "states": 831,
+        "path": "C:\\Users\\hughe\\dev\\DarkLantern64\\.dev\\rd4-rom\\836d82f6\\stream_lighting_multiple_doors-native.json",
+        "runner_sha256": "be1d9a2e90a25e55b2ce7f74b06d5a13fdc3f539e723fea4ed46f28827c978c7",
+        "scope": "Functional state parity on identical package and settled input ticks; host speed is separate."
+      },
+      "log": {
+        "path": ".dev/ares/runs/e5347028043941b79831c47a7bf52346/stream_lighting_multiple_doors.log",
+        "sha256": "25e93eab4608bfd5d0b999dab1342b0d34aa5b84da20c7bbf6304fdce2ea2123"
+      },
+      "settings_source_sha256": "0276ff94f095e05df973bd0a7a296a8a4433603ec932c8e19f1a766ead37cddc",
+      "observed_policy": [
+        {
+          "phase": "publication",
+          "source_sha256": "98bd4791288cdba68f92b895a0f3de634a46d514c3302cd581abce402093c4a1",
+          "published_mask": 7,
+          "cases": [
+            {
+              "version": 1,
+              "report": 1,
+              "mode": "live_night",
+              "reason": "independent_doors",
+              "models": 7,
+              "triangles": 240,
+              "line": 8,
+              "path": "fallback"
+            }
+          ],
+          "measured_policy_transport": {
+            "version": 1,
+            "report": 1,
+            "ticks": 20599,
+            "ticks_per_second": 46875000,
+            "scope": "policy_rows_and_transport",
+            "line": 9,
+            "basis": "measured_elapsed",
+            "elapsed_ms": 0.43944533333333335,
+            "active_cpu_ms": null,
+            "note": "Elapsed policy rows and transport; includes interrupts and excludes the cost row itself."
+          }
+        },
+        {
+          "phase": "lighting_change",
+          "source_sha256": "98bd4791288cdba68f92b895a0f3de634a46d514c3302cd581abce402093c4a1",
+          "published_mask": 7,
+          "cases": [
+            {
+              "version": 1,
+              "report": 2,
+              "mode": "live_night",
+              "reason": "independent_doors",
+              "models": 7,
+              "triangles": 240,
+              "line": 394,
+              "path": "fallback"
+            }
+          ],
+          "measured_policy_transport": {
+            "version": 1,
+            "report": 2,
+            "ticks": 20568,
+            "ticks_per_second": 46875000,
+            "scope": "policy_rows_and_transport",
+            "line": 395,
+            "basis": "measured_elapsed",
+            "elapsed_ms": 0.438784,
+            "active_cpu_ms": null,
+            "note": "Elapsed policy rows and transport; includes interrupts and excludes the cost row itself."
+          }
+        },
+        {
+          "phase": "lighting_change",
+          "source_sha256": "98bd4791288cdba68f92b895a0f3de634a46d514c3302cd581abce402093c4a1",
+          "published_mask": 7,
+          "cases": [
+            {
+              "version": 1,
+              "report": 3,
+              "mode": "live_night",
+              "reason": "independent_doors",
+              "models": 7,
+              "triangles": 240,
+              "line": 658,
+              "path": "fallback"
+            }
+          ],
+          "measured_policy_transport": {
+            "version": 1,
+            "report": 3,
+            "ticks": 21451,
+            "ticks_per_second": 46875000,
+            "scope": "policy_rows_and_transport",
+            "line": 659,
+            "basis": "measured_elapsed",
+            "elapsed_ms": 0.4576213333333333,
+            "active_cpu_ms": null,
+            "note": "Elapsed policy rows and transport; includes interrupts and excludes the cost row itself."
+          }
+        },
+        {
+          "phase": "lighting_change",
+          "source_sha256": "98bd4791288cdba68f92b895a0f3de634a46d514c3302cd581abce402093c4a1",
+          "published_mask": 7,
+          "cases": [
+            {
+              "version": 1,
+              "report": 4,
+              "mode": "live_night",
+              "reason": "independent_doors",
+              "models": 7,
+              "triangles": 240,
+              "line": 922,
+              "path": "fallback"
+            }
+          ],
+          "measured_policy_transport": {
+            "version": 1,
+            "report": 4,
+            "ticks": 20446,
+            "ticks_per_second": 46875000,
+            "scope": "policy_rows_and_transport",
+            "line": 923,
+            "basis": "measured_elapsed",
+            "elapsed_ms": 0.4361813333333333,
+            "active_cpu_ms": null,
+            "note": "Elapsed policy rows and transport; includes interrupts and excludes the cost row itself."
+          }
+        },
+        {
+          "phase": "lighting_change",
+          "source_sha256": "98bd4791288cdba68f92b895a0f3de634a46d514c3302cd581abce402093c4a1",
+          "published_mask": 7,
+          "cases": [
+            {
+              "version": 1,
+              "report": 5,
+              "mode": "live_night",
+              "reason": "independent_doors",
+              "models": 7,
+              "triangles": 240,
+              "line": 1211,
+              "path": "fallback"
+            }
+          ],
+          "measured_policy_transport": {
+            "version": 1,
+            "report": 5,
+            "ticks": 20715,
+            "ticks_per_second": 46875000,
+            "scope": "policy_rows_and_transport",
+            "line": 1212,
+            "basis": "measured_elapsed",
+            "elapsed_ms": 0.44192,
+            "active_cpu_ms": null,
+            "note": "Elapsed policy rows and transport; includes interrupts and excludes the cost row itself."
+          }
+        }
+      ],
+      "inspector": {
+        "path": ".dev/rd4-rom/836d82f6/stream_lighting_multiple_doors-inspector.html",
+        "sha256": "4944d4838373e62fac1017740c84b1bbd54e345863977c604ec395c6c76f7956"
+      }
+    }
+  ],
+  "target_fixture_result": {
+    "path": ".dev/rd4-rom/836d82f6/result.json",
+    "sha256": "6bb12eff36aabbdcdfc73cae4c52be22f37e1a4887ad3d0d3282259de7b3b6c1"
+  },
+  "saved_rom_editor": {
+    "passed": true,
+    "editor_sha256": "6405d559d0ad0b21aae33f83687ff5c36263fdb2a2fec1c88fd5d45450a27ac2",
+    "checks": [
+      {
+        "fixture": "stream_lighting_single_door",
+        "identity": {
+          "build_id": "7d0d61c3e6479d85ee07a94819362ce5f9eeedce0a579b2331612190cd809951",
+          "package_sha256": "b689b3c90d96d90a9e9f2016dde19a7531e4623030c8e35800356a2fae75805e",
+          "renderer_source_sha256": "1b441c458b7ec091f04993f2e74ef2b76d83b6df82afecf601496495bef67ee9",
+          "rom_sha256": "08a49d1ab9eb9be7ec0ce3b4baaecf0473ba3248c1fc5d1ffaa0d7ea6318a69b",
+          "source_file_sha256": "880e38f384abc0657a630e53de97a6144e02a7ed64ae28a3d46c92ccdebd1b7f",
+          "source_sha256": "1b441c458b7ec091f04993f2e74ef2b76d83b6df82afecf601496495bef67ee9"
+        },
+        "render_options": {
+          "bake_enabled": true,
+          "renderer": "t3d",
+          "reporting_enabled": true
+        },
+        "rom": "C:\\Users\\hughe\\dev\\DarkLantern64\\.dev\\rd4-rom\\836d82f6\\p\\build\\DarkLantern64-input-replay-bundle-rd4-start-multi-preset-default-t3d.z64",
+        "map": "C:\\Users\\hughe\\dev\\DarkLantern64\\.dev\\rd4-rom\\836d82f6\\p\\build\\DarkLantern64-input-replay-bundle-rd4-start-multi-preset-default-t3d\\runtime_debug_map.json",
+        "verified": "Exact build/ROM/package policy; ROM/map/partition tampering rejects and exact restoration revalidates"
+      },
+      {
+        "fixture": "stream_lighting_multiple_doors",
+        "identity": {
+          "build_id": "7d0d61c3e6479d85ee07a94819362ce5f9eeedce0a579b2331612190cd809951",
+          "package_sha256": "d9c84e7e753f858fcb0b923419cc303724d37e4f4d6b6d1dad01c69e5211db9a",
+          "renderer_source_sha256": "98bd4791288cdba68f92b895a0f3de634a46d514c3302cd581abce402093c4a1",
+          "rom_sha256": "08a49d1ab9eb9be7ec0ce3b4baaecf0473ba3248c1fc5d1ffaa0d7ea6318a69b",
+          "source_file_sha256": "f1841c799b7b60d025e95d86314e39ea060b3dde7f9037a8cc282ce791bb02f9",
+          "source_sha256": "98bd4791288cdba68f92b895a0f3de634a46d514c3302cd581abce402093c4a1"
+        },
+        "render_options": {
+          "bake_enabled": true,
+          "renderer": "t3d",
+          "reporting_enabled": true
+        },
+        "rom": "C:\\Users\\hughe\\dev\\DarkLantern64\\.dev\\rd4-rom\\836d82f6\\p\\build\\DarkLantern64-input-replay-bundle-rd4-start-multi-preset-default-t3d.z64",
+        "map": "C:\\Users\\hughe\\dev\\DarkLantern64\\.dev\\rd4-rom\\836d82f6\\p\\build\\DarkLantern64-input-replay-bundle-rd4-start-multi-preset-default-t3d\\runtime_debug_map.json",
+        "verified": "Exact build/ROM/package policy; ROM/map/partition tampering rejects and exact restoration revalidates"
+      }
+    ],
+    "result": {
+      "path": ".dev/rd4-rom/836d82f6/saved-rom-editor-result.json",
+      "sha256": "1538ca317c561c22b463ad8f704257dc3804bab5f50e72a66dd3e191ab4b572e"
+    }
+  },
+  "default_enabled_performance": {
+    "accepted": true,
+    "complete": true,
+    "build_id": "8f7fd297c10b691d9d4461422791b2f3e54df0cba9264186b5bdb3f9ee53644a",
+    "rom_sha256": "e4f4bb3719c409fa59a7aed923d8688f2d16a88dcd2c6815c712569686e2f85c",
+    "package_sha256": "11e59ed82b3fb6711f94a1afc6767fe7d828204d486d767213857a9202823230",
+    "frames": 3458,
+    "distributions": {
+      "frame_ticks": {
+        "samples": 3458,
+        "average_ms": 16.466820380181222,
+        "min_ms": 6.582549333333334,
+        "max_ms": 32.48296533333333,
+        "p50_ms": 16.414826666666666,
+        "p95_ms": 18.71328,
+        "p99_ms": 21.94112,
+        "over_budget_samples": 0,
+        "quantile_method": "nearest rank; acceptance uses every sample and the maximum"
+      },
+      "interval_ticks": {
+        "samples": 3458,
+        "average_ms": 16.767516927703877,
+        "min_ms": 0.012821333333333334,
+        "max_ms": 33.053866666666664,
+        "p50_ms": 16.679765333333332,
+        "p95_ms": 22.392874666666668,
+        "p99_ms": 24.584704,
+        "over_budget_samples": 0,
+        "quantile_method": "nearest rank; acceptance uses every sample and the maximum"
+      },
+      "service_ticks": {
+        "samples": 3458,
+        "average_ms": 1.1716524912280701,
+        "min_ms": 0.22632533333333332,
+        "max_ms": 10.317738666666667,
+        "p50_ms": 0.34449066666666667,
+        "p95_ms": 6.015850666666666,
+        "p99_ms": 6.445952,
+        "over_budget_samples": 0,
+        "quantile_method": "nearest rank; acceptance uses every sample and the maximum"
+      },
+      "service_cpu_ticks": {
+        "samples": 3458,
+        "average_ms": 1.1307760478118372,
+        "min_ms": 0.22632533333333332,
+        "max_ms": 7.980437333333334,
+        "p50_ms": 0.34446933333333335,
+        "p95_ms": 5.950592,
+        "p99_ms": 6.344106666666667,
+        "over_budget_samples": 0,
+        "quantile_method": "nearest rank; acceptance uses every sample and the maximum"
+      },
+      "render_ticks": {
+        "samples": 3458,
+        "average_ms": 10.161187269712745,
+        "min_ms": 2.2568106666666665,
+        "max_ms": 20.902592,
+        "p50_ms": 9.899157333333333,
+        "p95_ms": 15.404245333333334,
+        "p99_ms": 16.649194666666666,
+        "over_budget_samples": 0,
+        "quantile_method": "nearest rank; acceptance uses every sample and the maximum"
+      }
+    },
+    "failures": [],
+    "dropped_ticks": 0,
+    "blocked_ticks": 0,
+    "loading_wait_frames": 0,
+    "functional_passed": true,
+    "audio_continuity_passed": true,
+    "peak_measured_heap_bytes": 2059688,
+    "heap_headroom_bytes": 5151000,
+    "host_audio_output": "disabled",
+    "settings_source_sha256": "0276ff94f095e05df973bd0a7a296a8a4433603ec932c8e19f1a766ead37cddc",
+    "log": {
+      "path": ".dev/ares/runs/7cadd7a22c304f68b37ae8d9004c7d74/bafford-district-performance.log",
+      "sha256": "578ccff450addd9009ee32ad9f538d87d3db3a98b8c141a9b67ef215bb8d58b9"
+    },
+    "report": {
+      "path": "build/issue4-enabled-performance.json",
+      "sha256": "fdfb5b3232abcabba9dc07f87cd3a4c250dc8a669db504b9aace5ffc7c5bc65c"
+    }
+  },
+  "disabled_comparison_performance": {
+    "accepted": false,
+    "complete": true,
+    "build_id": "ee2dbae1501c4d23a7c9049c5ee26af32d3e9a1a8792bb541cf48f0ae7022b72",
+    "rom_sha256": "aebff89048bfa13b20565138ac27001414b7ba50a5ea40279f4af16cd98a2262",
+    "package_sha256": "11e59ed82b3fb6711f94a1afc6767fe7d828204d486d767213857a9202823230",
+    "frames": 3462,
+    "distributions": {
+      "frame_ticks": {
+        "samples": 3462,
+        "average_ms": 16.470128428268822,
+        "min_ms": 5.610730666666667,
+        "max_ms": 33.86050133333333,
+        "p50_ms": 16.407552,
+        "p95_ms": 18.737642666666666,
+        "p99_ms": 22.989888,
+        "over_budget_samples": 1,
+        "quantile_method": "nearest rank; acceptance uses every sample and the maximum"
+      },
+      "interval_ticks": {
+        "samples": 3462,
+        "average_ms": 16.77496655343732,
+        "min_ms": 0.015210666666666667,
+        "max_ms": 34.194368,
+        "p50_ms": 16.67780266666667,
+        "p95_ms": 22.425002666666668,
+        "p99_ms": 24.858474666666666,
+        "over_budget_samples": 2,
+        "quantile_method": "nearest rank; acceptance uses every sample and the maximum"
+      },
+      "service_ticks": {
+        "samples": 3462,
+        "average_ms": 1.165482709801656,
+        "min_ms": 0.23765333333333333,
+        "max_ms": 9.868096,
+        "p50_ms": 0.3538133333333333,
+        "p95_ms": 6.008682666666667,
+        "p99_ms": 6.397546666666667,
+        "over_budget_samples": 0,
+        "quantile_method": "nearest rank; acceptance uses every sample and the maximum"
+      },
+      "service_cpu_ticks": {
+        "samples": 3462,
+        "average_ms": 1.127246290005777,
+        "min_ms": 0.23765333333333333,
+        "max_ms": 7.577429333333333,
+        "p50_ms": 0.35370666666666667,
+        "p95_ms": 5.924032,
+        "p99_ms": 6.322645333333333,
+        "over_budget_samples": 0,
+        "quantile_method": "nearest rank; acceptance uses every sample and the maximum"
+      },
+      "render_ticks": {
+        "samples": 3462,
+        "average_ms": 10.080452751010977,
+        "min_ms": 2.3041066666666667,
+        "max_ms": 20.66944,
+        "p50_ms": 9.821056,
+        "p95_ms": 15.358506666666667,
+        "p99_ms": 16.618218666666667,
+        "over_budget_samples": 0,
+        "quantile_method": "nearest rank; acceptance uses every sample and the maximum"
+      }
+    },
+    "failures": [
+      "frame_ticks exceeds its maximum budget",
+      "interval_ticks exceeds its maximum budget"
+    ],
+    "dropped_ticks": 0,
+    "blocked_ticks": 0,
+    "loading_wait_frames": 0,
+    "functional_passed": true,
+    "audio_continuity_passed": true,
+    "peak_measured_heap_bytes": 2059744,
+    "heap_headroom_bytes": 5159184,
+    "host_audio_output": "disabled",
+    "settings_source_sha256": "0276ff94f095e05df973bd0a7a296a8a4433603ec932c8e19f1a766ead37cddc",
+    "log": {
+      "path": ".dev/ares/runs/cc6bc6c7b735441592c6ba49a321eb81/bafford-district-performance.log",
+      "sha256": "5d21bfd80858782c338310e8b8671406c64129cd2e9be1412a87fd8b6b65601d"
+    },
+    "report": {
+      "path": "build/issue4-disabled-performance.json",
+      "sha256": "00f0c306e52b5169ef025d512f49893f7f71870e42406a27cdb8b68ab7973bf3"
+    }
+  },
+  "overhead": {
+    "measurement_complete": true,
+    "strict_pair_passed": false,
+    "measured_policy_transport": {
+      "basis": "measured_elapsed",
+      "samples": 37,
+      "total_ms": 20.138346666666667,
+      "max_ms": 1.3119786666666666,
+      "average_ms": 0.5442796396396397,
+      "active_cpu_ms": null,
+      "scope": "Policy rows and transport, includes interrupts; excludes each cost row."
+    },
+    "whole_run_distributions": {
+      "frame_ticks": {
+        "enabled": {
+          "samples": 3458,
+          "average_ms": 16.466820380181222,
+          "min_ms": 6.582549333333334,
+          "max_ms": 32.48296533333333,
+          "p50_ms": 16.414826666666666,
+          "p95_ms": 18.71328,
+          "p99_ms": 21.94112,
+          "over_budget_samples": 0,
+          "quantile_method": "nearest rank; acceptance uses every sample and the maximum"
+        },
+        "disabled": {
+          "samples": 3462,
+          "average_ms": 16.470128428268822,
+          "min_ms": 5.610730666666667,
+          "max_ms": 33.86050133333333,
+          "p50_ms": 16.407552,
+          "p95_ms": 18.737642666666666,
+          "p99_ms": 22.989888,
+          "over_budget_samples": 1,
+          "quantile_method": "nearest rank; acceptance uses every sample and the maximum"
+        },
+        "enabled_minus_disabled_average_ms": -0.0033080480876002127,
+        "enabled_minus_disabled_max_ms": -1.3775359999999992
+      },
+      "interval_ticks": {
+        "enabled": {
+          "samples": 3458,
+          "average_ms": 16.767516927703877,
+          "min_ms": 0.012821333333333334,
+          "max_ms": 33.053866666666664,
+          "p50_ms": 16.679765333333332,
+          "p95_ms": 22.392874666666668,
+          "p99_ms": 24.584704,
+          "over_budget_samples": 0,
+          "quantile_method": "nearest rank; acceptance uses every sample and the maximum"
+        },
+        "disabled": {
+          "samples": 3462,
+          "average_ms": 16.77496655343732,
+          "min_ms": 0.015210666666666667,
+          "max_ms": 34.194368,
+          "p50_ms": 16.67780266666667,
+          "p95_ms": 22.425002666666668,
+          "p99_ms": 24.858474666666666,
+          "over_budget_samples": 2,
+          "quantile_method": "nearest rank; acceptance uses every sample and the maximum"
+        },
+        "enabled_minus_disabled_average_ms": -0.007449625733443099,
+        "enabled_minus_disabled_max_ms": -1.140501333333333
+      },
+      "service_ticks": {
+        "enabled": {
+          "samples": 3458,
+          "average_ms": 1.1716524912280701,
+          "min_ms": 0.22632533333333332,
+          "max_ms": 10.317738666666667,
+          "p50_ms": 0.34449066666666667,
+          "p95_ms": 6.015850666666666,
+          "p99_ms": 6.445952,
+          "over_budget_samples": 0,
+          "quantile_method": "nearest rank; acceptance uses every sample and the maximum"
+        },
+        "disabled": {
+          "samples": 3462,
+          "average_ms": 1.165482709801656,
+          "min_ms": 0.23765333333333333,
+          "max_ms": 9.868096,
+          "p50_ms": 0.3538133333333333,
+          "p95_ms": 6.008682666666667,
+          "p99_ms": 6.397546666666667,
+          "over_budget_samples": 0,
+          "quantile_method": "nearest rank; acceptance uses every sample and the maximum"
+        },
+        "enabled_minus_disabled_average_ms": 0.0061697814264141115,
+        "enabled_minus_disabled_max_ms": 0.4496426666666675
+      },
+      "service_cpu_ticks": {
+        "enabled": {
+          "samples": 3458,
+          "average_ms": 1.1307760478118372,
+          "min_ms": 0.22632533333333332,
+          "max_ms": 7.980437333333334,
+          "p50_ms": 0.34446933333333335,
+          "p95_ms": 5.950592,
+          "p99_ms": 6.344106666666667,
+          "over_budget_samples": 0,
+          "quantile_method": "nearest rank; acceptance uses every sample and the maximum"
+        },
+        "disabled": {
+          "samples": 3462,
+          "average_ms": 1.127246290005777,
+          "min_ms": 0.23765333333333333,
+          "max_ms": 7.577429333333333,
+          "p50_ms": 0.35370666666666667,
+          "p95_ms": 5.924032,
+          "p99_ms": 6.322645333333333,
+          "over_budget_samples": 0,
+          "quantile_method": "nearest rank; acceptance uses every sample and the maximum"
+        },
+        "enabled_minus_disabled_average_ms": 0.003529757806060241,
+        "enabled_minus_disabled_max_ms": 0.4030080000000007
+      },
+      "render_ticks": {
+        "enabled": {
+          "samples": 3458,
+          "average_ms": 10.161187269712745,
+          "min_ms": 2.2568106666666665,
+          "max_ms": 20.902592,
+          "p50_ms": 9.899157333333333,
+          "p95_ms": 15.404245333333334,
+          "p99_ms": 16.649194666666666,
+          "over_budget_samples": 0,
+          "quantile_method": "nearest rank; acceptance uses every sample and the maximum"
+        },
+        "disabled": {
+          "samples": 3462,
+          "average_ms": 10.080452751010977,
+          "min_ms": 2.3041066666666667,
+          "max_ms": 20.66944,
+          "p50_ms": 9.821056,
+          "p95_ms": 15.358506666666667,
+          "p99_ms": 16.618218666666667,
+          "over_budget_samples": 0,
+          "quantile_method": "nearest rank; acceptance uses every sample and the maximum"
+        },
+        "enabled_minus_disabled_average_ms": 0.0807345187017674,
+        "enabled_minus_disabled_max_ms": 0.23315199999999692
+      }
+    },
+    "measured_heap": {
+      "basis": "runtime_allocator_measurement",
+      "enabled_peak_bytes": 2059688,
+      "disabled_peak_bytes": 2059744,
+      "enabled_minus_disabled_bytes": -56
+    },
+    "settings_source_sha256": "0276ff94f095e05df973bd0a7a296a8a4433603ec932c8e19f1a766ead37cddc",
+    "report": {
+      "path": "build/issue4-render-diagnostics-overhead.json",
+      "sha256": "f91e43383fc5f247becbc9f73c0286d6befa1bf064759aeec922747887068543"
+    }
+  },
+  "startup_control": {
+    "old_accepted_rom_with_current_WASAPI": {
+      "timed_out": true,
+      "log": {
+        "path": ".dev/ares/runs/1ee455abeaff489ba99af6ceebceb81b/issue4-control-old.log",
+        "sha256": "9c105eaf19dc6bf7a93c03fb33994d881b457c40359550313d0d9a4d9442a78e"
+      }
+    },
+    "same_old_rom_with_owned_driver_None": {
+      "name": "issue4-control-no-host-audio",
+      "passed": true,
+      "log": ".dev\\ares\\runs\\857d3607c3024b0d97d5b64cb7523261\\issue4-control-no-host-audio.log",
+      "tested_rom": ".dev\\ares\\runs\\857d3607c3024b0d97d5b64cb7523261\\DarkLantern64-bundle-level_bundle-menu-bafford-district-test-performance-t3d.z64",
+      "rom_sha256": "6b1d092ae5a6df9241d9d74c8e68696d49ef35a09bd04f29b2a341c1921c20fb",
+      "rom_bytes": 1622016,
+      "settings": ".dev\\ares\\runs\\857d3607c3024b0d97d5b64cb7523261\\settings.bml",
+      "settings_source_sha256": "0276ff94f095e05df973bd0a7a296a8a4433603ec932c8e19f1a766ead37cddc",
+      "profile_report": null,
+      "elapsed_seconds": 3.266,
+      "peak_sampled_heap_bytes": null,
+      "max_reported_cpu_ms": null,
+      "boot": null,
+      "terminal_event": "DL64 menu_ready levels=8 initial=lantern-store mode=menu",
+      "original_settings_sha256": "d3917400079a47105fa6bd7df53e4f530915aa3b4b70e79769f1b389bc2b196a",
+      "scope": "Owned Ares audio driver None control; no active user settings changed; guest audio still emulated."
+    },
+    "new_fixture_silent_WASAPI_capture": {
+      "path": ".dev/ares/runs/2c9b15b6cff4470380bcf396f4f01a92/stream_lighting_single_door.log",
+      "sha256": "9c105eaf19dc6bf7a93c03fb33994d881b457c40359550313d0d9a4d9442a78e"
+    }
+  },
+  "intermediate_target_defect": {
+    "finding": "CPU backend emitted lighting changes; Tiny3D initially omitted the change report hook. Final Tiny3D captures above prove both paths after correction.",
+    "log": {
+      "path": ".dev/ares/runs/6aeb2f8dab3143048ab2bd57ab44f25b/stream_lighting_single_door.log",
+      "sha256": "e439092304976b03b599a1e1d547008170bfb5812de6b5475e9bddcd1131e5b5"
+    }
+  },
+  "limitations": [
+    "Ares emulated CP0 timing and heap allocation, not original N64 hardware measurements.",
+    "Host audio output was disabled in an owned settings copy to avoid a reproduced WASAPI startup block. Guest N64 callbacks and underruns remained independently checked. Active user settings were unchanged.",
+    "Default shipped diagnostics passed every strict district maximum; the complete disabled comparison exceeded frame/interval maxima. Both captures are preserved without filtering or rerun selection.",
+    "Whole-run differences include simulation/display phase variation and do not measure causal per-frame diagnostic CPU overhead.",
+    "Direct policy transport is measured elapsed time including interrupts and excludes its cost trailer; active CPU attribution remains unknown.",
+    "Policy buckets describe preparation/publication and lighting revisions. Backend-specific steady animation/probe timing and visible per-frame affected counts are unmeasured.",
+    "Cooked ROM/resident values are estimates. Embedded RGBA is a package subset, host worker cache is excluded, and unmeasured subsystem/total costs remain unknown."
+  ],
+  "validation": {
+    "full_python_suite": {
+      "tests": 538,
+      "passed": 535,
+      "skipped": 2,
+      "errors": 1,
+      "known_preexisting_error": "Sponza source geometry mismatch; not introduced by renderer diagnostics",
+      "log": {
+        "path": "build/issue4-python-tests.log",
+        "sha256": "ec0b844cd960118fa85f9dcebef84bf33ffd8741ffeead03bc0a7aefc9eb7d8c"
+      }
+    },
+    "final_diagnostics_suite": {
+      "tests": 44,
+      "passed": true,
+      "log": {
+        "path": "build/issue4-final-diagnostics-tests.log",
+        "sha256": "2a7d2714b2d82ffec415ccc171002c59cb5f985cba846dd52cac769c4bc8a00f"
+      }
+    },
+    "settings_parser_and_fixture_suite": {
+      "tests": 46,
+      "passed": true,
+      "command": "python -m unittest tests.test_verify_bafford_district_performance tests.test_runtime_inspector tests.test_lighting_diagnostics_fixtures -q",
+      "log": {
+        "path": "build/issue4-settings-diagnostics-tests.log",
+        "sha256": "630519978d064cb5fd69aff17580c14e36d518e6cdb38da553bf3537f716b106"
+      }
+    },
+    "portable_c": {
+      "passed": true,
+      "exit_code": 0,
+      "command": "python -c \"from tools.build import run_portable_tests; run_portable_tests()\"",
+      "evidence_scope": "Observed successful console exit; no persisted log or invented log hash."
+    },
+    "bazel": {
+      "passed": true,
+      "tests": 3,
+      "scope": [
+        "region authoring",
+        "exact floor support",
+        "character preview"
+      ],
+      "evidence_scope": "Observed successful console tests; no persisted aggregate log."
+    },
+    "native_route": {
+      "passed": true,
+      "ticks": 1070,
+      "scope": "Current host runner gameplay/coordinator route; this result does not claim current 1070-tick ROM parity. The two lighting fixture target replays above have separate Native/ROM parity.",
+      "result": {
+        "path": "build/issue4-native-replay.json",
+        "sha256": "acd580ec70674120b6bb0ef51e5996e46d50a7d50bb9313800f56ee0eb561907"
+      }
+    },
+    "cook_compiler_subgroup": {
+      "tests": 130,
+      "skipped": 1,
+      "passed": true,
+      "evidence_scope": "Observed console subgroup; no persisted log."
+    }
+  }
+}

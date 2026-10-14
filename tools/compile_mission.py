@@ -22,10 +22,12 @@ try:
     import compile_level as level
     from asset_pack import content_path
     from cook_stream_lighting import prepare_stream_lighting
+    import cook_diagnostics as diagnostics
 except ModuleNotFoundError:
     from tools import compile_level as level
     from tools.asset_pack import content_path
     from tools.cook_stream_lighting import prepare_stream_lighting
+    from tools import cook_diagnostics as diagnostics
 
 ROOT = Path(__file__).resolve().parents[1]
 DIRECTORY_HEADER_BYTES = 64
@@ -223,14 +225,20 @@ def working_sets(policy, region_reports, state, homes):
             dynamic = [entity for entity in state["models"] if entity["kind"] != "static" and
                        (entity["kind"] in ("door", "guard") or homes[entity["id"]] in resident)]
             triangles = sum(rows[name]["triangle_count"] for name in resident)
-            groups = sum(len(rows[name]["material_ids"]) for name in resident)
+            groups = sum(len(rows[name]["groups"]) for name in resident)
             result.append(dict(anchor=anchor, gates=gate_ids, regions=[rows[name]["id"] for name in sorted(resident)],
                 source_regions=sorted(resident), triangle_count=triangles, group_count=groups,
                 collider_count=sum(rows[name]["collider_count"] for name in resident),
                 floor_count=sum(rows[name].get("floor_count", 0) for name in resident), barrier_count=barriers,
                 model_count=groups+len(dynamic), scene_vertices=triangles*3+sum(len(state["meshes"][entity["model"]]["vertices"]) for entity in dynamic),
                 scene_triangles=triangles+sum(len(state["meshes"][entity["model"]]["indices"])//3 for entity in dynamic),
-                chunk_bytes=sum(rows[name]["chunk_bytes"] for name in resident)))
+                chunk_bytes=sum(rows[name]["chunk_bytes"] for name in resident),
+                groups=[group for name in sorted(resident) for group in rows[name]["groups"]],
+                contributors=[row for name in sorted(resident) for row in rows[name]["contributors"]] +
+                    [dict(id=entity["id"], kind=entity["kind"], home_region=homes[entity["id"]],
+                          static_triangles=0, model_triangles=len(state["meshes"][entity["model"]]["indices"])//3,
+                          model_vertices=len(state["meshes"][entity["model"]]["vertices"]), colliders=0, floors=0,
+                          membership="global bootstrap potential") for entity in dynamic if homes[entity["id"]] not in resident]))
     return result, max(len(wanted) for _, _, wanted, _ in requests)
 
 
@@ -453,10 +461,27 @@ def cook_mission(manifest, content_root=ROOT / "content", *, source_document=Non
         triangle_payload, collider_payload, floor_payload = bytearray(), bytearray(), bytearray()
         collider_entities = []
         region_materials = set()
+        group_rows, contributors = {}, []
         for ident in region["entities"]:
             entity = state["by_id"][ident]
+            mesh = state["meshes"].get(entity.get("model"))
+            static_triangles = len(mesh["indices"]) // 3 if mesh and entity["kind"] == "static" else 0
+            contributors.append(dict(id=ident, kind=entity["kind"], home_region=region["id"],
+                static_triangles=static_triangles, model_triangles=len(mesh["indices"])//3 if mesh and not static_triangles else 0,
+                model_vertices=len(mesh["vertices"]) if mesh and entity["kind"] != "static" else 0,
+                colliders=int(ident in boxes), floors=int(ident in floors)))
             if entity["kind"] == "static" and "model" in entity:
                 mesh = state["meshes"][entity["model"]]
+                material = entity["material"]
+                flags = 3 if chunk_version >= 2 else 0
+                group = group_rows.setdefault((material, flags), dict(
+                    id=region["id"] + "/" + material + "/attributes-" + str(flags),
+                    region=region["id"], region_id=region_ids[region["id"]], material=material,
+                    material_id=material_ids[material], attribute_flags=flags,
+                    triangles=0, source_entity_ids=[], contributors=[]))
+                group["triangles"] += static_triangles
+                group["source_entity_ids"].append(ident)
+                group["contributors"].append(dict(id=ident, triangles=static_triangles))
                 points = [level.transform_point(point, entity["transform"]) for point in mesh["vertices"]]
                 assert_bounds(region, points, ident + " static geometry")
                 for triangle in range(len(mesh["indices"]) // 3):
@@ -495,6 +520,7 @@ def cook_mission(manifest, content_root=ROOT / "content", *, source_document=Non
                                    chunk_version=chunk_version, triangle_count=len(triangle_payload) // triangle_bytes, collider_count=len(collider_payload) // 32,
                                    material_ids=sorted(region_materials), floor_count=len(floor_payload)//36,
                                    entity_count=len(region["entities"]),
+                                   groups=[group_rows[key] for key in sorted(group_rows)], contributors=contributors,
                                    collider_entity_ids=[entity_ids[ident] for ident in collider_entities]))
     lighting = bake_stream_payloads(document, state, regions, payloads, material_ids) if chunk_version >= 4 else None
     for payload, region_report in zip(payloads, region_reports):
@@ -509,6 +535,7 @@ def cook_mission(manifest, content_root=ROOT / "content", *, source_document=Non
     if policy:
         canonical_manifest["transitions"] = policy["transitions"]
     source_sha = hashlib.sha256(canonical_json(canonical_source(document))).hexdigest()
+    state["renderer_source_sha256"] = source_sha
     identity = hashlib.sha256(canonical_json(dict(format=f"DLM1/DLR1-v{chunk_version}", cook_version=COOK_VERSION,
                                                  lighting_signature=lighting["signature"] if lighting else None, source_sha256=source_sha,
                                                  manifest=canonical_manifest, content_dependencies=dependencies))).digest()
@@ -568,7 +595,66 @@ def cook_mission(manifest, content_root=ROOT / "content", *, source_document=Non
         report["policy_regions"] = [dict(id=region_ids[row["id"]], activation_bounds=row["activation_bounds"],
             working_mask=sum(1 << (region_ids[name]-1) for name in row["working_set"])) for row in regions]
         report["transitions"] = [dict(row, from_region=region_ids[row["from"]], to_region=region_ids[row["to"]]) for row in policy["transitions"]]
+    baked_ids = {row["id"] for row in (lighting or {}).get("bootstrap_models", [])}
+    door_ids = [row["id"] for row in state["objects"] if row["kind"] == "door"]
+    model_entries = []
+    for region in region_reports:
+        for group in region["groups"]:
+            model_entries.append(dict(group_id=group["id"], source_entity_ids=group["source_entity_ids"],
+                role="static", region_id=region["id"], region_source_id=region["source_id"],
+                material_id=group["material_id"], material_source_id=group["material"],
+                environment_enabled=lighting is not None, animated_mesh=False,
+                decision_contributors=door_ids if len(door_ids)>1 else [],
+                inline_payload=bool(lighting), **diagnostics.lighting_decision(night=lighting is not None,
+                    role="static", triangles=group["triangles"], inline_payload=bool(lighting), doors=len(door_ids))))
+    for entity in state["models"]:
+        if entity["kind"] == "static":
+            continue
+        model_entries.append(dict(entity_id=entity["id"], source_entity_ids=[entity["id"]], role=entity["kind"],
+            region_id=region_ids[homes[entity["id"]]], region_source_id=homes[entity["id"]],
+            material_id=material_ids[entity["material"]], material_source_id=entity["material"],
+            environment_enabled=lighting is not None, animated_mesh=False,
+            decision_contributors=door_ids if len(door_ids)>1 else [],
+            inline_payload=entity["id"] in baked_ids,
+            **diagnostics.lighting_decision(night=lighting is not None, role=entity["kind"],
+                triangles=len(state["meshes"][entity["model"]]["indices"])//3,
+                inline_payload=entity["id"] in baked_ids, doors=len(door_ids))))
+    report["renderer_diagnostics"] = diagnostics.renderer_report(model_entries, door_ids=door_ids,
+        identity=dict(renderer_source_sha256=source_sha, source_sha256=source_sha,
+            source_file_sha256=report["source_file_sha256"], package_sha256=report["package_sha256"], build_id=None))
+    for working in report["working_sets"]:
+        ids = {row["id"] for row in working["contributors"]}
+        entries = [row for row in model_entries if row.get("group_id") in {group["id"] for group in working["groups"]}
+                   or row.get("entity_id") in ids]
+        working["renderer"] = dict(basis="potential_membership_upper_bound", model_entries=entries,
+            mode_counts=diagnostics.counts(entries)[0], cases=diagnostics.counts(entries)[1],
+            change_mode_counts=diagnostics.counts(entries, changed=True)[0],
+            change_cases=diagnostics.counts(entries, changed=True)[1],
+            renderer_night_cache_bytes=48 * working["scene_triangles"] if lighting and
+                any(row["mode"] != "inline_two_state" for row in entries) else 0)
+    report["bridge_diagnostics"] = diagnostics.bridge_report(report)
+    meshes = {entity["model"] for entity in state["models"] if entity["kind"] != "static"}
+    geometry_bytes = sum(len(state["meshes"][ident]["vertices"])*12 + len(state["meshes"][ident]["indices"])*2 +
+        len(state["meshes"][ident].get("uvs", []))*8 + len(state["meshes"][ident].get("normals", []))*3 for ident in meshes)
+    slot_bytes = align16(max(row["chunk_bytes"] for row in region_reports)) * report["max_resident_regions"]
+    bootstrap_rgba = (lighting or {}).get("bootstrap_embedded_rgba_bytes", 0)
+    rgba_banks = 2 * 1440 * 48
+    cache_peak = max(row["renderer"]["renderer_night_cache_bytes"] for row in report["working_sets"])
+    report["bridge_diagnostics"]["memory"] = dict(basis="cooked_estimate", rom_package_bytes=package_bytes,
+        embedded_rgba_in_package_bytes=(lighting or {}).get("mission_embedded_rgba_bytes", 0),
+        bootstrap_rgba_resident_bytes=bootstrap_rgba, bootstrap_geometry_resident_bytes=geometry_bytes,
+        standalone_lighting_rom_bytes=0, host_worker_cache_bytes=(lighting or {}).get("host_worker_bytes", 0),
+        directory_resident_bytes=directory_bytes, slot_buffer_resident_bytes=slot_bytes,
+        scene_banks_rgba_resident_bytes=rgba_banks, renderer_night_cache_peak_bytes=cache_peak,
+        known_target_rom_bytes=package_bytes + geometry_bytes + bootstrap_rgba,
+        known_target_resident_bytes=directory_bytes + slot_bytes + geometry_bytes + bootstrap_rgba + rgba_banks + cache_peak,
+        total_target_resident_bytes=None, total_target_rom_bytes=None,
+        unknown_target_costs=["ROM metadata, textures, code and audio", "remaining scene banks/coordinator and gameplay structs", "DMA staging and allocator overhead",
+            "renderer packed geometry and texture allocations", "audio", "code and display/depth buffers"],
+        accounting_note="Package bytes include embedded triangle RGBA; embedded_rgba_in_package_bytes is a subset, never added again. Host worker cache is excluded from target totals. Slot copies, fixed scene-bank RGBA arrays, bootstrap constants and renderer night caches occupy separate target allocations. Known bytes are a subtotal, not an RDRAM certification.")
     report["runtime_debug_map"] = runtime_debug_map(report, state)
+    report["runtime_debug_map"].update(renderer_source_sha256=source_sha,
+        renderer_diagnostics=report["renderer_diagnostics"], bridge_diagnostics=report["bridge_diagnostics"])
     return bytes(result), report
 
 
@@ -597,6 +683,7 @@ def bootstrap_header(document, state, package_report, package_path):
     bootstrap["colliders"] = []
     bootstrap["floors"] = []
     bootstrap["streamed_source"] = False
+    bootstrap["renderer_source_sha256"] = package_report["renderer_diagnostics"]["identity"]["renderer_source_sha256"]
     bootstrap.pop("baked_lighting", None)
     text = level.header(document, bootstrap)
     baked = {row["id"]: row for row in (package_report.get("lighting") or {}).get("bootstrap_models", [])}
@@ -677,32 +764,8 @@ def bootstrap_header(document, state, package_report, package_path):
 
 def validate_stream_bridge(package_report):
     """The first ROM adapter is deliberately smaller than the portable format."""
-    regions = package_report["regions"]
-    authored = package_report.get("visibility") == "authored-sets"
-    level.require((1 <= len(regions) <= 32) if authored else len(regions) == 2,
-                  "Authored ROM policy requires 1..32 regions" if authored else "Stream ROM bridge requires exactly 2 regions")
-    level.require(len(package_report["entity_ids"]) <= 2048 and package_report["directory_bytes"] <= 65536,
-                  "Stream directory exceeds 2048 entities or 65536 bytes")
-    level.require(package_report["max_resident_regions"] <= 5, "Reachable working set exceeds 5 resident region slots")
-    by_id = {row["id"]: row for row in regions}
-    for working in package_report["working_sets"]:
-        label = "Working set " + ",".join(working["source_regions"]) + " from " + working["anchor"]
-        selected = [by_id[ident] for ident in working["regions"]]
-        triangles = sum(row["triangle_count"] for row in selected)
-        groups = sum(len(row["material_ids"]) for row in selected)
-        floors = sum(row.get("floor_count", 0) for row in selected)
-        boxes = sum(row["collider_count"] for row in selected)
-        level.require(triangles <= 1440, label + ": at most 1440 resident static triangles")
-        level.require(groups <= 64, label + ": at most 64 nonempty region/material groups")
-        level.require(floors <= 128, label + ": at most 128 floor triangles")
-        level.require(boxes+floors+working["barrier_count"] <= 400,
-                      label + ": boxes + floors + unavailable-region barriers exceed 400")
-        level.require(working["model_count"]-working["group_count"]+groups <= 128 and
-                      working["scene_vertices"]-working["triangle_count"]*3+triangles*3 <= 6144 and
-                      working["scene_triangles"]-working["triangle_count"]+triangles <= 4096,
-                      label + ": rendered models/vertices/triangles exceed 128/6144/4096")
-    level.require(max(row["chunk_bytes"] for row in regions) <= 65536,
-                  "Stream ROM bridge permits at most 65536 bytes per region chunk")
+    diagnostics_report = diagnostics.bridge_report(package_report)
+    level.require(diagnostics_report["valid"], diagnostics_report["failures"][0]["message"] if diagnostics_report["failures"] else "Invalid stream bridge")
 
 
 def stream_play_package(document, state, report, package_path):
@@ -716,6 +779,7 @@ def stream_play_package(document, state, report, package_path):
     bootstrap = dict(state, colliders=[], floors=[], streamed_source=False)
     result = level.play_package(document, bootstrap)
     dynamic = [entity for entity in state["models"] if entity["kind"] != "static"]
+    baked = {row["id"]: row for row in (report.get("lighting") or {}).get("bootstrap_models", [])}
     mesh_ids = sorted({entity["model"] for entity in dynamic})
     enemy_indices = {row["id"]: index for index, row in enumerate(state["enemies"])}
     result["stream_meshes"] = [dict(id=ident, **{key: state["meshes"][ident][key]
@@ -724,8 +788,21 @@ def stream_play_package(document, state, report, package_path):
         role=entity["kind"], position=entity["transform"]["position"],
         rotation=[math.radians(value) for value in entity["transform"]["rotation"]],
         scale=entity["transform"]["scale"], enemy_index=enemy_indices.get(entity["id"], -1)) for entity in dynamic]
+    for model, entity in zip(result["stream_models"], dynamic):
+        material = state["materials"][entity["material"]]
+        model.update(color=[round(value*255) for value in material["color"]],
+            emissive=[round(value*255) for value in material.get("emissive", [0,0,0])],
+            double_sided=material.get("double_sided", True))
+        if entity["id"] in baked:
+            row = baked[entity["id"]]
+            expected = len(state["meshes"][entity["model"]]["indices"]) // 3 * 24
+            colors = [row["closed_rgba"], row["open_rgba"]]
+            level.require(all(len(bytes.fromhex(value)) == expected for value in colors),
+                          entity["id"] + ": bootstrap lighting color count mismatch")
+            model["baked_colors"] = colors
     entity_ids = {row["source_id"]: row["id"] for row in report["entity_ids"]}
     result["stream"] = dict(package_path=str(package_path), package_sha256=report["package_sha256"],
+        renderer_source_sha256=report["renderer_diagnostics"]["identity"]["renderer_source_sha256"],
         directory_bytes=report["directory_bytes"], file_bytes=report["package_bytes"],
         max_region_bytes=max(row["chunk_bytes"] for row in report["regions"]), region_count=len(report["regions"]),
         max_resident_regions=report["max_resident_regions"], visibility=report["visibility"],

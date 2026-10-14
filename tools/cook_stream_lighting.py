@@ -84,7 +84,7 @@ def prepare_stream_lighting(unbaked_header, *, collider_count, floor_count=0, ca
                 path.write_bytes(raw)
             (temporary / "demo_level.h").write_bytes(header)
             object_files = []
-            for name in ("game", "static_lighting"):
+            for name in ("game", "static_lighting", "lighting_policy"):
                 obj, sha = objects / (name + ".o"), objects / (name + ".sha256")
                 if common._cached(obj, sha) is None:
                     candidate = temporary / (name + ".o")

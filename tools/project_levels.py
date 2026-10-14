@@ -238,6 +238,8 @@ class ProjectLevels:
                           peak_neighbor_overlap_chunk_bytes=report["memory"]["peak_neighbor_overlap_chunk_bytes"],
                           max_resident_regions=report["max_resident_regions"],
                           unknown_costs=report["memory"]["unknown_costs"])
+            if artifacts is not None:
+                artifacts["report"] = report
             validate_stream_bridge(report)
             status.update(valid=True, rom_valid=True)
             if artifacts is not None:
@@ -252,7 +254,10 @@ class ProjectLevels:
                     preview_mode="Full authoring scene; optional cooked runtime preview uses shared streaming residency and publication",
                     runtime_preview_supported=status["valid"],
                     regions=copy.deepcopy(partition["document"].get("regions", [])),
-                    working_sets=copy.deepcopy(report["working_sets"]) if report else [], status=status)
+                    working_sets=copy.deepcopy(report["working_sets"]) if report else [],
+                    renderer_diagnostics=copy.deepcopy(report.get("renderer_diagnostics")) if report else None,
+                    bridge_diagnostics=copy.deepcopy(report.get("bridge_diagnostics")) if report else None,
+                    status=status)
 
     def entry(self, path, raw, data, bundle):
         row = self.bundle_row(bundle, path)
@@ -584,6 +589,7 @@ class ProjectLevels:
                 report = compile_level(snapshot, cooked, self.content, authoring=True)
                 if streaming:
                     report.update(playable=streaming["native_play_supported"], native_play_supported=streaming["native_play_supported"], streaming=streaming,
+                                  renderer_diagnostics=streaming["renderer_diagnostics"], bridge_diagnostics=streaming["bridge_diagnostics"],
                                   preview_mode="Full authoring scene; cooked runtime preview and Native Play publish bounded stream working sets")
                 changes = {output / item.relative_to(cooked): item.read_bytes()
                            for item in cooked.rglob("*") if item.is_file() and
@@ -594,7 +600,9 @@ class ProjectLevels:
                         target = output / blocked
                         if target.exists():
                             changes[target] = None
-                    if stream_artifacts:
+                    if "report" in stream_artifacts:
+                        changes[output / "generated/mission_report.json"] = json_bytes(stream_artifacts["report"])
+                    if "package" in stream_artifacts:
                         package_report = stream_artifacts["report"]
                         package_path = output / "romfs/missions" / ("mission-" + package_report["package_sha256"] + ".dlm")
                         state = validate(canonical_source(candidate_data), self.content, streaming=True)

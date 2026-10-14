@@ -545,6 +545,7 @@ static void geometry_gpu(const DlGame *g){
         if(mesh->animation&&instance->role==DL_MODEL_GUARD)++drawn;
         dl_profile_record(DL_PROFILE_TRIANGLES,mark);
     }
+    if(lighting_changed)report_lighting_policy(g,true);
     cached_door=dl_game_lighting_revision(g);
     mark=dl_profile_mark();t3d_tri_sync();gpu_fences[frame]=rspq_syncpoint_new();
     rdpq_set_scissor(0,0,SCREEN_W,SCREEN_H);rdpq_set_mode_fill(rgb(0,0,0));

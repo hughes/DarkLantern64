@@ -1,0 +1,993 @@
+{
+  "version": 2,
+  "title": "Independent doors renderer policy fixture",
+  "authoring_profile": "streamed-mission",
+  "assets": [
+    {
+      "id": "fixture-box",
+      "type": "primitive",
+      "shape": "box"
+    }
+  ],
+  "materials": [
+    {
+      "id": "hub-stone",
+      "color": [
+        0.55,
+        0.45,
+        0.3,
+        1
+      ],
+      "double_sided": true
+    },
+    {
+      "id": "north-blue",
+      "color": [
+        0.2,
+        0.4,
+        0.8,
+        1
+      ],
+      "double_sided": true
+    },
+    {
+      "id": "courtyard-green",
+      "color": [
+        0.25,
+        0.75,
+        0.3,
+        1
+      ],
+      "double_sided": true
+    },
+    {
+      "id": "landmark-magenta",
+      "color": [
+        0.95,
+        0.15,
+        0.7,
+        1
+      ],
+      "double_sided": true
+    },
+    {
+      "id": "door-wood",
+      "color": [
+        0.4,
+        0.25,
+        0.1,
+        1
+      ],
+      "double_sided": true
+    },
+    {
+      "id": "loot-gold",
+      "color": [
+        1,
+        0.8,
+        0.2,
+        1
+      ],
+      "double_sided": true
+    }
+  ],
+  "entities": [
+    {
+      "id": "hub-floor",
+      "kind": "static",
+      "transform": {
+        "position": [
+          -5,
+          -0.1,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          10,
+          0.2,
+          12
+        ]
+      },
+      "model": "fixture-box",
+      "material": "hub-stone",
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          0.5,
+          0.5,
+          0.5
+        ]
+      }
+    },
+    {
+      "id": "hub-west-wall",
+      "kind": "static",
+      "transform": {
+        "position": [
+          -10,
+          1.5,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          0.2,
+          3,
+          12
+        ]
+      },
+      "model": "fixture-box",
+      "material": "hub-stone",
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          0.5,
+          0.5,
+          0.5
+        ]
+      }
+    },
+    {
+      "id": "hub-north-wall",
+      "kind": "static",
+      "transform": {
+        "position": [
+          -5,
+          1.5,
+          -6
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          10,
+          3,
+          0.2
+        ]
+      },
+      "model": "fixture-box",
+      "material": "hub-stone",
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          0.5,
+          0.5,
+          0.5
+        ]
+      }
+    },
+    {
+      "id": "hub-south-wall",
+      "kind": "static",
+      "transform": {
+        "position": [
+          -5,
+          1.5,
+          6
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          10,
+          3,
+          0.2
+        ]
+      },
+      "model": "fixture-box",
+      "material": "hub-stone",
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          0.5,
+          0.5,
+          0.5
+        ]
+      }
+    },
+    {
+      "id": "opening-wall-north-edge",
+      "kind": "static",
+      "transform": {
+        "position": [
+          0,
+          1.5,
+          -5
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          0.2,
+          3,
+          2
+        ]
+      },
+      "model": "fixture-box",
+      "material": "hub-stone",
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          0.5,
+          0.5,
+          0.5
+        ]
+      }
+    },
+    {
+      "id": "opening-wall-between-openings",
+      "kind": "static",
+      "transform": {
+        "position": [
+          0,
+          1.5,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          0.2,
+          3,
+          4
+        ]
+      },
+      "model": "fixture-box",
+      "material": "hub-stone",
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          0.5,
+          0.5,
+          0.5
+        ]
+      }
+    },
+    {
+      "id": "opening-wall-south-edge",
+      "kind": "static",
+      "transform": {
+        "position": [
+          0,
+          1.5,
+          5
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          0.2,
+          3,
+          2
+        ]
+      },
+      "model": "fixture-box",
+      "material": "hub-stone",
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          0.5,
+          0.5,
+          0.5
+        ]
+      }
+    },
+    {
+      "id": "opening-lintel-north",
+      "kind": "static",
+      "transform": {
+        "position": [
+          0,
+          2.8,
+          -3
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          0.2,
+          0.4,
+          2
+        ]
+      },
+      "model": "fixture-box",
+      "material": "hub-stone",
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          0.5,
+          0.5,
+          0.5
+        ]
+      }
+    },
+    {
+      "id": "opening-lintel-courtyard",
+      "kind": "static",
+      "transform": {
+        "position": [
+          0,
+          2.8,
+          3
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          0.2,
+          0.4,
+          2
+        ]
+      },
+      "model": "fixture-box",
+      "material": "hub-stone",
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          0.5,
+          0.5,
+          0.5
+        ]
+      }
+    },
+    {
+      "id": "north-door",
+      "kind": "door",
+      "transform": {
+        "position": [
+          0,
+          1.25,
+          -3
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          0.16,
+          2.5,
+          2
+        ]
+      },
+      "model": "fixture-box",
+      "material": "door-wood",
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          0.5,
+          0.5,
+          0.5
+        ]
+      },
+      "interaction_radius": 1.6
+    },
+    {
+      "id": "hub-start",
+      "kind": "spawn",
+      "transform": {
+        "position": [
+          -7,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          90,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "id": "hub-exit",
+      "kind": "objective",
+      "transform": {
+        "position": [
+          -9,
+          0,
+          4
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "zone": true,
+      "required_loot": 25,
+      "interaction_radius": 0.8
+    },
+    {
+      "id": "hub-light",
+      "kind": "light",
+      "transform": {
+        "position": [
+          -5,
+          2.7,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "radius": 11,
+      "intensity": 0.6,
+      "color": [
+        1,
+        0.8,
+        0.55
+      ]
+    },
+    {
+      "id": "north-floor",
+      "kind": "static",
+      "transform": {
+        "position": [
+          5,
+          -0.1,
+          -3
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          10,
+          0.2,
+          6
+        ]
+      },
+      "model": "fixture-box",
+      "material": "north-blue",
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          0.5,
+          0.5,
+          0.5
+        ]
+      }
+    },
+    {
+      "id": "north-east-wall",
+      "kind": "static",
+      "transform": {
+        "position": [
+          10,
+          1.5,
+          -3
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          0.2,
+          3,
+          6
+        ]
+      },
+      "model": "fixture-box",
+      "material": "north-blue",
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          0.5,
+          0.5,
+          0.5
+        ]
+      }
+    },
+    {
+      "id": "north-outer-wall",
+      "kind": "static",
+      "transform": {
+        "position": [
+          5,
+          1.5,
+          -6
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          10,
+          3,
+          0.2
+        ]
+      },
+      "model": "fixture-box",
+      "material": "north-blue",
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          0.5,
+          0.5,
+          0.5
+        ]
+      }
+    },
+    {
+      "id": "north-light",
+      "kind": "light",
+      "transform": {
+        "position": [
+          5,
+          2.7,
+          -3
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "radius": 8,
+      "intensity": 0.5,
+      "color": [
+        0.65,
+        0.85,
+        1
+      ]
+    },
+    {
+      "id": "courtyard-floor",
+      "kind": "static",
+      "transform": {
+        "position": [
+          5,
+          -0.1,
+          3
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          10,
+          0.2,
+          6
+        ]
+      },
+      "model": "fixture-box",
+      "material": "courtyard-green",
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          0.5,
+          0.5,
+          0.5
+        ]
+      }
+    },
+    {
+      "id": "courtyard-east-wall",
+      "kind": "static",
+      "transform": {
+        "position": [
+          10,
+          1.5,
+          3
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          0.2,
+          3,
+          6
+        ]
+      },
+      "model": "fixture-box",
+      "material": "courtyard-green",
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          0.5,
+          0.5,
+          0.5
+        ]
+      }
+    },
+    {
+      "id": "courtyard-outer-wall",
+      "kind": "static",
+      "transform": {
+        "position": [
+          5,
+          1.5,
+          6
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          10,
+          3,
+          0.2
+        ]
+      },
+      "model": "fixture-box",
+      "material": "courtyard-green",
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          0.5,
+          0.5,
+          0.5
+        ]
+      }
+    },
+    {
+      "id": "courtyard-light",
+      "kind": "light",
+      "transform": {
+        "position": [
+          5,
+          2.7,
+          3
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "radius": 8,
+      "intensity": 0.5,
+      "color": [
+        0.65,
+        0.85,
+        1
+      ]
+    },
+    {
+      "id": "rooms-divider",
+      "kind": "static",
+      "transform": {
+        "position": [
+          5,
+          1.5,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          10,
+          3,
+          0.2
+        ]
+      },
+      "model": "fixture-box",
+      "material": "north-blue",
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          0.5,
+          0.5,
+          0.5
+        ]
+      }
+    },
+    {
+      "id": "courtyard-landmark",
+      "kind": "static",
+      "transform": {
+        "position": [
+          8,
+          1.4,
+          5
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          0.4,
+          2.8,
+          1
+        ]
+      },
+      "model": "fixture-box",
+      "material": "landmark-magenta",
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          0.5,
+          0.5,
+          0.5
+        ]
+      }
+    },
+    {
+      "id": "courtyard-loot",
+      "kind": "loot",
+      "transform": {
+        "position": [
+          7,
+          0.5,
+          3
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          0.3,
+          0.5,
+          0.3
+        ]
+      },
+      "model": "fixture-box",
+      "material": "loot-gold",
+      "value": 25,
+      "interaction_radius": 1.5
+    },
+    {
+      "id": "courtyard-door",
+      "kind": "door",
+      "transform": {
+        "position": [
+          0,
+          1.25,
+          3
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          0.16,
+          2.5,
+          2
+        ]
+      },
+      "model": "fixture-box",
+      "material": "door-wood",
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "half_size": [
+          0.5,
+          0.5,
+          0.5
+        ]
+      },
+      "interaction_radius": 1.6
+    }
+  ],
+  "test_starts": [
+    {
+      "id": "hub",
+      "label": "Hub sees both openings",
+      "position": [
+        -7,
+        0,
+        0
+      ],
+      "yaw": 90,
+      "pitch": 0,
+      "door_open": false,
+      "crouched": false
+    },
+    {
+      "id": "north",
+      "label": "North room",
+      "position": [
+        7,
+        0,
+        -3
+      ],
+      "yaw": 270,
+      "pitch": 0,
+      "door_open": false,
+      "crouched": false
+    },
+    {
+      "id": "courtyard",
+      "label": "Courtyard",
+      "position": [
+        7,
+        0,
+        3
+      ],
+      "yaw": 270,
+      "pitch": 0,
+      "door_open": false,
+      "crouched": false
+    }
+  ],
+  "environment": {
+    "ambient": [
+      0.01,
+      0.015,
+      0.03
+    ],
+    "moon_direction": [
+      0.2,
+      0.5,
+      0.3
+    ],
+    "moon_color": [
+      0.3,
+      0.45,
+      0.8
+    ],
+    "moon_intensity": 0.65,
+    "fog_color": [
+      0.015,
+      0.025,
+      0.05
+    ],
+    "fog_near": 18,
+    "fog_far": 48,
+    "sky_top": [
+      0.005,
+      0.012,
+      0.035
+    ],
+    "sky_bottom": [
+      0.04,
+      0.08,
+      0.14
+    ],
+    "exposure": 1.3
+  }
+}

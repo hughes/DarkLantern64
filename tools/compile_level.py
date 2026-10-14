@@ -32,11 +32,13 @@ try:
     from cook_lighting import prepare_lighting
     from asset_pack import resolve_asset_packs
     from content_profile import content_limits, is_study, is_streamed, STUDY_PLAY_REASON, STREAM_PLAY_REASON
+    import cook_diagnostics as diagnostics
 except ModuleNotFoundError:
     from tools.cook_textures import prepare_texture, validate_texture, texture_memory_summary
     from tools.cook_lighting import prepare_lighting
     from tools.asset_pack import resolve_asset_packs
     from tools.content_profile import content_limits, is_study, is_streamed, STUDY_PLAY_REASON, STREAM_PLAY_REASON
+    from tools import cook_diagnostics as diagnostics
 
 ROOT = Path(__file__).resolve().parents[1]
 KINDS = {"static", "spawn", "guard", "waypoint", "door", "control", "objective", "light", "loot"}
@@ -696,6 +698,8 @@ def header(data, state):
     lines[-1]=lines[-1].replace("\n};\n#endif", ", .objects="+"dl_objects"+", .object_count="+str(len(state["objects"]))+", .collider_objects=dl_collider_objects, .foot_contacts="+("dl_contacts" if state["foot_contacts"] else "NULL")+"\n};\n#endif")
     if state.get("baked_lighting"):
         lines[-1] = lines[-1].replace("\n};\n#endif", ", .baked_lighting=" + json.dumps(state["baked_lighting"]) + "\n};\n#endif")
+    lines[-1] = lines[-1].replace("\n};\n#endif", ", .renderer_source_sha256=" + json.dumps(
+        state.get("renderer_source_sha256", diagnostics.source_identity(data))) + "\n};\n#endif")
     return "\n".join(lines)
 
 
@@ -805,6 +809,7 @@ def compile_level(source=ROOT/"content/first_room.json",output=ROOT/"build",asse
     started=time.perf_counter(); source,output=Path(source),Path(output)
     raw=source.read_bytes(); data=json.loads(raw)
     state=validate(data,asset_root or source.parent, authoring=authoring)
+    state["renderer_source_sha256"] = diagnostics.source_identity(data)
     data=state["resolved_document"]
     state["shared_characters"] = shared_characters is not None
     if shared_characters is not None:
@@ -921,6 +926,22 @@ def compile_level(source=ROOT/"content/first_room.json",output=ROOT/"build",asse
     }
     texture_report={"version":1,"textures":state["textures"], **texture_memory_summary(state["textures"])}
     report["textures"]=texture_report
+    report["renderer_diagnostics"] = diagnostics.resident_renderer(data, state,
+        standalone_status="loaded" if lighting is not None else "unconfigured")
+    report["renderer_diagnostics"]["identity"].update(source_sha256=report["source_sha256"],
+        source_file_sha256=hashlib.sha256(raw).hexdigest())
+    cache_bytes = triangles * 48 if data.get("environment") is not None else 0
+    report["resource_diagnostics"] = dict(schema_version=1, basis="cooked_estimate",
+        memory=dict(geometry_resident_bytes=report["compiled_geometry_bytes"],
+            standalone_lighting_rom_bytes=lighting["bytes"] if lighting else 0,
+            host_worker_cache_bytes=lighting["bytes"] if lighting else 0,
+            renderer_night_cache_bytes=cache_bytes if report["playable"] else None,
+            embedded_rgba_in_package_bytes=0, bootstrap_rgba_resident_bytes=0,
+            known_target_resident_bytes=report["compiled_geometry_bytes"] + cache_bytes if report["playable"] else None,
+            known_target_rom_bytes=report["compiled_geometry_bytes"] + (lighting["bytes"] if lighting else 0) if report["playable"] else None,
+            total_target_resident_bytes=None, total_target_rom_bytes=None,
+            unknown_target_costs=["ROM metadata, textures, code and audio", "model descriptors and gameplay state", "packed geometry and textures", "animation state", "audio", "code and display/depth buffers"],
+            accounting_note="Standalone lighting is one ROM asset; its host cache is a copy, excluded from target totals. Geometry arrays and renderer two-state RGBA cache are distinct target allocations. Totals remain unknown until all costs are measured."))
     atomic_write(output/"generated/character_report.json", json.dumps({"version": 1, "characters": report["characters"]}, indent=2)+"\n")
     atomic_write(output/"generated/texture_report.json",json.dumps(texture_report,indent=2)+"\n")
     atomic_write(output/"generated/level_report.json",json.dumps(report,indent=2)+"\n")

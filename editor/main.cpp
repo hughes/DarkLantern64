@@ -407,6 +407,7 @@ class DemoEditor
 #include "preparation.inc"
 #include "stream_preview.inc"
 #include "stream_workspace.inc"
+#include "render_diagnostics.inc"
 
     bool Busy() const { return job_.valid()||preparation_.valid(); }
     static std::string LevelLabel(std::string title)
@@ -450,7 +451,7 @@ class DemoEditor
             {"source",source_.string()},{"output",output_.string()},{"scene_path",scenePath_},{"project_editor",true},
             {"operations",{"pick_editor","inspect","list_levels","open_level","create_level","duplicate_level","delete_level","update_level","play_level","play_menu",
                 "drop_selection","save_prefab","place_prefab","add_game_object","set_game_object","undo","redo","add_blockout","select_entities","transform_selection","group_entities","duplicate_entities","delete_entities","refresh_preview","add_floor","add_transition","set_transition","delete_transition","import_blender_scene","import_asset_pack","add_prop","set_entity","add_enemy","duplicate_enemy","add_waypoint","delete_entity","set_environment","set_material",
-                "set_preview_transform","get_animation","set_animation","focus_character","save","build","capture","get_layout","set_panel","reset_layout","get_streaming","assign_region","set_region","set_streaming","fit_region_bounds","create_region","rename_region","duplicate_region","delete_region","add_transition_pair","select_stream_bounds","move_stream_bounds","clear_stream_bounds","start_stream_preview","stop_stream_preview","inspect_stream_preview","step_stream_preview","set_stream_preview_camera","set_stream_preview_transport","select_stream_preview","start_play","stop_play","inspect_scene","query_play","set_play_debug","inspect_play","pause_play","step_play","restart_play","set_play_input","get_play_trace","export_replay","replay_play","reload","get_audio_memory","set_audio_config","recalculate_audio","quit"}}}.dump(2));
+                "set_preview_transform","get_animation","set_animation","focus_character","save","build","capture","get_layout","set_panel","reset_layout","get_streaming","get_render_diagnostics","refresh_render_diagnostics","select_resource_witness","assign_region","set_region","set_streaming","fit_region_bounds","create_region","rename_region","duplicate_region","delete_region","add_transition_pair","select_stream_bounds","move_stream_bounds","clear_stream_bounds","start_stream_preview","stop_stream_preview","inspect_stream_preview","step_stream_preview","set_stream_preview_camera","set_stream_preview_transport","select_stream_preview","start_play","stop_play","inspect_scene","query_play","set_play_debug","inspect_play","pause_play","step_play","restart_play","set_play_input","get_play_trace","export_replay","replay_play","reload","get_audio_memory","set_audio_config","recalculate_audio","quit"}}}.dump(2));
     }
     void InvalidatePreviewAssets(const Json& cooked)
     {
@@ -490,6 +491,7 @@ class DemoEditor
         streamBoundsInputs_.clear();floorVertexInputs_.clear();
         history_.Reset(AuthorSnapshot());selection_.clear();lastPreviewDraft_.clear();
         output_=output;scenePath_=scenePath;report_=report;catalog_=catalog;
+        AdoptDiagnostics(AuthorSnapshot());
         RefreshStreamCookReport();
         loadedPreviewFingerprint_=fingerprint;selected_=selected;
         browserLevel_=source_.filename().string(); testStart_="default";
@@ -686,13 +688,14 @@ class DemoEditor
         if (!result.report.empty())
         {
             report_ = result.report;
+            AdoptDiagnostics({{"scene",Json::parse(jobSnapshot_)},{"partition",jobStreamSnapshot_.empty()?Json(nullptr):Json::parse(jobStreamSnapshot_)}});
             dirty_ = document_.dump(2) + "\n" != jobSnapshot_;
             if (!dirty_) structureDirty_ = false;
             sourceSnapshot_=jobSnapshot_;
+            if(result.project.contains("source_sha256"))sourceSavedSha_=result.project.at("source_sha256");
             if(!jobStreamSnapshot_.empty()){
                 streamSnapshot_=jobStreamSnapshot_;
                 streamSavedSha_=result.project.at("streaming").at("mission_manifest_sha256");
-                sourceSavedSha_=result.project.at("source_sha256");
             }
             RefreshStreamCookReport();
             UpdateAuthorDirty();
@@ -1647,7 +1650,7 @@ class DemoEditor
                 const double now = std::chrono::duration<double>(std::chrono::system_clock::now().time_since_epoch()).count();
                 if (request.at("expires_at").get<double>() < now) throw std::runtime_error("Request expired without execution");
                 const std::string op = request.at("op");
-                if(preparation_.valid()&&op!="inspect"&&op!="get_layout"&&op!="get_animation"&&op!="get_audio_memory")continue;
+                if(preparation_.valid()&&op!="inspect"&&op!="get_layout"&&op!="get_animation"&&op!="get_audio_memory"&&op!="get_render_diagnostics"&&op!="select_resource_witness")continue;
                 fs::remove(path);
                 const Json args = request.value("args",Json::object());
                 SyncStreamBoundsHandle();
@@ -1656,6 +1659,7 @@ class DemoEditor
                 if (op == "get_audio_memory") { Respond(id,true,AudioState()); continue; }
                 if (op == "get_animation") { Respond(id,true,AnimationState()); continue; }
                 if (op == "get_layout") { Respond(id,true,Layout()); continue; }
+                if(op=="get_render_diagnostics"){Respond(id,true,RenderDiagnostics(true));continue;}
                 if (op == "get_streaming") { Respond(id,true,StreamCommand(op,args)); continue; }
                 if(op=="start_stream_preview"||op=="stop_stream_preview"||op=="inspect_stream_preview"||op=="step_stream_preview"||op=="set_stream_preview_camera"||op=="set_stream_preview_transport"||op=="select_stream_preview") {Respond(id,true,StreamPreviewCommand(op,args));continue;}
                 if(op=="select_stream_bounds"||op=="move_stream_bounds"||op=="clear_stream_bounds") {Respond(id,true,StreamBoundsCommand(op,args));continue;}
@@ -1668,7 +1672,9 @@ class DemoEditor
                 if(engine_.IsPlaying()&&op!="capture"&&op!="quit")throw std::runtime_error("Stop native Play before authoring changes");
                 if (Busy()) throw std::runtime_error("Editor build is busy; inspect remains available");
                 if (!pendingAction_.empty()) throw std::runtime_error("A level action needs attention; inspect remains available");
-                if(op=="pick_editor") {
+                if(op=="refresh_render_diagnostics"){RefreshDraft();Respond(id,true,RenderDiagnostics(true));}
+                else if(op=="select_resource_witness")Respond(id,true,SelectResourceWitness(args));
+                else if(op=="pick_editor") {
                     CheckVector(args.at("from"),"from",-10000,10000);CheckVector(args.at("to"),"to",-10000,10000);
                     const auto from=Vector(args.at("from")),delta=Vector(args.at("to"))-from;
                     if(glm::length(delta)<.00001f)throw std::runtime_error("Pick ray must have a direction");
@@ -2288,70 +2294,41 @@ class DemoEditor
     }
     void RefreshStreamCookReport()
     {
-        streamCookReport_=Json::object();streamCookReportPath_.clear();
-        if(streamPath_.empty())return;
+        streamCookReport_=Json::object();streamCookReportPath_.clear();savedRomDiagnostics_=Json::object();savedRomBindings_=Json::object();diagnosticsChecked_={};
         std::vector<std::pair<fs::file_time_type,fs::path>> candidates;
-        std::error_code error;
-        const auto build=root_/"build";
+        std::error_code error;const auto build=root_/"build";
         if(!fs::is_directory(build,error))return;
-        for(const auto& entry:fs::directory_iterator(build,error)){
-            if(!entry.is_directory(error))continue;
-            const auto path=entry.path()/"catalog/generated/bundle_report.json";
-            if(fs::is_regular_file(path,error))candidates.emplace_back(fs::last_write_time(path,error),path);
-        }
+        const auto add=[&](const fs::path& work){if(fs::is_regular_file(work/"build.json",error))candidates.emplace_back(fs::last_write_time(work/"build.json",error),work);};
+        add(build);
+        for(const auto& entry:fs::recursive_directory_iterator(build,fs::directory_options::skip_permission_denied,error))
+            if(entry.is_regular_file(error)&&entry.path().filename()=="build.json")add(entry.path().parent_path());
         std::sort(candidates.begin(),candidates.end(),[](const auto& a,const auto& b){return a.first>b.first;});
-        for(const auto& [modified,path]:candidates)try{
-            if(fs::last_write_time(streamPath_)>modified)continue;
-            const auto catalog=ReadJson(path);
-            for(const auto& entry:catalog.value("levels",Json::array())){
-                if(fs::path(entry.value("source",std::string())).lexically_normal()!=source_.lexically_normal()||
-                   fs::path(entry.value("mission_manifest",std::string())).lexically_normal()!=streamPath_.lexically_normal())continue;
-                const auto content=entry.value("content",Json::object());
-                const auto mission=content.value("mission",Json::object());
-                const auto package=mission.value("report",Json::object());
-                if(!content.value("experimental_stream",false)||package.value("source_file_sha256",std::string())!=sourceSavedSha_||
-                   content.value("mission_manifest_sha256",std::string())!=streamSavedSha_)continue;
-                if(document_.contains("environment")&&package.value("chunk_version",0)!=4)continue;
-                streamCookReport_=content;streamCookReportPath_=path;return;
+        for(const auto& [modified,work]:candidates)try{
+            const auto manifest=ReadJson(work/"build.json"),debug=ReadJson(work/"runtime_debug_map.json");
+            if(debug.at("build_id")!=manifest.at("signature")||debug.at("rom_sha256")!=manifest.at("rom_sha256")||
+               DlStreamPlay::FileSha256((work/"runtime_debug_map.json").string())!=manifest.at("runtime_debug_map_sha256").get<std::string>())continue;
+            const auto rom=root_/manifest.at("rom").get<std::string>();
+            if(DlStreamPlay::FileSha256(rom.string())!=manifest.at("rom_sha256").get<std::string>())continue;
+            for(const auto& entry:manifest.at("level_catalog").at("levels")){
+                if(fs::path(entry.at("source").get<std::string>()).lexically_normal()!=source_.lexically_normal())continue;
+                const auto& content=entry.at("content");const bool mission=content.value("experimental_stream",false);
+                if(mission!=!streamPath_.empty())continue;
+                if(mission&&(fs::path(entry.at("mission_manifest").get<std::string>()).lexically_normal()!=streamPath_.lexically_normal()||content.at("mission_manifest_sha256")!=streamSavedSha_))continue;
+                for(const auto& mapped:debug.at("levels")){
+                    if(mapped.at("id")!=entry.at("id")||mapped.at("source")!=entry.at("source")||!mapped.contains("renderer_diagnostics"))continue;
+                    const auto& policy=mapped.at("renderer_diagnostics");const auto& identity=policy.at("identity");
+                    if(identity.at("build_id")!=manifest.at("signature")||identity.at("rom_sha256")!=manifest.at("rom_sha256")||identity.at("source_file_sha256")!=sourceSavedSha_)continue;
+                    if(mission&&(mapped.at("mission_manifest")!=entry.at("mission_manifest")||identity.at("package_sha256")!=content.at("mission").at("report").at("package_sha256")))continue;
+                    streamCookReport_=content;streamCookReportPath_=work/"build.json";
+                    savedRomDiagnostics_={{"identity",identity},{"renderer_diagnostics",policy},{"render_options",mapped.value("render_options",Json::object())},
+                        {"runtime_debug_map",(work/"runtime_debug_map.json").string()},{"rom",rom.string()}};
+                    savedRomBindings_={{"source_file_sha256",identity.at("source_file_sha256")},{"mission",mission},
+                        {"dependencies",mission?content.at("mission").at("report").at("content_dependencies"):content.at("dependencies")},
+                        {"debug_sha256",manifest.at("runtime_debug_map_sha256")}};
+                    if(mission)savedRomBindings_["mission_manifest_sha256"]=content.at("mission_manifest_sha256");return;
+                }
             }
         }catch(const std::exception&){}
-    }
-    void DrawStreamCook()
-    {
-        ImGui::TextUnformatted("Experimental stream mission");
-        if(ImGui::Button("Refresh ROM cook report"))RefreshStreamCookReport();
-        if(streamCookReport_.empty()){
-            ImGui::TextWrapped("Build the ROM to view its region budgets and cooked lighting. Authoring preview counts describe the complete source scene.");
-            return;
-        }
-        const auto mission=streamCookReport_.value("mission",Json::object());
-        const auto package=mission.value("report",Json::object());
-        const auto lighting=streamCookReport_.contains("lighting")&&streamCookReport_.at("lighting").is_object()?streamCookReport_.at("lighting"):Json::object();
-        unsigned triangles=0,largestChunk=0,peakTriangles=0,peakGroups=0;
-        const auto regions=package.value("regions",Json::array());
-        for(const auto& region:regions){
-            triangles+=region.value("triangle_count",0u);
-            largestChunk=std::max(largestChunk,region.value("chunk_bytes",0u));
-        }
-        for(const auto& working:package.value("working_sets",Json::array())){
-            peakTriangles=std::max(peakTriangles,working.value("triangle_count",0u));
-            peakGroups=std::max(peakGroups,working.value("group_count",0u));
-        }
-        ImGui::Text("Last saved ROM cook | %u regions | %u static triangles",static_cast<unsigned>(regions.size()),triangles);
-        if(dirty_)ImGui::TextWrapped("Unsaved edits are not included in these ROM measurements.");
-        ImGui::Text("Largest resident view: %u triangles | %u groups",peakTriangles,peakGroups);
-        ImGui::Text("Mission ROM: %u bytes",mission.value("bytes",0u));
-        ImGui::Text("Embedded triangle RGBA: %u bytes (included in mission)",lighting.value("mission_embedded_rgba_bytes",triangles*(package.value("chunk_version",0)==4?48u:0u)));
-        const auto geometry=streamCookReport_.value("compiled_geometry_bytes",0u);
-        const auto colors=streamCookReport_.value("compiled_baked_color_bytes",lighting.value("bootstrap_embedded_rgba_bytes",0u));
-        ImGui::Text("Shared geometry: %u | Constant lighting: %u bytes",geometry,colors);
-        ImGui::Text("Known resident arrays: %u bytes",streamCookReport_.value("compiled_known_array_bytes",geometry+colors));
-        ImGui::Text("Region slots: %u | Largest chunk: %u bytes",package.value("max_resident_regions",0u),largestChunk);
-        if(lighting.value("states",0)==2){
-            ImGui::TextWrapped("Lighting baked automatically in closed/open states using the complete mission's shadow blockers.");
-            ImGui::Text("Shadow scene: %u colliders | %u floors | %u lights",lighting.value("full_scene_colliders",0u),lighting.value("full_scene_floors",0u),lighting.value("global_lights",0u));
-        }
-        ImGui::TextWrapped("Descriptors, scene banks, slots, renderer, audio and display buffers require separate memory measurement.");
     }
     void DrawBuild()
     {
@@ -2383,9 +2360,9 @@ class DemoEditor
             if (!report_.empty())
             {
                 const Json counts = report_.value("counts",Json::object());
-                if(!streamPath_.empty())DrawStreamCook();
-                else ImGui::Text("Cook %.2f ms | %d models | %d triangles | %d geometry bytes",report_.value("elapsed_ms",0.0),counts.value("models",0),counts.value("instanced_triangles",0),report_.value("compiled_geometry_bytes",0));
+                ImGui::Text("Measured cook %.2f ms | source models %d | triangles %d",report_.value("elapsed_ms",0.0),counts.value("models",0),counts.value("instanced_triangles",0));
             }
+            DrawRenderDiagnostics();
             if (ImGui::CollapsingHeader("Last compiler log")) ImGui::TextUnformatted(Tail(queue_/"compiler.log").c_str());
             if (ImGui::CollapsingHeader("Last ROM build log")) ImGui::TextUnformatted(Tail(queue_/"rom-build.log").c_str());
         }

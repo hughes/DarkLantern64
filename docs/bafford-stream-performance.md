@@ -10,7 +10,7 @@ and remote restart admission remain explicit and are reported separately.
 
 ```powershell
 python tools/build.py --bundle content/level_bundle.json --bafford-district-performance-test
-python tools/verify_bafford_district_performance.py --rom build/DarkLantern64-bundle-level_bundle-menu-bafford-district-test-performance-t3d.z64 --output build/bafford-district-performance.json
+python tools/verify_bafford_district_performance.py --rom build/DarkLantern64-bundle-level_bundle-menu-district-perf-t3d.z64 --output build/bafford-district-performance.json
 ```
 
 The verifier requires every gameplay frame and raw frame interval to stay at or
@@ -82,6 +82,94 @@ district's next working set. Embedded triangle colors are already part of
 mission ROM bytes; bootstrap constant colors are counted separately as resident
 arrays. The DLS1 host worker cache, including its table/header, is not a separate
 ROM asset.
+
+## Renderer and resource diagnostic evidence
+
+The embedded two-state shortcut is valid for at most one independent door.
+Its runtime decision uses the complete mission's door definitions, including
+doors outside the current view. With two independent doors, streamed static
+models report `live_night` / `independent_doors`, since closed/open colors cannot
+represent four combinations. Guards use body probes, objectives use their live
+probe and animated meshes remain live. Loaded standalone baked files retain
+their existing initial path; an independent door change is reported separately
+and uses live lighting. A single-door live-prepared cache reports
+`runtime_two_state` on later changes, distinct from offline baked data.
+
+Bounded `DL64 lighting_policy` records identify publication or lighting change,
+exact build/source/package hashes, bake load result, door count and revision,
+published mask, and the model/bucket totals. `lighting_case` rows carry concrete
+mode/reason and affected model/triangle counts. They describe all published
+models' policy, rather than inventing visible per-frame work counts.
+The buckets describe publication/preparation and lighting-revision policy.
+Steady frame animation and probe work can differ by renderer backend (Tiny3D
+uses body probes for animated meshes). Its timing and affected visible counts
+remain unmeasured here; the cook buckets do not infer them. The streamed
+lighting fixtures contain no animated meshes.
+`lighting_policy_cost` measures elapsed policy-row construction and transport,
+including interrupts and excluding its own cost row. It does not measure pure
+CPU time or full lighting work. The runtime inspector accepts these records
+before or after stream startup, validates the identity and bucket totals, and
+preserves incomplete reports. Captures containing only renderer diagnostics
+remain inspectable without inventing a streaming timeline.
+
+Cooked `renderer_diagnostics` are predictions. `bridge_diagnostics` are resource
+estimates with source-linked activation/transition witnesses, region/material
+groups, contributing objects and explicit caps. Embedded RGBA is a subset of
+the package's ROM bytes and is never added again. Bootstrap constants, fixed
+scene-bank RGBA, slot buffers and renderer night caches are separate resident
+allocations. DLS1 host worker bytes are excluded from target totals. A known
+subtotal leaves the complete target ROM/RAM amount unknown when renderer,
+allocator, audio, code or display costs have not been measured.
+
+`tools/verify_render_diagnostics.py` checks primitive single-door and
+independent-door fixtures against the actual decoded package and the shared C
+renderer policy, including all two/four door combinations. Its optional owned
+editor run verifies pre-Play warnings, source navigation and invalid/stale draft
+behavior. Host policy measurements are reported separately from ROM evidence.
+Target overhead requires the same continuous district workload with diagnostic
+logging enabled and disabled, recording both complete captures, source/build/
+package identities, strict maxima, heap and underruns. Comparing selected
+frames or relaxing the 33.333333 ms / 8 ms limits cannot certify the added
+diagnostics.
+
+```powershell
+python tools/verify_render_diagnostics_rom.py --run
+python tools/verify_native_lighting_metadata.py
+python tools/build.py --bundle content/level_bundle.json --bafford-district-performance-test
+python tools/build.py --bundle content/level_bundle.json --bafford-district-performance-test --disable-render-diagnostics
+python tools/verify_bafford_district_performance.py --rom build/DarkLantern64-bundle-level_bundle-menu-district-perf-t3d.z64 --output build/render-diagnostics-enabled-performance.json
+python tools/verify_bafford_district_performance.py --rom build/DarkLantern64-bundle-level_bundle-menu-district-perf-no-rdiag-t3d.z64 --output build/render-diagnostics-disabled-performance.json
+python tools/compare_render_diagnostics_overhead.py --enabled build/render-diagnostics-enabled-performance.json --disabled build/render-diagnostics-disabled-performance.json
+```
+
+Run these GPU checks sequentially. The fixture tool creates a short private
+project path to respect Windows SDK path limits, captures every two/four-state
+input replay and compares declared Native/ROM state at settled boundaries.
+`--settings <owned-profile.bml>` selects an isolated settings source for the ROM
+fixture or district verifier. It records the source settings hash and host
+audio output configuration; both A/B runs must use the same source settings.
+Disabling an unavailable host audio endpoint does not disable emulated guest
+N64 audio, whose callbacks and underruns still require acceptance. Active user
+emulator settings remain unchanged.
+
+The [renderer diagnostics evidence](evidence/render-diagnostics.json) records
+the 2026-10-13 checks. Actual Tiny3D replays covered both single-door states
+(289 ticks) and all four independent-door states (831 ticks), matched cooked
+publication/change buckets, and matched Native functional state on identical
+packages. The owned editor verified source witnesses, stale/invalid drafts,
+and saved ROM/map/partition hash rejection with exact restoration.
+
+The default diagnostics-enabled district passed all strict limits across
+3,458 frames: maximum frame 32.483 ms, raw interval 33.054 ms and service CPU
+7.980 ms, with zero dropped time, loading suppression or audio failures.
+Its 37 policy-row transports measured 20.138 ms total and 1.312 ms maximum,
+including interrupts and excluding cost trailers. The complete disabled
+comparison had one frame and two intervals over budget (maxima 33.861 and
+34.194 ms), so `strict_pair_passed` is **false**. Both unfiltered captures are
+retained; the comparison does not establish a causal per-frame CPU delta.
+Both used the same owned host-audio-disabled settings after the prior accepted
+ROM reproduced a WASAPI startup block. Guest audio remained checked. Original
+hardware timing and unmeasured per-subsystem allocations remain unknown.
 
 Transition preparation keeps the published scene available while assembling a
 candidate bank. Work advances through chunk reads/checksums, bounded scene

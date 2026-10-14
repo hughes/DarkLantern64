@@ -14,8 +14,8 @@ new_local_repository(
 load("@rules_cc//cc:defs.bzl", "cc_library")
 cc_library(
     name = "animation",
-    srcs = ["src/animation.c", "src/game.c", "src/tick.c", "src/mission.c", "src/world_stream.c", "src/stream_scene.c", "src/stream_coordinator.c"],
-    hdrs = ["src/animation.h", "src/game.h", "src/enemy_types.def", "src/tick.h", "src/mission.h", "src/world_stream.h", "src/stream_scene.h", "src/stream_coordinator.h", "src/runtime_trace.h", "src/content_limits.h"],
+    srcs = ["src/animation.c", "src/game.c", "src/tick.c", "src/mission.c", "src/world_stream.c", "src/stream_scene.c", "src/stream_coordinator.c", "src/lighting_policy.c"],
+    hdrs = ["src/animation.h", "src/game.h", "src/enemy_types.def", "src/tick.h", "src/mission.h", "src/world_stream.h", "src/stream_scene.h", "src/stream_coordinator.h", "src/runtime_trace.h", "src/content_limits.h", "src/lighting_policy.h"],
     includes = ["src"],
     copts = select({"@platforms//os:windows": ["/std:c11"], "//conditions:default": []}),
     visibility = ["//visibility:public"],

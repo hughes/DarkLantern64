@@ -1,0 +1,212 @@
+{
+  "version": 1,
+  "source": "stream_lighting_single_door.json",
+  "entry_region": "hub",
+  "visibility": "authored-sets",
+  "regions": [
+    {
+      "id": "hub",
+      "bounds": [
+        [
+          -10.11,
+          -0.3,
+          -6.11
+        ],
+        [
+          0.11,
+          3.11,
+          6.11
+        ]
+      ],
+      "activation_bounds": [
+        [
+          -10,
+          -1,
+          -6
+        ],
+        [
+          0,
+          3,
+          6
+        ]
+      ],
+      "entities": [
+        "hub-floor",
+        "hub-west-wall",
+        "hub-north-wall",
+        "hub-south-wall",
+        "opening-wall-north-edge",
+        "opening-wall-between-openings",
+        "opening-wall-south-edge",
+        "opening-lintel-north",
+        "opening-lintel-courtyard",
+        "north-door",
+        "hub-start",
+        "hub-exit",
+        "hub-light"
+      ],
+      "neighbors": [
+        "north",
+        "courtyard"
+      ],
+      "working_set": [
+        "hub",
+        "north",
+        "courtyard"
+      ]
+    },
+    {
+      "id": "north",
+      "bounds": [
+        [
+          -0.01,
+          -0.3,
+          -6.11
+        ],
+        [
+          10.11,
+          3.11,
+          0.11
+        ]
+      ],
+      "activation_bounds": [
+        [
+          0,
+          -1,
+          -6
+        ],
+        [
+          10,
+          3,
+          0
+        ]
+      ],
+      "entities": [
+        "north-floor",
+        "north-east-wall",
+        "north-outer-wall",
+        "north-light",
+        "rooms-divider"
+      ],
+      "neighbors": [
+        "hub"
+      ],
+      "working_set": [
+        "north"
+      ]
+    },
+    {
+      "id": "courtyard",
+      "bounds": [
+        [
+          -0.01,
+          -0.3,
+          -0.11
+        ],
+        [
+          10.11,
+          3.11,
+          6.11
+        ]
+      ],
+      "activation_bounds": [
+        [
+          0,
+          -1,
+          0
+        ],
+        [
+          10,
+          3,
+          6
+        ]
+      ],
+      "entities": [
+        "courtyard-floor",
+        "courtyard-east-wall",
+        "courtyard-outer-wall",
+        "courtyard-light",
+        "courtyard-landmark",
+        "courtyard-loot"
+      ],
+      "neighbors": [
+        "hub"
+      ],
+      "working_set": [
+        "courtyard"
+      ]
+    }
+  ],
+  "transitions": [
+    {
+      "id": "hub-to-north",
+      "from": "hub",
+      "to": "north",
+      "bounds": [
+        [
+          -0.03,
+          -1,
+          -4
+        ],
+        [
+          0.03,
+          3,
+          -2
+        ]
+      ],
+      "door": "north-door"
+    },
+    {
+      "id": "north-to-hub",
+      "from": "north",
+      "to": "hub",
+      "bounds": [
+        [
+          -0.03,
+          -1,
+          -4
+        ],
+        [
+          0.03,
+          3,
+          -2
+        ]
+      ],
+      "door": "north-door"
+    },
+    {
+      "id": "hub-to-courtyard",
+      "from": "hub",
+      "to": "courtyard",
+      "bounds": [
+        [
+          -0.03,
+          -1,
+          2
+        ],
+        [
+          0.03,
+          3,
+          4
+        ]
+      ]
+    },
+    {
+      "id": "courtyard-to-hub",
+      "from": "courtyard",
+      "to": "hub",
+      "bounds": [
+        [
+          -0.03,
+          -1,
+          2
+        ],
+        [
+          0.03,
+          3,
+          4
+        ]
+      ]
+    }
+  ]
+}

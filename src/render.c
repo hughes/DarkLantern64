@@ -8,6 +8,7 @@
 #include "render_transform.h"
 #include "static_lighting.h"
 #include "lighting_bake.h"
+#include "lighting_policy.h"
 #include "dl_music.h"
 #include "stream_rom.h"
 #ifdef DL_RENDER_T3D
@@ -32,6 +33,7 @@ static void gpu_report(void);
 #include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 
 /* Full XYZ meshes: CPU affine/view transforms and frustum clipping, followed
  * by the RDP triangle rasterizer and hardware depth buffer. No grid dependency. */
@@ -78,6 +80,15 @@ static int vertex_count,triangle_count,submitted_triangles;
 static const DlLevel *cached_level;
 static uint32_t cached_door;
 static bool multiple_doors;
+static uint32_t independent_doors;
+static bool standalone_loaded;
+static const char *standalone_status="unconfigured";
+#ifndef DL_DISABLE_RENDER_DIAGNOSTICS
+static uint64_t lighting_policy_sequence;
+#endif
+#ifndef DL_RUNTIME_BUILD_ID
+#define DL_RUNTIME_BUILD_ID "unidentified"
+#endif
 static surface_t depth_buffer;
 static sprite_t *textures[64];
 static const DlLevel *texture_level;
@@ -92,10 +103,37 @@ static DlVec3 *animation_normals;
 static int animation_normal_count,animation_model_count;
 static bool inline_lighting(const DlGame *g,int index){
 #ifdef DL_DISABLE_LIGHTING_BAKE
-    (void)g;(void)index;return false;
+    const bool enabled=false;
 #else
-    const DlModelInstance *model=&g->level->models[index];
-    return g->level->environment.enabled&&!multiple_doors&&model->baked_colors[0]&&model->baked_colors[1];
+    const bool enabled=true;
+#endif
+    return dl_lighting_inline_payload(enabled,g->level->environment.enabled,independent_doors,&g->level->models[index]);
+}
+static void report_lighting_policy(const DlGame *g,bool changed){
+#ifndef DL_DISABLE_RENDER_DIAGNOSTICS
+    const uint32_t start=TICKS_READ();
+    DlLightingSettings settings={.standalone_loaded=standalone_loaded,.independent_doors=independent_doors,
+        .standalone_rejected=g->level->baked_lighting&&*g->level->baked_lighting&&!standalone_loaded};
+#ifndef DL_DISABLE_LIGHTING_BAKE
+    settings.bake_enabled=true;
+#endif
+    DlLightingPolicyReport report;dl_lighting_policy_report(g->level,settings,changed,&report);
+    DlLightingPolicyIdentity identity={.report=++lighting_policy_sequence,.build=DL_RUNTIME_BUILD_ID,
+        .source=g->level->renderer_source_sha256,.package=g->level->stream?g->level->stream->package_sha256:"none",
+        .standalone=standalone_status,.door_revision=dl_game_lighting_revision(g),.doors=independent_doors,.changed=changed};
+    dl_stream_rom_lighting_view(g,&identity.revision,&identity.published);
+    char row[512];size_t bytes=dl_lighting_policy_header_text(row,sizeof row-4,&identity,&report);
+    if(bytes){for(size_t i=bytes;i<((bytes+3u)&~(size_t)3);++i)row[i]=0;ssize_t written=write(STDERR_FILENO,row,bytes);(void)written;}
+    for(unsigned mode=0;mode<DL_LIGHT_MODE_COUNT;++mode)for(unsigned reason=0;reason<DL_LIGHT_REASON_COUNT;++reason){
+        const DlLightingCount count=report.cases[mode][reason];if(!count.models)continue;
+        bytes=dl_lighting_policy_case_text(row,sizeof row-4,identity.report,(DlLightingMode)mode,(DlLightingReason)reason,count);
+        if(bytes){for(size_t i=bytes;i<((bytes+3u)&~(size_t)3);++i)row[i]=0;ssize_t written=write(STDERR_FILENO,row,bytes);(void)written;}
+    }
+    const uint32_t elapsed=TICKS_READ()-start;
+    bytes=dl_lighting_policy_cost_text(row,sizeof row-4,identity.report,elapsed,TICKS_PER_SECOND);
+    if(bytes){for(size_t i=bytes;i<((bytes+3u)&~(size_t)3);++i)row[i]=0;ssize_t written=write(STDERR_FILENO,row,bytes);(void)written;}
+#else
+    (void)g;(void)changed;
 #endif
 }
 #ifndef DL_RENDER_T3D
@@ -426,20 +464,21 @@ static size_t read_lighting_bake(void *context,void *destination,size_t bytes){
 #endif
 static bool load_lighting_bake(const DlGame *g){
     const char *path=g->level->baked_lighting;
-    if(!g->level->environment.enabled){debugf("DL64 lighting_bake status=absent reason=legacy\n");return false;}
+    if(!g->level->environment.enabled){standalone_status="legacy";debugf("DL64 lighting_bake status=absent reason=legacy\n");return false;}
 #ifdef DL_DISABLE_LIGHTING_BAKE
     (void)path;
-    debugf("DL64 lighting_bake status=disabled reason=build_flag\n");return false;
+    standalone_status="disabled";debugf("DL64 lighting_bake status=disabled reason=build_flag\n");return false;
 #else
-    if(!path||!*path){debugf("DL64 lighting_bake status=absent reason=unconfigured\n");return false;}
-    if(strncmp(path,"rom:/",5)){debugf("DL64 lighting_bake status=rejected reason=path\n");return false;}
+    if(!path||!*path){standalone_status="unconfigured";debugf("DL64 lighting_bake status=absent reason=unconfigured\n");return false;}
+    if(strncmp(path,"rom:/",5)){standalone_status="path";debugf("DL64 lighting_bake status=rejected reason=path\n");return false;}
     int handle=dfs_open(path+4);
-    if(handle<0){debugf("DL64 lighting_bake status=rejected reason=open path=%s\n",path);return false;}
+    if(handle<0){standalone_status="open";debugf("DL64 lighting_bake status=rejected reason=open path=%s\n",path);return false;}
     int size=dfs_size((uint32_t)handle);
     DlLightingBakeResult result={.status=DL_LIGHTING_BAKE_TRUNCATED};
     if(size>=0)result=dl_lighting_bake_decode(g->level,read_lighting_bake,&handle,(size_t)size,
         night_colors[0],night_colors[1],(size_t)triangle_count);
     dfs_close((uint32_t)handle);
+    standalone_status=result.status==DL_LIGHTING_BAKE_OK?"loaded":dl_lighting_bake_status_name(result.status);
     debugf("DL64 lighting_bake status=%s reason=%s models=%lu triangles=%lu states=2 rgb_bytes=%lu crc32=%08lx path=%s\n",
         result.status==DL_LIGHTING_BAKE_OK?"loaded":"rejected",dl_lighting_bake_status_name(result.status),
         (unsigned long)result.models,(unsigned long)result.triangles,(unsigned long)result.payload_bytes,
@@ -495,8 +534,7 @@ static void build_cache(const DlGame *g){
         for(int i=0;i<previous_count;++i)
             previous_stream_keys[i]=cached_level->meshes[cached_level->models[i].mesh].stream_key;
     }
-    int doors=0;for(int i=0;i<g->level->object_count;++i)if(g->level->objects[i].kind==DL_OBJECT_DOOR)++doors;
-    multiple_doors=doors>1;
+    independent_doors=dl_lighting_independent_doors(g->level);multiple_doors=independent_doors>1;
     /* Loading is user-visible elapsed time, including audio/VI interrupts.
      * Raw tick stages avoid rounded milliseconds and cover RSP/HUD setup too;
      * the older scene_prepared record intentionally keeps its original scope. */
@@ -614,7 +652,7 @@ static void build_cache(const DlGame *g){
         }
     }
     uint32_t geometry_ticks=scene_load_lap(&load_mark);
-    bool baked=load_lighting_bake(g);
+    bool baked=load_lighting_bake(g);standalone_loaded=baked;
     uint32_t bake_ticks=scene_load_lap(&load_mark);
 #ifdef DL_VERIFY_LIGHTING_BAKE
     if(baked)verify_baked_lighting(g);
@@ -640,6 +678,7 @@ static void build_cache(const DlGame *g){
         restore_ticks=scene_load_lap(&load_mark);
     }
     cached_level=g->level;cached_door=dl_game_lighting_revision(g);
+    report_lighting_policy(g,false);
     debugf("DL64 geometry_ready models=%d meshes=%d vertices=%d triangles=%d depth=hardware transform=xyz-euler dynamic_lighting=two-body-probes objective_lighting=emissive\n",
         g->level->model_count,g->level->mesh_count,vertex_count,triangle_count);
     debugf("DL64 scene_prepared ms=%.2f night_cache_bytes=%d door_states=%d textures=%d\n",
@@ -850,6 +889,7 @@ static void geometry(const DlGame *g){
         }
     }
     dl_profile_record(DL_PROFILE_LIGHTING,mark);
+    if(lighting_changed)report_lighting_policy(g,true);
     cached_door=dl_game_lighting_revision(g);
     mark=dl_profile_mark();
     for(int m=0;m<g->level->model_count;++m){

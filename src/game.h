@@ -173,6 +173,7 @@ typedef struct {
     const DlFloorTriangle *floors;
     int floor_count;
     const DlQueryCache *query_cache; /* NULL retains scalar queries */
+    const char *renderer_source_sha256; /* canonical authored source bound to renderer diagnostics */
 } DlLevel;
 
 typedef enum { DL_PATROL, DL_INVESTIGATE, DL_SEARCH, DL_CHASE } DlGuardState;

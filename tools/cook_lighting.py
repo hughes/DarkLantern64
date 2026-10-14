@@ -73,7 +73,7 @@ def host_compiler():
 
 
 def snapshot_sources():
-    names = ["src/game.c", "src/static_lighting.c", "src/render.c", "tools/bake_lighting.c", "tools/cook_lighting.py"]
+    names = ["src/game.c", "src/static_lighting.c", "src/lighting_policy.c", "src/render.c", "tools/bake_lighting.c", "tools/cook_lighting.py"]
     names += [p.relative_to(ROOT).as_posix() for pattern in ("*.h", "*.def") for p in sorted((ROOT / "src").glob(pattern))]
     return {name: (ROOT / name).read_bytes() for name in sorted(set(names))}
 
@@ -141,7 +141,7 @@ def prepare_lighting(unbaked_header, *, cache_root=None):
                 path.write_bytes(raw)
             (temporary / "demo_level.h").write_bytes(header)
             object_files = []
-            for name in ("game", "static_lighting"):
+            for name in ("game", "static_lighting", "lighting_policy"):
                 obj, sha = objects / (name + ".o"), objects / (name + ".sha256")
                 if _cached(obj, sha) is None:
                     candidate = temporary / (name + ".o")

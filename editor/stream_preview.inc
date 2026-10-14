@@ -99,6 +99,7 @@
                 {"cooked_partition_sha256",streamPreviewPartitionCookSha_},{"content_identity_sha256",streamPreviewReport_.value("content_identity_sha256",std::string())}};
             result["package_sha256"]=package.at("stream").at("package_sha256");
             result["play_fingerprint"]=package.at("fingerprint");result["game"]=streamPreview_->State();result["stream"]=result.at("game").at("stream");
+            result["renderer_runtime"]=result.at("game").value("renderer_runtime",Json::object());
             result["camera"]={{"position",DlPlaySession::J(streamPreview_->game.player)},{"yaw",streamPreview_->game.yaw},{"pitch",streamPreview_->game.pitch}};
             result["regions"]=streamPreviewReport_.value("regions",Json::array());
             result["cooked_partition"]=streamPreviewSnapshot_.at("partition");

@@ -274,6 +274,8 @@ def main(argv=None):
     parser.add_argument('--baseline',action='store_true',help='Report an older immutable fixed-dt run without claiming target acceptance')
     parser.add_argument('--frame-budget-ms',type=float,default=1000/30);parser.add_argument('--service-budget-ms',type=float,default=8)
     parser.add_argument('--timeout',type=float,default=420)
+    parser.add_argument('--settings',type=Path,default=ROOT/'.dev/ares/settings-8mb.bml',
+                        help='Settings source copied into an owned Ares run; active user settings are never changed')
     parser.add_argument('--output',type=Path,default=ROOT/'build/bafford-district-performance.json')
     args=parser.parse_args(argv);report=dict(passed=False,accepted=False,platform='Ares emulator')
     try:
@@ -281,6 +283,9 @@ def main(argv=None):
         if args.log:
             log=args.log.resolve();metadata=log.parent/'verification-build.json';build=json.loads(metadata.read_bytes())
             rom=args.rom.resolve() if args.rom else log.parent/Path(build['rom']).name
+            run_path=log.parent/'verification-run.json'
+            if run_path.is_file():
+                report['run']=json.loads(run_path.read_bytes())
         else:
             require(not args.baseline,'Baseline analysis requires an existing log')
             from tools.build import build_rom
@@ -294,7 +299,7 @@ def main(argv=None):
         if not args.log:
             from tools.smoke_ares import exercise
             exe=Path(os.environ.get('ARES_EXE',str(Path(os.environ.get('LOCALAPPDATA',''))/'ares/ares.exe')))
-            settings=ROOT/'.dev/ares/settings-8mb.bml'
+            settings=args.settings.resolve()
             try:
                 run=exercise(exe,settings,rom,'bafford-district-performance',COMPLETE,args.timeout,build['rom_sha256'],memory=8)
             except RuntimeError as error:
@@ -302,6 +307,16 @@ def main(argv=None):
                 if run is None:raise
             report['run']=run;log=ROOT/run['log']
             (log.parent/'verification-build.json').write_text(json.dumps(build,indent=2)+'\n')
+            (log.parent/'verification-run.json').write_text(json.dumps(run,indent=2)+'\n')
+        profile=log.parent/'settings.bml'
+        if profile.is_file():
+            from tools.prepare_ares import node_indices
+            lines=profile.read_text(encoding='utf-8-sig').splitlines();index=node_indices(lines).get(('Audio','Driver'))
+            driver=lines[index].partition(':')[2].strip() if index is not None else None
+            report['host_audio_output']='disabled' if driver=='None' else 'configured' if driver else 'unknown'
+            report['host_audio_driver']=driver
+            report['isolated_settings_sha256']=hashlib.sha256(profile.read_bytes()).hexdigest()
+            report['host_audio_scope']='Isolated emulator host output configuration; guest N64 callbacks and underruns remain checked independently.'
         snapshot=log.parent/rom.name
         require(snapshot.is_file() and hashlib.sha256(snapshot.read_bytes()).hexdigest()==build['rom_sha256'],'Log lacks matching ROM snapshot')
         content=next(row['content'] for row in build['level_catalog']['levels'] if row['id']=='bafford-district')

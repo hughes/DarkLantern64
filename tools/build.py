@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import argparse
+import copy
 import hashlib
 import json
 import math
@@ -53,7 +54,7 @@ def scene_paths(level=None):
     return source, BUILD if default else BUILD / "scenes" / source.stem, default
 
 
-def build_runtime_debug_map(catalog, build_id, rom_sha256):
+def build_runtime_debug_map(catalog, build_id, rom_sha256, render_options=None):
     """Bind authored ID maps to one immutable executable and content catalog."""
     levels = []
     for entry in catalog["levels"]:
@@ -62,6 +63,46 @@ def build_runtime_debug_map(catalog, build_id, rom_sha256):
             regions=[], transitions=[], entities=[], surfaces=[], colliders=[], object_entity_ids=[], enemy_entity_ids=[])
         mapped.update(id=entry["id"], source=entry["source"],
                       compiled_source_sha256=entry["content"]["source_sha256"])
+        diagnostics = copy.deepcopy(entry["content"].get("renderer_diagnostics") or
+                                    (mission["report"].get("renderer_diagnostics") if mission else None))
+        if diagnostics:
+            try:
+                from cook_diagnostics import apply_renderer_settings
+            except ModuleNotFoundError:
+                from tools.cook_diagnostics import apply_renderer_settings
+            options = render_options or {"bake_enabled": True}
+            diagnostics = apply_renderer_settings(diagnostics, bake_enabled=options.get("bake_enabled", True))
+            diagnostics["identity"].update(build_id=build_id, rom_sha256=rom_sha256)
+            mapped.update(renderer_source_sha256=diagnostics["identity"]["renderer_source_sha256"],
+                          renderer_diagnostics=diagnostics, render_options=options)
+            bridge = copy.deepcopy(entry["content"].get("bridge_diagnostics") or
+                                   (mission["report"].get("bridge_diagnostics") if mission else None))
+            if bridge:
+                mapped["bridge_diagnostics"] = bridge
+                peak = 0
+                cache_witnesses = []
+                for working in bridge.get("working_sets", []):
+                    predicted = copy.deepcopy(diagnostics)
+                    predicted["model_entries"] = working.get("renderer", {}).get("model_entries", [])
+                    predicted = apply_renderer_settings(predicted, bake_enabled=options.get("bake_enabled", True))
+                    working["renderer"] = dict(predicted, basis="potential_membership_upper_bound")
+                    cache = 48*working["usage"]["scene_triangles"] if any(row.get("environment_enabled") for row in predicted["model_entries"]) and any(row["mode"]!="inline_two_state" for row in predicted["model_entries"]) else 0
+                    working["renderer"]["renderer_night_cache_bytes"] = cache
+                    working["usage"]["renderer_night_cache_bytes"] = cache
+                    witness = {key: copy.deepcopy(working[key]) for key in
+                               ("anchor", "gates", "source_regions", "regions", "groups", "contributors")}
+                    witness.update(usage=cache, cap=None)
+                    if cache > peak:
+                        peak, cache_witnesses = cache, [witness]
+                    elif cache == peak:
+                        cache_witnesses.append(witness)
+                bridge["maxima"]["renderer_night_cache_bytes"] = dict(usage=peak, cap=None, witnesses=cache_witnesses)
+                memory = bridge.get("memory", {})
+                if memory:
+                    old = memory.get("renderer_night_cache_peak_bytes", 0)
+                    memory["renderer_night_cache_peak_bytes"] = peak
+                    if memory.get("known_target_resident_bytes") is not None:
+                        memory["known_target_resident_bytes"] += peak-old
         if entry.get("mission_manifest"):
             mapped["mission_manifest"] = entry["mission_manifest"]
             mapped["mission_manifest_sha256"] = entry["content"]["mission_manifest_sha256"]
@@ -76,7 +117,7 @@ def build_rom(sdk, autoplay=False, debug_overlay=False, level=None, capture=Fals
               stream_test_capture=False, bafford_stream_test=False, bafford_stream_test_capture=False,
               bafford_expanded_test=False, bafford_expanded_test_capture=False,
               bafford_district_test=False, bafford_district_test_capture=False,
-              bafford_district_performance_test=False, runtime_trace=False):
+              bafford_district_performance_test=False, runtime_trace=False, disable_render_diagnostics=False):
     start = time.perf_counter()
     replay = None
     if bafford_district_performance_test:
@@ -171,15 +212,17 @@ def build_rom(sdk, autoplay=False, debug_overlay=False, level=None, capture=Fals
     if bafford_expanded_test_capture:
         name += "-capture"
     if bafford_district_test:
-        name += '-bafford-district-test'
+        name += '-district' if bafford_district_performance_test else '-bafford-district-test'
     if bafford_district_test_capture:
         name += '-capture'
     if bafford_district_performance_test:
-        name += '-performance'
+        name += '-perf'
     if lighting_bake_verify:
         name += "-verify-lighting"
     if disable_lighting_bake:
         name += "-runtime-lighting"
+    if disable_render_diagnostics:
+        name += "-no-rdiag"
     if renderer != "cpu":
         name += "-" + renderer
     work = BUILD / name
@@ -258,6 +301,8 @@ def build_rom(sdk, autoplay=False, debug_overlay=False, level=None, capture=Fals
         common += ["-DDL_VERIFY_LIGHTING_BAKE=1"]
     if disable_lighting_bake:
         common += ["-DDL_DISABLE_LIGHTING_BAKE=1"]
+    if disable_render_diagnostics:
+        common += ["-DDL_DISABLE_RENDER_DIAGNOSTICS=1"]
     extra_headers = []
     if replay is not None:
         selected = catalog["levels"][catalog["initial_level"]]
@@ -291,7 +336,7 @@ def build_rom(sdk, autoplay=False, debug_overlay=False, level=None, capture=Fals
         extra_headers.append(capture_header)
     sources = [ROOT / "src" / f for f in ("game.c", "tick.c", "main.c", "dl_profile.c", "dl_music.c", "launch.c", "animation.c",
                                          "render_lighting.c", "render_batches.c", "render_transform.c", "render_texture_packing.c",
-                                         "static_lighting.c", "lighting_bake.c", "mission.c", "world_stream.c",
+                                         "static_lighting.c", "lighting_policy.c", "lighting_bake.c", "mission.c", "world_stream.c",
                                          "stream_scene.c", "stream_coordinator.c", "stream_rom.c", "runtime_trace.c", "runtime_diagnostics.c")]
     sources += generated_sources
     if runtime_trace:
@@ -317,7 +362,7 @@ def build_rom(sdk, autoplay=False, debug_overlay=False, level=None, capture=Fals
         headers.append(bundle)
     headers += [ROOT / "tools" / name for name in ("compile_bundle.py", "compile_level.py", "cook_textures.py", "cook_lighting.py",
                                                   "bake_lighting.c", "cook_stream_lighting.py", "bake_stream_lighting.c",
-                                                  "character_assets.py", "asset_pack.py", "cook_music.py")]
+                                                  "character_assets.py", "asset_pack.py", "cook_music.py", "cook_diagnostics.py")]
     sdk_inputs = [lib / n for n in ("libdragon.a", "libdragonsys.a", "n64.ld")]
     sdk_inputs += sorted((sdk / "mips64-elf/include").rglob("*.h"))
     compiler_version = run([tools["mips64-elf-gcc"], "--version"], env=env, capture=True).stdout.splitlines()[0]
@@ -328,21 +373,20 @@ def build_rom(sdk, autoplay=False, debug_overlay=False, level=None, capture=Fals
                             {"flags": common, "kernel_flags": kernel_flags, "compiler": compiler_version, "renderer": renderer,
                              "tools": {n: (p.stat().st_size, p.stat().st_mtime_ns) for n, p in tools.items()}},
                             content_hashes=[entry["content"]["source_sha256"] for entry in catalog["levels"]])
-    if runtime_trace:
-        # Derive this header after fingerprinting to avoid a self-referential
-        # hash. The flag and generator are fingerprint inputs; the header's
-        # only variable input is that resulting build signature.
-        trace_header = work / "runtime_trace_build.h"
-        trace_header.write_text("#ifndef DL_RUNTIME_TRACE_BUILD_H\n#define DL_RUNTIME_TRACE_BUILD_H\n" +
-                                "#define DL_RUNTIME_TRACE_BUILD_ID " + json.dumps(signature) +
-                                "\n#endif\n", encoding="utf-8")
-        common += ["-include", str(trace_header)]
+    # Bind diagnostics to every executable. Generate after fingerprinting so
+    # the identity does not feed back into its own recipe.
+    trace_header = work / "runtime_trace_build.h"
+    trace_header.write_text("#ifndef DL_RUNTIME_TRACE_BUILD_H\n#define DL_RUNTIME_TRACE_BUILD_H\n" +
+                            "#define DL_RUNTIME_BUILD_ID " + json.dumps(signature) +
+                            "\n#define DL_RUNTIME_TRACE_BUILD_ID DL_RUNTIME_BUILD_ID\n#endif\n", encoding="utf-8")
+    common += ["-include", str(trace_header)]
     manifest = work / "build.json"
     rom = BUILD / (name + ".z64")
     if manifest.exists() and rom.exists():
         previous = json.loads(manifest.read_text())
         if previous.get("signature") == signature and previous.get("rom_sha256") == hashlib.sha256(rom.read_bytes()).hexdigest():
-            debug_map = build_runtime_debug_map(catalog, signature, previous["rom_sha256"])
+            debug_map = build_runtime_debug_map(catalog, signature, previous["rom_sha256"],
+                {"bake_enabled": not disable_lighting_bake, "renderer": renderer, "reporting_enabled": not disable_render_diagnostics})
             debug_map_path = work / "runtime_debug_map.json"
             debug_map_path.write_text(json.dumps(debug_map, indent=2) + "\n", encoding="utf-8")
             map_metadata = dict(runtime_trace=runtime_trace,
@@ -398,7 +442,8 @@ def build_rom(sdk, autoplay=False, debug_overlay=False, level=None, capture=Fals
         bundle.read_bytes() + "".join(entry["content"]["source_sha256"] for entry in catalog["levels"]).encode()).hexdigest()
     rom_sha256 = hashlib.sha256(rom.read_bytes()).hexdigest()
     debug_map_path = work / "runtime_debug_map.json"
-    debug_map_path.write_text(json.dumps(build_runtime_debug_map(catalog, signature, rom_sha256), indent=2) + "\n", encoding="utf-8")
+    debug_map_path.write_text(json.dumps(build_runtime_debug_map(catalog, signature, rom_sha256,
+        {"bake_enabled": not disable_lighting_bake, "renderer": renderer, "reporting_enabled": not disable_render_diagnostics}), indent=2) + "\n", encoding="utf-8")
     report = {"signature": signature, "compiler": compiler_version, "sdk": str(sdk),
               "renderer": renderer, "renderer_dependency": renderer_dependency, "kernel_flags": kernel_flags,
               "source_sha256": source_sha256, "rom": str(rom.relative_to(ROOT)),
@@ -409,6 +454,7 @@ def build_rom(sdk, autoplay=False, debug_overlay=False, level=None, capture=Fals
               "autoplay": autoplay, "debug_overlay": debug_overlay, "capture": capture,
               "scale_bench": scale_bench, "model_culling": not disable_model_cull,
               "lighting_bake_verify": lighting_bake_verify, "disable_lighting_bake": disable_lighting_bake,
+              "render_diagnostics": not disable_render_diagnostics,
               "level": str(level.relative_to(ROOT)) if level is not None else None,
               "bundle": str(bundle.relative_to(ROOT)) if bundle is not None else None,
               "start_level": start_level, "start_preset": start_preset, "menu_test": menu_test, "stream_test": stream_test,
@@ -506,8 +552,9 @@ def run_portable_tests():
         "test_hud_cache": [],
         "test_render_texture_packing": ["src/render_texture_packing.c", "src/render_batches.c"],
         "test_collision_cache": ["src/game.c"],
-        "test_lighting_bake": ["src/lighting_bake.c", "src/static_lighting.c", "src/game.c"],
-        "test_static_lighting": ["src/static_lighting.c", "src/game.c"],
+        "test_lighting_bake": ["src/lighting_bake.c", "src/static_lighting.c", "src/lighting_policy.c", "src/game.c"],
+        "test_static_lighting": ["src/static_lighting.c", "src/lighting_policy.c", "src/game.c"],
+        "test_lighting_policy": ["src/lighting_policy.c"],
         "test_mission": ["src/mission.c"],
         "test_world_stream": ["src/mission.c", "src/world_stream.c"],
         "test_stream_scene": ["src/mission.c", "src/world_stream.c", "src/stream_scene.c", "src/game.c"],
@@ -591,6 +638,7 @@ def main():
     parser.add_argument("--disable-model-cull", action="store_true", help="Disable early bounds rejection for controlled A/B measurements")
     parser.add_argument("--verify-lighting-bake", action="store_true", help="Diagnostic comparison of baked colors with runtime lighting")
     parser.add_argument("--disable-lighting-bake", action="store_true", help="Diagnostic runtime lighting fallback for load comparisons")
+    parser.add_argument("--disable-render-diagnostics", action="store_true", help="Suppress renderer policy reporting for controlled overhead measurements")
     parser.add_argument("--editor", action="store_true")
     parser.add_argument("--test", action="store_true")
     args = parser.parse_args()
@@ -615,7 +663,7 @@ def main():
                             bafford_district_test=args.bafford_district_test,
                             bafford_district_test_capture=args.bafford_district_test_capture,
                             bafford_district_performance_test=args.bafford_district_performance_test,
-                            runtime_trace=args.runtime_trace)
+                            runtime_trace=args.runtime_trace, disable_render_diagnostics=args.disable_render_diagnostics)
             if args.run:
                 ares = os.environ.get("ARES_EXE", str(Path(os.environ.get("LOCALAPPDATA", "")) / "ares/ares.exe"))
                 if not Path(ares).is_file():

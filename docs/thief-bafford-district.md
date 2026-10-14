@@ -49,7 +49,7 @@ entity table. Its largest chunk is 54,736 bytes. Five allocated region slots
 therefore occupy 273,680 bytes; directory storage is separate, as are DMA
 scratch, scene banks, query indexes and renderer resources. These current
 storage figures come from the district entry in
-`build/DarkLantern64-bundle-level_bundle-menu-bafford-district-test-performance-t3d/catalog/generated/bundle_report.json`.
+`build/DarkLantern64-bundle-level_bundle-menu-district-perf-t3d/catalog/generated/bundle_report.json`.
 V4 adds two states of front/back RGBA without changing source geometry or the
 working-set capacities. The earlier v3 package recorded in the historical
 evidence below was 245,496 bytes.

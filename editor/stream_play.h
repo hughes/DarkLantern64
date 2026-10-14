@@ -12,6 +12,7 @@
 #include <vector>
 #include <unordered_map>
 #include <deque>
+#include <cmath>
 
 // Desktop transport owns only the directory, fixed slot pool and shared
 // bootstrap. Static geometry/collision enters exclusively through DLM decoding.
@@ -41,6 +42,10 @@ public:
         {"renderer_delay_ticks",transport_.renderer_delay_ticks},{"rsp_delay_ticks",transport_.rsp_delay_ticks},{"rdp_delay_ticks",transport_.rdp_delay_ticks},
         {"service_tick",serviceTick_},{"submitted_serial",submitted_},{"read_stalls",coordinator.world.stats.read_stalls}};}
     const DlLevel* PublishedLevel() const {return dl_stream_scene_level(&coordinator.scene);}
+    static std::string FileSha256(const std::string& path) {
+        std::ifstream file(path,std::ios::binary);if(!file)throw std::runtime_error("Cannot read dependency: "+path);
+        return Sha256(file);
+    }
     explicit DlStreamPlay(Json& package,DlLevel& bootstrap):package_(package),bootstrap_(bootstrap) {
         const auto& data=package_.at("stream");
         file_.open(data.at("package_path").get<std::string>(),std::ios::binary);
@@ -69,6 +74,14 @@ public:
         definition_.max_resident_regions=data.at("max_resident_regions");
         if(definition_.max_region_bytes>65536||!definition_.max_resident_regions||definition_.max_resident_regions>5)
             throw std::runtime_error("Mission exceeds bounded slot pool");
+        if(data.contains("renderer_source_sha256")) {
+            const auto& source=data.at("renderer_source_sha256");
+            if(!source.is_string()||source.get_ref<const std::string&>().size()!=64||
+                !std::all_of(source.get_ref<const std::string&>().begin(),source.get_ref<const std::string&>().end(),
+                    [](char c){return (c>='0'&&c<='9')||(c>='a'&&c<='f');}))
+                throw std::runtime_error("Invalid renderer source SHA-256");
+            bootstrap_.renderer_source_sha256=source.get_ref<const std::string&>().c_str();
+        }
         modelLinks_=data.at("model_entity_ids").get<std::vector<uint32_t>>();
         objectLinks_=data.at("object_entity_ids").get<std::vector<uint32_t>>();
         enemyLinks_=data.at("enemy_entity_ids").get<std::vector<uint32_t>>();
@@ -87,17 +100,49 @@ public:
             for(const auto& row:data.at("transitions"))transitions_.push_back({row.at("from_region"),row.at("to_region"),V(row.at("bounds")[0]),V(row.at("bounds")[1]),row.at("door_entity_id")});
             definition_.policy_regions=policy_.data();definition_.transitions=transitions_.data();definition_.transition_count=(uint32_t)transitions_.size();
         }
-        for(const auto& row:package_.at("stream_meshes")) {
+        const auto& meshRows=package_.at("stream_meshes");const auto& modelRows=package_.at("stream_models");
+        if(!meshRows.is_array()||!modelRows.is_array()||meshRows.size()>DL_MAX_MODELS||modelRows.size()>DL_MAX_MODELS)
+            throw std::runtime_error("Mission shared visual capacity exceeded");
+        for(const auto& row:meshRows) {
+            const auto& points=row.at("vertices");const auto& ids=row.at("indices");
+            if(!points.is_array()||points.empty()||points.size()>DL_MAX_MESH_VERTICES||!ids.is_array()||ids.empty()||
+                ids.size()%3||ids.size()>DL_MAX_SCENE_TRIANGLES*3u)
+                throw std::runtime_error("Invalid bounded shared mesh dimensions");
+            for(const auto& id:ids)if(!id.is_number_integer()||id<0||id>=points.size())throw std::runtime_error("Shared mesh index outside vertices");
             vertices_.emplace_back();indices_.push_back(row.at("indices").get<std::vector<uint16_t>>());
             for(const auto& point:row.at("vertices"))vertices_.back().push_back(V(point));
             DlMesh mesh{};mesh.vertices=vertices_.back().data();mesh.vertex_count=(int)vertices_.back().size();
             mesh.indices=indices_.back().data();mesh.index_count=(int)indices_.back().size();meshes_.push_back(mesh);
         }
-        for(const auto& row:package_.at("stream_models")) {
+        bakedModels_.reserve(modelRows.size());size_t bakedBytes=0;
+        for(const auto& row:modelRows) {
+            if(!row.at("mesh").is_number_integer()||row.at("mesh")<0||row.at("mesh")>=meshes_.size())throw std::runtime_error("Invalid shared model mesh");
             DlModelInstance m{};m.id=row.at("id").get_ref<const std::string&>().c_str();m.mesh=row.at("mesh");
             m.position=V(row.at("position"));m.rotation=V(row.at("rotation"));m.scale=V(row.at("scale"));m.enemy_index=row.at("enemy_index");m.texture=-1;
             const auto role=row.at("role");m.role=role=="guard"?DL_MODEL_GUARD:role=="door"?DL_MODEL_DOOR:role=="control"?DL_MODEL_CONTROL:role=="loot"?DL_MODEL_LOOT:DL_MODEL_OBJECTIVE;
-            std::fill(std::begin(m.color),std::end(m.color),uint8_t(255));models_.push_back(m);
+            std::fill(std::begin(m.color),std::end(m.color),uint8_t(255));
+            const auto channels=[&](const char* key,uint8_t* out,size_t count){if(!row.contains(key))return;
+                const auto& values=row.at(key);if(!values.is_array()||values.size()!=count)throw std::runtime_error(std::string("Invalid model ")+key+" dimensions");
+                for(size_t i=0;i<count;++i){const auto& value=values.at(i);if(!value.is_number_integer()||value<0||value>255)
+                    throw std::runtime_error(std::string("Invalid model ")+key+" channel");out[i]=value.get<uint8_t>();}};
+            channels("color",m.color,4);channels("emissive",m.emissive,3);
+            if(row.contains("double_sided")){if(!row.at("double_sided").is_boolean())throw std::runtime_error("Invalid model sidedness");m.double_sided=row.at("double_sided");}
+            bakedModels_.emplace_back();
+            if(row.contains("baked_colors")) {
+                const auto& colors=row.at("baked_colors");const size_t bytes=size_t(meshes_[m.mesh].index_count/3)*24;
+                if(!colors.is_array()||colors.size()!=2||bakedBytes+bytes*2>DL_MAX_SCENE_TRIANGLES*48u)
+                    throw std::runtime_error("Model baked lighting capacity exceeded");
+                for(size_t state=0;state<2;++state){const auto& encoded=colors.at(state);
+                    if(!encoded.is_string()||encoded.get_ref<const std::string&>().size()!=bytes*2)throw std::runtime_error("Model baked lighting length mismatch");
+                    const auto& hex=encoded.get_ref<const std::string&>();auto& buffer=bakedModels_.back()[state];buffer.resize(bytes);
+                    const auto digit=[](char c)->int{return c>='0'&&c<='9'?c-'0':c>='a'&&c<='f'?c-'a'+10:c>='A'&&c<='F'?c-'A'+10:-1;};
+                    for(size_t i=0;i<bytes;++i){const int high=digit(hex[i*2]),low=digit(hex[i*2+1]);if(high<0||low<0)throw std::runtime_error("Invalid model baked lighting hexadecimal byte");buffer[i]=uint8_t(high*16+low);}
+                    for(size_t i=3;i<bytes;i+=4)if(buffer[i]!=255)throw std::runtime_error("Model baked lighting requires opaque RGBA");
+                    m.baked_colors[state]=buffer.data();
+                }
+                bakedBytes+=bytes*2;
+            }
+            models_.push_back(m);
         }
         if(modelLinks_.size()!=models_.size()||objectLinks_.size()!=size_t(bootstrap_.object_count)||enemyLinks_.size()!=size_t(bootstrap_.enemy_count))
             throw std::runtime_error("Mission bootstrap/entity mapping mismatch");
@@ -155,13 +200,15 @@ private:
     std::vector<DlStreamPolicyRegion> policy_;std::vector<DlStreamTransition> transitions_;
     std::vector<std::vector<DlVec3>> vertices_;std::vector<std::vector<uint16_t>> indices_;
     std::vector<DlMesh> meshes_;std::vector<DlModelInstance> models_;
+    std::vector<std::array<std::vector<uint8_t>,2>> bakedModels_;
     std::vector<std::vector<uint8_t>> buffers_;std::vector<DlRegionSlot> slots_;
     std::unordered_map<std::string,uint32_t> staticHomes_;
     Transport transport_{};bool transportEnabled_=false,bootstrapping_=true;
     uint64_t serviceTick_=0,submitted_=0,rendererJob_=0,rendererReadyTick_=0;
     std::unordered_map<uint64_t,uint64_t> readReadyTicks_;
     Json transportEvents_=Json::array();
-    static DlVec3 V(const Json& row){return {row.at(0),row.at(1),row.at(2)};}
+    static DlVec3 V(const Json& row){if(!row.is_array()||row.size()!=3)throw std::runtime_error("Expected shared XYZ vector");
+        DlVec3 p{row.at(0),row.at(1),row.at(2)};if(!std::isfinite(p.x)||!std::isfinite(p.y)||!std::isfinite(p.z))throw std::runtime_error("Non-finite shared vector");return p;}
     static void Check(DlStreamCoordinatorStatus status){if(status!=DL_COORDINATOR_OK)throw std::runtime_error(std::string("Native stream: ")+dl_stream_coordinator_status_name(status));}
     static size_t Read(void* context,uint32_t offset,void* target,size_t size) {
         auto& self=*static_cast<DlStreamPlay*>(context);

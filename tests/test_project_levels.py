@@ -574,6 +574,31 @@ class ProjectLevelTests(unittest.TestCase):
         self.assertTrue((Path(result["asset_root"]) / result["scene_path"]).exists())
         self.assertFalse(result["native_play_supported"])
 
+    def test_target_invalid_portable_cook_preserves_diagnostics_and_removes_play_package(self):
+        self.stream_fixture()
+        valid = self.project.cook("streaming_probe.json")
+        output = Path(valid["output"])
+        self.assertTrue((output / "generated/play.json").exists())
+        # A legacy one-region package is portable-valid, but cannot run through
+        # the two-region bridge. No source geometry or dependency is invalid.
+        self.stream_manifest["regions"] = [dict(id="west", bounds=[[-8,-.5,-4],[8,4,4]],
+            entities=[row["id"] for row in self.stream_source["entities"]], neighbors=[])]
+        self.write("streaming_probe.mission.json", self.stream_manifest)
+        result = self.project.cook("streaming_probe.json")
+        self.assertTrue(result["streaming"]["status"]["portable_valid"])
+        self.assertFalse(result["streaming"]["status"]["rom_valid"])
+        self.assertFalse(result["report"]["playable"])
+        self.assertFalse((output / "generated/play.json").exists())
+        portable = json.loads((output / "generated/mission_report.json").read_bytes())
+        bridge = portable["bridge_diagnostics"]
+        self.assertFalse(bridge["valid"])
+        self.assertEqual(bridge, result["streaming"]["bridge_diagnostics"])
+        self.assertEqual(bridge, result["report"]["bridge_diagnostics"])
+        self.assertEqual(portable["renderer_diagnostics"], result["report"]["renderer_diagnostics"])
+        self.assertTrue(any(row["metric"] == "region_count" for row in bridge["failures"]))
+        self.assertTrue(all(row["anchor"] and row["contributors"] for row in bridge["failures"]))
+        self.assertTrue((Path(result["asset_root"]) / result["scene_path"]).exists())
+
     def paired_drafts(self):
         self.stream_fixture()
         source = self.root / "scene-draft.json"

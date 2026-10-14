@@ -116,7 +116,7 @@
         if(!capacity.is_object()){ImGui::TextDisabled("%s capacity: validate or recook to obtain a witness",label);return;}
         ImGui::Text("%s capacity witness",label);
         ImGui::Text("Regions %u / 5 | triangles %u / 1440 | groups %u / 64",unsigned(capacity.value("regions",Json::array()).size()),capacity.value("triangle_count",0u),capacity.value("group_count",0u));
-        ImGui::Text("Colliders + barriers %u / 400 | floors %u / 128",capacity.value("collider_count",0u)+capacity.value("barrier_count",0u),capacity.value("floor_count",0u));
+        ImGui::Text("Boxes + floors + barriers %u / 400 | floors %u / 128",capacity.value("collider_count",0u)+capacity.value("floor_count",0u)+capacity.value("barrier_count",0u),capacity.value("floor_count",0u));
         ImGui::Text("Models %u / 128 | decoded chunks %u bytes",capacity.value("model_count",0u),capacity.value("chunk_bytes",0u));
     }
     void DrawStreamPreviewControls() {

@@ -9,11 +9,12 @@ from tools import runtime_inspector as inspector
 
 BUILD = 'a'*64
 PACKAGE = 'b'*64
+SOURCE = 'd'*64
 
 
 def debug_map():
     return dict(schema_version=1, build_id=BUILD, rom_sha256=hashlib.sha256(b'ROM').hexdigest(), levels=[dict(
-        id='doorway-fixture', package_sha256=PACKAGE, content_identity_sha256='c'*64,
+        id='doorway-fixture', package_sha256=PACKAGE, content_identity_sha256='c'*64, source_sha256=SOURCE,
         regions=[dict(id=1, source_id='west', bounds=[[-5, -1, -5], [0.1, 3, 5]], chunk_bytes=100),
                  dict(id=2, source_id='east', bounds=[[0, -1, -5], [5, 3, 5]], chunk_bytes=100)],
         transitions=[dict(index=0, id='west-to-east', from_region=1, to_region=2,
@@ -82,6 +83,13 @@ def complete_capture():
     return capture
 
 
+def lighting_capture(report=1, *, doors=1, mode='inline_two_state', reason='inline_payload', phase='publication'):
+    return (f'DL64 lighting_policy version=1 report={report} phase={phase} build={BUILD} source={SOURCE} '
+            f'package={PACKAGE} standalone=unconfigured doors={doors} revision=3 published=1 door_revision=0 models=4 cases=1\n'
+            f'DL64 lighting_case version=1 report={report} mode={mode} reason={reason} models=4 triangles=48\n'
+            f'DL64 lighting_policy_cost version=1 report={report} ticks=23 ticks_per_second=1000 scope=policy_rows_and_transport\n')
+
+
 class RuntimeInspectorTests(unittest.TestCase):
     def report(self, capture, mapping=None):
         text = capture.text() if isinstance(capture, Capture) else capture
@@ -100,6 +108,80 @@ class RuntimeInspectorTests(unittest.TestCase):
         self.assertFalse(slot['rdp_owned'])
         self.assertEqual(slot['pins'], 2)
         self.assertEqual(session['level']['entities'][0]['source_provenance']['object_id'], 44)
+
+    def test_lighting_records_before_trace_keep_exact_identity_and_measured_transport_scope(self):
+        report = self.report(lighting_capture()+complete_capture().text())
+        self.assertTrue(report['complete'], report['diagnostics'])
+        row = report['lighting_reports'][0]
+        self.assertEqual((row['build'], row['source'], row['package']), (BUILD, SOURCE, PACKAGE))
+        self.assertEqual(row['basis'], 'runtime_observation')
+        self.assertEqual(row['cases'][0]['path'], 'baked')
+        self.assertEqual((row['cases'][0]['models'], row['cases'][0]['triangles']), (4, 48))
+        self.assertEqual(row['cost']['basis'], 'measured_elapsed')
+        self.assertEqual(row['cost']['elapsed_ms'], 23)
+        self.assertIsNone(row['cost']['active_cpu_ms'])
+        self.assertIsNone(row['measured_runtime_allocation_bytes'])
+        self.assertNotIn('time', row)
+
+    def test_diagnostics_only_capture_supports_independent_door_fallback_and_change_rows(self):
+        report = self.report(lighting_capture(doors=2, mode='live_night', reason='independent_doors')+
+            lighting_capture(2, doors=2, mode='live_night', reason='independent_doors', phase='lighting_change'))
+        self.assertTrue(report['complete'])
+        self.assertEqual(report['sessions'], [])
+        self.assertEqual([row['cases'][0]['path'] for row in report['lighting_reports']], ['fallback', 'fallback'])
+        with tempfile.TemporaryDirectory() as directory:
+            output = Path(directory)/'lighting.html'
+            inspector.write_html(output, report)
+            html = output.read_text(encoding='utf-8')
+        self.assertIn('Renderer lighting paths', html)
+        self.assertIn('if(!session)', html)
+        self.assertIn('independent_doors', html)
+
+    def test_lighting_stale_build_source_package_and_unknown_decisions_are_rejected(self):
+        text = lighting_capture()
+        variants = [text.replace(BUILD, 'e'*64), text.replace(SOURCE, 'e'*64), text.replace(PACKAGE, 'e'*64),
+                    text.replace('mode=inline_two_state', 'mode=approximate'),
+                    text.replace('reason=inline_payload', 'reason=unspecified'),
+                    text.replace('report=1 mode=', 'report=2 mode='),
+                    text.replace('scope=policy_rows_and_transport', 'scope=frame_cpu')]
+        for variant in variants:
+            with self.subTest(text=variant), self.assertRaises(inspector.TraceError):
+                self.report(variant)
+
+    def test_missing_or_truncated_lighting_rows_preserve_incomplete_report(self):
+        text = lighting_capture()
+        for variant in ('\n'.join(text.splitlines()[:1])+'\n',
+                        '\n'.join(text.splitlines()[:2])+'\n', text.rstrip('\n'),
+                        text.replace('models=4 triangles=48', 'models=3 triangles=48')):
+            with self.subTest(text=variant):
+                report = self.report(variant)
+                self.assertFalse(report['complete'])
+                self.assertFalse(report['lighting_reports'][0]['complete'])
+                self.assertIn('incomplete_lighting_report', {row['code'] for row in report['diagnostics']})
+
+    def test_duplicate_or_out_of_order_lighting_buckets_are_rejected(self):
+        text = lighting_capture()
+        header, case, cost = text.splitlines(keepends=True)
+        for variant in (text+text, header+case+case+cost, case+header+cost,
+                        header+case+cost+case, header.replace('cases=1', 'cases=2')+case+case+cost):
+            with self.subTest(text=variant), self.assertRaises(inspector.TraceError):
+                self.report(variant)
+
+    def test_lighting_change_cached_runtime_states_remain_distinct_from_baked_assets(self):
+        report = self.report(lighting_capture(mode='live_night', reason='night_without_bake')+
+            lighting_capture(2, mode='runtime_two_state', reason='cached_single_door_states', phase='lighting_change'))
+        modes = [row['cases'][0]['mode'] for row in report['lighting_reports']]
+        self.assertEqual(modes, ['live_night', 'runtime_two_state'])
+        self.assertEqual([row['cases'][0]['path'] for row in report['lighting_reports']], ['live', 'live'])
+
+    def test_resident_renderer_source_identity_is_distinct_from_dependency_aware_cook_hash(self):
+        mapping = dict(schema_version=1, build_id=BUILD, levels=[dict(id='resident',
+            package_sha256=None, source_sha256='e'*64, renderer_source_sha256=SOURCE)])
+        text = lighting_capture().replace(f'package={PACKAGE}', 'package=none').replace('published=1', 'published=0')
+        report = self.report(text, mapping)
+        self.assertTrue(report['complete'])
+        self.assertEqual(report['lighting_reports'][0]['level_id'], 'resident')
+        self.assertEqual(report['lighting_reports'][0]['source'], SOURCE)
 
     def test_elapsed_publication_span_is_distinct_from_cpu_distributed_audio_and_commit(self):
         report = self.report(complete_capture())

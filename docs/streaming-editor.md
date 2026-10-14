@@ -73,6 +73,61 @@ a valid portable partition from one that fits the current ROM bridge; a
 bridge-capacity failure keeps the authoring preview available and prevents ROM
 publication.
 
+The **Build & Diagnostics** panel separates a cooked renderer prediction from
+the shared target policy evaluated on a currently published runtime bank. It
+shows the independent door count before Play. A second independently controlled
+door disables the embedded closed/open shortcut: one Boolean cannot describe
+all four combinations, so ordinary streamed static models use `live_night`
+with reason `independent_doors`. A single door can use `inline_two_state` with
+reason `inline_payload`. Guards, animated meshes and objectives retain their
+own live paths. A rejected standalone bake or an incomplete inline payload has
+its own fallback reason; a cache prepared live for a single door is reported
+as `runtime_two_state` on later changes. The host preview displays the shared
+policy decision; ROM logs establish which target renderer path actually ran.
+These rows describe publication/preparation and door-revision policy. Steady
+frame animation/probe details vary by backend and remain unmeasured; a cooked
+bucket does not establish that per-frame workload.
+
+Each renderer bucket reports affected model and triangle counts. Cooked group
+rows retain their region, material and contributing source object IDs. Capacity
+maxima and failures retain the activation anchor, directed gates, constituent
+regions, groups, objects, usage and cap. Selecting a region or gate focuses its
+Streaming controls; selecting a group or object focuses the authored source
+geometry. An invalid target capacity remains an editable authoring draft with
+these witnesses, while runtime admission rejects it. Group navigation requires
+a current cook. Source region/object navigation can still guide a stale draft
+to repair without treating its old capacity report as current.
+
+Diagnostics bind their canonical source and saved source/dependency hashes to
+the cooked package. Saved ROM diagnostics also bind the actual build identity.
+Scene, partition or imported asset edits invalidate the corresponding report;
+**Refresh draft diagnostics** recomputes it. A stale report cannot certify a modified
+draft. ROM package storage includes embedded RGBA exactly once. Bootstrap
+constant arrays, fixed scene banks, slot buffers and renderer caches occupy
+separate resident allocations. The host lighting worker cache is excluded from
+target ROM/RAM totals. Cooked values are estimates, live policy rows are
+observations, and ROM timing/heap samples are measurements. Missing audio,
+display, code, renderer and allocator categories remain explicitly unknown.
+
+The actual-editor verification uses primitive lit single-door and independent
+two-door fixtures, source witness navigation, stale report rejection, an
+editable six-slot capacity failure and imported dependency changes:
+
+```powershell
+python tools/verify_render_diagnostics.py --editor editor/bazel-bin/darklantern64_project_editor.exe
+```
+
+Without `--editor`, the tool decodes both real cooked packages through the shared
+coordinator and compares their predictions with the same C policy helper used
+by the renderer, including every door combination. It records host executable,
+source and package hashes; those host checks do not establish target timing.
+`python tools/verify_native_lighting_metadata.py` verifies the actual Native
+loader's bounded arrays and color ownership, rejects fourteen malformed
+metadata cases, and verifies a valid package again after rejection.
+The [diagnostics evidence](evidence/render-diagnostics.json) includes actual
+editor navigation/stale-capacity tests, both Tiny3D fixture replays, Native
+parity, saved ROM hash checks and the complete measured performance comparison.
+
 Textured region chunks retain evaluated UVs and normals. Shared texture sprites
 use the ordinary texture cooker and active-level renderer lifetime; they are
 not yet evicted by region. The manifest's optional `visibility` chooses the

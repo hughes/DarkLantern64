@@ -1,4 +1,5 @@
 #include "static_lighting.h"
+#include "lighting_policy.h"
 #include "render_shading.h"
 #include "content_limits.h"
 #include <math.h>
@@ -14,11 +15,7 @@ static bool finite3(DlVec3 p){return isfinite(p.x)&&isfinite(p.y)&&isfinite(p.z)
 static float clampf(float v,float lo,float hi){return v<lo?lo:v>hi?hi:v;}
 
 bool dl_static_lighting_eligible(const DlLevel *level,int index){
-    if(!level||!level->environment.enabled||!level->models||!level->meshes||
-       index<0||index>=level->model_count)return false;
-    const DlModelInstance *model=&level->models[index];
-    return model->mesh<level->mesh_count&&model->role!=DL_MODEL_GUARD&&
-        model->role!=DL_MODEL_OBJECTIVE&&!level->meshes[model->mesh].animation;
+    return dl_lighting_static_eligible(level,index);
 }
 
 /* Keep the arithmetic and its grouping identical to render.c's legacy

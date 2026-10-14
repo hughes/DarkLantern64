@@ -22,6 +22,9 @@ uint32_t dl_stream_rom_service_stage(void);
 bool dl_stream_rom_settled(void);
 uint32_t dl_stream_rom_view_mask(void);
 void dl_stream_rom_snapshot(const DlGame *game, DlStreamCoordinatorSnapshot *snapshot);
+/* Renderer commit observes the new published bank before view_regions is
+ * updated by the coordinator. Return that bank's exact ownership identity. */
+void dl_stream_rom_lighting_view(const DlGame *game,uint32_t *revision,uint32_t *mask);
 /* Foreground log transport. Compile-time disabled in ordinary builds. */
 void dl_stream_rom_trace_flush(void);
 void dl_stream_rom_trace_poll(void); /* maintain extended clock during menus */

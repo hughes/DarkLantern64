@@ -17,6 +17,13 @@ EVENTS = {'request', 'read_progress', 'read_complete', 'resident', 'failed', 'ca
           'candidate_cancel', 'demand', 'motion', 'interaction'}
 STAGES = {0: 'read', 1: 'assembly', 2: 'gpu', 3: 'publication'}
 HEX = re.compile(r'^[0-9a-f]{64}$')
+LIGHTING_MODES = {'inline_two_state', 'standalone_baked', 'live_night', 'actor_body_probes',
+                  'objective_probe', 'legacy_scalar', 'legacy_actor_probes',
+                  'legacy_objective_emissive', 'runtime_two_state', 'invalid'}
+LIGHTING_REASONS = {'inline_payload', 'standalone_asset', 'independent_doors', 'guard',
+                    'objective', 'animated_mesh', 'night_without_bake', 'legacy_environment',
+                    'disabled_build', 'standalone_rejected', 'incomplete_inline_payload',
+                    'cached_single_door_states', 'invalid_model'}
 
 
 class TraceError(ValueError):
@@ -108,6 +115,95 @@ def validate_map(mapping):
             require(isinstance(gate.get('id'), str) and gate.get('from_region') in range(1, len(regions)+1) and
                     gate.get('to_region') in range(1, len(regions)+1), 'Debug map: invalid gate mapping')
     return mapping
+
+
+def parse_lighting_records(text, mapping):
+    """Read bounded renderer reports, including those emitted before rt_begin.
+
+    A header binds its buckets and measured transport cost to actual source,
+    package and build bytes. These reports have no frame clock: log-line order
+    is retained instead of inventing a runtime trace timestamp.
+    """
+    reports, diagnostics, current = [], [], None
+    seen = set()
+
+    def finding(code, message, line):
+        diagnostics.append(dict(code=code, message=message, line=line,
+                                lighting_report=current['report'] if current else None))
+
+    def finish():
+        if current is None:
+            return
+        current['complete'] = (len(current['cases']) == current['case_count'] and
+                               sum(row['models'] for row in current['cases']) == current['models'] and
+                               current['cost'] is not None)
+        if not current['complete']:
+            finding('incomplete_lighting_report',
+                    f"Renderer report {current['report']} lacks its declared buckets, model total or cost trailer",
+                    current['line'])
+
+    for line, raw in enumerate(text.splitlines(keepends=True), 1):
+        match = re.match(r'^DL64 (lighting_policy|lighting_case|lighting_policy_cost)(?:\s|$)', raw.strip())
+        if not match:
+            continue
+        if not raw.endswith(('\n', '\r')):
+            finding('partial_lighting_line', 'Unfinished renderer diagnostic record was excluded', line)
+            break
+        kind, record = match.group(1), fields(raw.strip()[match.end():], line)
+        numbers(record, {'version', 'report'}, line)
+        require(record['version'] == 1, f'line {line}: unsupported lighting report version')
+        record['line'] = line
+        if kind == 'lighting_policy':
+            finish()
+            numbers(record, {'doors', 'revision', 'published', 'door_revision', 'models', 'cases'}, line)
+            require(record.get('phase') in ('publication', 'lighting_change'),
+                    f'line {line}: unknown lighting report phase')
+            require(record.get('build') == mapping['build_id'],
+                    f'line {line}: stale debug map: lighting build identity differs')
+            require(isinstance(record.get('source'), str) and HEX.fullmatch(record['source']),
+                    f'line {line}: lighting report has no exact source SHA-256')
+            choices = [level for level in mapping['levels'] if
+                       (level.get('renderer_source_sha256') or
+                        (level.get('renderer_diagnostics') or {}).get('identity', {}).get('renderer_source_sha256') or
+                        level.get('source_sha256')) == record['source'] and
+                       (level.get('package_sha256') or 'none') == record.get('package')]
+            require(len(choices) == 1, f'line {line}: stale/ambiguous debug map: lighting package/source identity differs')
+            key = (record['build'], record['report'])
+            require(key not in seen, f'line {line}: repeated lighting report ID')
+            seen.add(key)
+            require(record['published'] & ~((1 << len(choices[0].get('regions', [])))-1) == 0,
+                    f'line {line}: lighting report references unmapped region')
+            require(record['cases'] <= record['models'], f'line {line}: lighting bucket count exceeds model count')
+            require('standalone' in record, f'line {line}: lighting report missing standalone bake result')
+            current = dict(record, level_id=choices[0]['id'], case_count=record['cases'], cases=[],
+                           cost=None, basis='runtime_observation', measured_runtime_allocation_bytes=None)
+            reports.append(current)
+        else:
+            require(current is not None, f'line {line}: lighting bucket/cost before header')
+            require(record['report'] == current['report'], f'line {line}: lighting report ID differs from header')
+            require(current['cost'] is None, f'line {line}: lighting record after cost trailer')
+            if kind == 'lighting_case':
+                numbers(record, {'models', 'triangles'}, line)
+                require(record.get('mode') in LIGHTING_MODES and record.get('reason') in LIGHTING_REASONS,
+                        f'line {line}: unknown lighting mode/reason')
+                require(record['models'] > 0, f'line {line}: empty lighting bucket')
+                require(len(current['cases']) < current['case_count'], f'line {line}: excess lighting buckets')
+                require(not any(row['mode'] == record['mode'] and row['reason'] == record['reason']
+                                for row in current['cases']), f'line {line}: repeated lighting bucket')
+                record['path'] = ('invalid' if record['mode'] == 'invalid' else
+                                  'baked' if record['mode'] in ('inline_two_state', 'standalone_baked') else
+                                  'fallback' if record['reason'] in ('independent_doors', 'disabled_build',
+                                      'standalone_rejected', 'incomplete_inline_payload') else 'live')
+                current['cases'].append(record)
+            else:
+                numbers(record, {'ticks', 'ticks_per_second'}, line)
+                require(record['ticks_per_second'] > 0 and record.get('scope') == 'policy_rows_and_transport',
+                        f'line {line}: invalid lighting diagnostic cost scope/rate')
+                current['cost'] = dict(record, basis='measured_elapsed',
+                    elapsed_ms=record['ticks']*1000/record['ticks_per_second'],
+                    active_cpu_ms=None, note='Elapsed policy rows and transport; includes interrupts and excludes the cost row itself.')
+    finish()
+    return reports, diagnostics
 
 
 def parse_trace(text, mapping):
@@ -402,7 +498,15 @@ def make_report(log_bytes, mapping, source_path, *, map_path=None, rom_bytes=Non
     if rom_bytes is not None:
         require(mapping.get('rom_sha256') == hashlib.sha256(rom_bytes).hexdigest(),
                 'Stale debug map: supplied ROM SHA-256 differs')
-    sessions, diagnostics = parse_trace(log_bytes.decode('utf-8', errors='replace'), mapping)
+    text = log_bytes.decode('utf-8', errors='replace')
+    validate_map(mapping)
+    lighting_reports, lighting_findings = parse_lighting_records(text, mapping)
+    if re.search(r'^DL64 rt_', text, re.MULTILINE):
+        sessions, diagnostics = parse_trace(text, mapping)
+    else:
+        require(lighting_reports, 'No runtime trace or renderer diagnostics found. Capture a play session.')
+        sessions, diagnostics = [], []
+    diagnostics.extend(lighting_findings)
     for session in sessions:
         session['jobs'] = job_report(session, diagnostics)
         rate = session['ticks_per_second']
@@ -423,13 +527,20 @@ def make_report(log_bytes, mapping, source_path, *, map_path=None, rom_bytes=Non
                 row['max_elapsed_ms'] = max(row['max_elapsed_ms'], cost['elapsed']*1000/rate)
         session['stage_totals'] = totals
     return dict(schema_version=1, complete=not diagnostics, diagnostics=diagnostics, sessions=sessions,
+                lighting_reports=lighting_reports,
+                source_resource_reports=[dict(level=level['id'], package_sha256=level.get('package_sha256'),
+                    renderer_prediction=level.get('renderer_diagnostics'), bridge_estimate=level.get('bridge_diagnostics'))
+                    for level in mapping['levels']],
                 source_log=str(Path(source_path).resolve()), source_log_sha256=hashlib.sha256(log_bytes).hexdigest(),
                 source_log_bytes=len(log_bytes), debug_map=str(Path(map_path).resolve()) if map_path else None,
                 build_id=mapping['build_id'], rom_sha256=mapping.get('rom_sha256'),
                 limitations=['Imported emulator trace; original hardware timing is not established.',
                     'Request-to-publication latency is an elapsed span, separate from active service CPU/audio/stage costs.',
                     'Snapshot completeness is verified; state between snapshots is observed only through emitted events.',
-                    'An unfinished or overflowed trace remains explicitly incomplete.'])
+                    'An unfinished or overflowed trace remains explicitly incomplete.',
+                    'Renderer policy reports use capture-line order, not invented frame timestamps; measured policy transport excludes its cost row.',
+                    'Policy buckets classify preparation and lighting revisions; backend-specific steady animation/probe work and visible per-frame counts remain unmeasured.',
+                    'ROM storage and resident-array values in cook reports are estimates; absent runtime allocation measurements remain unknown.'])
 
 
 def write_html(path, report):
@@ -455,23 +566,28 @@ HTML = r'''<!doctype html>
 <main><section class="panel"><h2>Authored regions and gates</h2><canvas id="map" width="760" height="380"></canvas><p class="small legend">Blue fill: published · amber border: wanted · green border: physical · dashed white: candidate · pink: pending gate · white dot: player · arrow: last requested movement. X/Z metres.</p><div id="state"></div></section>
 <section class="panel"><h2>Slot progress and ownership</h2><div id="slots"></div><h2>Gate motion and interaction</h2><div id="objects"></div><div id="extra"></div></section>
 <section class="panel full"><h2>Request → publication</h2><p class="small">Elapsed latency measures waiting plus distributed work. Service CPU, audio and commit are attributed separately. Cancelled candidates retain their actual outcome.</p><div id="jobs" class="scroll"></div><h2>Service stage totals</h2><div id="costs"></div><p id="overhead" class="small"></p></section>
+<section class="panel full"><h2>Renderer lighting paths</h2><p class="small">Observed publication and lighting-change decisions, bound to source/package/build identity. Policy transport is measured elapsed time, including interrupts; runtime allocation remains unknown unless measured separately.</p><div id="lighting" class="scroll"></div><details><summary>Exact lighting records and source resource witnesses</summary><pre id="lighting-raw"></pre></details></section>
 <section class="panel full"><div class="bar"><h2>Events and service costs</h2><input id="filter" aria-label="Filter events" placeholder="Filter: gate, region, reason…"><label><input id="near" type="checkbox"> ±1 second around snapshot</label></div><div id="events" class="scroll"></div><details><summary>Selected event: exact captured fields</summary><pre id="raw"></pre></details></section>
 <section class="panel full"><details><summary>Capture provenance and limitations</summary><pre id="provenance"></pre></details><details><summary>Completeness findings</summary><div id="findings"></div></details></section></main>
 <script type="application/json" id="data">__REPORT__</script><script>
 const report=JSON.parse(document.getElementById('data').textContent), $=id=>document.getElementById(id), esc=v=>String(v??'—').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-let session=report.sessions[0],snapshot=null,index=0;
+let session=report.sessions[0]||null,snapshot=null,index=0;
 const ms=t=>(t*1000/session.ticks_per_second).toFixed(3),names=m=>session.level.regions.filter(r=>m&(1<<(r.id-1))).map(r=>r.source_id).join(', ')||'none',table=(heads,rows)=>'<table><thead><tr>'+heads.map(h=>'<th>'+esc(h)+'</th>').join('')+'</tr></thead><tbody>'+rows.map(row=>'<tr>'+row.map(c=>'<td>'+c+'</td>').join('')+'</tr>').join('')+'</tbody></table>';
 $('status').innerHTML='<span class="badge '+(report.complete?'':'bad')+'">'+(report.complete?'Complete capture':'Incomplete capture — '+report.diagnostics.length+' finding(s)')+'</span>';
 $('sessions').innerHTML=report.sessions.map((s,i)=>'<option value="'+i+'">'+esc(s.level.id)+' · session '+s.session+'</option>').join('');
 $('findings').innerHTML=report.diagnostics.length?'<ul>'+report.diagnostics.map(d=>'<li>'+esc(d.code)+': '+esc(d.message)+(d.line?' (log line '+d.line+')':'')+'</li>').join('')+'</ul>':'All captured sequences, session end markers and slot snapshots are complete.';
 $('provenance').textContent=JSON.stringify({source_log:report.source_log,source_log_sha256:report.source_log_sha256,build_id:report.build_id,rom_sha256:report.rom_sha256,debug_map:report.debug_map,limitations:report.limitations},null,2);
+const lighting=report.lighting_reports||[];
+$('lighting').innerHTML=lighting.length?table(['Report / source level','Phase / published mask','Observed path and reason','Affected models / triangles','Measured policy transport'],lighting.map(r=>[esc(r.report+' · '+r.level_id),esc(r.phase+' · '+r.published),r.cases.map(c=>esc(c.path+' · '+c.mode+' · '+c.reason)).join('<br>'),r.cases.map(c=>esc(c.models+' / '+c.triangles)).join('<br>'),esc(r.cost?r.cost.elapsed_ms.toFixed(3)+' ms; active CPU unknown':'unknown; incomplete')])):'No renderer lighting reports captured; decisions and transport cost are unknown.';
+$('lighting-raw').textContent=JSON.stringify({reports:lighting,source_resource_witnesses:report.source_resource_reports||[]},null,2);
+if(!session){for(const id of ['sessions','prev','scrub','next','filter','near'])$(id).disabled=true;$('clock').textContent='Renderer diagnostics only; no streaming timeline captured.';}
 function draw(){const c=$('map'),ctx=c.getContext('2d');ctx.clearRect(0,0,c.width,c.height);const regions=session.level.regions,bounds=regions.filter(r=>r.bounds).map(r=>r.bounds);if(!bounds.length)return;
 const lo=[Math.min(...bounds.map(b=>b[0][0])),Math.min(...bounds.map(b=>b[0][2]))],hi=[Math.max(...bounds.map(b=>b[1][0])),Math.max(...bounds.map(b=>b[1][2]))],scale=Math.min((c.width-50)/(hi[0]-lo[0]),(c.height-45)/(hi[1]-lo[1])),point=(x,z)=>[25+(x-lo[0])*scale,c.height-25-(z-lo[1])*scale];
 function rect(b,color,width=1,dash=[],fill=null){const a=point(b[0][0],b[1][2]),d=point(b[1][0],b[0][2]);ctx.setLineDash(dash);ctx.lineWidth=width;ctx.strokeStyle=color;if(fill){ctx.fillStyle=fill;ctx.fillRect(a[0],a[1],d[0]-a[0],d[1]-a[1]);}ctx.strokeRect(a[0],a[1],d[0]-a[0],d[1]-a[1]);ctx.setLineDash([]);}
 regions.forEach(r=>{if(!r.bounds)return;const bit=1<<(r.id-1);rect(r.bounds,'#46616c',1,[],snapshot&&snapshot.published&bit?'#234765':'#152129');if(snapshot&&snapshot.physical&bit)rect(r.bounds,'#70c79f',2);if(snapshot&&snapshot.wanted&bit)rect(r.activation_bounds||r.bounds,'#ffc168',2);if(snapshot&&snapshot.candidate&bit)rect(r.bounds,'#ecf3f5',2,[5,4]);const p=point((r.bounds[0][0]+r.bounds[1][0])/2,(r.bounds[0][2]+r.bounds[1][2])/2);ctx.fillStyle='#dce6eb';ctx.font='12px system-ui';ctx.fillText(r.source_id,p[0],p[1]);});
 (session.level.transitions||[]).forEach(g=>{if(g.bounds)rect(g.bounds,snapshot&&g.index+1===snapshot.gate?'#ff8cbe':'#75556e',snapshot&&g.index+1===snapshot.gate?4:1);});if(snapshot){const p=point(snapshot.player[0],snapshot.player[2]);ctx.beginPath();ctx.fillStyle='#fff';ctx.arc(...p,5,0,Math.PI*2);ctx.fill();const motion=session.motions.filter(e=>e.seq<=snapshot.seq).at(-1);if(motion){const norm=Math.hypot(motion.delta[0],motion.delta[2]);if(norm>0){ctx.beginPath();ctx.moveTo(...p);ctx.lineTo(p[0]+motion.delta[0]/norm*18,p[1]-motion.delta[2]/norm*18);ctx.strokeStyle='#fff';ctx.stroke();}}}ctx.fillStyle='#a5b8c0';ctx.fillText('X →',c.width-42,c.height-5);ctx.fillText('Z ↑',6,16);}
 function objectName(entity){return entity?entity.source_id:'unmapped';}
-function render(){snapshot=session.snapshots[index]||null;$('scrub').max=Math.max(0,session.snapshots.length-1);$('scrub').value=Math.max(0,index);$('clock').textContent=snapshot?ms(snapshot.time)+' ms · seq '+snapshot.seq:'No preceding state snapshot';
+function render(){if(!session)return;snapshot=session.snapshots[index]||null;$('scrub').max=Math.max(0,session.snapshots.length-1);$('scrub').value=Math.max(0,index);$('clock').textContent=snapshot?ms(snapshot.time)+' ms · seq '+snapshot.seq:'No preceding state snapshot';
 if(snapshot){const gate=(session.level.transitions||[]).find(g=>g.index+1===snapshot.gate);$('state').innerHTML=table(['State','Authored identity'],[['Current',esc(session.level.regions.find(r=>r.id===snapshot.current)?.source_id)],['Wanted',esc(names(snapshot.wanted))],['Physical',esc(names(snapshot.physical))],['Published',esc(names(snapshot.published))],['Candidate',esc(names(snapshot.candidate))],['Pending gate',esc(gate?.id||'none')],['Readiness',esc('prepare='+snapshot.preparing+' CPU='+snapshot.cpu_ready+' GPU='+snapshot.gpu_ready+' revision='+snapshot.revision)],['Snapshot',snapshot.complete?'Complete':'<strong>Incomplete slot rows</strong>']]);
 $('slots').innerHTML=table(['Slot / generation','Region','State / read','CPU pins','Graphics ownership'],snapshot.slots.map(s=>[esc(s.slot+' / '+s.generation),esc(session.level.regions.find(r=>r.id===s.region)?.source_id||'none'),esc(s.state+' · '+s.bytes+'/'+s.total+' bytes'),esc(s.pins),esc('RSP '+s.rsp+(s.rsp_owned?' pending':' complete')+'; RDP '+s.rdp+(s.rdp_owned?' pending':' complete'))]));
 const motion=session.motions.filter(e=>e.seq<=snapshot.seq).at(-1),interaction=session.interactions.filter(e=>e.seq<=snapshot.seq).at(-1),motionGate=motion?(session.level.transitions||[]).find(g=>g.index+1===motion.gate):null;let rows=[];if(motion){rows.push(['Motion at '+ms(motion.time)+' ms',esc((motionGate?.id||'no authored gate')+' · '+motion.direction)],['Required view',esc(names(motion.required))],['Readiness',esc(motion.readiness)],['Missing physical / published',esc(names(motion.missing_physical)+' / '+names(motion.missing_published))],['Input',esc('gate waiting='+motion.waiting+' horizontal suppressed='+motion.suppressed+' jump suppressed='+motion.jump)]);}if(interaction){rows.push(['Interaction at '+ms(interaction.time)+' ms',esc(interaction.object_source_id)],['Admission',esc('eligible='+interaction.eligible+' in range='+interaction.in_range+' raw LOS clear='+interaction.raw_clear+' effective LOS clear='+interaction.effective_clear+' reason='+interaction.reason+' suppressed='+interaction.suppressed)],['Blocking source',esc(interaction.kind+' · '+(interaction.blocker_source_id||'none')+' region='+interaction.source_region+' record='+interaction.source_record+' gate='+interaction.source_gate)],['Associated object',esc(objectName((session.level.entities||[]).find(e=>e.object_index===interaction.associated_object)))]);} $('objects').innerHTML=rows.length?table(['Last diagnostic','Captured observation'],rows):'No input/query diagnostic captured before this snapshot.';

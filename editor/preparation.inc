@@ -19,6 +19,7 @@
     }
     void ApplyPreparedPreview(const Json& cooked) {
         InvalidatePreviewAssets(cooked);report_=cooked.at("report");
+        AdoptDiagnostics(AuthorSnapshot());
         const std::string fingerprint=cooked.value("preview_fingerprint",std::string());
         if(fingerprint.empty()||fingerprint!=loadedPreviewFingerprint_)ReloadPreviewKeepingCamera();
         loadedPreviewFingerprint_=fingerprint;
